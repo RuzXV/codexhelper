@@ -1,0 +1,163 @@
+.navbar {
+  @include flex-between;
+  background-color: $dark-bg;
+  position: fixed;
+  display: flex;
+  place-items: center;
+  width: 100%;
+  max-width: 78rem;
+  border-radius: 30px;
+  padding: 15px 20px;
+  margin-top: 30px;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+  .navbar-logo {
+    @include flex-center;
+    height: 4.5rem;
+    gap: 10px;
+  }
+
+  .nav-toggle {
+    display: none;
+  }
+
+  .nav-toggle-label {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 20px;
+    cursor: pointer;
+    z-index: 1001;
+
+    span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background-color: $text-color;
+      transition: all 0.3s ease-in-out;
+      border-radius: 2px;
+    }
+  }
+
+  .navbar-links {
+    ul {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+
+      li {
+        a {
+          font-size: 1.1rem;
+          padding: 5px 0;
+          position: relative;
+          transition: color 0.3s ease;
+          color: $light-text-color;
+
+          &:hover {
+            color: $text-color;
+          }
+
+          &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 0;
+            height: 2px;
+            background-color: $primary-color;
+            transition: width 0.3s ease;
+          }
+
+          &:hover::after,
+          &.active::after {
+            width: 100%;
+          }
+        }
+      }
+
+      .cta-buttons {
+        display: flex;
+        gap: 15px;
+
+        .btn {
+          @include button-styles($primary-color, $text-color);
+        }
+      }
+    }
+  }
+
+  /* Mobile Styles (Hamburger Menu) */
+  @media (max-width: 768px) {
+    padding: 1rem; // Adjust padding for smaller screens
+
+    .nav-toggle-label {
+      display: flex; // Show hamburger icon
+    }
+
+    .navbar-links {
+      position: absolute;
+      top: 100%; // Position below the navbar
+      left: 0;
+      width: 100%;
+      background-color: $light-bg;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      flex-direction: column;
+      transform: translateY(-100%); // Hide by default
+      transition: transform 0.3s ease-in-out;
+      opacity: 0;
+      pointer-events: none; // Prevent clicks when hidden
+
+      ul {
+        flex-direction: column;
+        padding: 20px 0;
+        gap: 15px; // Adjust gap for vertical links
+
+        li {
+          text-align: center;
+          width: 100%;
+
+          a {
+            padding: 10px 0; // More padding for clickability
+            display: block; // Make links full width
+            font-size: 1.2rem;
+
+            &::after {
+              // Hide underline on mobile for cleaner look or adjust
+              display: none;
+            }
+          }
+        }
+
+        .cta-buttons {
+          flex-direction: column; // Stack buttons vertically
+          gap: 10px;
+          margin-top: 10px; // Add some space above buttons
+        }
+      }
+    }
+
+    // When checkbox is checked, show the menu
+    .nav-toggle:checked ~ .navbar-links {
+      transform: translateY(0); // Slide in
+      opacity: 1;
+      pointer-events: all; // Enable clicks
+    }
+
+    // Hamburger icon animation when active
+    .nav-toggle:checked + .nav-toggle-label {
+      span {
+        &:nth-child(1) {
+          transform: translateY(8px) rotate(45deg);
+        }
+        &:nth-child(2) {
+          opacity: 0;
+        }
+        &:nth-child(3) {
+          transform: translateY(-8px) rotate(-45deg);
+        }
+      }
+    }
+  }
+}

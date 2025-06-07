@@ -1,0 +1,13 @@
+// Colors
+$primary-color: hsl(211, 95%, 52%);
+$secondary-color: hsl(206, 96%, 62%);
+$dark-bg: hsl(210, 44%, 4%);
+$light-bg: hsl(214, 41%, 7%);
+$text-color: hsl(0, 0%, 100%);
+$light-text-color: hsl(0, 0%, 80%);
+$accent-color: hsl(211, 96%, 54%);
+$hover-color: lighten($primary-color, 10%);
+
+// Fonts
+$font-stack: "Open Sans", sans-serif;
+$heading-font: "Montserrat", sans-serif;

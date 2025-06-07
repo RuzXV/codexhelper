@@ -1,0 +1,33 @@
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin button-styles($bg-color, $text-color: white) {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 17px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  cursor: pointer;
+
+  i {
+    margin-right: 8px;
+  }
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
