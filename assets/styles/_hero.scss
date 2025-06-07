@@ -1,4 +1,5 @@
 .hero-section {
+  margin-top: 90px;
   min-height: 70vh;
   @include flex-center;
   flex-direction: column;
@@ -12,7 +13,36 @@
     color: $primary-color;
   }
   .hero-banner {
-    padding: 1rem;
+    padding: 1rem; // Keeps padding consistent
+    // REMOVE or change the fixed width: 78rem;
+
+    // Use max-width to ensure it never exceeds its parent's width
+    max-width: 100%;
+
+    // Optional: Set a preferred width, but allow it to shrink
+    // For example, start with a large percentage or keep it at 78rem for very large screens
+    width: 78rem; // This sets its intended max size
+    display: block; // If it's an image, ensures it behaves correctly for max-width
+
+    // Essential for images to maintain aspect ratio when scaling
+    height: auto;
+
+    // Center it if it's smaller than its container
+    margin-left: auto;
+    margin-right: auto;
+
+    // Add media query for smaller screens if you want specific behavior
+    @media (max-width: 768px) {
+      // Adjust this breakpoint as needed
+      // You might want to remove specific padding or adjust other properties
+      // padding: 0.5rem; // Example: smaller padding on small screens
+      width: 100%; // Ensure it takes full width on smaller screens if you need it
+    }
+
+    @media (max-width: 480px) {
+      // Another common mobile breakpoint
+      // Further adjustments if necessary
+    }
   }
 
   p {
