@@ -1,55 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/assets/styles/style.css" />
+    <link rel="icon" href="/assets/images/tkc.png" type="image/png" />
     <title>Codex Helper Policies</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-            padding: 20px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            background-color: #f4f4f4;
-            color: #333;
-            text-align: center;
-        }
-        h1 {
-            color: #004cff;
-            border-bottom: 2px solid #004cff;
-            padding-bottom: 10px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            margin-bottom: 10px;
-        }
-        a {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #004cff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        a:hover {
-            background-color: #0033aa;
-        }
-    </style>
-</head>
-<body>
-    <h1>Codex Helper Bot Policies</h1>
-    <p>Welcome to the official policy pages for the Codex Helper Discord Bot.</p>
-    <ul>
-        <li><a href="privacy.html">Privacy Policy</a></li>
-        <li><a href="terms.html">Terms of Service</a></li>
-    </ul>
-    <p>If you have any questions, please visit our <a href="https://discord.gg/kingscodex">Discord Support Server</a>.</p>
-</body>
+  </head>
+  <body class="body-main">
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <img
+          src="/assets/images/logo.gif"
+          alt="The King's Codex"
+          class="navbar-logo" />
+      </div>
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" />
+      <label for="nav-toggle" class="nav-toggle-label">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+      <div class="navbar-links">
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#commands">Commands</a></li>
+          <li><a href="#features">Features</a></li>
+
+          <li class="cta-buttons">
+            <a
+              href="https://discord.gg/kingscodex"
+              target="_blank"
+              class="btn btn-discord">
+              <i class="fab fa-discord"></i> Support Server
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <header id="home" class="hero-section">
+      <h1>Codex Helper Bot</h1>
+      <p></p>
+      <a
+        href="https://discord.gg/kingscodex"
+        target="_blank"
+        class="btn btn-primary-hero"
+        >Invite Now</a
+      >
+    </header>
+    <section class="content-section">
+      <p>
+        Welcome to the official policy pages for the Codex Helper Discord Bot.
+      </p>
+      <ul>
+        <li><a href="/pages/privacy.html">Privacy Policy</a></li>
+        <li><a href="/pages/terms.html">Terms of Service</a></li>
+      </ul>
+    </section>
+    <section id="commands" class="content-section">
+      <h2>Commands</h2>
+      <p>
+        The current list of features of the bot are as follows: 
+        <p>All commander
+        talent trees/equipment/formations/pairings </p>Updated meta commander
+        pairings like kvk1/artifact kvks/ark of osiris/open field Consistently
+        rotated event guides & information Commonly seen bundle contents &
+        information Custom commands to track timers in kvk for
+        buffs/structures/shields or even flag costs
+      </p>
+    </section>
+
+    <section id="features" class="content-section">
+      <h2>Features</h2>
+      <p>Discover the amazing features of Your Bot Name.</p>
+    </section>
+    <section class="content-section">
+      <p>
+        If you have any questions, please visit our
+        <a href="https://discord.gg/kingscodex">Discord Support Server</a>.
+      </p>
+    </section>
+    <footer><p>&copy; 2025 The King's Codex. All rights reserved.</p></footer>
+    <script src="/scripts/main.js"></script>
+  </body>
 </html>
