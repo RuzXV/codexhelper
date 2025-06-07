@@ -17,9 +17,4 @@
     max-width: 800px;
     color: $light-text-color;
   }
-  .btn-primary-hero {
-    @include button-styles($primary-color, $text-color);
-    padding: 15px 30px;
-    font-size: 1.2rem;
-  }
 }
