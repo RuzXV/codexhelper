@@ -14,10 +14,18 @@
   .hero-banner {
     padding: 1rem;
   }
+
   p {
     font-size: 1.3rem;
     margin-bottom: 2rem;
     max-width: 800px;
     color: $light-text-color;
+  }
+  .btn-primary-hero {
+    display: flex;
+
+    .new-tab-icon {
+      padding: 0.5rem;
+    }
   }
 }
