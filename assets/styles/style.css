@@ -101,17 +101,17 @@ a {
   align-items: center;
   gap: 30px;
 }
-.navbar .navbar-links ul li a {
+.navbar .navbar-links ul li .navbar-link {
   font-size: 1.1rem;
   padding: 5px 0;
   position: relative;
   transition: color 0.3s ease;
   color: hsl(0, 0%, 80%);
 }
-.navbar .navbar-links ul li a:hover {
+.navbar .navbar-links ul li .navbar-link:hover {
   color: hsl(0, 0%, 100%);
 }
-.navbar .navbar-links ul li a::after {
+.navbar .navbar-links ul li .navbar-link::after {
   content: "";
   position: absolute;
   left: 0;
@@ -121,7 +121,7 @@ a {
   background-color: hsl(211, 95%, 52%);
   transition: width 0.3s ease;
 }
-.navbar .navbar-links ul li a:hover::after, .navbar .navbar-links ul li a.active::after {
+.navbar .navbar-links ul li .navbar-link:hover::after, .navbar .navbar-links ul li .navbar-link.active::after {
   width: 100%;
 }
 .navbar .navbar-links ul .cta-buttons {
@@ -200,6 +200,9 @@ a {
   font-size: 3.5rem;
   margin-bottom: 1rem;
   color: hsl(211, 95%, 52%);
+}
+.hero-section .hero-banner {
+  padding: 1rem;
 }
 .hero-section p {
   font-size: 1.3rem;
