@@ -194,25 +194,60 @@ a {
   flex-direction: column;
   text-align: center;
   padding: 2rem;
+  max-width: 100%;
+  max-width: 78rem;
 }
-.hero-section h1 {
+.hero-section .hero-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3rem;
+}
+@media (max-width: 768px) {
+  .hero-section .hero-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+}
+.hero-section .hero-container .hero-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 20;
+}
+.hero-section .hero-container .hero-title .hero-logo {
+  max-width: 250px;
+  width: 80%;
+  height: auto;
+  margin-bottom: 1rem;
+}
+.hero-section .hero-container .hero-title h1 {
   font-family: "Montserrat", sans-serif;
   font-size: 3.5rem;
   margin-bottom: 1rem;
   color: hsl(211, 95%, 52%);
 }
+@media (max-width: 768px) {
+  .hero-section .hero-container .hero-title h1 {
+    font-size: 2.5rem;
+  }
+}
+@media (max-width: 480px) {
+  .hero-section .hero-container .hero-title h1 {
+    font-size: 2rem;
+  }
+}
 .hero-section .hero-banner {
   padding: 1rem;
-  max-width: 100%;
-  width: 78rem;
-  display: block;
-  height: auto;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 60rem;
+  z-index: 10;
 }
 @media (max-width: 768px) {
   .hero-section .hero-banner {
-    width: 100%;
+    padding: 0;
+    width: 80%;
   }
 }
 .hero-section p {
@@ -221,11 +256,23 @@ a {
   max-width: 800px;
   color: hsl(0, 0%, 80%);
 }
+@media (max-width: 768px) {
+  .hero-section p {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+}
 .hero-section .btn-primary-hero {
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .hero-section .btn-primary-hero .new-tab-icon {
-  padding: 0.5rem;
+  padding: 0 0.5rem;
+  height: 1.2em;
+  width: auto;
+  vertical-align: middle;
+  display: inline-block;
 }
 
 .content-section {
@@ -250,9 +297,18 @@ a {
   color: hsl(0, 0%, 80%);
   line-height: 1.5;
 }
-.content-section ul {
+.content-section ul .commands-container {
+  display: flex;
+  align-items: center;
+}
+.content-section ul .commands-container p {
   font-size: 1.5rem;
-  margin: 1.5rem 0;
+  margin: 1.5rem 0.25rem;
+  color: hsl(0, 0%, 100%);
+}
+.content-section ul .commands-container .commands-icon {
+  height: 40px;
+  margin: 5px;
 }
 .content-section ul li {
   font-size: 1rem;

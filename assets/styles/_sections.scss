@@ -21,8 +21,21 @@
     line-height: 1.5;
   }
   ul {
-    font-size: 1.5rem;
-    margin: 1.5rem 0;
+    .commands-container {
+      display: flex;
+      align-items: center;
+
+      p {
+        font-size: 1.5rem;
+        margin: 1.5rem 0.25rem;
+        color: $text-color;
+      }
+
+      .commands-icon {
+        height: 40px;
+        margin: 5px;
+      }
+    }
 
     li {
       font-size: 1rem;
