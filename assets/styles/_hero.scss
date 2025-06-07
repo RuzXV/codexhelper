@@ -5,43 +5,59 @@
   flex-direction: column;
   text-align: center;
   padding: 2rem;
+  max-width: 100%;
+  max-width: 78rem;
 
-  h1 {
-    font-family: $heading-font;
-    font-size: 3.5rem;
-    margin-bottom: 1rem;
-    color: $primary-color;
-  }
-  .hero-banner {
-    padding: 1rem; // Keeps padding consistent
-    // REMOVE or change the fixed width: 78rem;
+  .hero-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3rem;
 
-    // Use max-width to ensure it never exceeds its parent's width
-    max-width: 100%;
-
-    // Optional: Set a preferred width, but allow it to shrink
-    // For example, start with a large percentage or keep it at 78rem for very large screens
-    width: 78rem; // This sets its intended max size
-    display: block; // If it's an image, ensures it behaves correctly for max-width
-
-    // Essential for images to maintain aspect ratio when scaling
-    height: auto;
-
-    // Center it if it's smaller than its container
-    margin-left: auto;
-    margin-right: auto;
-
-    // Add media query for smaller screens if you want specific behavior
     @media (max-width: 768px) {
-      // Adjust this breakpoint as needed
-      // You might want to remove specific padding or adjust other properties
-      // padding: 0.5rem; // Example: smaller padding on small screens
-      width: 100%; // Ensure it takes full width on smaller screens if you need it
+      flex-direction: column;
+      text-align: center;
+      gap: 2rem;
     }
 
-    @media (max-width: 480px) {
-      // Another common mobile breakpoint
-      // Further adjustments if necessary
+    .hero-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      z-index: 20;
+
+      .hero-logo {
+        max-width: 250px;
+        width: 80%;
+        height: auto;
+        margin-bottom: 1rem;
+      }
+
+      h1 {
+        font-family: $heading-font;
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        color: $primary-color;
+
+        @media (max-width: 768px) {
+          font-size: 2.5rem;
+        }
+        @media (max-width: 480px) {
+          font-size: 2rem;
+        }
+      }
+    }
+  }
+
+  .hero-banner {
+    padding: 1rem;
+    max-width: 60rem;
+    z-index: 10;
+
+    @media (max-width: 768px) {
+      padding: 0;
+      width: 80%;
     }
   }
 
@@ -50,12 +66,26 @@
     margin-bottom: 2rem;
     max-width: 800px;
     color: $light-text-color;
+
+    @media (max-width: 768px) {
+      font-size: 1rem; // Scale down paragraph text on smaller screens
+      padding: 0 1rem; // Add horizontal padding for readability
+    }
   }
+
   .btn-primary-hero {
     display: flex;
+    align-items: center; // Ensure icon and text are aligned
+    justify-content: center; // Center content if button is wider
+    // Your existing button styles will come from the mixin
+    // ...
 
     .new-tab-icon {
-      padding: 0.5rem;
+      padding: 0 0.5rem; // Padding on sides of the icon for spacing
+      height: 1.2em; // Adjust icon size relative to font-size
+      width: auto;
+      vertical-align: middle;
+      display: inline-block; // Ensures padding and height work as expected
     }
   }
 }
