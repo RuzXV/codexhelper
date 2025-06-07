@@ -18,6 +18,16 @@
   p {
     font-size: 1.1rem;
     color: $light-text-color;
-    text-align: center;
+    line-height: 1.5;
+  }
+  ul {
+    font-size: 1.5rem;
+    margin: 1.5rem 0;
+
+    li {
+      font-size: 1rem;
+      color: $light-text-color;
+      margin: 0.25rem 0;
+    }
   }
 }
