@@ -8,11 +8,24 @@
   margin-top: 15rem;
   padding: 15px 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  p {
+    color: hsl(210, 4%, 65%);
+  }
 
   .legal-section {
     padding: 1px;
+    margin: 1rem 0;
 
-    li {
+    h2 {
+      margin: 1rem 0;
+    }
+    h3 {
+      margin: 0.5rem 0;
+    }
+
+    li,
+    ul,
+    p {
       color: hsl(210, 4%, 65%);
     }
   }
