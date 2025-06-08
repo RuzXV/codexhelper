@@ -186,83 +186,52 @@ a {
 }
 
 .hero-section {
-  margin-top: 90px;
-  min-height: 70vh;
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  justify-items: center;
   align-items: center;
-  flex-direction: column;
-  text-align: center;
-  padding: 2rem;
-  max-width: 100%;
   max-width: 78rem;
+  margin-top: 150px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem;
 }
-.hero-section .hero-container {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 3rem;
-}
-@media (max-width: 768px) {
-  .hero-section .hero-container {
-    flex-direction: column;
-    text-align: center;
-    gap: 2rem;
-  }
-}
-.hero-section .hero-container .hero-title {
+.hero-section .hero-title {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  z-index: 20;
+  grid-area: 1/1/4/2;
 }
-.hero-section .hero-container .hero-title .hero-logo {
+.hero-section .hero-title .hero-logo {
   max-width: 250px;
   width: 80%;
   height: auto;
   margin-bottom: 1rem;
 }
-.hero-section .hero-container .hero-title h1 {
+.hero-section .hero-title h1 {
   font-family: "Montserrat", sans-serif;
   font-size: 3.5rem;
   margin-bottom: 1rem;
   color: hsl(211, 95%, 52%);
 }
-@media (max-width: 768px) {
-  .hero-section .hero-container .hero-title h1 {
-    font-size: 2.5rem;
-  }
-}
-@media (max-width: 480px) {
-  .hero-section .hero-container .hero-title h1 {
-    font-size: 2rem;
-  }
-}
 .hero-section .hero-banner {
-  padding: 1rem;
+  grid-area: 1/2/4/4;
   max-width: 60rem;
-  z-index: 10;
-}
-@media (max-width: 768px) {
-  .hero-section .hero-banner {
-    padding: 0;
-    width: 80%;
-  }
+  display: block;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 .hero-section p {
+  grid-area: 4/1/5/4;
   font-size: 1.3rem;
   margin-bottom: 2rem;
   max-width: 800px;
   color: hsl(0, 0%, 80%);
 }
-@media (max-width: 768px) {
-  .hero-section p {
-    font-size: 1rem;
-    padding: 0 1rem;
-  }
-}
 .hero-section .btn-primary-hero {
+  grid-area: 5/1/6/4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -273,6 +242,55 @@ a {
   width: auto;
   vertical-align: middle;
   display: inline-block;
+}
+@media (max-width: 992px) {
+  .hero-section {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    padding: 1.5rem;
+  }
+  .hero-section .hero-title {
+    grid-area: auto;
+    margin-bottom: 2rem;
+  }
+  .hero-section .hero-banner {
+    grid-area: auto;
+    width: 90%;
+    max-width: 500px;
+    margin-bottom: 2rem;
+  }
+  .hero-section p {
+    grid-area: auto;
+    font-size: 1.1rem;
+    padding: 0 1rem;
+  }
+  .hero-section .btn-primary-hero {
+    grid-area: auto;
+    margin-top: 1rem;
+  }
+  .hero-section .hero-title h1 {
+    font-size: 2.5rem;
+  }
+}
+@media (max-width: 768px) {
+  .hero-section {
+    margin-top: 100px;
+    padding: 1rem;
+  }
+  .hero-section .hero-title h1 {
+    font-size: 2rem;
+  }
+  .hero-section .hero-title .hero-logo {
+    max-width: 180px;
+  }
+  .hero-section .hero-banner {
+    width: 95%;
+    padding: 0;
+  }
+  .hero-section p {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
 }
 
 .content-section {
