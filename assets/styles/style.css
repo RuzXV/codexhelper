@@ -188,14 +188,13 @@ a {
 .hero-section {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(5, 1fr);
   justify-items: center;
   align-items: center;
   max-width: 60vw;
   margin-top: 150px;
   margin-left: auto;
   margin-right: auto;
-  padding: 2rem;
+  padding: 10rem 2rem;
 }
 .hero-section .hero-title {
   display: flex;
@@ -315,9 +314,7 @@ a {
 .content-section {
   position: relative;
   padding: 60px 2rem;
-  margin-bottom: 30px;
   border-radius: 8px;
-  margin: 20px auto;
   width: 100%;
   max-width: 78rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);

@@ -1,14 +1,13 @@
 .hero-section {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(5, 1fr);
   justify-items: center;
   align-items: center;
   max-width: 60vw;
   margin-top: 150px;
   margin-left: auto;
   margin-right: auto;
-  padding: 2rem;
+  padding: 10rem 2rem;
 
   .hero-title {
     display: flex;
