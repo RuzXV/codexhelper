@@ -180,10 +180,9 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const serverList = document.querySelector('.server-list');
-        // Use your new, secure, and professional API URL
         const apiUrl = 'https://api.codexhelper.com/api/top-servers';
     
-        fetch(apiUrl) // No more proxy needed!
+        fetch(apiUrl)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Network response was not ok (status: ${response.status})`);
