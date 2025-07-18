@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="assets/styles/style.css" />
     <link rel="icon" href="assets/images/tkc.png" type="image/png" />
-    <title>Codex Helper Policies</title>
+    <title>Codex Helper</title>
   </head>
   <body class="body-main">
     <nav class="navbar">
@@ -93,10 +93,10 @@
         <h2>Trusted by the best</h2>
         <p>Codex Helper is trusted by some of the largest and most active Rise of Kingdoms communities on Discord.</p>
         
-        <!-- This div will be populated by the JavaScript below -->
-        <div class="server-list">
-            <!-- It's good practice to have a loading message as a placeholder -->
-            <p>Loading top servers...</p>
+        <div class="server-list-container">
+            <ul class="server-list" data-animated="true">
+                <p class="loading-message">Loading top servers...</p>
+            </ul>
         </div>
     </section>
 
@@ -177,63 +177,59 @@
 
     <script src="scripts/main.js"></script>
     
-    <!-- SCRIPT TO FETCH AND DISPLAY TOP SERVERS -->
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // The container where the server list will be displayed.
-        const serverListContainer = document.querySelector('.server-list');
-    
-        // Your working API endpoint URL.
+        const serverList = document.querySelector('.server-list');
         const apiUrl = 'http://193.31.31.121:25829/api/top-servers';
     
-        // Use the fetch API to get the data from your bot.
         fetch(apiUrl)
             .then(response => {
-                // Check if the request was successful.
                 if (!response.ok) {
                     throw new Error(`Network response was not ok (status: ${response.status})`);
                 }
-                return response.json(); // Parse the JSON from the response.
+                return response.json();
             })
             .then(servers => {
-                // Clear the "Loading..." placeholder text.
-                serverListContainer.innerHTML = '';
+                serverList.innerHTML = '';
     
-                // If the API returns an empty list, show a friendly message.
                 if (!servers || servers.length === 0) {
-                    serverListContainer.innerHTML = '<p>Could not load server data at this time.</p>';
+                    serverList.innerHTML = '<p class="error-message">Could not load server data at this time.</p>';
                     return;
                 }
     
-                // Loop through each server object returned by the API.
                 servers.forEach(server => {
-                    // Create a new div element for this server item.
-                    const serverItem = document.createElement('div');
+                    const serverItem = document.createElement('li');
                     serverItem.className = 'server-item';
     
-                    // Format the member count with commas (e.g., 100,000).
                     const memberCount = server.member_count.toLocaleString();
     
-                    // Check if the server has an icon_url. If not, use the placeholder.
                     const iconHtml = server.icon_url 
                         ? `<img src="${server.icon_url}" alt="${server.name} Icon" class="server-logo">`
-                        : '<div class="server-logo-placeholder"></div>';
+                        : `<div class="server-logo-placeholder"></div>`;
     
-                    // Set the complete HTML content for the server item.
                     serverItem.innerHTML = `
                         ${iconHtml}
-                        <p>${server.name}</p>
-                        <span>${memberCount} members</span>
+                        <div class="server-info">
+                            <p class="server-name">${server.name}</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="6" fill="#43b581"></circle></svg>
+                                ${memberCount} members
+                            </span>
+                        </div>
                     `;
-    
-                    // Add the newly created server item to the main container.
-                    serverListContainer.appendChild(serverItem);
+                    serverList.appendChild(serverItem);
+                });
+
+                const scrollerContent = Array.from(serverList.children);
+                scrollerContent.forEach(item => {
+                    const duplicatedItem = item.cloneNode(true);
+                    duplicatedItem.setAttribute('aria-hidden', true);
+                    serverList.appendChild(duplicatedItem);
                 });
             })
             .catch(error => {
-                // If anything goes wrong with the fetch request, log it and show an error.
                 console.error('Error fetching top servers:', error);
-                serverListContainer.innerHTML = '<p>Could not retrieve server data. Please try again later.</p>';
+                serverList.innerHTML = '<p class="error-message">Could not retrieve server data. Please try again later.</p>';
             });
     });
     </script>
