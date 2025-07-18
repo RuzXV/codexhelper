@@ -180,12 +180,10 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const serverList = document.querySelector('.server-list');
-
-        const originalApiUrl = 'http://193.31.31.121:25829/api/top-servers';
-
-        const proxiedApiUrl = 'https://corsproxy.io/?' + encodeURIComponent(originalApiUrl);
+        // Use your new, secure, and professional API URL
+        const apiUrl = 'https://api.codexhelper.com/api/top-servers';
     
-        fetch(proxiedApiUrl)
+        fetch(apiUrl) // No more proxy needed!
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Network response was not ok (status: ${response.status})`);
@@ -222,7 +220,7 @@
                     `;
                     serverList.appendChild(serverItem);
                 });
-
+    
                 const scrollerContent = Array.from(serverList.children);
                 scrollerContent.forEach(item => {
                     const duplicatedItem = item.cloneNode(true);
