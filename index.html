@@ -92,27 +92,11 @@
     <section id="trusted-by" class="content-section">
         <h2>Trusted by the best</h2>
         <p>Codex Helper is trusted by some of the largest and most active Rise of Kingdoms communities on Discord.</p>
+        
+        <!-- This div will be populated by the JavaScript below -->
         <div class="server-list">
-            <div class="server-item">
-                <div class="server-logo-placeholder"></div>
-                <p>Server Name 1</p>
-                <span>100,000+ members</span>
-            </div>
-            <div class="server-item">
-                <div class="server-logo-placeholder"></div>
-                <p>Server Name 2</p>
-                <span>80,000+ members</span>
-            </div>
-            <div class="server-item">
-                <div class="server-logo-placeholder"></div>
-                <p>Server Name 3</p>
-                <span>75,000+ members</span>
-            </div>
-            <div class="server-item">
-                <div class="server-logo-placeholder"></div>
-                <p>Server Name 4</p>
-                <span>50,000+ members</span>
-            </div>
+            <!-- It's good practice to have a loading message as a placeholder -->
+            <p>Loading top servers...</p>
         </div>
     </section>
 
@@ -192,5 +176,66 @@
     </footer>
 
     <script src="scripts/main.js"></script>
+    
+    <!-- SCRIPT TO FETCH AND DISPLAY TOP SERVERS -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // The container where the server list will be displayed.
+        const serverListContainer = document.querySelector('.server-list');
+    
+        // Your working API endpoint URL.
+        const apiUrl = 'http://193.31.31.121:25829/api/top-servers';
+    
+        // Use the fetch API to get the data from your bot.
+        fetch(apiUrl)
+            .then(response => {
+                // Check if the request was successful.
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok (status: ${response.status})`);
+                }
+                return response.json(); // Parse the JSON from the response.
+            })
+            .then(servers => {
+                // Clear the "Loading..." placeholder text.
+                serverListContainer.innerHTML = '';
+    
+                // If the API returns an empty list, show a friendly message.
+                if (!servers || servers.length === 0) {
+                    serverListContainer.innerHTML = '<p>Could not load server data at this time.</p>';
+                    return;
+                }
+    
+                // Loop through each server object returned by the API.
+                servers.forEach(server => {
+                    // Create a new div element for this server item.
+                    const serverItem = document.createElement('div');
+                    serverItem.className = 'server-item';
+    
+                    // Format the member count with commas (e.g., 100,000).
+                    const memberCount = server.member_count.toLocaleString();
+    
+                    // Check if the server has an icon_url. If not, use the placeholder.
+                    const iconHtml = server.icon_url 
+                        ? `<img src="${server.icon_url}" alt="${server.name} Icon" class="server-logo">`
+                        : '<div class="server-logo-placeholder"></div>';
+    
+                    // Set the complete HTML content for the server item.
+                    serverItem.innerHTML = `
+                        ${iconHtml}
+                        <p>${server.name}</p>
+                        <span>${memberCount} members</span>
+                    `;
+    
+                    // Add the newly created server item to the main container.
+                    serverListContainer.appendChild(serverItem);
+                });
+            })
+            .catch(error => {
+                // If anything goes wrong with the fetch request, log it and show an error.
+                console.error('Error fetching top servers:', error);
+                serverListContainer.innerHTML = '<p>Could not retrieve server data. Please try again later.</p>';
+            });
+    });
+    </script>
   </body>
 </html>
