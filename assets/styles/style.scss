@@ -1,7 +1,5 @@
-// Import variables
 @import 'variables';
 
-// Reset styles
 * {
   margin: 0;
   padding: 0;
@@ -79,7 +77,7 @@ body {
 
 .btn-primary-hero {
     background-color: $primary-color;
-    color: #ffffff; /* Explicitly white for primary button */
+    color: #ffffff;
     padding: 0.8rem 1.5rem;
     border-radius: 5px;
     text-decoration: none;
@@ -101,7 +99,7 @@ body {
 
     &:hover {
         background-color: $primary-color;
-        color: #ffffff; /* Explicitly white for hover state */
+        color: #ffffff;
     }
 }
 
@@ -163,7 +161,6 @@ body {
   }
 }
 
-/* STYLES FOR THE DYNAMIC SERVER LIST */
 .server-list {
     display: flex;
     justify-content: center;
@@ -173,7 +170,7 @@ body {
 }
 
 .server-item {
-    background-color: #1a1a1a; /* Matching your dark background */
+    background-color: #1a1a1a;
     padding: 1.5rem;
     border-radius: 10px;
     width: 200px;
