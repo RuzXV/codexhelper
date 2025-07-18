@@ -1,15 +1,12 @@
 // Colors
-$primary-color: hsl(211, 95%, 52%);
-$secondary-color: hsl(206, 96%, 62%);
-$dark-bg: #060a0f;
-$light-bg: hsl(214, 41%, 7%);
-$dark-grey-bg: #282b2e; // A darker grey for the hero section background
-$light-grey-text: #cccccc; // Your existing light text color
-$text-color: hsl(0, 0%, 100%);
-$light-text-color: hsl(0, 0%, 67%);
-$accent-color: hsl(211, 96%, 54%);
-$hover-color: lighten($primary-color, 10%);
+$primary-color: #4a90e2;
+$secondary-color: #50e3c2;
+$dark-bg: #1a1a1a;
+$light-bg: #2a2a2a;
+$text-color: #ffffff;
+$secondary-text-color: #a0a0a0;
+$border-color: #3a3a3a;
 
 // Fonts
-$font-stack: "Open Sans", sans-serif;
-$heading-font: "Montserrat", sans-serif;
+$primary-font: 'Open Sans', sans-serif;
+$secondary-font: 'Raleway', sans-serif;
