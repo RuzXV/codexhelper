@@ -940,7 +940,7 @@ body {
 
 .feature-image img:hover {
     transform: scale(1.03);
-    filter: drop-shadow(0 0 15px var(--accent-blue-bright)) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4));
+    filter: drop-shadow(0 0 15px var(--accent-blue-bright));
     border-color: rgba(255, 255, 255, 0.5);
 }
 
