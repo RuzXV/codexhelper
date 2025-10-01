@@ -931,7 +931,7 @@ body {
 }
 
 .feature-image img:hover {
-    transform: scale(1.07);
+    transform: scale(1.2);
     filter: drop-shadow(0 0 15px var(--accent-blue-bright));
     border-color: rgba(255, 255, 255, 0.5);
 }
@@ -996,8 +996,6 @@ body {
 .faq-hero {
     padding: 140px var(--spacing-6) var(--spacing-16);
     text-align: center;
-    background: radial-gradient(ellipse 70% 80% at 50% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-    background-repeat: no-repeat;
 }
 
 .faq-question span {
@@ -1025,6 +1023,8 @@ body {
 
 .faq-content {
     padding: var(--spacing-16) var(--spacing-6);
+    background-image: radial-gradient(ellipse 80% 100% at center -150px, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+    background-repeat: no-repeat;
 }
 
 .faq-container {
