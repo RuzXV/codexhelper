@@ -1994,6 +1994,10 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     font-size: var(--font-size-sm);
 }
 
+.stats-grid .stat-item:nth-child(4) .stat-label {
+    font-size: var(--font-size-sm);
+}
+
 .stat-animated-gradient {
     background: linear-gradient(90deg, 
       var(--text-primary), 
