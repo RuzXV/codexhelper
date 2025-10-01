@@ -1735,8 +1735,11 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     }
     
     .stat-item {
-        padding: var(--spacing-4);
-        text-align: center;
+        padding: var(--spacing-6);
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-4);
     }
     
     .stat-number {
@@ -1761,20 +1764,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     .feature-content {
         padding: var(--spacing-3);
         order: 2;
-    }
-    
-    .feature-image {
-        order: 1;
-        height: auto;
-        max-width: 100%;
-        margin: 0 auto;
-    }
-    
-    .feature-image img {
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-        border-radius: var(--radius-lg);
     }
 }
 
@@ -1890,11 +1879,17 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     }
     
     .feature-image {
-        order: 2;
-        height: auto;
         max-width: 100%;
-        margin: 0;
+        margin: 0 auto;
+        height: auto;
         width: 100%;
+    }
+
+    .feature-image img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        border-radius: var(--radius-lg);
     }
 }
 
