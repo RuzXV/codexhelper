@@ -457,7 +457,7 @@ body {
 
 .top-servers {
     padding-top: 140px;
-    padding-bottom: calc(var(--spacing-12) + 150px);
+    padding-bottom: 150px;
     background-color: var(--bg-primary);
     background-image: radial-gradient(ellipse 60% 70% at center 40%, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
     background-repeat: no-repeat;
@@ -629,9 +629,8 @@ body {
     text-decoration: underline;
 }
 
-/* Features Section */
 .features {
-    padding: var(--spacing-24) var(--spacing-6);
+    padding: 0 var(--spacing-6) var(--spacing-12);
 }
 
 .features-container {
@@ -644,7 +643,6 @@ body {
     margin-bottom: var(--spacing-16);
 }
 
-/* Featured Commanders Section */
 .commanders {
     padding: var(--spacing-24) var(--spacing-6);
     background: var(--bg-secondary);
@@ -998,12 +996,7 @@ body {
 .faq-hero {
     padding: 140px var(--spacing-6) var(--spacing-16);
     text-align: center;
-    background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
-}
-
-.faq-content {
-    padding: var(--spacing-16) var(--spacing-6);
-    background-image: radial-gradient(ellipse 80% 100% at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+    background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
     background-repeat: no-repeat;
 }
 
@@ -1107,23 +1100,6 @@ body {
     margin-top: var(--spacing-6);
 }
 
-.faq-answer a:not(.btn-primary):not(.btn-secondary) {
-    word-break: break-all;
-    overflow-wrap: break-word;
-    color: var(--accent-blue);
-    text-decoration: underline;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    text-decoration-color: rgba(59, 130, 246, 0.5);
-    text-underline-offset: 4px;
-    text-decoration-thickness: 1px;
-}
-
-.faq-answer a:not(.btn-primary):not(.btn-secondary):hover {
-    color: var(--accent-blue-hover);
-    border-bottom: none;
-    text-decoration-color: var(--accent-blue-hover);
-}
 .faq-contact {
     text-align: center;
 }
@@ -1156,20 +1132,20 @@ body {
     flex-wrap: wrap;
 }
 
-/* Add brighter link styling for privacy and terms pages */
+.faq-answer a:not(.btn-primary):not(.btn-secondary),
 .faq-content a:not(.btn-primary):not(.btn-secondary) {
     word-break: break-all;
     overflow-wrap: break-word;
     color: var(--accent-blue);
     text-decoration: none;
     font-weight: 500;
-    border-bottom: 1px solid rgba(59, 130, 246, 0.3);
-    transition: all 0.2s ease;
+    transition: color 0.2s ease;
+    border-bottom: none;
 }
 
+.faq-answer a:not(.btn-primary):not(.btn-secondary):hover,
 .faq-content a:not(.btn-primary):not(.btn-secondary):hover {
     color: var(--accent-blue-hover);
-    border-bottom: 1px solid var(--accent-blue-hover);
     text-decoration: none;
 }
 
