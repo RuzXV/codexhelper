@@ -112,16 +112,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let isDragging = false;
     let startTime = 0;
 
-    // Enhanced mobile carousel functionality
     function updateCardWidth() {
         if (window.innerWidth <= 360) {
-            cardWidth = 160 + 12; // extra small mobile
+            cardWidth = 160 + 12;
         } else if (window.innerWidth <= 480) {
-            cardWidth = 180 + 16; // small mobile
+            cardWidth = 180 + 16;
         } else if (window.innerWidth <= 768) {
-            cardWidth = 200 + 16; // tablet
+            cardWidth = 200 + 16;
         } else {
-            cardWidth = 250 + 32; // desktop
+            cardWidth = 250 + 32;
         }
     }
     
@@ -135,7 +134,6 @@ document.addEventListener('DOMContentLoaded', function() {
             currentIndex++;
             moveToSlide(currentIndex);
         } else {
-            // Jump to cloned first card, then instantly move to real first card
             track.style.transition = 'none';
             track.style.transform = `translateX(0px)`;
             setTimeout(() => {
@@ -151,7 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
             currentIndex--;
             moveToSlide(currentIndex);
         } else {
-            // Jump to cloned last card, then instantly move to real last card
             track.style.transition = 'none';
             track.style.transform = `translateX(-${(totalCards + 1) * cardWidth}px)`;
             setTimeout(() => {
@@ -165,20 +162,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (prevBtn && nextBtn && track && totalCards > 0) {
         updateCardWidth();
         
-        // Clone first and last cards for infinite loop effect
         const firstCard = cards[0].cloneNode(true);
         const lastCard = cards[totalCards - 1].cloneNode(true);
         track.appendChild(firstCard);
         track.insertBefore(lastCard, cards[0]);
         
-        // Adjust initial position to show first real card
         moveToSlide(0);
         
-        // Button event listeners
         prevBtn.addEventListener('click', prevSlide);
         nextBtn.addEventListener('click', nextSlide);
         
-        // Improved touch handling for better mobile experience
         if (carousel) {
             let touchStartTime = 0;
             
@@ -187,12 +180,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 touchStartTime = Date.now();
                 isDragging = true;
                 track.style.transition = 'none';
-                e.preventDefault(); // Prevent scrolling
+                e.preventDefault();
             }, { passive: false });
             
             carousel.addEventListener('touchmove', (e) => {
                 if (!isDragging) return;
-                e.preventDefault(); // Prevent scrolling
+                e.preventDefault();
                 currentX = e.touches[0].clientX;
                 const diffX = currentX - startX;
                 const currentTransform = -(currentIndex + 1) * cardWidth;
@@ -208,7 +201,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const timeDiff = Date.now() - startTime;
                 const velocity = Math.abs(diffX) / timeDiff;
                 
-                // Determine if swipe was significant enough
                 if (Math.abs(diffX) > 50 || velocity > 0.3) {
                     if (diffX > 0) {
                         prevSlide();
@@ -216,20 +208,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         nextSlide();
                     }
                 } else {
-                    // Snap back to current position
                     moveToSlide(currentIndex);
                 }
             }, { passive: true });
         }
         
-        // Update on window resize
         window.addEventListener('resize', () => {
             updateCardWidth();
             moveToSlide(currentIndex);
         });
     }
 
-    // Add intersection observer for animations
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -100px 0px'
@@ -244,7 +233,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
 
-    // Observe elements for animation
     document.querySelectorAll('.feature-card, .stat-item, .faq-item, .feature-showcase-item').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(50px)';
@@ -252,17 +240,14 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(el);
     });
 
-    // Mobile menu toggle with overlay
     const mobileMenuToggle = document.querySelector('.nav-menu-toggle');
     const navLinks = document.querySelector('.nav-links');
     const hamburger = document.querySelector('.hamburger');
     
-    // Create overlay element
     const overlay = document.createElement('div');
     overlay.className = 'nav-overlay';
     document.body.appendChild(overlay);
     
-    // Enhanced mobile menu toggle
     function toggleMobileMenu() {
         const isActive = navLinks.classList.contains('active');
         
@@ -282,7 +267,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Ensure hamburger menu works properly
     if (mobileMenuToggle && hamburger) {
         mobileMenuToggle.addEventListener('click', (e) => {
             e.preventDefault();
@@ -291,17 +275,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Close menu when clicking overlay
     overlay.addEventListener('click', toggleMobileMenu);
     
-    // Close menu on escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && navLinks.classList.contains('active')) {
             toggleMobileMenu();
         }
     });
     
-    // Close mobile menu when clicking on a link
     document.querySelectorAll('.nav-link, .patreon-btn').forEach(link => {
         link.addEventListener('click', () => {
             if (navLinks && navLinks.classList.contains('active')) {
@@ -310,10 +291,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Add loading states to buttons
     document.querySelectorAll('.btn-primary, .btn-secondary').forEach(button => {
         button.addEventListener('click', function(e) {
-            // Don't add loading state to external links
             if (this.getAttribute('href') && this.getAttribute('href').startsWith('http')) {
                 return;
             }
@@ -327,27 +306,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Initialize counter animations when stats section is in view
     const statsObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                // Load API data when stats section is in view
                 loadApiData();
                 
-                // Stop observing after loading
                 statsObserver.unobserve(entry.target);
             }
         });
     }, { threshold: 0.5 });
 
-    // Observe the stats section
     const sectionToObserve = document.querySelector('.top-servers');
     if (sectionToObserve) {
         statsObserver.observe(sectionToObserve);
     }
 });
 
-// Add CSS for animations
 const style = document.createElement('style');
 style.textContent = `
     .animate-spin {
