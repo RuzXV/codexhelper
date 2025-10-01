@@ -415,7 +415,7 @@ style.textContent = `
         padding: 0;
         margin: 0;
         width: max-content;
-        animation: scroll-left 50s linear infinite; /* Adjusted base duration */
+        animation: scroll-left 50s linear infinite; /* Increased duration for slower speed */
     }
 
     .server-list[data-direction="right"] {
@@ -601,8 +601,7 @@ async function fetchApiData(endpoint) {
             credentials: 'omit', // Don't send cookies or auth headers
             headers: {
                 'Content-Type': 'application/json',
-                // Add a custom header to help with debugging
-                'X-Client': 'CodexHelper-Website'
+                // The 'X-Client' header that caused the issue has been REMOVED.
             }
         };
         
