@@ -598,12 +598,13 @@ body {
     align-items: center;
     justify-content: center;
     position: relative;
+    padding-left: var(--spacing-4);
+    padding-right: var(--spacing-4);
 }
 
 .feature-image img {
     max-width: 100%;
     height: auto;
-    max-height: 450px;
     border-radius: var(--radius-lg);
     object-fit: contain;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1205,8 +1206,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         margin: 0 auto;
         height: auto;
         width: 100%;
-        padding-left: var(--spacing-4);
-        padding-right: var(--spacing-4);
     }
 
     .feature-showcase-item .feature-image img {
@@ -1236,10 +1235,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         width: 56px;
         height: 56px;
         font-size: var(--font-size-2xl);
-    }
-
-    .feature-image img {
-        max-height: 450px;
     }
 
     .cta-section {
@@ -1575,4 +1570,15 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         width: 100%;
         font-size: var(--font-size-sm);
     }
+}
+
+@media (min-width: 768px) {
+  .feature-image {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .feature-image img {
+    max-height: 500px;
+  }
 }
