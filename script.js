@@ -415,7 +415,10 @@ style.textContent = `
         padding: 0;
         margin: 0;
         width: max-content;
-        animation: scroll-left 50s linear infinite; /* Increased duration for slower speed */
+        animation-name: scroll-left;
+        animation-duration: 60s; /* Set a fixed, long duration for smooth speed */
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
     }
 
     .server-list[data-direction="right"] {
@@ -757,18 +760,6 @@ function renderTopServers(servers) {
             serverListRow2.appendChild(duplicateItem);
         });
     }
-    
-    // Dynamically adjust animation duration for a consistent speed
-    // 5 seconds per server item for a smooth, slow scroll
-    const animationDurationRow1 = serversRow1.length * 5; 
-    const animationDurationRow2 = serversRow2.length * 5;
-    
-    if (serverListRow1) {
-        serverListRow1.style.animationDuration = `${animationDurationRow1}s`;
-    }
-    if (serverListRow2) {
-        serverListRow2.style.animationDuration = `${animationDurationRow2}s`;
-    }
 }
 
 // Function to load fallback data when API is unavailable
@@ -903,11 +894,6 @@ async function loadApiData() {
         // Just ensure the animation is running
         const serverListElements = document.querySelectorAll('.server-list');
         serverListElements.forEach(serverList => {
-            // Reset animation to ensure it's running
-            serverList.style.animation = 'none';
-            setTimeout(() => {
-                serverList.style.animation = '';
-            }, 10);
         });
     }
 }
