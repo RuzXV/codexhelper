@@ -456,7 +456,7 @@ body {
 }
 
 .top-servers {
-    padding-top: var(--spacing-16);
+    padding-top: 140px;
     padding-bottom: calc(var(--spacing-12) + 150px);
     background-color: var(--bg-primary);
     background-image: radial-gradient(ellipse 60% 70% at center 40%, rgba(59, 130, 246, 0.1) 0%, transparent 60%);

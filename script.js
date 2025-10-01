@@ -341,9 +341,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { threshold: 0.5 });
 
     // Observe the stats section
-    const statsSection = document.querySelector('.stats');
-    if (statsSection) {
-        statsObserver.observe(statsSection);
+    const sectionToObserve = document.querySelector('.top-servers');
+    if (sectionToObserve) {
+        statsObserver.observe(sectionToObserve);
     }
 });
 
