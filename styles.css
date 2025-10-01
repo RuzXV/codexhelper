@@ -810,7 +810,8 @@ body {
     gap: var(--spacing-4);
 }
 
-.cta-section h2 {
+.cta-section h2,
+.cta-text-prefix {
     font-size: var(--font-size-3xl);
     font-weight: 700;
     background: linear-gradient(90deg, var(--text-primary) 0%, var(--accent-blue-bright) 100%);
@@ -818,12 +819,6 @@ body {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     background-color: transparent;
-}
-
-.cta-text-prefix {
-    font-size: var(--font-size-3xl);
-    font-weight: 700;
-    color: var(--text-primary);
 }
 
 .cta-section .btn-primary .patreon-logo {
@@ -1266,6 +1261,10 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     .cta-section h2,
     .cta-text-prefix {
         font-size: var(--font-size-2xl);
+    }
+
+    .cta-container {
+        flex-direction: column;
     }
     
     .footer-content {
