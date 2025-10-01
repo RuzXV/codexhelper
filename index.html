@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Codex Helper</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--spacing-2);">
+                    <img src="images/logo.png" alt="Codex Helper Logo" class="logo-image">
+                    <span>Codex Helper</span>
+                </a>
+            </div>
+            <div class="nav-menu-toggle">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="faq.html" class="nav-link">FAQ</a>
+                <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="patreon-btn">
+                    <i class="fa-brands fa-patreon"></i>
+                    <span>Subscribe</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero" style="background-image: url('images/hero-banner.jpeg');">
+        <div class="hero-overlay"></div>
+        <div class="hero-container">
+            <h1 class="hero-title">
+                Codex Helper
+            </h1>
+            <p class="hero-description">
+                ROK information done right. Enhance your Rise of Kingdoms experience on Discord today.
+            </p>
+            <div class="hero-buttons">
+                <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="btn-primary">Subscribe <i class="fas fa-external-link-alt"></i></a>
+                <a href="https://discord.gg/kingscodex" target="_blank" class="btn-secondary"><i class="fa-brands fa-discord"></i> Our Discord</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stats-header">
+                <div class="section-badge">STATISTICS</div>
+                <div class="stats-text">
+                    <p>Join the growing community of Rise of Kingdoms players using Codex Helper to optimize your gameplay. </p>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="stat-number" data-stat="total_servers">220</div>
+                    <div class="stat-label">Servers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number" data-stat="total_users">339,694</div>
+                    <div class="stat-label">Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-chess-knight"></i>
+                    </div>
+                    <div class="stat-number" data-stat="total_commands_used">6,771</div>
+                    <div class="stat-label">Commands Used</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div class="stat-number" data-stat="pricing">$3</div>
+                    <div class="stat-label">Pricing</div>
+                </div>
+            </div>
+        
+        </div>
+    </section>
+
+    <section class="top-servers">
+        <div class="top-servers-container">
+            <div class="features-header">
+                <div class="section-badge">TRUSTED BY THE BEST</div>
+                <h2>Codex Helper is trusted by some of the largest and most active Rise of Kingdoms communities on Discord.</h2>
+            </div>
+          
+            <div class="server-list-container">
+                <ul class="server-list" id="serverList" data-animated="true">
+                    <!-- Pre-populate with client's servers to avoid loading delay -->
+                    <li class="server-item">
+                        <img src="https://cdn.discordapp.com/icons/474739462589382667/a_ba71b1a1461efb0e2fda104ea9474411.gif?size=1024" alt="Rise of Kingdoms Icon" class="server-logo">
+                        <div class="server-info">
+                            <p class="server-name">Rise of Kingdoms</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
+                                </svg>
+                                235,752 members
+                            </span>
+                        </div>
+                    </li>
+                    <li class="server-item">
+                        <img src="https://cdn.discordapp.com/icons/538735518037442560/a_10bedab0c8877a2ca616f3c4209e09bd.gif?size=1024" alt="Chisgule Gaming Icon" class="server-logo">
+                        <div class="server-info">
+                            <p class="server-name">Chisgule Gaming</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
+                                </svg>
+                                47,374 members
+                            </span>
+                        </div>
+                    </li>
+                    <li class="server-item">
+                        <img src="https://cdn.discordapp.com/icons/1031515159627300924/a_778ebbee161c50472d506d2cbe433e02.gif?size=1024" alt="The King's Codex Icon" class="server-logo">
+                        <div class="server-info">
+                            <p class="server-name">The King's Codex</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
+                                </svg>
+                                14,998 members
+                            </span>
+                        </div>
+                    </li>
+                    <li class="server-item">
+                        <img src="https://cdn.discordapp.com/icons/1298023304271233114/a73cdfe7db17a0c7ec69f4cd57abb9ef.png?size=1024" alt="WarDaddyChadski Icon" class="server-logo">
+                        <div class="server-info">
+                            <p class="server-name">WarDaddyChadski</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
+                                </svg>
+                                7,362 members
+                            </span>
+                        </div>
+                    </li>
+                    <li class="server-item">
+                        <img src="https://cdn.discordapp.com/icons/946738284195872828/e5f39917d000761594168bc9d3e20abc.png?size=1024" alt="Cortex Icon" class="server-logo">
+                        <div class="server-info">
+                            <p class="server-name">Cortex</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
+                                </svg>
+                                1,978 members
+                            </span>
+                        </div>
+                    </li>
+                    <!-- Duplicate items for seamless looping -->
+                    <li class="server-item" aria-hidden="true">
+                        <img src="https://cdn.discordapp.com/icons/474739462589382667/a_ba71b1a1461efb0e2fda104ea9474411.gif?size=1024" alt="Rise of Kingdoms Icon" class="server-logo">
+                        <div class="server-info">
+                            <p class="server-name">Rise of Kingdoms</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
+                                </svg>
+                                235,752 members
+                            </span>
+                        </div>
+                    </li>
+                    <li class="server-item" aria-hidden="true">
+                        <img src="https://cdn.discordapp.com/icons/538735518037442560/a_10bedab0c8877a2ca616f3c4209e09bd.gif?size=1024" alt="Chisgule Gaming Icon" class="server-logo">
+                        <div class="server-info">
+                            <p class="server-name">Chisgule Gaming</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
+                                </svg>
+                                47,374 members
+                            </span>
+                        </div>
+                    </li>
+                    <li class="server-item" aria-hidden="true">
+                        <img src="https://cdn.discordapp.com/icons/1031515159627300924/a_778ebbee161c50472d506d2cbe433e02.gif?size=1024" alt="The King's Codex Icon" class="server-logo">
+                        <div class="server-info">
+                            <p class="server-name">The King's Codex</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
+                                </svg>
+                                14,998 members
+                            </span>
+                        </div>
+                    </li>
+                    <li class="server-item" aria-hidden="true">
+                        <img src="https://cdn.discordapp.com/icons/1298023304271233114/a73cdfe7db17a0c7ec69f4cd57abb9ef.png?size=1024" alt="WarDaddyChadski Icon" class="server-logo">
+                        <div class="server-info">
+                            <p class="server-name">WarDaddyChadski</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
+                                </svg>
+                                7,362 members
+                            </span>
+                        </div>
+                    </li>
+                    <li class="server-item" aria-hidden="true">
+                        <img src="https://cdn.discordapp.com/icons/946738284195872828/e5f39917d000761594168bc9d3e20abc.png?size=1024" alt="Cortex Icon" class="server-logo">
+                        <div class="server-info">
+                            <p class="server-name">Cortex</p>
+                            <span class="server-members">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
+                                </svg>
+                                1,978 members
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+     
+    <section id="features" class="features">
+        <div class="features-container">
+            <div class="features-header">
+                <div class="section-badge">FEATURES</div>
+                <h2>Explore the features that make Codex Helper the ultimate Rise of Kingdoms bot for Discord communities.</h2>
+            </div>
+            
+            <div class="features-showcase">
+                <!-- Feature 1: Commander Guides (Content Left, Image Right) -->
+                <div class="feature-showcase-item">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-chess-queen"></i>
+                        </div>
+                        <h3>Commander Guides</h3>
+                        <p>Comprehensive commander guides including pairings, talents, equipment and formation recommendations for EVERY single commander in the game and their appropriate uses. Get the edge you need in battle with detailed strategies.</p>
+                    </div>
+                    <div class="feature-image">
+                        <img src="images/f1.png" alt="Commander Guides">
+                    </div>
+                </div>
+
+                <!-- Feature 2: Ark of Osiris Signups (Image Left, Content Right) -->
+                <div class="feature-showcase-item">
+                    <div class="feature-image">
+                        <img src="images/f2.png" alt="Ark of Osiris Signups">
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <h3>Ark of Osiris Signups</h3>
+                        <p>Easily configured Ark of Osiris signups for multiple teams & alliances. Streamline your AoO organization with automated signup management and team coordination tools.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 3: Event Reminders (Content Left, Image Right) -->
+                <div class="feature-showcase-item">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h3>Event Reminders</h3>
+                        <p>Altar of Darkness and Ancient Ruins reminder setup. Never miss important events again with automated notifications and customizable reminder schedules for your alliance.</p>
+                    </div>
+                    <div class="feature-image">
+                        <img src="images/f3.png" alt="Event Reminders">
+                    </div>
+                </div>
+
+                <!-- Feature 4: Event Tracker (Image Left, Content Right) -->
+                <div class="feature-showcase-item">
+                    <div class="feature-image">
+                        <img src="images/f7.png" alt="Event Tracker">
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3>Event Tracker</h3>
+                        <p>Comprehensive event tracker for upcoming in-game events and all active events in the game. Stay ahead of the competition with real-time event information and detailed schedules.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 5: Bundle Information (Content Left, Image Right) -->
+                <div class="feature-showcase-item">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <h3>Bundle Information</h3>
+                        <p>Detailed bundle information for most commonly rotated bundles in the game. Make informed purchasing decisions with comprehensive bundle analysis and value calculations.</p>
+                    </div>
+                    <div class="feature-image">
+                        <img src="images/f4.png" alt="Bundle Information">
+                    </div>
+                </div>
+
+                <!-- Feature 6: KvK Commands (Image Left, Content Right) -->
+                <div class="feature-showcase-item">
+                    <div class="feature-image">
+                        <img src="images/f6.png" alt="KvK Commands">
+                    </div>
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-flag"></i>
+                        </div>
+                        <h3>KvK Commands</h3>
+                        <p>Useful KvK related commands for timers and flag calculations. Dominate Kingdom vs Kingdom battles with precise timing tools and strategic calculations for optimal performance.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 7: Event Information (Content Left, Image Right) -->
+                <div class="feature-showcase-item">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h3>Event Information</h3>
+                        <p>Comprehensive guides for all active in-game events. Stay informed about event mechanics, rewards, and strategies to maximize your performance during limited-time events.</p>
+                    </div>
+                    <div class="feature-image">
+                        <img src="images/f5.png" alt="Event Information">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Call to Action Section -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <h2>What are you still waiting for? Invite Codex Helper now!</h2>
+            <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="btn-primary"><i class="fas fa-external-link-alt"></i> Invite Now</a>
+        </div>
+    </section>
+    
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <img src="images/logo-gif.gif" alt="Codex Helper Logo" class="logo-image">
+                        <span>Codex Helper</span>
+                    </div>
+                    <p>The ultimate Discord bot for Rise of Kingdoms players and gaming communities.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Website Pages</h4>
+                        <a href="index.html">Home</a>
+                        <a href="faq.html">FAQ</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Support</h4>
+                        <a href="https://discord.com/channels/1031515159627300924/1314193270078967829" target="_blank">Discord Support</a>
+                        <a href="https://discord.com/channels/1031515159627300924/1320650068751155200" target="_blank">Feedback</a>
+                        <a href="https://www.patreon.com/settings/apps" target="_blank">Link Patreon</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="terms.html">Terms of Service</a>
+                        <a href="privacy.html">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Copyright © 2025 The King's Codex - All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
