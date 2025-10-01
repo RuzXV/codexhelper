@@ -994,8 +994,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     }
 }
 
-/* --- Media Queries --- */
-
 @media (max-width: 1024px) {
     .navbar {
         margin: var(--spacing-2);
@@ -1207,6 +1205,8 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         margin: 0 auto;
         height: auto;
         width: 100%;
+        padding-left: var(--spacing-4);
+        padding-right: var(--spacing-4);
     }
 
     .feature-showcase-item .feature-image img {
