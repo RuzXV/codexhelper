@@ -820,6 +820,12 @@ body {
     background-color: transparent;
 }
 
+.cta-text-prefix {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
 .cta-section .btn-primary .patreon-logo {
     height: 28px;
 }
@@ -1257,7 +1263,8 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         padding: var(--spacing-12) var(--spacing-4);
     }
     
-    .cta-section h2 {
+    .cta-section h2,
+    .cta-text-prefix {
         font-size: var(--font-size-2xl);
     }
     
