@@ -191,6 +191,11 @@ body {
     border-color: var(--accent-blue-hover);
 }
 
+.patreon-logo {
+    height: 16px;
+    width: auto;
+}
+
 .nav-link {
     color: var(--text-secondary);
     text-decoration: none;
@@ -291,8 +296,8 @@ body {
 }
 
 .hero-buttons .btn-primary {
-    padding: var(--spacing-1) var(--spacing-4);
-    border: 1px solid var(--accent-blue);
+    padding: var(--spacing-3) var(--spacing-6); /* Restored original padding */
+    border: none; /* Removed border override */
 }
 
 .hero-buttons .btn-secondary {
