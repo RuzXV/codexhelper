@@ -395,12 +395,18 @@ style.textContent = `
     }
     
     /* Server carousel styles */
+    .server-carousel-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-4);
+        margin-top: 50px;
+    }
+
     .server-list-container {
         overflow: hidden;
         position: relative;
         width: 100%;
         height: 80px;
-        margin-top: 50px; /* Increased space between heading and carousel */
     }
     
     .server-list {
@@ -409,7 +415,11 @@ style.textContent = `
         padding: 0;
         margin: 0;
         width: max-content;
-        animation: scroll-left 25s linear infinite; /* Slower duration */
+        animation: scroll-left 50s linear infinite; /* Adjusted base duration */
+    }
+
+    .server-list[data-direction="right"] {
+        animation-name: scroll-right;
     }
     
     @keyframes scroll-left {
@@ -420,9 +430,14 @@ style.textContent = `
             transform: translateX(-50%);
         }
     }
-    
-    .server-list:hover {
-        animation-play-state: paused;
+
+    @keyframes scroll-right {
+        0% {
+            transform: translateX(-50%);
+        }
+        100% {
+            transform: translateX(0);
+        }
     }
     
     .server-item {
@@ -674,23 +689,30 @@ async function fetchApiData(endpoint) {
 
 // Function to render top servers in carousel format
 function renderTopServers(servers) {
-    logMessage(`Rendering ${servers.length} servers in carousel`, 'debug');
-    const serverList = document.getElementById('serverList');
+    logMessage(`Rendering ${servers.length} servers into two carousel rows`, 'debug');
+    const serverListRow1 = document.getElementById('serverListRow1');
+    const serverListRow2 = document.getElementById('serverListRow2');
     
-    if (!serverList) {
-        logMessage('Server list element not found', 'error');
+    if (!serverListRow1 || !serverListRow2) {
+        logMessage('One or both server list elements not found', 'error');
         return;
     }
     
     if (servers.length === 0) {
-        serverList.innerHTML = '<li class="server-placeholder">No servers found</li>';
+        serverListRow1.innerHTML = '<li class="server-placeholder">No servers found</li>';
+        serverListRow2.innerHTML = ''; // Keep the second row empty
         return;
     }
     
-    // Clear the list
-    serverList.innerHTML = '';
+    // Clear the lists
+    serverListRow1.innerHTML = '';
+    serverListRow2.innerHTML = '';
+
+    // Split servers into two groups (up to 10 each)
+    const serversRow1 = servers.slice(0, 10);
+    const serversRow2 = servers.slice(10, 20);
     
-    // Create server items
+    // Helper function to create a server item element
     function createServerItem(server) {
         const serverItem = document.createElement('li');
         serverItem.className = 'server-item';
@@ -711,29 +733,42 @@ function renderTopServers(servers) {
         return serverItem;
     }
     
-    // Add each server twice to create the infinite loop effect
-    servers.forEach(server => {
-        serverList.appendChild(createServerItem(server));
-    });
+    // Populate the first row
+    if (serversRow1.length > 0) {
+        serversRow1.forEach(server => {
+            serverListRow1.appendChild(createServerItem(server));
+        });
+        // Duplicate for seamless loop
+        serversRow1.forEach(server => {
+            const duplicateItem = createServerItem(server);
+            duplicateItem.setAttribute('aria-hidden', 'true');
+            serverListRow1.appendChild(duplicateItem);
+        });
+    }
+
+    // Populate the second row
+    if (serversRow2.length > 0) {
+        serversRow2.forEach(server => {
+            serverListRow2.appendChild(createServerItem(server));
+        });
+        // Duplicate for seamless loop
+        serversRow2.forEach(server => {
+            const duplicateItem = createServerItem(server);
+            duplicateItem.setAttribute('aria-hidden', 'true');
+            serverListRow2.appendChild(duplicateItem);
+        });
+    }
     
-    // Add duplicate servers for seamless looping
-    servers.forEach(server => {
-        const duplicateItem = createServerItem(server);
-        duplicateItem.setAttribute('aria-hidden', 'true');
-        serverList.appendChild(duplicateItem);
-    });
+    // Dynamically adjust animation duration for a consistent speed
+    // 5 seconds per server item for a smooth, slow scroll
+    const animationDurationRow1 = serversRow1.length * 5; 
+    const animationDurationRow2 = serversRow2.length * 5;
     
-    // Update animation duration - slower speed for better readability
-    // Using a fixed duration based on number of servers for consistent speed
-    const animationDuration = servers.length * 5; // 5 seconds per server (slower)
-    const serverListElement = document.querySelector('.server-list');
-    if (serverListElement) {
-        serverListElement.style.animationDuration = `${animationDuration}s`;
-        // Force a reflow to ensure the animation starts immediately
-        serverListElement.style.animation = 'none';
-        setTimeout(() => {
-            serverListElement.style.animation = '';
-        }, 10);
+    if (serverListRow1) {
+        serverListRow1.style.animationDuration = `${animationDurationRow1}s`;
+    }
+    if (serverListRow2) {
+        serverListRow2.style.animationDuration = `${animationDurationRow2}s`;
     }
 }
 
@@ -867,14 +902,14 @@ async function loadApiData() {
         logMessage('Failed to load servers data, using pre-populated HTML', 'info');
         // Servers are already pre-populated in HTML, so no need to do anything
         // Just ensure the animation is running
-        const serverListElement = document.querySelector('.server-list');
-        if (serverListElement) {
+        const serverListElements = document.querySelectorAll('.server-list');
+        serverListElements.forEach(serverList => {
             // Reset animation to ensure it's running
-            serverListElement.style.animation = 'none';
+            serverList.style.animation = 'none';
             setTimeout(() => {
-                serverListElement.style.animation = '';
+                serverList.style.animation = '';
             }, 10);
-        }
+        });
     }
 }
 
@@ -980,7 +1015,3 @@ window.addEventListener('scroll', () => {
         ticking = true;
     }
 }, { passive: true });
-
-
-
-
