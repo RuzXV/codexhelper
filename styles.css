@@ -57,7 +57,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Navigation */
 .navbar {
     position: fixed;
     top: 0;
@@ -117,7 +116,6 @@ body {
     transform-origin: center;
 }
 
-/* Mobile hamburger menu fixes */
 @media (max-width: 768px) {
     .nav-menu-toggle {
         display: flex;
@@ -239,9 +237,6 @@ body {
     border-radius: 1px;
 }
 
-/* Patreon button styles restored */
-
-/* Hero Section */
 .hero {
     min-height: 100vh;
     display: flex;
@@ -329,12 +324,10 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
-/* Add specific styling for the Discord button */
 .hero-buttons .btn-secondary[href*="discord"] {
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Add specific styling for the Subscribe button */
 .hero-buttons .btn-primary {
     border: 1px solid var(--accent-blue);
 }
@@ -399,7 +392,6 @@ body {
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* Touch device optimizations */
 @media (hover: none) and (pointer: coarse) {
     .btn-primary:hover,
     .btn-secondary:hover,
@@ -432,7 +424,6 @@ body {
     }
 }
 
-/* Button responsiveness improvements */
 @media (max-width: 768px) {
     .btn-primary,
     .btn-secondary {
@@ -601,164 +592,6 @@ body {
     margin-bottom: var(--spacing-16);
 }
 
-.commanders {
-    padding: var(--spacing-24) var(--spacing-6);
-    background: var(--bg-secondary);
-}
-
-.commanders-container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.commanders-header {
-    text-align: center;
-    margin-bottom: var(--spacing-16);
-}
-
-.commanders-carousel {
-    position: relative;
-    overflow: hidden;
-    padding: 0 var(--spacing-12);
-}
-
-.commanders-wrapper {
-    overflow: hidden;
-}
-
-.commanders-track {
-    display: flex;
-    gap: var(--spacing-8);
-    transition: transform 0.5s ease;
-    touch-action: pan-x;
-    -webkit-overflow-scrolling: touch;
-}
-
-.commander-card {
-    flex: 0 0 calc(20% - var(--spacing-8) * 0.8);
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    position: relative;
-    min-width: 250px;
-}
-
-.commander-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.commander-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--border-hover);
-    background: var(--bg-tertiary);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-}
-
-.commander-card:hover::before {
-    opacity: 1;
-}
-
-.commander-image {
-    background: var(--bg-secondary);
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.commander-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.commander-info {
-    padding: var(--spacing-6);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.commander-name h3 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    margin-bottom: var(--spacing-1);
-    color: var(--text-primary);
-}
-
-.nickname {
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    margin: 0;
-}
-
-.power {
-    color: var(--accent-blue);
-    font-weight: 600;
-    font-size: var(--font-size-sm);
-    margin: 0;
-    text-align: right;
-}
-
-.carousel-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
-    min-height: 44px;
-    min-width: 44px;
-}
-
-.carousel-arrow:hover {
-    background: var(--bg-tertiary);
-    border-color: var(--border-hover);
-    transform: translateY(-50%) scale(1.1);
-}
-
-.carousel-arrow:active {
-    transform: translateY(-50%) scale(0.95);
-    background: var(--bg-tertiary);
-}
-
-.carousel-arrow i {
-    color: var(--text-primary);
-    font-size: var(--font-size-xl);
-}
-
-.left-arrow {
-    left: 0;
-}
-
-.right-arrow {
-    right: 0;
-}
-
 .section-badge {
     display: inline-block;
     background: var(--accent-blue-light);
@@ -780,22 +613,6 @@ body {
     padding: 0 var(--spacing-4);
 }
 
-.commanders-header h2 {
-    font-size: var(--font-size-3xl);
-    font-weight: 700;
-    line-height: 1.2;
-    max-width: 800px;
-    margin: 0 auto;
-    color: var(--text-primary);
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: var(--spacing-8);
-}
-
-/* Features Showcase Layout */
 .features-showcase {
     display: flex;
     flex-direction: column;
@@ -902,77 +719,30 @@ body {
     padding: var(--spacing-4);
 }
 
-.feature-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-8);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.feature-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.feature-card:hover {
-    border-color: var(--border-hover);
-    transform: translateY(-4px);
-    background: var(--bg-tertiary);
-}
-
-.feature-card:hover::before {
-    opacity: 1;
-}
-
-.feature-icon {
-    color: var(--accent-blue);
-    margin-bottom: var(--spacing-4);
-}
-
-.feature-card h3 {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    margin-bottom: var(--spacing-3);
-    color: var(--text-primary);
-}
-
-.feature-card p {
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
 .faq-hero {
     padding: 140px var(--spacing-6) var(--spacing-16);
     text-align: center;
     background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+}
+
+.faq-hero::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+    z-index: -1;
+    filter: blur(50px);
 }
 
 .faq-hero h1 {
     position: relative;
-    display: inline-block;
-}
-
-.faq-hero h1::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 150%; 
-    height: 150%;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
-    filter: blur(50px);
-    z-index: -1;
+    display: block;
 }
 
 .faq-question span {
@@ -1124,7 +894,6 @@ body {
     text-decoration: none;
 }
 
-/* Call to Action Section */
 .cta-section {
     padding: var(--spacing-16) var(--spacing-6);
     text-align: center;
@@ -1147,7 +916,6 @@ body {
     color: var(--text-primary);
 }
 
-/* Footer */
 .footer {
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-color);
@@ -1210,13 +978,15 @@ body {
 }
 
 .footer-column a {
+    min-height: auto;
     display: block;
     color: var(--text-secondary);
     text-decoration: none;
-    margin-bottom: 0;
-    padding-bottom: var(--spacing-1);
+    margin-bottom: var(--spacing-1);
+    padding: var(--spacing-1) 0;
     transition: color 0.2s ease;
     font-size: var(--font-size-sm);
+    justify-content: flex-start;
 }
 
 .footer-column a:hover {
@@ -1263,10 +1033,6 @@ body {
     
     .feature-showcase-item {
         gap: var(--spacing-8);
-    }
-    
-    .commanders-carousel {
-        padding: 0 var(--spacing-8);
     }
 }
 
@@ -1435,35 +1201,9 @@ body {
     }
     
     .feature-image {
-        height: 280px;
+        height: auto;
         margin: 0 auto;
         max-width: 400px;
-    }
-    
-    .commanders {
-        padding: var(--spacing-16) var(--spacing-4);
-    }
-    
-    .commanders-header h2 {
-        font-size: var(--font-size-2xl);
-    }
-    
-    .commanders-carousel {
-        padding: 0 var(--spacing-6);
-    }
-    
-    .commanders-track {
-        gap: var(--spacing-4);
-    }
-    
-    .commander-card {
-        min-width: 220px;
-        flex: 0 0 220px;
-    }
-    
-    .carousel-arrow {
-        width: 44px;
-        height: 44px;
     }
     
     .cta-section {
@@ -1547,7 +1287,6 @@ body {
     }
 }
 
-/* Mobile phones */
 @media (max-width: 480px) {
     .navbar {
         margin: var(--spacing-1);
@@ -1665,54 +1404,8 @@ body {
     }
     
     .feature-image {
-        height: 240px;
+        height: auto;
         max-width: none;
-    }
-    
-    .commanders {
-        padding: var(--spacing-12) var(--spacing-3);
-    }
-    
-    .commanders-header h2 {
-        font-size: var(--font-size-xl);
-    }
-    
-    .commanders-carousel {
-        padding: 0 var(--spacing-3);
-    }
-    
-    .commander-card {
-        min-width: 180px;
-        flex: 0 0 180px;
-    }
-    
-    .commander-image {
-        height: 140px;
-    }
-    
-    .commander-info {
-        padding: var(--spacing-4);
-    }
-    
-    .commander-name h3 {
-        font-size: var(--font-size-base);
-    }
-    
-    .nickname {
-        font-size: var(--font-size-xs);
-    }
-    
-    .power {
-        font-size: var(--font-size-xs);
-    }
-    
-    .carousel-arrow {
-        width: 36px;
-        height: 36px;
-    }
-    
-    .carousel-arrow i {
-        font-size: var(--font-size-base);
     }
     
     .cta-section {
@@ -1793,7 +1486,6 @@ body {
         font-size: var(--font-size-xs);
     }
 
-    /* Add more spacing between stats section and footer on mobile */
     .stats-cta {
         margin-bottom: var(--spacing-12);
     }
@@ -1848,7 +1540,6 @@ body {
     }
 }
 
-/* Extra small devices - Enhanced */
 @media (max-width: 480px) {
     .navbar {
         margin: 0;
@@ -1906,18 +1597,8 @@ body {
         font-size: var(--font-size-sm);
         line-height: 1.4;
     }
-    
-    .commander-card {
-        min-width: 160px;
-        flex: 0 0 160px;
-    }
-    
-    .commander-image {
-        height: 120px;
-    }
 }
 
-/* Touch-friendly improvements */
 @media (hover: none) and (pointer: coarse) {
     .btn-primary,
     .btn-secondary,
@@ -1933,12 +1614,10 @@ body {
     }
 }
 
-/* Smooth scrolling */
 html {
     scroll-behavior: smooth;
 }
 
-/* Mobile navigation overlay */
 .nav-overlay {
     position: fixed;
     top: 0;
@@ -1959,18 +1638,15 @@ html {
     visibility: visible;
 }
 
-/* Improved scrolling for mobile */
 body {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
 }
 
-/* Prevent zoom on input focus (iOS) */
 input, select, textarea {
     font-size: 16px;
 }
 
-/* Better tap targets */
 a, button, .nav-link, .faq-question, .carousel-arrow {
     min-height: 44px;
     min-width: 44px;
@@ -1985,7 +1661,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     transition: all 0.2s ease;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -2003,7 +1678,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     background: var(--border-hover);
 }
 
-/* Hide scrollbar on mobile */
 @media (max-width: 768px) {
     ::-webkit-scrollbar {
         width: 0px;
@@ -2011,9 +1685,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     }
 }
 
-/* Enhanced Mobile Optimizations */
-
-/* Improved navbar for mobile */
 @media (max-width: 768px) {
     .navbar {
         margin: var(--spacing-1);
@@ -2036,7 +1707,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     }
 }
 
-/* Better hero section mobile layout */
 @media (max-width: 768px) {
     .hero {
         padding: 80px var(--spacing-3) var(--spacing-12);
@@ -2071,7 +1741,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     }
 }
 
-/* Improved stats section */
 @media (max-width: 768px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -2096,7 +1765,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     }
 }
 
-/* Better feature showcase mobile layout */
 @media (max-width: 768px) {
     .feature-showcase-item {
         grid-template-columns: 1fr;
@@ -2112,43 +1780,19 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     
     .feature-image {
         order: 1;
-        height: 200px;
+        height: auto;
         max-width: 100%;
         margin: 0 auto;
     }
     
     .feature-image img {
         width: 100%;
-        height: 100%;
+        height: auto;
         object-fit: contain;
         border-radius: var(--radius-lg);
     }
 }
 
-/* Enhanced commander carousel for mobile */
-@media (max-width: 768px) {
-    .commanders-carousel {
-        padding: 0 var(--spacing-4);
-        margin: 0 -var(--spacing-4);
-    }
-    
-    .commander-card {
-        min-width: 200px;
-        flex: 0 0 200px;
-    }
-    
-    .commander-image {
-        height: 150px;
-    }
-    
-    .carousel-arrow {
-        width: 40px;
-        height: 40px;
-        font-size: var(--font-size-sm);
-    }
-}
-
-/* Better footer mobile layout */
 @media (max-width: 768px) {
     .footer-content {
         flex-direction: column;
@@ -2204,13 +1848,11 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         color: var(--text-primary);
     }
 
-    /* Add more spacing between stats section and footer on mobile */
     .stats-cta {
         margin-bottom: var(--spacing-12);
     }
 }
 
-/* Mobile feature section improvements */
 @media (max-width: 768px) {
     .feature-showcase-item {
         grid-template-columns: 1fr;
@@ -2264,7 +1906,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     
     .feature-image {
         order: 2;
-        height: 240px;
+        height: auto;
         max-width: 100%;
         margin: 0;
         width: 100%;
@@ -2294,11 +1936,10 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     }
     
     .feature-image {
-        height: 200px;
+        height: auto;
     }
 }
 
-/* Enhanced mobile navigation */
 @media (max-width: 768px) {
     .nav-links {
         position: fixed;
