@@ -603,7 +603,6 @@ body {
 .feature-image img {
     max-width: 100%;
     height: auto;
-    max-height: 450px;
     border-radius: var(--radius-lg);
     object-fit: contain;
     border: 1px solid rgba(255, 255, 255, 0.2);
