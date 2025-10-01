@@ -192,8 +192,12 @@ body {
 }
 
 .patreon-logo {
-    height: 16px;
+    height: 20px;
     width: auto;
+}
+
+.hero-buttons .btn-primary .patreon-logo {
+    height: 28px;
 }
 
 .nav-link {
@@ -800,17 +804,24 @@ body {
 .cta-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--spacing-12);
-    border-radius: var(--radius-xl);
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-    border: 1px solid var(--border-color);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-4);
 }
 
 .cta-section h2 {
     font-size: var(--font-size-3xl);
     font-weight: 700;
-    margin-bottom: var(--spacing-8);
-    color: var(--text-primary);
+    background: linear-gradient(90deg, var(--text-primary) 0%, var(--accent-blue-bright) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.cta-section .btn-primary .patreon-logo {
+    height: 28px;
 }
 
 .footer {
@@ -1252,7 +1263,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     
     .cta-section h2 {
         font-size: var(--font-size-2xl);
-        margin-bottom: var(--spacing-6);
     }
     
     .footer-content {
