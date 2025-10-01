@@ -284,8 +284,6 @@ body {
     padding: var(--spacing-16) 0;
 }
 
-/* Remove hero badge - not used in Tickety design */
-
 .hero-title {
     font-size: var(--font-size-5xl);
     font-weight: 700;
@@ -813,7 +811,7 @@ body {
 }
 
 .features-header h2 {
-    font-size: var(--font-size-4xl);
+    font-size: var(--font-size-3xl);
     font-weight: 700;
     line-height: 1.2;
     max-width: 800px;
@@ -823,7 +821,7 @@ body {
 }
 
 .commanders-header h2 {
-    font-size: var(--font-size-4xl);
+    font-size: var(--font-size-3xl);
     font-weight: 700;
     line-height: 1.2;
     max-width: 800px;
@@ -996,7 +994,7 @@ body {
 .faq-hero {
     padding: 140px var(--spacing-6) var(--spacing-16);
     text-align: center;
-    background: radial-gradient(ellipse 70% 150% at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+    background: radial-gradient(ellipse 70% 200% at 50% 150px, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
     background-repeat: no-repeat;
 }
 
