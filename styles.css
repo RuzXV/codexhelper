@@ -2379,3 +2379,16 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         margin-top: var(--spacing-4);
     }
 }
+
+.text-gradient {
+    background: linear-gradient(45deg, var(--text-primary), var(--accent-blue));
+    
+    -webkit-background-clip: text;
+    background-clip: text;
+    
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+}
