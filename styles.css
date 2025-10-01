@@ -1265,9 +1265,8 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         padding: var(--spacing-12) var(--spacing-4);
     }
     
-    .cta-section h2,
-    .cta-text-prefix {
-        font-size: var(--font-size-2xl);
+    .cta-section .animated-gradient-text {
+        font-size: var(--font-size-xl);
     }
 
     .cta-container {
