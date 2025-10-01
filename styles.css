@@ -192,7 +192,7 @@ body {
 }
 
 .patreon-logo {
-    height: 20px;
+    height: 30px;
     width: auto;
 }
 
@@ -796,7 +796,7 @@ body {
 }
 
 .cta-section {
-    padding: var(--spacing-16) var(--spacing-6);
+    padding: var(--spacing-16) 0;
     text-align: center;
     background: var(--bg-primary);
 }
@@ -805,7 +805,6 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: var(--spacing-4);
@@ -818,6 +817,7 @@ body {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-color: transparent;
 }
 
 .cta-section .btn-primary .patreon-logo {
@@ -1255,10 +1255,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
 
     .cta-section {
         padding: var(--spacing-12) var(--spacing-4);
-    }
-    
-    .cta-container {
-        padding: var(--spacing-8);
     }
     
     .cta-section h2 {
