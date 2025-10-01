@@ -610,7 +610,7 @@ body {
 }
 
 .feature-image img:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
     filter: drop-shadow(0 0 15px var(--accent-blue-bright));
     border-color: rgba(255, 255, 255, 0.5);
 }
@@ -1235,6 +1235,10 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         width: 56px;
         height: 56px;
         font-size: var(--font-size-2xl);
+    }
+
+    .feature-image img {
+        max-height: 450px;
     }
 
     .cta-section {
