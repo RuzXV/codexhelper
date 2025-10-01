@@ -246,13 +246,17 @@ style.textContent = `
         padding: 0;
         margin: 0;
         width: max-content;
+        /* Animation properties are now controlled by the .is-animated class */
+    }
+    
+    .server-list.is-animated {
         animation-name: scroll-left;
-        animation-duration: 60s; /* Set a fixed, long duration for smooth speed */
+        animation-duration: 60s;
         animation-timing-function: linear;
         animation-iteration-count: infinite;
     }
 
-    .server-list[data-direction="right"] {
+    .server-list[data-direction="right"].is-animated {
         animation-name: scroll-right;
     }
     
@@ -559,6 +563,7 @@ function renderTopServers(servers) {
             duplicateItem.setAttribute('aria-hidden', 'true');
             serverListRow1.appendChild(duplicateItem);
         });
+        serverListRow1.classList.add('is-animated');
     }
 
     if (serversRow2.length > 0) {
@@ -570,6 +575,7 @@ function renderTopServers(servers) {
             duplicateItem.setAttribute('aria-hidden', 'true');
             serverListRow2.appendChild(duplicateItem);
         });
+        serverListRow2.classList.add('is-animated');
     }
 }
 
