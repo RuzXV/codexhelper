@@ -259,17 +259,6 @@ body {
     overflow: hidden;
 }
 
-.hero::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 200px;
-    background: linear-gradient(to top, var(--bg-secondary), transparent);
-    z-index: 2;
-}
-
 .hero::before {
     content: '';
     position: absolute;
@@ -473,13 +462,10 @@ body {
 /* Stats Section */
 .stats {
     padding: var(--spacing-24) var(--spacing-6);
-    position: relative;
-
-    background-image:
-        radial-gradient(ellipse at center top, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-        linear-gradient(to bottom, var(--bg-secondary) 85%, var(--bg-primary) 100%);
-
+    background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1) 0%, transparent 60%), var(--bg-secondary);
     background-repeat: no-repeat;
+    background-position: center top;
+    position: relative;
 }
 
 .top-servers,
