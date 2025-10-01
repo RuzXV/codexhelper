@@ -935,7 +935,6 @@ body {
     border-radius: var(--radius-lg);
     object-fit: contain;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
     transition: all 0.3s ease-in-out;
 }
 
@@ -1290,9 +1289,6 @@ body {
     font-size: var(--font-size-sm);
 }
 
-/* Responsive Design */
-
-/* Large tablets and small desktops */
 @media (max-width: 1024px) {
     .navbar {
         margin: var(--spacing-2);
@@ -1329,7 +1325,6 @@ body {
     }
 }
 
-/* Tablets */
 @media (max-width: 768px) {
     .navbar {
         margin: var(--spacing-2);
