@@ -1,7 +1,0 @@
-.btn {
-  @include button-styles(hsla(211, 95%, 52%, 0.14), $text-color);
-  border-color: hsla(227, 58%, 65%, 0.5);
-  &:hover {
-    background-color: rgba(114, 137, 218, 0.5);
-  }
-}
