@@ -810,15 +810,9 @@ body {
     gap: var(--spacing-4);
 }
 
-.cta-section h2,
-.cta-text-prefix {
+.cta-section .animated-gradient-text {
     font-size: var(--font-size-3xl);
     font-weight: 700;
-    background: linear-gradient(90deg, var(--text-primary) 0%, var(--accent-blue-bright) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-color: transparent;
 }
 
 .cta-section .btn-primary .patreon-logo {
@@ -1010,6 +1004,19 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     100% {
       background-position: 0% center;
     }
+}
+
+.animated-gradient-text {
+    background: linear-gradient(90deg, 
+      var(--text-primary), 
+      var(--accent-blue-bright), 
+      var(--text-primary)
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-flow 3s linear infinite;
 }
 
 @media (max-width: 1024px) {
