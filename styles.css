@@ -723,21 +723,7 @@ body {
     padding: 140px var(--spacing-6) var(--spacing-16);
     text-align: center;
     background-repeat: no-repeat;
-    position: relative;
-    overflow: hidden;
-}
-
-.faq-hero::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 800px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-    z-index: -1;
-    filter: blur(50px);
+    background-image: radial-gradient(ellipse 80% 40% at center 50%, rgba(59, 130, 246, 0.12) 0%, transparent 60%);
 }
 
 .faq-hero h1 {
@@ -963,9 +949,8 @@ body {
 }
 
 .footer-links {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-2);
+    display: flex;
+    gap: var(--spacing-16);
     justify-content: flex-end;
     width: 100%;
     max-width: 600px;
