@@ -319,8 +319,12 @@ body {
     background-clip: text;
     color: transparent;
     position: relative;
-    text-shadow: -1px -1px 3px var(--bg-primary), 1px -1px 3px var(--bg-primary), -1px 1px 3px var(--bg-primary), 1px 1px 3px var(--bg-primary);
+    filter: drop-shadow(1px 1px 2px var(--bg-primary)) 
+            drop-shadow(-1px 1px 2px var(--bg-primary)) 
+            drop-shadow(1px -1px 2px var(--bg-primary)) 
+            drop-shadow(-1px -1px 2px var(--bg-primary));
 }
+
 @keyframes sparkle-breathe {
     0% {
         background-position: 200% center;
@@ -1144,6 +1148,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     animation-name: sparkle;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
+    opacity: 0;
 }
 
 @keyframes sparkle {
