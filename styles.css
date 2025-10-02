@@ -322,7 +322,11 @@ body {
     -webkit-text-fill-color: transparent;
     animation: flow-gradient 8s ease-in-out infinite;
 
-    -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.9);
+    text-shadow:
+      -1.5px -1.5px 0 rgba(0, 0, 0, 0.9),  
+       1.5px -1.5px 0 rgba(0, 0, 0, 0.9),
+      -1.5px  1.5px 0 rgba(0, 0, 0, 0.9),
+       1.5px  1.5px 0 rgba(0, 0, 0, 0.9);
 }
 
 @keyframes flow-gradient {
@@ -667,10 +671,10 @@ body {
     align-self: flex-start;
 }
 
-.feature-content .feature-icon i {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.feature-icon img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain; 
 }
 
 .feature-content h3 {
