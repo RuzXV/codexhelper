@@ -308,18 +308,22 @@ body {
     font-weight: 700;
     line-height: 1.1;
     margin-bottom: var(--spacing-6);
-    background: linear-gradient(135deg, 
-        var(--accent-blue-bright) 0%, 
-        #ffffff 50%, 
-        var(--accent-blue) 100%
-    );
-    background-size: 300% 300%;
+    
+    background: linear-gradient(135deg, var(--color-stop-1), var(--color-stop-2));
+    
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
     color: transparent;
-    position: relative;
-    animation: pulse-color 5s ease-in-out infinite;
+    
+    animation: breathing-color 3s ease-in-out infinite;
+
+    text-shadow: 
+        -1px -1px 0 #000,  
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000,
+        0 0 25px rgba(59, 130, 246, 0.6);
 }
 
 .hero-title::after {
@@ -345,10 +349,19 @@ body {
     animation: crystal-shine 4s ease-in-out infinite;
 }
 
-@keyframes pulse-color {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+@keyframes breathing-color {
+    0% {
+        --color-stop-1: #ffffff;
+        --color-stop-2: #f0f0f0;
+    }
+    50% {
+        --color-stop-1: var(--accent-blue-bright);
+        --color-stop-2: var(--accent-blue);
+    }
+    100% {
+        --color-stop-1: #ffffff;
+        --color-stop-2: #f0f0f0;
+    }
 }
 
 @keyframes crystal-shine {
