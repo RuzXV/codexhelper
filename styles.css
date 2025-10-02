@@ -308,27 +308,27 @@ body {
     font-weight: 700;
     line-height: 1.1;
     margin-bottom: var(--spacing-6);
-    
-    background: linear-gradient(135deg, var(--color-stop-1), var(--color-stop-2));
-    
+
+    background: var(--hero-title-color);
+
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: breathing-color 3s ease-in-out infinite;
+    background-clip: text;
+
+    animation: breathing-fade 5s ease-in-out infinite;
+
     text-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
 }
 
-@keyframes breathing-color {
+@keyframes breathing-fade {
     0% {
-        --color-stop-1: #ffffff;
-        --color-stop-2: #f0f0f0;
+        --hero-title-color: #ffffff;
     }
     50% {
-        --color-stop-1: var(--accent-blue-bright);
-        --color-stop-2: var(--accent-blue);
+        --hero-title-color: var(--accent-blue-bright);
     }
     100% {
-        --color-stop-1: #ffffff;
-        --color-stop-2: #f0f0f0;
+        --hero-title-color: #ffffff;
     }
 }
 
