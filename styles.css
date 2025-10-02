@@ -1618,43 +1618,58 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
 }
 
 .hero-buttons .btn-primary {
-    position: relative;
-    background: var(--bg-secondary); /* Dark background */
+    background: linear-gradient(145deg, #3b82f6, #2563eb); /* Rich blue gradient */
+    border: 1px solid rgba(255, 255, 255, 0.8);
     color: white;
     font-weight: 500;
-    border: 2px solid transparent; /* Transparent border to hold space */
-    background-clip: padding-box; /* Important for border gradient */
-    z-index: 1;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25), 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* The gradient border element */
-.hero-buttons .btn-primary::before {
+/* The shine pseudo-element */
+.hero-buttons .btn-primary::after {
     content: '';
     position: absolute;
-    top: -2px; left: -2px;
-    right: -2px; bottom: -2px;
-    background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6, #60a5fa);
-    background-size: 300% 100%;
-    border-radius: var(--radius-md); /* Match the button's border-radius */
+    top: -50%;
+    left: -75%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0) 40%,
+        rgba(255, 255, 255, 0.5) 50%,
+        rgba(255, 255, 255, 0) 60%,
+        rgba(255, 255, 255, 0)
+    );
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.4s ease;
     z-index: -1;
-    animation: gradient-border-flow 4s linear infinite;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
-}
-
-/* Keyframes for the border animation */
-@keyframes gradient-border-flow {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 300% 50%; }
 }
 
 /* Hover effect */
 .hero-buttons .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(167, 139, 250, 0.2);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25), 0 8px 25px rgba(59, 130, 246, 0.3);
 }
 
-.hero-buttons .btn-primary:hover::before {
+/* Animate the shine on hover */
+.hero-buttons .btn-primary:hover::after {
     opacity: 1;
+    animation: crystal-shine 1.2s ease-out;
+}
+
+@keyframes crystal-shine {
+    from {
+        left: -75%;
+        top: -50%;
+    }
+    to {
+        left: -15%;
+        top: -10%;
+    }
 }
