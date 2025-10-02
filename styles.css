@@ -1203,7 +1203,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     
     .nav-links {
         position: fixed;
-        top: 70px;
+        top: 80px;
         right: var(--spacing-4);
         flex-direction: column;
         background: rgba(30, 30, 35, 0.6);
