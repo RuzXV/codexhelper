@@ -292,7 +292,7 @@ body {
 .hero::after {
     background-image: url('/images/caesar.png');
     background-position: bottom right;
-    right: 6vw;
+    right: 2vw;
 }
 
 .hero-container {
@@ -319,16 +319,19 @@ body {
     background-clip: text;
     color: transparent;
     position: relative;
+    text-shadow: -1px -1px 3px var(--bg-primary), 1px -1px 3px var(--bg-primary), -1px 1px 3px var(--bg-primary), 1px 1px 3px var(--bg-primary);
 }
-
-@keyframes breathe-effect {
+@keyframes sparkle-breathe {
     0% {
+        background-position: 200% center;
         opacity: 0;
     }
     50% {
+        background-position: -20% center;
         opacity: 1;
     }
     100% {
+        background-position: -200% center;
         opacity: 0;
     }
 }
@@ -345,17 +348,25 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    color: white;
-    -webkit-text-fill-color: white;
-    opacity: 0;
-    animation: breathe-effect 4s ease-in-out infinite;
+    text-align: center;
+
+    background: linear-gradient(100deg, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 80%);
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    animation: sparkle-breathe 4s ease-in-out infinite;
 }
 
 .hero-description {
     font-size: var(--font-size-xl);
     color: #c9d2e3;
     margin-bottom: var(--spacing-8);
-    max-width: 600px;
+    max-width: none;
+    white-space: nowrap;
     margin-left: auto;
     margin-right: auto;
     font-weight: 400;
@@ -1274,6 +1285,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         line-height: 1.5;
         margin-bottom: var(--spacing-6);
         max-width: 90%;
+        white-space: normal;
     }
     
     .hero-buttons {
