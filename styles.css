@@ -312,7 +312,6 @@ body {
     background: linear-gradient(135deg, var(--color-stop-1), var(--color-stop-2));
     
     -webkit-background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
     
     animation: breathing-color 3s ease-in-out infinite;
