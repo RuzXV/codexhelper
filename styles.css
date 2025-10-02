@@ -1271,15 +1271,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         width: 100%;
     }
     
-    .hero-buttons .btn-primary,
-    .hero-buttons .btn-secondary {
-        width: 100%;
-        max-width: 320px;
-        padding: var(--spacing-4) var(--spacing-6);
-        font-size: var(--font-size-base);
-        min-height: 48px;
-    }
-
     .top-servers {
         padding-top: 75px;
         padding-bottom: 75px;
