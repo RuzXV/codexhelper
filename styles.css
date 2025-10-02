@@ -291,7 +291,7 @@ body {
 .hero::after {
     background-image: url('/images/caesar.png');
     background-position: bottom right;
-    right: -8vw;
+    right: -5vw;
 }
 
 .hero-container {
@@ -304,7 +304,7 @@ body {
 
 .hero-title {
     font-size: clamp(3rem, 10vw, 6.5rem);
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.1;
     margin-bottom: var(--spacing-6);
     background: linear-gradient(135deg, 
@@ -318,14 +318,12 @@ body {
     background-clip: text;
     color: transparent;
     animation: title-breathe 4s ease-in-out infinite;
-    -webkit-text-stroke: 1px rgba(0,0,0,0.5);
-    text-shadow: 0 0 1px rgba(0,0,0,0.5);
 }
 
 @keyframes title-breathe {
-    0% { background-position: 50% 0%; }
-    50% { background-position: 50% 100%; }
-    100% { background-position: 50% 0%; }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .hero-title .highlight {
