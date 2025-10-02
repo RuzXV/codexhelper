@@ -789,3 +789,35 @@ window.addEventListener('scroll', () => {
         ticking = true;
     }
 }, { passive: true });
+
+function createStars() {
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+
+    const starContainer = document.createElement('div');
+    starContainer.className = 'stars';
+    hero.appendChild(starContainer);
+
+    const starCount = 100;
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        
+        const size = Math.random() * 2 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        
+        star.style.animationDelay = `${Math.random() * 5}s`;
+        star.style.animationDuration = `${3 + Math.random() * 4}s`;
+
+        starContainer.appendChild(star);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createStars();
+});
