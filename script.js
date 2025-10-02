@@ -47,7 +47,6 @@ function createStars() {
 createStars();
 
 document.addEventListener('DOMContentLoaded', function() {
-    createParticles();
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
