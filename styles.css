@@ -1166,7 +1166,9 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
 
     .nav-menu-toggle {
         display: flex;
-        position: relative;
+        position: fixed;
+        right: 21px;
+        top: 15px;
         z-index: 1002;
         transform: translateZ(1px);
     }
