@@ -831,6 +831,9 @@ body {
     padding: var(--spacing-8);
     max-width: 600px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .contact-card h3 {
@@ -1203,7 +1206,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     
     .nav-links {
         position: fixed;
-        top: 80px;
+        top: 70px;
         right: var(--spacing-4);
         flex-direction: column;
         background: rgba(30, 30, 35, 0.6);
