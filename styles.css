@@ -322,14 +322,12 @@ body {
     animation: pulse-color 5s ease-in-out infinite;
 
     text-shadow: 
-        -1px -1px 0 rgba(0, 0, 0, 0.4),  
-         1px -1px 0 rgba(0, 0, 0, 0.4),
-        -1px  1px 0 rgba(0, 0, 0, 0.4),
-         1px  1px 0 rgba(0, 0, 0, 0.4),
-
-        0 0 25px rgba(59, 130, 246, 0.6),
-
-        inset 0 0 5px rgba(255, 255, 255, 0.3);
+        -1px -1px 0 #000,  
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000,
+         
+        0 0 25px rgba(59, 130, 246, 0.6);
 }
 
 .hero-title::after {
