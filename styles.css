@@ -313,15 +313,8 @@ body {
     
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    
     animation: breathing-color 3s ease-in-out infinite;
-
-    text-shadow: 
-        -1px -1px 0 #000,  
-         1px -1px 0 #000,
-        -1px  1px 0 #000,
-         1px  1px 0 #000,
-        0 0 25px rgba(59, 130, 246, 0.6);
+    text-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
 }
 
 @keyframes breathing-color {
