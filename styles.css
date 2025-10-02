@@ -235,32 +235,38 @@ body {
     align-items: center;
     padding: 0 var(--spacing-6);
     text-align: center;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     position: relative;
     overflow: hidden;
+    background: 
+        radial-gradient(ellipse at center, rgba(59, 130, 246, 0.15) 0%, transparent 55%),
+        var(--bg-primary);
+}
+
+.hero::before,
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 30vw;
+    max-width: 400px;
+    height: 60vh;
+    max-height: 550px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 1;
+    opacity: 0.7;
 }
 
 .hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
-    z-index: 0;
+    background-image: url('/images/mulan.png');
+    background-position: bottom left;
+    left: 4%;
 }
 
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(12, 12, 15, 0.7);
-    z-index: 1;
+.hero::after {
+    background-image: url('/images/caesar.png');
+    background-position: bottom right;
+    right: 4%;
 }
 
 .hero-container {
@@ -272,14 +278,15 @@ body {
 }
 
 .hero-title {
-    font-size: var(--font-size-5xl);
-    font-weight: 700;
+    font-size: clamp(3rem, 10vw, 6.5rem);
+    font-weight: 800;
     line-height: 1.1;
     margin-bottom: var(--spacing-6);
-    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+    background: linear-gradient(135deg, #ffffff, #c0c8e0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    text-shadow: 0 0 20px rgba(90, 160, 255, 0.6), 0 0 40px rgba(90, 160, 255, 0.4);
 }
 
 .hero-title .highlight {
@@ -288,12 +295,13 @@ body {
 }
 
 .hero-description {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
     color: var(--text-secondary);
     margin-bottom: var(--spacing-8);
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
+    font-weight: 400;
 }
 
 .hero-buttons {
@@ -1170,6 +1178,13 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         font-size: clamp(1.75rem, 8vw, 2.5rem);
         line-height: 1.1;
         margin-bottom: var(--spacing-4);
+    }
+
+    .hero::before,
+    .hero::after {
+        width: 35vw;
+        height: 45vh;
+        opacity: 0.4;
     }
     
     .hero-description {
