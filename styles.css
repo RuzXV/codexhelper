@@ -697,7 +697,6 @@ body {
 
 .feature-image img:hover {
     transform: scale(1.05);
-    filter: drop-shadow(0 0 15px var(--accent-blue-bright));
     border-color: rgba(255, 255, 255, 0.5);
 }
 
@@ -1166,6 +1165,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         display: flex;
         position: relative;
         z-index: 1002;
+        transform: translateZ(1px);
     }
     
     .hamburger.active span:nth-child(1) {
@@ -1713,5 +1713,11 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
 
   .feature-image img {
     max-height: 500px;
+  }
+}
+
+@media (hover: hover) {
+  .feature-image img:hover {
+     filter: drop-shadow(0 0 15px var(--accent-blue-bright));
   }
 }

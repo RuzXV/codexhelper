@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
             body.style.width = '';
             body.style.overflow = '';
             
-            window.scrollTo(0, savedScrollY);
+            window.scrollTo({ top: savedScrollY, behavior: 'instant' });
 
         } else {
             savedScrollY = window.scrollY;
