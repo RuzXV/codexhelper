@@ -71,6 +71,9 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--border-hover);
 }
+* {
+    -webkit-tap-highlight-color: transparent;
+}
 
 .navbar {
     position: fixed;
@@ -1142,11 +1145,20 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
 @media (max-width: 768px) {
     .btn-primary,
     .btn-secondary {
-        width: 100%;
         max-width: 300px;
-        margin: 0 auto;
+        margin: 0;
         min-height: 48px;
         font-size: var(--font-size-base);
+        flex-grow: 0;
+        flex-shrink: 1;
+        width: auto;
+        padding: var(--spacing-3) var(--spacing-6);
+    }
+
+    .hero-buttons .btn-primary,
+    .hero-buttons .btn-secondary {
+        width: auto;
+        max-width: 280px;
     }
 
     .nav-menu-toggle {
@@ -1190,26 +1202,32 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     
     .nav-links {
         position: fixed;
-        top: 0;
-        right: -100%;
+        top: 70px;
+        right: var(--spacing-2);
         flex-direction: column;
-        background: var(--bg-secondary);
-        width: 280px;
-        height: 100vh;
-        padding: 80px 24px 40px;
-        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
-        z-index: 1001;
-        gap: var(--spacing-4);
-        border-left: 1px solid var(--border-color);
+        background: rgba(30, 30, 35, 0.6);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
+        width: 220px;
+        height: auto;
+        padding: var(--spacing-4);
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        z-index: 1001;
+        gap: var(--spacing-2);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
         justify-content: flex-start;
         align-items: stretch;
+        opacity: 0;
+        transform: translateY(-10px);
+        visibility: hidden;
     }
-    
+
     .nav-links.active {
-        right: 0;
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
     }
     
     .nav-links .patreon-btn {
@@ -1334,8 +1352,8 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         margin: 0 auto;
         height: auto;
         width: 100%;
-        padding-left: 0;
-        padding-right: 0;
+        padding-left: var(--spacing-4);
+        padding-right: var(--spacing-4);
     }
 
     .feature-showcase-item .feature-image img {
@@ -1463,7 +1481,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
 
     .navbar {
         margin: var(--spacing-1);
-        border-radius: 0;
     }
     
     .nav-container {
@@ -1619,7 +1636,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         gap: var(--spacing-4);
         text-align: left;
         max-width: none;
-        justify-content: flex-start;
+        justify-content: center;
     }
 
     .footer-column {
