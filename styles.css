@@ -261,10 +261,11 @@ body {
     position: relative;
     overflow: hidden;
     background: 
-        radial-gradient(ellipse at center, rgba(59, 130, 246, 0.15) 0%, transparent 55%),
+        radial-gradient(ellipse at center, rgba(59, 130, 246, 0.25) 0%, transparent 55%),
         var(--bg-primary);
     width: 100vw;
 }
+
 .hero::before,
 .hero::after {
     content: '';
@@ -303,39 +304,36 @@ body {
     padding: var(--spacing-16) 0;
 }
 
-@property --hero-title-color {
-    syntax: '<color>';
-    inherits: false;
-    initial-value: #ffffff;
-}
-
 .hero-title {
     font-size: clamp(3rem, 10vw, 6.5rem);
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1.1;
     margin-bottom: var(--spacing-6);
 
-    background: var(--hero-title-color);
-
+    background: linear-gradient(
+        90deg,
+        #ffffff 0%,
+        var(--accent-blue-bright) 50%,
+        #ffffff 100%
+    );
+    background-size: 200% auto;
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: flow-gradient 8s ease-in-out infinite;
 
-    animation-name: breathing-fade;
-    animation-duration: 3s;
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-
-    text-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+    -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.9);
 }
 
-@keyframes breathing-fade {
-    from {
-        --hero-title-color: #ffffff;
+@keyframes flow-gradient {
+    0% {
+        background-position: 0% 50%;
     }
-    to {
-        --hero-title-color: #5aa0ff;
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
     }
 }
 
