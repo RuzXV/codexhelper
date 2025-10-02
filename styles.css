@@ -286,7 +286,7 @@ body {
 .hero::before {
     background-image: url('/images/mulan.png');
     background-position: bottom 4rem left;
-    left: -15vw;
+    left: -10vw;
 }
 
 .hero::after {
