@@ -326,29 +326,6 @@ body {
         0 0 25px rgba(59, 130, 246, 0.6);
 }
 
-.hero-title::after {
-    content: 'Codex Helper';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    
-    background: linear-gradient(100deg, 
-        rgba(255, 255, 255, 0) 20%, 
-        rgba(255, 255, 255, 0.5) 50%, 
-        rgba(255, 255, 255, 0) 80%
-    );
-    background-size: 200% 100%;
-    background-repeat: no-repeat;
-    
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    
-    animation: crystal-shine 4s ease-in-out infinite;
-}
-
 @keyframes breathing-color {
     0% {
         --color-stop-1: #ffffff;
@@ -361,15 +338,6 @@ body {
     100% {
         --color-stop-1: #ffffff;
         --color-stop-2: #f0f0f0;
-    }
-}
-
-@keyframes crystal-shine {
-    0% {
-        background-position: 200% center;
-    }
-    100% {
-        background-position: -200% center;
     }
 }
 
