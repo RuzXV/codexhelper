@@ -246,28 +246,30 @@ body {
 .hero::after {
     content: '';
     position: absolute;
-    bottom: -5vh;
-    width: 55vw;
-    max-width: 800px; 
-    height: 90vh;
-    max-height: 950px;
+    bottom: 0;
+    width: 60vw;
+    max-width: 900px; 
+    height: 95vh;
+    max-height: 1000px;
     background-size: contain;
     background-repeat: no-repeat;
     z-index: 1;
-    opacity: 0.8;
+    opacity: 0.9;
     transition: opacity 0.3s ease;
+    mask-image: linear-gradient(to top, transparent 0%, black 25%);
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 25%);
 }
 
 .hero::before {
     background-image: url('/images/mulan.png');
     background-position: bottom left;
-    left: -5vw;
+    left: -12vw;
 }
 
 .hero::after {
     background-image: url('/images/caesar.png');
     background-position: bottom right;
-    right: -12vw;
+    right: -8vw;
 }
 
 .hero-container {
@@ -283,11 +285,24 @@ body {
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: var(--spacing-6);
-    background: linear-gradient(135deg, #ffffff, #c0c8e0);
+    background: linear-gradient(135deg, 
+        var(--accent-blue-bright) 0%, 
+        #ffffff 50%, 
+        var(--accent-blue-bright) 100%
+    );
+    background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 0 20px rgba(90, 160, 255, 0.6), 0 0 40px rgba(90, 160, 255, 0.4);
+    animation: title-breathe 4s ease-in-out infinite;
+    -webkit-text-stroke: 1px rgba(0,0,0,0.5);
+    text-shadow: 0 0 1px rgba(0,0,0,0.5);
+}
+
+@keyframes title-breathe {
+    0% { background-position: 50% 0%; }
+    50% { background-position: 50% 100%; }
+    100% { background-position: 50% 0%; }
 }
 
 .hero-title .highlight {
@@ -297,12 +312,13 @@ body {
 
 .hero-description {
     font-size: var(--font-size-xl);
-    color: var(--text-secondary);
+    color: #c9d2e3;
     margin-bottom: var(--spacing-8);
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
     font-weight: 400;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
 }
 
 .hero-buttons {
@@ -1066,6 +1082,12 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     height: 100%;
     z-index: 0;
     overflow: hidden;
+    animation: star-fade-in 2s ease-out;
+}
+
+@keyframes star-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .star {

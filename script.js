@@ -16,40 +16,35 @@ function subscribePatreon() {
     window.open(patreonURL, '_blank');
 }
 
-function createParticles() {
+function createStars() {
     const hero = document.querySelector('.hero');
     if (!hero) return;
-    
-    const particlesContainer = document.createElement('div');
-    particlesContainer.className = 'particles';
-    particlesContainer.style.cssText = `
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 0;
-    `;
-    
-    hero.appendChild(particlesContainer);
-    
-    for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        particle.style.cssText = `
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(59, 130, 246, 0.3);
-            border-radius: 50%;
-            animation: float ${3 + Math.random() * 4}s ease-in-out infinite;
-            left: ${Math.random() * 100}%;
-            top: ${Math.random() * 100}%;
-            animation-delay: ${Math.random() * 2}s;
-        `;
-        particlesContainer.appendChild(particle);
+
+    const starContainer = document.createElement('div');
+    starContainer.className = 'stars';
+    hero.appendChild(starContainer);
+
+    const starCount = 100;
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        
+        const size = Math.random() * 2 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        
+        star.style.animationDelay = `${Math.random() * 5}s`;
+        star.style.animationDuration = `${3 + Math.random() * 4}s`;
+
+        starContainer.appendChild(star);
     }
 }
+
+createStars();
 
 document.addEventListener('DOMContentLoaded', function() {
     createParticles();
@@ -789,35 +784,3 @@ window.addEventListener('scroll', () => {
         ticking = true;
     }
 }, { passive: true });
-
-function createStars() {
-    const hero = document.querySelector('.hero');
-    if (!hero) return;
-
-    const starContainer = document.createElement('div');
-    starContainer.className = 'stars';
-    hero.appendChild(starContainer);
-
-    const starCount = 100;
-
-    for (let i = 0; i < starCount; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        
-        star.style.top = `${Math.random() * 100}%`;
-        star.style.left = `${Math.random() * 100}%`;
-        
-        const size = Math.random() * 2 + 1;
-        star.style.width = `${size}px`;
-        star.style.height = `${size}px`;
-        
-        star.style.animationDelay = `${Math.random() * 5}s`;
-        star.style.animationDuration = `${3 + Math.random() * 4}s`;
-
-        starContainer.appendChild(star);
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    createStars();
-});
