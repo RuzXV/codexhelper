@@ -25,7 +25,7 @@ function createStars() {
     hero.appendChild(starContainer);
 
     const isMobile = window.innerWidth < 768;
-    const starCount = isMobile ? 30 : 100;
+    const starCount = isMobile ? 15 : 100;
 
     for (let i = 0; i < starCount; i++) {
         const star = document.createElement('div');
