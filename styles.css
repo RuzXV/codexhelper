@@ -1514,7 +1514,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         gap: var(--spacing-2);
     }
     
-    ..hero-buttons .btn-primary,
+    .hero-buttons .btn-primary,
     .hero-buttons .btn-secondary {
         width: auto;
         max-width: 280px;
