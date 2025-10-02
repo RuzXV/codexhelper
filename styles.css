@@ -1618,41 +1618,43 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
 }
 
 .hero-buttons .btn-primary {
-    background: rgba(59, 130, 246, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    position: relative;
+    background: var(--bg-secondary); /* Dark background */
     color: white;
     font-weight: 500;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    border: 2px solid transparent; /* Transparent border to hold space */
+    background-clip: padding-box; /* Important for border gradient */
     z-index: 1;
+    transition: all 0.3s ease;
 }
 
+/* The gradient border element */
 .hero-buttons .btn-primary::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.4), 
-        transparent
-    );
-    transition: left 0.4s ease;
+    top: -2px; left: -2px;
+    right: -2px; bottom: -2px;
+    background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6, #60a5fa);
+    background-size: 300% 100%;
+    border-radius: var(--radius-md); /* Match the button's border-radius */
     z-index: -1;
+    animation: gradient-border-flow 4s linear infinite;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
 }
 
+/* Keyframes for the border animation */
+@keyframes gradient-border-flow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+/* Hover effect */
 .hero-buttons .btn-primary:hover {
-    background: rgba(59, 130, 246, 0.4);
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(167, 139, 250, 0.2);
 }
 
 .hero-buttons .btn-primary:hover::before {
-    left: 100%;
+    opacity: 1;
 }
