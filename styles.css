@@ -780,6 +780,10 @@ body {
 
 .faq-answer a:not(.btn-primary):not(.btn-secondary),
 .faq-content a:not(.btn-primary):not(.btn-secondary) {
+    display: inline;
+    min-height: auto;
+    min-width: auto;
+    justify-content: flex-start;
     word-break: break-all;
     overflow-wrap: break-word;
     color: var(--accent-blue);
