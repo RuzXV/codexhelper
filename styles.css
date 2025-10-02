@@ -292,7 +292,7 @@ body {
 .hero::after {
     background-image: url('/images/caesar.png');
     background-position: bottom right;
-    right: 1vw;
+    right: 0vw;
 }
 
 .hero-container {
