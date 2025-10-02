@@ -303,6 +303,12 @@ body {
     padding: var(--spacing-16) 0;
 }
 
+@property --hero-title-color {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: #ffffff;
+}
+
 .hero-title {
     font-size: clamp(3rem, 10vw, 6.5rem);
     font-weight: 700;
@@ -315,20 +321,21 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
 
-    animation: breathing-fade 5s ease-in-out infinite;
+    animation-name: breathing-fade;
+    animation-duration: 3s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
 
     text-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
 }
 
 @keyframes breathing-fade {
-    0% {
+    from {
         --hero-title-color: #ffffff;
     }
-    50% {
-        --hero-title-color: var(--accent-blue-bright);
-    }
-    100% {
-        --hero-title-color: #ffffff;
+    to {
+        --hero-title-color: #5aa0ff;
     }
 }
 
