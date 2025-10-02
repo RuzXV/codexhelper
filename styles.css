@@ -263,8 +263,8 @@ body {
     background: 
         radial-gradient(ellipse at center, rgba(59, 130, 246, 0.15) 0%, transparent 55%),
         var(--bg-primary);
+    width: 100vw;
 }
-
 .hero::before,
 .hero::after {
     content: '';
@@ -292,7 +292,7 @@ body {
 .hero::after {
     background-image: url('/images/caesar.png');
     background-position: bottom right;
-    right: 3vw;
+    right: -1vw;
 }
 
 .hero-container {
