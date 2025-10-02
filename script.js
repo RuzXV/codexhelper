@@ -105,25 +105,38 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.className = 'nav-overlay';
     document.body.appendChild(overlay);
     
+    let savedScrollY;
+
     function toggleMobileMenu() {
         const isActive = navLinks.classList.contains('active');
+        const body = document.body;
         
         if (isActive) {
             navLinks.classList.remove('active');
             hamburger.classList.remove('active');
             overlay.classList.remove('active');
-            document.body.style.overflow = '';
-            document.body.style.position = '';
+
+            body.style.position = '';
+            body.style.top = '';
+            body.style.width = '';
+            body.style.overflow = '';
+            
+            window.scrollTo(0, savedScrollY);
+
         } else {
+            savedScrollY = window.scrollY;
+
+            body.style.position = 'fixed';
+            body.style.top = `-${savedScrollY}px`;
+            body.style.width = '100%';
+            body.style.overflow = 'hidden';
+
             navLinks.classList.add('active');
             hamburger.classList.add('active');
             overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.width = '100%';
         }
     }
-    
+        
     if (mobileMenuToggle && hamburger) {
         mobileMenuToggle.addEventListener('click', (e) => {
             e.preventDefault();

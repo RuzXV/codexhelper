@@ -692,6 +692,7 @@ body {
     object-fit: contain;
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease-in-out;
+    transform: translateZ(0);
 }
 
 .feature-image img:hover {
@@ -1487,11 +1488,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         height: 36px;
     }
     
-    .nav-links {
-        width: 100%;
-        padding: 70px 20px 40px;
-    }
-    
     .hero {
         padding: 80px var(--spacing-3) var(--spacing-12);
         min-height: 75vh;
@@ -1513,10 +1509,10 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
         gap: var(--spacing-2);
     }
     
-    .hero-buttons .btn-primary,
+    ..hero-buttons .btn-primary,
     .hero-buttons .btn-secondary {
-        width: 100%;
-        max-width: none;
+        width: auto;
+        max-width: 280px;
     }
     
     .stats-grid {
