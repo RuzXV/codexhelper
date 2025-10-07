@@ -672,36 +672,89 @@ function handleApiError(error, section) {
     }
 }
 
+function showOfflineWarning() {
+    let warningEl = document.getElementById('offline-warning');
+    if (!warningEl) {
+        warningEl = document.createElement('div');
+        warningEl.id = 'offline-warning';
+        warningEl.style.position = 'fixed';
+        warningEl.style.bottom = '20px';
+        warningEl.style.left = '20px';
+        warningEl.style.backgroundColor = 'var(--accent-yellow)';
+        warningEl.style.color = 'var(--bg-primary)';
+        warningEl.style.padding = '10px 15px';
+        warningEl.style.borderRadius = 'var(--radius-md)';
+        warningEl.style.zIndex = '2000';
+        warningEl.style.fontSize = 'var(--font-size-sm)';
+        warningEl.style.fontWeight = '500';
+        warningEl.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+        document.body.appendChild(warningEl);
+    }
+    warningEl.textContent = '⚠️ Displaying cached data. Live stats are currently unavailable.';
+}
+
 async function loadApiData() {
     logMessage('Starting API data loading', 'info');
-    logMessage(`User agent: ${navigator.userAgent}`, 'debug');
-    logMessage(`Current origin: ${window.location.origin}`, 'debug');
-    logMessage(`Current protocol: ${window.location.protocol}`, 'debug');
-    
-    if (!window.fetch) {
-        logMessage('Fetch API not supported in this browser', 'error');
-        return;
-    }
-    
+    let wasDataLoadedFromCache = false;
+
     try {
-        logMessage('Loading stats data', 'info');
+        logMessage('Attempting to fetch live stats data...', 'info');
         const statsData = await fetchApiData(STATS_ENDPOINT);
         updateStats(statsData);
-        logMessage('Stats data loaded and displayed successfully', 'info');
+        localStorage.setItem('statsCache', JSON.stringify({
+            timestamp: Date.now(),
+            data: statsData
+        }));
+        logMessage('Live stats loaded and cached.', 'info');
     } catch (error) {
-        logMessage('Failed to load stats data, using default values', 'info');
+        logMessage('Failed to load live stats. Attempting to load from cache.', 'warn');
+        const cachedStats = localStorage.getItem('statsCache');
+        if (cachedStats) {
+            const { timestamp, data } = JSON.parse(cachedStats);
+            if (Date.now() - timestamp < CACHE_DURATION) {
+                logMessage('Found valid cached stats. Rendering...', 'info');
+                updateStats(data);
+                wasDataLoadedFromCache = true;
+            } else {
+                logMessage('Cached stats are stale (> 24 hours old).', 'warn');
+            }
+        } else {
+            logMessage('No cached stats found.', 'warn');
+        }
     }
-    
+
     try {
-        logMessage('Loading top servers data', 'info');
+        logMessage('Attempting to fetch live top servers data...', 'info');
         const serversData = await fetchApiData(TOP_SERVERS_ENDPOINT);
         renderTopServers(serversData);
-        logMessage('Top servers data loaded and displayed successfully', 'info');
+        localStorage.setItem('serversCache', JSON.stringify({
+            timestamp: Date.now(),
+            data: serversData
+        }));
+        logMessage('Live top servers loaded and cached.', 'info');
     } catch (error) {
-        logMessage('Failed to load servers data, using pre-populated HTML', 'info');
-        const serverListElements = document.querySelectorAll('.server-list');
-        serverListElements.forEach(serverList => {
-        });
+        logMessage('Failed to load live servers. Attempting to load from cache.', 'warn');
+        const cachedServers = localStorage.getItem('serversCache');
+        if (cachedServers) {
+            const { timestamp, data } = JSON.parse(cachedServers);
+            if (Date.now() - timestamp < CACHE_DURATION) {
+                logMessage('Found valid cached servers. Rendering...', 'info');
+                renderTopServers(data);
+                wasDataLoadedFromCache = true;
+            } else {
+                logMessage('Cached servers are stale (> 24 hours old).', 'warn');
+            }
+        } else {
+            logMessage('No cached servers found.', 'warn');
+            const serverListElements = document.querySelectorAll('.server-list');
+            serverListElements.forEach(serverList => {
+                serverList.innerHTML = '<li class="server-error">Could not load server list</li>';
+            });
+        }
+    }
+    
+    if (wasDataLoadedFromCache) {
+        showOfflineWarning();
     }
 }
 
