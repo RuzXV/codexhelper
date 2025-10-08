@@ -68,56 +68,58 @@
         </div>
     </nav>
 
-    <section class="tool-hero">
-        <div class="tool-hero-container">
-            <div class="section-badge">Community Tools</div>
-            <h1>Alliance Mail Generator</h1>
-            <p>Create formatted in-game mails for your alliance with ease.</p>
-        </div>
-    </section>
-
-    <section class="tool-content">
-        <div class="tool-container">
-            <div class="mail-generator">
-                <div class="toolbar">
-                    <button id="bold-btn" class="toolbar-btn"><i class="fas fa-bold"></i></button>
-                    <button id="italic-btn" class="toolbar-btn"><i class="fas fa-italic"></i></button>
-                    <div class="tool-group">
-                        <select id="size-select" class="toolbar-select">
-                            <option value="20">Size</option>
-                            <option value="12">12</option>
-                            <option value="14">14</option>
-                            <option value="16">16</option>
-                            <option value="18">18</option>
-                            <option value="20">20</option>
-                            <option value="24">24</option>
-                            <option value="30">30</option>
-                            <option value="36">36</option>
-                        </select>
-                    </div>
-                    <div class="tool-group">
-                        <select id="color-select" class="toolbar-select">
-                            <option value="">Color</option>
-                            <option value="red">Red</option>
-                            <option value="green">Green</option>
-                            <option value="blue">Blue</option>
-                            <option value="yellow">Yellow</option>
-                            <option value="orange">Orange</option>
-                            <option value="purple">Purple</option>
-                        </select>
-                        <input type="color" id="hex-color-picker" class="toolbar-color-picker" value="#ffffff">
-                        <button id="hex-color-btn" class="toolbar-btn">Apply</button>
-                    </div>
-                </div>
-                <textarea id="mail-input" placeholder="Enter your alliance mail content here..."></textarea>
-                <div class="mail-preview-container">
-                    <h3>Preview</h3>
-                    <div id="mail-preview"></div>
-                </div>
-                <button id="copy-btn" class="btn-primary">Copy to Clipboard</button>
+    <main class="tool-page-wrapper">
+        <section class="tool-hero">
+            <div class="tool-hero-container">
+                <div class="section-badge">Community Tools</div>
+                <h1>Alliance Mail Generator</h1>
+                <p>Create formatted in-game mails for your alliance with ease.</p>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <section class="tool-content">
+            <div class="tool-container">
+                <div class="mail-generator">
+                    <div class="toolbar">
+                        <button id="bold-btn" class="toolbar-btn"><i class="fas fa-bold"></i></button>
+                        <button id="italic-btn" class="toolbar-btn"><i class="fas fa-italic"></i></button>
+                        <div class="tool-group">
+                            <select id="size-select" class="toolbar-select">
+                                <option value="20">Size</option>
+                                <option value="12">12</option>
+                                <option value="14">14</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                                <option value="20">20</option>
+                                <option value="24">24</option>
+                                <option value="30">30</option>
+                                <option value="36">36</option>
+                            </select>
+                        </div>
+                        <div class="tool-group">
+                            <select id="color-select" class="toolbar-select">
+                                <option value="">Color</option>
+                                <option value="red">Red</option>
+                                <option value="green">Green</option>
+                                <option value="blue">Blue</option>
+                                <option value="yellow">Yellow</option>
+                                <option value="orange">Orange</option>
+                                <option value="purple">Purple</option>
+                            </select>
+                            <input type="color" id="hex-color-picker" class="toolbar-color-picker" value="#ffffff">
+                            <button id="hex-color-btn" class="toolbar-btn">Apply</button>
+                        </div>
+                    </div>
+                    <textarea id="mail-input" placeholder="Enter your alliance mail content here..."></textarea>
+                    <div class="mail-preview-container">
+                        <h3>Preview</h3>
+                        <div id="mail-preview"></div>
+                    </div>
+                    <button id="copy-btn" class="btn-primary">Copy to Clipboard</button>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <footer class="footer">
         <div class="footer-container">
