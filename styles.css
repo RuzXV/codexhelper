@@ -71,17 +71,16 @@ body {
     position: absolute;
     z-index: -1;
 
-    top: 20%;
-    left: 25%;
+    /* --- Customize Your Glow Here --- */
 
-    width: 50%;
-    height: 70%;
+    /* Shape & Position (a tall, thin, invisible rectangle) */
+    width: 30%;
+    height: 80%;
+    left: 35%; /* (100% - 30% width) / 2 */
+    top: 15%;
 
-    border-radius: 1000px;
-
-    background-color: rgba(59, 130, 246, 0.12);
-
-    filter: blur(120px);
+    /* The high-quality glow effect using box-shadow */
+    box-shadow: 0 0 150px 100px rgba(59, 130, 246, 0.15);
 }
 
 ::-webkit-scrollbar {
