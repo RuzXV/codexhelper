@@ -58,7 +58,7 @@ body {
 }
 
 .page-wrapper {
-    background-image: radial-gradient(ellipse 65% 75% at 50% 55%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+    background-image: radial-gradient(ellipse 65% 75% at 50% 35%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
     background-repeat: no-repeat;
 }
 
@@ -704,10 +704,8 @@ body {
 }
 
 .faq-hero {
-    padding: 140px var(--spacing-6) var(--spacing-16);
+    padding: 100px var(--spacing-6) var(--spacing-16);
     text-align: center;
-    background-repeat: no-repeat;
-    background-image: radial-gradient(ellipse 50% 60% at center 65%, rgba(59, 130, 246, 0.12) 0%, transparent 60%);
 }
 
 .faq-hero h1 {
