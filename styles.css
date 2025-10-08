@@ -63,8 +63,25 @@ body {
 }
 
 .legal-page-wrapper {
-    background-image: radial-gradient(ellipse 35% 95% at 50% 60%, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
-    background-repeat: no-repeat;
+    position: relative;
+}
+
+.legal-page-wrapper::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+
+    top: 20%;
+    left: 25%;
+
+    width: 50%;
+    height: 70%;
+
+    border-radius: 1000px;
+
+    background-color: rgba(59, 130, 246, 0.12);
+
+    filter: blur(120px);
 }
 
 ::-webkit-scrollbar {
