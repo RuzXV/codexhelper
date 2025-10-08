@@ -1,3 +1,8 @@
+.navbar {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
 .sub-navbar {
     position: absolute;
     top: 100%;
@@ -73,7 +78,7 @@
 
 .tool-content {
     padding: 0 var(--spacing-6) var(--spacing-16);
-    background-image: radial-gradient(ellipse 50% 70% at 50% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+    background-image: radial-gradient(ellipse 80% 90% at 50% 40%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
     background-repeat: no-repeat;
 }
 
