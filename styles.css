@@ -63,7 +63,7 @@ body {
 }
 
 .legal-page-wrapper {
-    background-image: radial-gradient(ellipse 50% 95% at 50% 60%, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+    background-image: radial-gradient(ellipse 55% 80% at 50% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
     background-repeat: no-repeat;
     position: relative;
 }
