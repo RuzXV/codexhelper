@@ -57,6 +57,11 @@ body {
     overflow-x: hidden;
 }
 
+.page-wrapper {
+    background-image: radial-gradient(ellipse 65% 75% at 50% 55%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+    background-repeat: no-repeat;
+}
+
 ::-webkit-scrollbar {
     width: 10px;
 }
