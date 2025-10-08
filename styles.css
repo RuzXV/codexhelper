@@ -58,12 +58,12 @@ body {
 }
 
 .faq-page-wrapper {
-    background-image: radial-gradient(ellipse 65% 65% at 50% 45%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+    background-image: radial-gradient(ellipse 65% 70% at 50% 45%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
     background-repeat: no-repeat;
 }
 
 .legal-page-wrapper {
-    background-image: radial-gradient(ellipse 65% 95% at 50% 45%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+    background-image: radial-gradient(ellipse 65% 90% at 50% 45%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
     background-repeat: no-repeat;
 }
 
@@ -709,7 +709,7 @@ body {
 }
 
 .faq-hero {
-    padding: 100px var(--spacing-6) var(--spacing-10);
+    padding: 100px var(--spacing-6) var(--spacing-14);
     text-align: center;
 }
 
