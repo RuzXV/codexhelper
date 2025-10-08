@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.querySelectorAll('.btn-primary, .btn-secondary').forEach(button => {
+    document.querySelectorAll('.btn-primary:not(#copy-btn), .btn-secondary').forEach(button => {
         button.addEventListener('click', function(e) {
             if (this.getAttribute('href') && this.getAttribute('href').startsWith('http')) {
                 return;

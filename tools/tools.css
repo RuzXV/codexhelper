@@ -1,7 +1,22 @@
 .sub-navbar {
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
-    padding-top: 80px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgba(30, 30, 35, 0.6);
+    border-top: 1px solid var(--border-color);
+    border-radius: 0 0 20px 20px;
+    overflow: hidden;
+    transform: translateY(-10px);
+    opacity: 0;
+    animation: slide-down 0.4s ease-out forwards;
+}
+
+@keyframes slide-down {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .sub-nav-container {
@@ -15,7 +30,7 @@
 .sub-nav-link {
     color: var(--text-secondary);
     text-decoration: none;
-    padding: var(--spacing-3) var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-2);
     font-weight: 500;
     position: relative;
     transition: color 0.2s ease;
@@ -36,7 +51,7 @@
 }
 
 .tool-hero {
-    padding: var(--spacing-16) var(--spacing-6);
+    padding: 180px var(--spacing-6) var(--spacing-12);
     text-align: center;
 }
 
@@ -58,6 +73,8 @@
 
 .tool-content {
     padding: 0 var(--spacing-6) var(--spacing-16);
+    background-image: radial-gradient(ellipse 50% 70% at 50% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+    background-repeat: no-repeat;
 }
 
 .tool-container {

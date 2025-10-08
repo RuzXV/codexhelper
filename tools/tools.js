@@ -31,12 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
         text = text.replace(/<b>(.*?)<\/b>/g, '<strong>$1</strong>');
         text = text.replace(/<i>(.*?)<\/i>/g, '<em>$1</em>');
         text = text.replace(/<size=(\d+)>(.*?)<\/size>/g, '<span style="font-size: $1px;">$2</span>');
-        text = text.replace(/<color=(.*?)>(.*?)<\/color>/g, (match, color, content) => {
-            if (color.startsWith('#')) {
-                return `<span style="color: ${color};">${content}</span>`;
-            }
-            return `<span style="color: ${color};">${content}</span>`;
-        });
+        text = text.replace(/<color=([^>]+)>(.*?)<\/color>/g, '<span style="color: $1;">$2</span>');
+        
         mailPreview.innerHTML = text.replace(/\n/g, '<br>');
     }
 
