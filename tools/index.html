@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Tools - Codex Helper</title>
+        <meta name="description" content="A collection of tools to help Rise of Kingdoms players, including an Alliance Mail Generator.">
+    
+        <meta property="og:title" content="Tools - Codex Helper">
+        <meta property="og:description" content="A collection of tools to help Rise of Kingdoms players, including an Alliance Mail Generator.">
+        <meta property="og:image" content="https://codexhelper.com/images/logo_meta.png">
+        <meta property="og:url" content="https://codexhelper.com/tools">
+        <meta property="og:type" content="website">
+        <meta name="theme-color" content="#3b82f6">
+    
+        <link rel="stylesheet" href="/styles.css">
+        <link rel="stylesheet" href="/tools/tools.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+        <link rel="manifest" href="/images/favicon/site.webmanifest">
+
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-156DRH9ZB0"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-156DRH9ZB0');
+        </script>
+    </head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--spacing-2);">
+                    <img src="/images/logo-new.png" alt="Codex Helper Logo" class="logo-image">
+                    <span>Codex Helper</span>
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">
+                    <img src="/images/navi_home.png" alt="Home" class="nav-icon">
+                    <span>Home</span>
+                </a>
+                <a href="/faq/" class="nav-link">
+                    <img src="/images/navi_question.png" alt="FAQ" class="nav-icon">
+                    <span>FAQ</span>
+                </a>
+                <a href="/tools/" class="nav-link active">
+                    <img src="/images/navi_tools.png" alt="Tools" class="nav-icon">
+                    <span>Tools</span>
+                </a>
+                <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="patreon-btn">
+                    <img src="/images/patreon.png" alt="Patreon Logo" class="patreon-logo">
+                    <span>Subscribe</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <nav class="sub-navbar">
+        <div class="sub-nav-container">
+            <a href="/tools/" class="sub-nav-link active">Alliance Mail Generator</a>
+        </div>
+    </nav>
+
+    <section class="tool-hero">
+        <div class="tool-hero-container">
+            <div class="section-badge">Community Tools</div>
+            <h1>Alliance Mail Generator</h1>
+            <p>Create formatted in-game mails for your alliance with ease.</p>
+        </div>
+    </section>
+
+    <section class="tool-content">
+        <div class="tool-container">
+            <div class="mail-generator">
+                <div class="toolbar">
+                    <button id="bold-btn" class="toolbar-btn"><i class="fas fa-bold"></i></button>
+                    <button id="italic-btn" class="toolbar-btn"><i class="fas fa-italic"></i></button>
+                    <div class="tool-group">
+                        <select id="size-select" class="toolbar-select">
+                            <option value="20">Size</option>
+                            <option value="12">12</option>
+                            <option value="14">14</option>
+                            <option value="16">16</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
+                            <option value="24">24</option>
+                            <option value="30">30</option>
+                            <option value="36">36</option>
+                        </select>
+                    </div>
+                    <div class="tool-group">
+                        <select id="color-select" class="toolbar-select">
+                            <option value="">Color</option>
+                            <option value="red">Red</option>
+                            <option value="green">Green</option>
+                            <option value="blue">Blue</option>
+                            <option value="yellow">Yellow</option>
+                            <option value="orange">Orange</option>
+                            <option value="purple">Purple</option>
+                        </select>
+                        <input type="color" id="hex-color-picker" class="toolbar-color-picker" value="#ffffff">
+                        <button id="hex-color-btn" class="toolbar-btn">Apply</button>
+                    </div>
+                </div>
+                <textarea id="mail-input" placeholder="Enter your alliance mail content here..."></textarea>
+                <div class="mail-preview-container">
+                    <h3>Preview</h3>
+                    <div id="mail-preview"></div>
+                </div>
+                <button id="copy-btn" class="btn-primary">Copy to Clipboard</button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <img src="/images/logo-new.png" alt="Codex Helper Logo" class="logo-image">
+                        <span>Codex Helper</span>
+                    </div>
+                    <p>The ultimate Discord bot for Rise of Kingdoms players and gaming communities.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Website Pages</h4>
+                        <a href="/">Home</a>
+                        <a href="/faq/">FAQ</a>
+                        <a href="/tools/">Tools</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Support</h4>
+                        <a href="https://discord.com/channels/1031515159627300924/1314193270078967829" target="_blank">Discord Support</a>
+                        <a href="https://discord.com/channels/1031515159627300924/1320650068751155200" target="_blank">Feedback</a>
+                        <a href="https://www.patreon.com/settings/apps" target="_blank">Link Patreon</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="/terms/">Terms of Service</a>
+                        <a href="/privacy/">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Copyright © 2025 The King's Codex - All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+    <script src="/tools/tools.js"></script>
+</body>
+</html>
