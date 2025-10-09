@@ -86,59 +86,66 @@
                 </div>
     
                 <div id="generator-view" class="generator-view active">
-                    <div class="mail-generator">
-                        <div class="toolbar">
-                            <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
-                            <button id="italic-btn" class="toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
-                            
-                            <div class="tool-group">
-                                <i class="fas fa-text-height icon-prefix"></i>
-                                <select id="size-select" class="toolbar-select">
-                                    <option value="" disabled selected>Size</option>
-                                    <option value="12">12</option>
-                                    <option value="14">14</option>
-                                    <option value="16">16</option>
-                                    <option value="18">18</option>
-                                    <option value="20">20</option>
-                                    <option value="24">24</option>
-                                    <option value="30">30</option>
-                                    <option value="36">36</option>
-                                </select>
+                    <div class="generator-layout">
+                        <div class="generator-panel">
+                            <div class="mail-generator">
+                                <div class="toolbar">
+                                    <div class="toolbar-item">
+                                        <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
+                                        <label>Bold</label>
+                                    </div>
+                                    <div class="toolbar-item">
+                                        <button id="italic-btn" class="toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
+                                        <label>Italic</label>
+                                    </div>
+                                    <div class="toolbar-item">
+                                        <select id="size-select" class="toolbar-select">
+                                            <option value="" disabled selected>Size</option>
+                                            <option value="12">12</option>
+                                            <option value="14">14</option>
+                                            <option value="16">16</option>
+                                            <option value="18">18</option>
+                                            <option value="20">20</option>
+                                            <option value="24">24</option>
+                                            <option value="30">30</option>
+                                            <option value="36">36</option>
+                                        </select>
+                                    </div>
+                                    <div class="toolbar-item">
+                                        <div id="custom-color-dropdown" class="custom-dropdown">
+                                            <button id="custom-color-toggle" class="toolbar-btn"><i class="fas fa-palette"></i></button>
+                                            <div id="custom-color-options" class="custom-dropdown-options">
+                                                <div class="custom-option" data-value="red"><span class="color-swatch" style="background:red;"></span>Red</div>
+                                                <div class="custom-option" data-value="green"><span class="color-swatch" style="background:green;"></span>Green</div>
+                                                <div class="custom-option" data-value="blue"><span class="color-swatch" style="background:blue;"></span>Blue</div>
+                                                <div class="custom-option" data-value="yellow"><span class="color-swatch" style="background:yellow;"></span>Yellow</div>
+                                                <div class="custom-option" data-value="orange"><span class="color-swatch" style="background:orange;"></span>Orange</div>
+                                                <div class="custom-option" data-value="purple"><span class="color-swatch" style="background:purple;"></span>Purple</div>
+                                                <div class="custom-option" data-value="custom"><i class="fas fa-swatchbook color-wheel-icon"></i>Custom...</div>
+                                            </div>
+                                        </div>
+                                        <label>Color</label>
+                                    </div>
+                                    <div class="toolbar-item">
+                                        <button id="gradient-btn" class="toolbar-btn" title="Gradient"><i class="fas fa-brush"></i></button>
+                                        <label>Gradient</label>
+                                    </div>
+                                </div>
+                                <textarea id="mail-input" placeholder="Enter your alliance mail content here..."></textarea>
                             </div>
-    
-                            <div class="tool-group">
-                                 <i class="fas fa-palette icon-prefix"></i>
-                                <select id="color-select" class="toolbar-select">
-                                    <option value="" disabled selected>Color</option>
-                                    <option value="red">Red</option>
-                                    <option value="green">Green</option>
-                                    <option value="blue">Blue</option>
-                                    <option value="yellow">Yellow</option>
-                                    <option value="orange">Orange</option>
-                                    <option value="purple">Purple</option>
-                                    <option value="custom">Custom...</option>
-                                </select>
-                            </div>
-                            
-                            <button id="gradient-btn" class="toolbar-btn" title="Gradient">
-                                <i class="fas fa-brush"></i>
-                            </button>
                         </div>
-                        <textarea id="mail-input" placeholder="Enter your alliance mail content here..."></textarea>
-                        
-                        <div class="preview-controls">
-                            <h3>Preview</h3>
-                            <div class="preview-tabs">
-                                <button class="preview-tab-btn active" data-bg="mail">Mail Preview</button>
-                                <button class="preview-tab-btn" data-bg="board">Board Preview</button>
+                        <div class="preview-panel">
+                            <div class="preview-header">
+                                <div class="preview-tabs">
+                                    <button class="preview-tab-btn active" data-bg="mail">Mail Preview</button>
+                                    <button class="preview-tab-btn" data-bg="board">Board Preview</button>
+                                </div>
+                                <button id="copy-btn" class="btn-primary">Copy Code</button>
+                            </div>
+                            <div id="mail-preview-container" class="mail-preview-container mail-bg">
+                                <div id="mail-preview"></div>
                             </div>
                         </div>
-    
-                        <div id="mail-preview-container" class="mail-preview-container mail-bg">
-                            <div id="mail-preview"></div>
-                        </div>
-    
-                        <button id="copy-btn" class="btn-primary copy-btn-positioned">Copy to Clipboard</button>
                     </div>
                 </div>
     
@@ -147,8 +154,7 @@
                         <div class="template-filters">
                             <button id="filter-toggle-btn" class="btn-secondary"><i class="fas fa-filter"></i> Filters</button>
                         </div>
-                        <div id="template-gallery" class="template-gallery">
-                        </div>
+                        <div id="template-gallery" class="template-gallery"></div>
                         <div class="template-actions">
                             <button id="load-template-btn" class="btn-primary" disabled>Load Selected Template</button>
                         </div>
@@ -160,8 +166,7 @@
                         <h3>Filter Templates</h3>
                         <button id="filter-reset-btn" class="btn-secondary">Reset</button>
                     </div>
-                    <div id="filter-options" class="filter-options">
-                    </div>
+                    <div id="filter-options" class="filter-options"></div>
                 </div>
                 
                 <div id="gradient-modal" class="modal-overlay">
