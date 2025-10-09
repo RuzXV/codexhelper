@@ -353,22 +353,26 @@
 
 #mail-preview {
     position: absolute;
-    top: 65px;
-    left: 45px;
-    right: 45px;
-    bottom: 65px;
     padding: 0;
     margin: 0;
     line-height: 1.6;
     font-size: 15px;
     word-wrap: break-word;
     color: #e0e0e0;
-    max-width: 48ch;
     overflow-y: auto;
 }
 
 .mail-bg #mail-preview {
+    top: 55px;
+    left: 40px;
     color: #000000;
+    max-width: 48ch;
+}
+
+.board-bg #mail-preview {
+    top: 65px;
+    left: 45px;
+    max-width: 42ch;
 }
 
 #mail-preview strong { font-weight: bold; }
