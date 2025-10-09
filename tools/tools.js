@@ -62,24 +62,42 @@ document.addEventListener('DOMContentLoaded', function() {
         mailPreview.innerHTML = text.replace(/\n/g, '<br>');
     }
 
-    customColorToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        customColorOptions.classList.toggle('visible');
-    });
-
-    customColorOptions.addEventListener('click', (e) => {
-        const target = e.target.closest('.custom-option');
-        if (!target) return;
-
-        const value = target.dataset.value;
-
-        if (value === 'custom') {
-            hiddenColorPicker.click();
-        } else {
-            applyTag('color', value);
-            customColorOptions.classList.remove('visible');
+    function closeAllDropdowns() {
+        customColorOptions.classList.remove('visible');
+        customSizeOptions.classList.remove('visible');
         }
-    });
+
+        customColorToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = customColorOptions.classList.contains('visible');
+            closeAllDropdowns();
+            if (!isVisible) {
+                customColorOptions.classList.add('visible');
+            }
+        });
+
+        customSizeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = customSizeOptions.classList.contains('visible');
+            closeAllDropdowns();
+            if (!isVisible) {
+                customSizeOptions.classList.add('visible');
+            }
+        });
+
+        customColorOptions.addEventListener('click', (e) => {
+            const target = e.target.closest('.custom-option');
+            if (!target) return;
+        
+            const value = target.dataset.value;
+        
+            if (value === 'custom') {
+                hiddenColorPicker.click();
+            } else {
+                applyTag('color', value);
+                customColorOptions.classList.remove('visible');
+            }
+        });
 
     hiddenColorPicker.addEventListener('change', (e) => {
         applyTag('color', e.target.value);
@@ -87,8 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.addEventListener('click', () => {
-        customColorOptions.classList.remove('visible');
-        customSizeOptions.classList.remove('visible');
+        closeAllDropdowns();
     });
 
     function openGradientModal() { gradientModal.classList.add('visible'); }
@@ -285,7 +302,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!target) return;
         
         const value = target.dataset.value;
-        applyTag('size', value);
+        if (value === 'custom') {
+            const customSize = prompt("Enter a custom font size (e.g., 22):");
+            if (customSize && !isNaN(customSize)) {
+                applyTag('size', customSize);
+            }
+        } else {
+            applyTag('size', value);
+        }
+        
         customSizeOptions.classList.remove('visible');
     });
 

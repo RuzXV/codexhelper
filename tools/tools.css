@@ -186,6 +186,16 @@
     font-weight: 500;
 }
 
+.toolbar-item .toolbar-btn:hover {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    border-color: var(--accent-blue-bright);
+}
+
+.toolbar-item:hover label {
+    color: var(--text-primary);
+    text-shadow: 0 0 8px rgba(90, 160, 255, 0.7);
+}
+
 .toolbar-btn, .toolbar-select {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
@@ -274,14 +284,22 @@
     border: 1px solid var(--border-hover);
 }
 .color-wheel-icon {
-    color: var(--accent-blue-bright);
+    width: 16px;
+    height: 16px;
 }
 
 #custom-size-options {
     min-width: 80px;
 }
 #custom-size-options .custom-option {
-    justify-content: center;
+    justify-content: flex-start;
+    gap: var(--spacing-3);
+}
+
+#custom-size-options .custom-option i {
+    color: var(--text-muted);
+    width: 20px;
+    text-align: center;
 }
 
 .preview-header {
@@ -332,11 +350,13 @@
 }
 
 #mail-preview {
-    padding: 10px 15px; 
+    padding: 25px 30px;
     line-height: 1.6;
     font-size: 15px;
     word-wrap: break-word;
     color: #e0e0e0;
+    max-width: 94ch;
+    margin: 0 auto;
 }
 .mail-bg #mail-preview {
     color: #000000;
@@ -350,8 +370,6 @@
     top: var(--spacing-6);
     right: var(--spacing-6);
 }
-
-/* --- TEMPLATE GALLERY & FILTER STYLES --- */
 
 .template-gallery-container {
     background: var(--bg-secondary);
@@ -370,7 +388,7 @@
     gap: var(--spacing-4);
     max-height: 600px;
     overflow-y: auto;
-    padding-right: var(--spacing-2); /* For scrollbar */
+    padding-right: var(--spacing-2);
 }
 
 .template-item {
@@ -391,7 +409,7 @@
     padding: 0;
     margin: 0;
     border-width: 0;
-    font-size: 0; /* Helps with smooth collapse */
+    font-size: 0;
 }
 
 .template-item:hover {
@@ -424,7 +442,7 @@
 .filter-panel {
     position: fixed;
     top: 0;
-    right: -350px; /* Initially hidden */
+    right: -350px;
     width: 320px;
     height: 100%;
     background: var(--bg-secondary);
@@ -485,9 +503,6 @@
     color: var(--text-muted);
     border-color: var(--border-color);
 }
-
-
-/* --- GRADIENT MODAL STYLES --- */
 
 .modal-overlay {
     position: fixed;
