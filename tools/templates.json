@@ -1,0 +1,22 @@
+[
+    {
+        "title": "Ark of Osiris Registration",
+        "content": "<b><color=orange>Ark of Osiris Registration</color></b>\n\nHello Governors!\n\nPlease register for the upcoming Ark of Osiris match. Sign up with your in-game name below.\n\n<i>Let's aim for victory!</i>",
+        "tags": ["event", "registration", "aoo"]
+    },
+    {
+        "title": "Kingdom-wide Buff Notice",
+        "content": "<b><color=green>Kingdom Buff Activated!</color></b>\n\n<size=18><b>TRAINING BUFF IS NOW ACTIVE</b></size>\n\nFor the next 8 hours, all troop training speed is increased by 10%.\n\nUtilize this opportunity to strengthen your armies!",
+        "tags": ["announcement", "buffs", "kingdom"]
+    },
+    {
+        "title": "Alliance Fortress Build",
+        "content": "<b><color=red>URGENT: Alliance Fortress</color></b>\n\nWe are building a new Fortress in <b>[Coordinates]</b>.\n\nAll members are required to send builders to assist. Your contribution is crucial for our territory expansion.",
+        "tags": ["alliance", "building", "urgent"]
+    },
+    {
+        "title": "Pre-KvK Rally Cry",
+        "content": "<size=24><color=#FFD700>FOR THE KINGDOM!</color></size>\n\nWar is upon us. Prepare your troops, check your equipment, and be ready for the fight of your lives.\n\n<i><color=grey>No mercy, no retreat.</color></i>",
+        "tags": ["kvk", "war", "announcement"]
+    }
+]

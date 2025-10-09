@@ -76,46 +76,83 @@
                 <p>Create formatted in-game mails for your alliance with ease.</p>
             </div>
         </section>
-
+    
         <section class="tool-content">
             <div class="tool-container">
-                <div class="mail-generator">
-                    <div class="toolbar">
-                        <button id="bold-btn" class="toolbar-btn"><i class="fas fa-bold"></i></button>
-                        <button id="italic-btn" class="toolbar-btn"><i class="fas fa-italic"></i></button>
-                        <div class="tool-group">
-                            <select id="size-select" class="toolbar-select">
-                                <option value="20">Size</option>
-                                <option value="12">12</option>
-                                <option value="14">14</option>
-                                <option value="16">16</option>
-                                <option value="18">18</option>
-                                <option value="20">20</option>
-                                <option value="24">24</option>
-                                <option value="30">30</option>
-                                <option value="36">36</option>
-                            </select>
+    
+                <div class="generator-tabs">
+                    <button class="generator-tab-btn active" data-tab="generator">Mail Generator</button>
+                    <button class="generator-tab-btn" data-tab="templates">Load Template</button>
+                </div>
+    
+                <div id="generator-view" class="generator-view active">
+                    <div class="mail-generator">
+                        <div class="toolbar">
+                            <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
+                            <button id="italic-btn" class="toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
+                            
+                            <div class="tool-group">
+                                <i class="fas fa-text-height icon-prefix"></i>
+                                <select id="size-select" class="toolbar-select">
+                                    <option value="" disabled selected>Size</option>
+                                    <option value="12">12</option>
+                                    <option value="14">14</option>
+                                    <option value="16">16</option>
+                                    <option value="18">18</option>
+                                    <option value="20">20</option>
+                                    <option value="24">24</option>
+                                    <option value="30">30</option>
+                                    <option value="36">36</option>
+                                </select>
+                            </div>
+    
+                            <div class="tool-group">
+                                 <i class="fas fa-palette icon-prefix"></i>
+                                <select id="color-select" class="toolbar-select">
+                                    <option value="" disabled selected>Color</option>
+                                    <option value="red">Red</option>
+                                    <option value="green">Green</option>
+                                    <option value="blue">Blue</option>
+                                    <option value="yellow">Yellow</option>
+                                    <option value="orange">Orange</option>
+                                    <option value="purple">Purple</option>
+                                </select>
+                            </div>
+                            
+                            <div class="tool-group">
+                                <input type="color" id="hex-color-picker" class="toolbar-color-picker" value="#ffffff" title="Custom Color">
+                                <button id="hex-color-btn" class="toolbar-btn">Apply</button>
+                            </div>
                         </div>
-                        <div class="tool-group">
-                            <select id="color-select" class="toolbar-select">
-                                <option value="">Color</option>
-                                <option value="red">Red</option>
-                                <option value="green">Green</option>
-                                <option value="blue">Blue</option>
-                                <option value="yellow">Yellow</option>
-                                <option value="orange">Orange</option>
-                                <option value="purple">Purple</option>
-                            </select>
-                            <input type="color" id="hex-color-picker" class="toolbar-color-picker" value="#ffffff">
-                            <button id="hex-color-btn" class="toolbar-btn">Apply</button>
+                        <textarea id="mail-input" placeholder="Enter your alliance mail content here..."></textarea>
+                        
+                        <div class="preview-controls">
+                            <h3>Preview</h3>
+                            <div class="preview-tabs">
+                                <button class="preview-tab-btn active" data-bg="mail">Mail Preview</button>
+                                <button class="preview-tab-btn" data-bg="board">Board Preview</button>
+                            </div>
+                        </div>
+    
+                        <div id="mail-preview-container" class="mail-preview-container mail-bg">
+                            <div id="mail-preview"></div>
+                        </div>
+    
+                        <button id="copy-btn" class="btn-primary copy-btn-positioned">Copy to Clipboard</button>
+                    </div>
+                </div>
+    
+                <div id="templates-view" class="generator-view">
+                    <div class="template-gallery-container">
+                        <div class="template-filters">
+                            <input type="text" id="template-search" placeholder="Search templates...">
+                        </div>
+                        <div id="template-gallery" class="template-gallery">
+                        </div>
+                         <div class="template-actions">
+                            <button id="load-template-btn" class="btn-primary" disabled>Load Selected Template</button>
                         </div>
                     </div>
-                    <textarea id="mail-input" placeholder="Enter your alliance mail content here..."></textarea>
-                    <div class="mail-preview-container">
-                        <h3>Preview</h3>
-                        <div id="mail-preview"></div>
-                    </div>
-                    <button id="copy-btn" class="btn-primary">Copy to Clipboard</button>
                 </div>
             </div>
         </section>
