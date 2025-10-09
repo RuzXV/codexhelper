@@ -52,6 +52,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updatePreview() {
         let text = mailInput.value;
+        const charCount = text.length;
+        const charCounter = document.getElementById('char-counter');
+        charCounter.textContent = `${charCount}/2000`;
+        charCounter.style.color = charCount > 2000 ? 'var(--accent-red)' : 'var(--text-secondary)';
+
         text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         text = text.replace(/&lt;b&gt;(.*?)&lt;\/b&gt;/gis, '<strong>$1</strong>');
         text = text.replace(/&lt;i&gt;(.*?)&lt;\/i&gt;/gis, '<em>$1</em>');
@@ -294,7 +299,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     customSizeToggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        customSizeOptions.classList.toggle('visible');
+        const isVisible = customSizeOptions.classList.contains('visible');
+        closeAllDropdowns();
+        if (!isVisible) {
+            customSizeOptions.classList.add('visible');
+        }
     });
 
     customSizeOptions.addEventListener('click', (e) => {

@@ -350,14 +350,15 @@
 }
 
 #mail-preview {
-    padding: 25px 30px;
+    padding: 15px 20px;
     line-height: 1.6;
     font-size: 15px;
     word-wrap: break-word;
     color: #e0e0e0;
-    max-width: 94ch;
-    margin: 0 auto;
+    max-width: 48ch;
+    margin: 0;
 }
+
 .mail-bg #mail-preview {
     color: #000000;
 }
@@ -544,6 +545,13 @@
     display: flex;
     justify-content: space-around;
     margin: var(--spacing-6) 0;
+}
+
+.char-counter {
+    text-align: right;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-top: var(--spacing-2);
 }
 
 .color-input-group {
