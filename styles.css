@@ -99,6 +99,11 @@ body {
     border-radius: 20px;
     margin: var(--spacing-4) auto;
     max-width: 1200px;
+    position: relative;
+}
+
+body.home .navbar {
+    position: fixed;
 }
 
 .nav-container {

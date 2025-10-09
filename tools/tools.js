@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterOptionsContainer = document.getElementById('filter-options');
     const filterResetBtn = document.getElementById('filter-reset-btn');
 
+    const charCounter = document.getElementById('char-counter');
+    let currentCharLimit = 2000;
     let templates = [];
     let selectedTemplate = null;
 
@@ -53,9 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function updatePreview() {
         let text = mailInput.value;
         const charCount = text.length;
-        const charCounter = document.getElementById('char-counter');
-        charCounter.textContent = `${charCount}/2000`;
-        charCounter.style.color = charCount > 2000 ? 'var(--accent-red)' : 'var(--text-secondary)';
+        
+        charCounter.textContent = `${charCount}/${currentCharLimit}`;
+        charCounter.style.color = charCount > currentCharLimit ? '#ff4d4d' : 'var(--text-secondary)';
 
         text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         text = text.replace(/&lt;b&gt;(.*?)&lt;\/b&gt;/gis, '<strong>$1</strong>');
@@ -70,39 +72,39 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeAllDropdowns() {
         customColorOptions.classList.remove('visible');
         customSizeOptions.classList.remove('visible');
+    }
+
+    customColorToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = customColorOptions.classList.contains('visible');
+        closeAllDropdowns();
+        if (!isVisible) {
+            customColorOptions.classList.add('visible');
         }
+    });
 
-        customColorToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isVisible = customColorOptions.classList.contains('visible');
-            closeAllDropdowns();
-            if (!isVisible) {
-                customColorOptions.classList.add('visible');
-            }
-        });
+    customSizeToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = customSizeOptions.classList.contains('visible');
+        closeAllDropdowns();
+        if (!isVisible) {
+            customSizeOptions.classList.add('visible');
+        }
+    });
 
-        customSizeToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isVisible = customSizeOptions.classList.contains('visible');
-            closeAllDropdowns();
-            if (!isVisible) {
-                customSizeOptions.classList.add('visible');
-            }
-        });
-
-        customColorOptions.addEventListener('click', (e) => {
-            const target = e.target.closest('.custom-option');
-            if (!target) return;
-        
-            const value = target.dataset.value;
-        
-            if (value === 'custom') {
-                hiddenColorPicker.click();
-            } else {
-                applyTag('color', value);
-                customColorOptions.classList.remove('visible');
-            }
-        });
+    customColorOptions.addEventListener('click', (e) => {
+        const target = e.target.closest('.custom-option');
+        if (!target) return;
+    
+        const value = target.dataset.value;
+    
+        if (value === 'custom') {
+            hiddenColorPicker.click();
+        } else {
+            applyTag('color', value);
+            customColorOptions.classList.remove('visible');
+        }
+    });
 
     hiddenColorPicker.addEventListener('change', (e) => {
         applyTag('color', e.target.value);
@@ -285,26 +287,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     generatorTabBtn.addEventListener('click', () => switchView('generator'));
     templatesTabBtn.addEventListener('click', () => switchView('templates'));
+
     previewTabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             previewTabBtns.forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
             previewContainer.className = 'mail-preview-container';
-            previewContainer.classList.add(btn.dataset.bg === 'mail' ? 'mail-bg' : 'board-bg');
+
+            if (btn.dataset.bg === 'mail') {
+                previewContainer.classList.add('mail-bg');
+                currentCharLimit = 2000;
+                mailPreview.style.maxWidth = '48ch';
+            } else {
+                previewContainer.classList.add('board-bg');
+                currentCharLimit = 1000;
+                mailPreview.style.maxWidth = '42ch';
+            }
+            
+            updatePreview();
         });
     });
 
     boldBtn.addEventListener('click', () => applyTag('b'));
     italicBtn.addEventListener('click', () => applyTag('i'));
-
-    customSizeToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isVisible = customSizeOptions.classList.contains('visible');
-        closeAllDropdowns();
-        if (!isVisible) {
-            customSizeOptions.classList.add('visible');
-        }
-    });
 
     customSizeOptions.addEventListener('click', (e) => {
         const target = e.target.closest('.custom-option');

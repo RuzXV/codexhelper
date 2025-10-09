@@ -337,6 +337,7 @@
     border-style: solid;
     border-width: 50px 25px 50px 25px;
     min-height: 200px;
+    position: relative;
 }
 .mail-preview-container.mail-bg {
     border-image-source: url('/images/tools_mail_preview.jpg');
@@ -347,16 +348,23 @@
     border-image-source: url('/images/tools_board_preview.png');
     border-image-slice: 60 30 60 30 fill;
     border-image-repeat: stretch;
+    border-width: 60px 30px 60px 30px;
 }
 
 #mail-preview {
-    padding: 15px 20px;
+    position: absolute;
+    top: 65px;
+    left: 45px;
+    right: 45px;
+    bottom: 65px;
+    padding: 0;
+    margin: 0;
     line-height: 1.6;
     font-size: 15px;
     word-wrap: break-word;
     color: #e0e0e0;
     max-width: 48ch;
-    margin: 0;
+    overflow-y: auto;
 }
 
 .mail-bg #mail-preview {
