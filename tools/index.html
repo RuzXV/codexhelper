@@ -145,12 +145,42 @@
                 <div id="templates-view" class="generator-view">
                     <div class="template-gallery-container">
                         <div class="template-filters">
-                            <input type="text" id="template-search" placeholder="Search templates...">
+                            <button id="filter-toggle-btn" class="btn-secondary"><i class="fas fa-filter"></i> Filters</button>
                         </div>
                         <div id="template-gallery" class="template-gallery">
                         </div>
-                         <div class="template-actions">
+                        <div class="template-actions">
                             <button id="load-template-btn" class="btn-primary" disabled>Load Selected Template</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="filter-panel" class="filter-panel">
+                    <div class="filter-panel-header">
+                        <h3>Filter Templates</h3>
+                        <button id="filter-reset-btn" class="btn-secondary">Reset</button>
+                    </div>
+                    <div id="filter-options" class="filter-options">
+                    </div>
+                </div>
+                
+                <div id="gradient-modal" class="modal-overlay">
+                    <div class="modal-content">
+                        <h3>Create Gradient Text</h3>
+                        <p>Select two colors to apply a gradient to the selected text.</p>
+                        <div class="gradient-picker">
+                            <div class="color-input-group">
+                                <label for="gradient-color-1">Start Color</label>
+                                <input type="color" id="gradient-color-1" value="#3b82f6">
+                            </div>
+                            <div class="color-input-group">
+                                <label for="gradient-color-2">End Color</label>
+                                <input type="color" id="gradient-color-2" value="#ffffff">
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button id="apply-gradient-btn" class="btn-primary">Apply Gradient</button>
+                            <button id="cancel-gradient-btn" class="btn-secondary">Cancel</button>
                         </div>
                     </div>
                 </div>
