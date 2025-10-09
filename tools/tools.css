@@ -363,15 +363,15 @@
 }
 
 .mail-bg #mail-preview {
-    top: 5px;
-    left: 15px;
+    top: 0px;
+    left: 5px;
     color: #000000;
     max-width: 48ch;
 }
 
 .board-bg #mail-preview {
-    top: 5px;
-    left: 15px;
+    top: -10px;
+    left: -5px;
     max-width: 42ch;
 }
 
