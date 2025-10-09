@@ -182,7 +182,8 @@
 
 .toolbar-item label {
     font-size: var(--font-size-xs);
-    color: var(--text-muted);
+    color: var(--text-secondary);
+    font-weight: 500;
 }
 
 .toolbar-btn, .toolbar-select {
@@ -276,6 +277,13 @@
     color: var(--accent-blue-bright);
 }
 
+#custom-size-options {
+    min-width: 80px;
+}
+#custom-size-options .custom-option {
+    justify-content: center;
+}
+
 .preview-header {
     display: flex;
     justify-content: space-between;
@@ -324,7 +332,7 @@
 }
 
 #mail-preview {
-    padding: var(--spacing-3);
+    padding: 10px 15px; 
     line-height: 1.6;
     font-size: 15px;
     word-wrap: break-word;

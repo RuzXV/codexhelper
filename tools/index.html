@@ -99,17 +99,22 @@
                                         <label>Italic</label>
                                     </div>
                                     <div class="toolbar-item">
-                                        <select id="size-select" class="toolbar-select">
-                                            <option value="" disabled selected>Size</option>
-                                            <option value="12">12</option>
-                                            <option value="14">14</option>
-                                            <option value="16">16</option>
-                                            <option value="18">18</option>
-                                            <option value="20">20</option>
-                                            <option value="24">24</option>
-                                            <option value="30">30</option>
-                                            <option value="36">36</option>
-                                        </select>
+                                        <div id="custom-size-dropdown" class="custom-dropdown">
+                                            <button id="custom-size-toggle" class="toolbar-btn" title="Size">
+                                                <i class="fas fa-text-height"></i>
+                                            </button>
+                                            <div id="custom-size-options" class="custom-dropdown-options">
+                                                <div class="custom-option" data-value="12">12</div>
+                                                <div class="custom-option" data-value="14">14</div>
+                                                <div class="custom-option" data-value="16">16</div>
+                                                <div class="custom-option" data-value="18">18</div>
+                                                <div class="custom-option" data-value="20">20</div>
+                                                <div class="custom-option" data-value="24">24</div>
+                                                <div class="custom-option" data-value="30">30</div>
+                                                <div class="custom-option" data-value="36">36</div>
+                                            </div>
+                                        </div>
+                                        <label>Size</label>
                                     </div>
                                     <div class="toolbar-item">
                                         <div id="custom-color-dropdown" class="custom-dropdown">

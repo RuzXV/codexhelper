@@ -6,8 +6,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const boldBtn = document.getElementById('bold-btn');
     const italicBtn = document.getElementById('italic-btn');
-    const sizeSelect = document.getElementById('size-select');
     const gradientBtn = document.getElementById('gradient-btn');
+    const customSizeToggle = document.getElementById('custom-size-toggle');
+    const customSizeOptions = document.getElementById('custom-size-options');
 
     const customColorToggle = document.getElementById('custom-color-toggle');
     const customColorOptions = document.getElementById('custom-color-options');
@@ -87,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.addEventListener('click', () => {
         customColorOptions.classList.remove('visible');
+        customSizeOptions.classList.remove('visible');
     });
 
     function openGradientModal() { gradientModal.classList.add('visible'); }
@@ -272,9 +274,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     boldBtn.addEventListener('click', () => applyTag('b'));
     italicBtn.addEventListener('click', () => applyTag('i'));
-    sizeSelect.addEventListener('change', () => {
-        if (sizeSelect.value) applyTag('size', sizeSelect.value);
-        sizeSelect.selectedIndex = 0;
+
+    customSizeToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        customSizeOptions.classList.toggle('visible');
+    });
+
+    customSizeOptions.addEventListener('click', (e) => {
+        const target = e.target.closest('.custom-option');
+        if (!target) return;
+        
+        const value = target.dataset.value;
+        applyTag('size', value);
+        customSizeOptions.classList.remove('visible');
     });
 
     gradientBtn.addEventListener('click', openGradientModal);
