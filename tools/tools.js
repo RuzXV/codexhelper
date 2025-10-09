@@ -37,8 +37,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const charCounter = document.getElementById('char-counter');
     let currentCharLimit = 2000;
+    const CACHE_KEY = 'mailGeneratorCache';
+
     let templates = [];
     let selectedTemplate = null;
+
+    const cachedContent = localStorage.getItem(CACHE_KEY);
+    if (cachedContent) {
+        mailInput.value = cachedContent;
+    }
 
     function applyTag(tag, value = null) {
         const start = mailInput.selectionStart;
@@ -53,20 +60,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePreview() {
-        let text = mailInput.value;
+        const text = mailInput.value;
+        
+        localStorage.setItem(CACHE_KEY, text);
+
         const charCount = text.length;
         
         charCounter.textContent = `${charCount}/${currentCharLimit}`;
         charCounter.style.color = charCount > currentCharLimit ? '#ff4d4d' : 'var(--text-secondary)';
 
-        text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        text = text.replace(/&lt;b&gt;(.*?)&lt;\/b&gt;/gis, '<strong>$1</strong>');
-        text = text.replace(/&lt;i&gt;(.*?)&lt;\/i&gt;/gis, '<em>$1</em>');
-        text = text.replace(/&lt;size=(\d+)&gt;(.*?)&lt;\/size&gt;/gis, '<span style="font-size: $1px;">$2</span>');
-        text = text.replace(/&lt;color=([a-zA-Z0-9#]+)&gt;(.*?)&lt;\/color&gt;/gis, (match, colorValue, content) => {
+        let previewText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        previewText = previewText.replace(/&lt;b&gt;(.*?)&lt;\/b&gt;/gis, '<strong>$1</strong>');
+        previewText = previewText.replace(/&lt;i&gt;(.*?)&lt;\/i&gt;/gis, '<em>$1</em>');
+        previewText = previewText.replace(/&lt;size=(\d+)&gt;(.*?)&lt;\/size&gt;/gis, '<span style="font-size: $1px;">$2</span>');
+        previewText = previewText.replace(/&lt;color=([a-zA-Z0-9#]+)&gt;(.*?)&lt;\/color&gt;/gis, (match, colorValue, content) => {
             return `<span style="color: ${colorValue};">${content}</span>`;
         });
-        mailPreview.innerHTML = text.replace(/\n/g, '<br>');
+        mailPreview.innerHTML = previewText.replace(/\n/g, '<br>');
     }
 
     function closeAllDropdowns() {
@@ -297,11 +307,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (btn.dataset.bg === 'mail') {
                 previewContainer.classList.add('mail-bg');
                 currentCharLimit = 2000;
-                mailPreview.style.maxWidth = '48ch';
             } else {
                 previewContainer.classList.add('board-bg');
                 currentCharLimit = 1000;
-                mailPreview.style.maxWidth = '42ch';
             }
             
             updatePreview();
