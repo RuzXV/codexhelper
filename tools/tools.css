@@ -499,12 +499,14 @@
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
+    transition: none;
 }
 
 .filter-panel.visible {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    transition: none;
 }
 
 .filter-panel-header {
@@ -805,7 +807,7 @@ input[type="range"]::-moz-range-thumb {
     }
 }
 @media (max-width: 768px) {
-    .tool-hero { padding: var(--spacing-12) var(--spacing-4) 0; }
+    .tool-hero { padding: 100px var(--spacing-4) 0; }
     .tool-content { padding: var(--spacing-6) var(--spacing-4) var(--spacing-12); }
 
     .sub-nav-container {

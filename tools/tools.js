@@ -305,6 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
                     if (isAlreadySelected) {
                         selectedTemplate = null;
+                        hoveredTemplate = null;
                         loadTemplateBtn.disabled = true;
                     } else {
                         item.classList.add('selected');
