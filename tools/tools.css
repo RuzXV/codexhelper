@@ -789,13 +789,10 @@ input[type="range"]::-moz-range-thumb {
         flex-wrap: nowrap;
         gap: var(--spacing-1);
     }
-    .toolbar-section:last-child {
-        margin-left: 0;
-    }
     .toolbar-btn {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
         font-size: 14px;
     }
     #bold-italic-item {
@@ -811,19 +808,18 @@ input[type="range"]::-moz-range-thumb {
         margin: 0 auto;
         padding: 0 var(--spacing-4);
         box-sizing: border-box;
+        order: 1;
     }
     #magnified-preview-container {
         display: flex;
         width: 100%;
-        margin-top: var(--spacing-4);
-        order: 2;
     }
     .magnified-preview-container.has-image {
         filter: none;
         box-shadow: none;
     }
     .template-gallery-wrapper {
-        order: 1;
+        order: 2;
     }
     #template-gallery {
         max-height: 400px;

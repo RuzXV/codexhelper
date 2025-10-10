@@ -295,12 +295,23 @@ document.addEventListener('DOMContentLoaded', function() {
             item.dataset.index = index;
             item.innerHTML = `<img src="${template.image}" alt="${template.title} preview"><h4>${template.title}</h4>`;
             item.style.display = isVisible ? 'block' : 'none';
+
             item.addEventListener('click', () => {
+                const isAlreadySelected = item.classList.contains('selected');
                 document.querySelectorAll('.template-item.selected').forEach(el => el.classList.remove('selected'));
-                item.classList.add('selected');
-                selectedTemplate = template;
-                loadTemplateBtn.disabled = false;
+
+                if (isAlreadySelected) {
+                    selectedTemplate = null;
+                    loadTemplateBtn.disabled = true;
+                    updateMagnifiedPreview(null, null);
+                } else {
+                    item.classList.add('selected');
+                    selectedTemplate = template;
+                    loadTemplateBtn.disabled = false;
+                    updateMagnifiedPreview(template.image, template.title);
+                }
             });
+
             templateGallery.appendChild(item);
         });
     }
@@ -346,6 +357,18 @@ document.addEventListener('DOMContentLoaded', function() {
         templatesTabBtn.classList.toggle('active', tabName === 'templates');
     }
     
+    function updateMagnifiedPreview(imageSrc, titleText) {
+        if (imageSrc && titleText) {
+            magnifiedImage.src = imageSrc;
+            magnifiedTitle.textContent = titleText;
+            magnifiedPreviewContainer.classList.add('has-image');
+            magnifiedTitle.classList.add('visible');
+        } else {
+            magnifiedPreviewContainer.classList.remove('has-image');
+            magnifiedTitle.classList.remove('visible');
+        }
+    }
+
     undoBtn.addEventListener('click', undo);
     clearBtn.addEventListener('click', () => {
         if (confirm('Are you sure you want to clear the editor?')) {
@@ -434,10 +457,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (item) {
             const index = parseInt(item.dataset.index, 10);
             const template = templates[index];
-            magnifiedImage.src = template.image;
-            magnifiedTitle.textContent = template.title;
-            magnifiedPreviewContainer.classList.add('has-image');
-            magnifiedTitle.classList.add('visible');
+            updateMagnifiedPreview(template.image, template.title);
         }
     });
     
