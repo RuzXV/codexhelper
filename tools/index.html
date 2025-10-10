@@ -90,81 +90,88 @@
                         <div class="generator-panel">
                             <div class="mail-generator">
                                 <div class="toolbar">
-                                    <div class="toolbar-item">
-                                        <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
-                                        <label>Bold</label>
-                                    </div>
-                                    <div class="toolbar-item">
-                                        <button id="italic-btn" class="toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
-                                        <label>Italic</label>
-                                    </div>
-                                    <div class="toolbar-item">
-                                        <button id="bold-italic-btn" class="toolbar-btn" title="Bold & Italic"><i class="fas fa-bold"></i><i class="fas fa-italic"></i></button>
-                                        <label>B+I</label>
-                                    </div>
-                                    <div class="toolbar-item">
-                                        <div id="custom-size-dropdown" class="custom-dropdown">
-                                            <button id="custom-size-toggle" class="toolbar-btn" title="Size">
-                                                <i class="fas fa-text-height"></i>
-                                            </button>
-                                            <div id="custom-size-options" class="custom-dropdown-options">
-                                                <div class="custom-option" data-value="12"><i class="fas fa-font fa-xs"></i><span>12</span></div>
-                                                <div class="custom-option" data-value="16"><i class="fas fa-font fa-sm"></i><span>16</span></div>
-                                                <div class="custom-option" data-value="20"><i class="fas fa-font"></i><span>20</span></div>
-                                                <div class="custom-option" data-value="24"><i class="fas fa-font fa-lg"></i><span>24</span></div>
-                                                <div class="custom-option" data-value="30"><i class="fas fa-font fa-xl"></i><span>30</span></div>
-                                                <div class="custom-option" data-value="36"><i class="fas fa-font fa-2xl"></i><span>36</span></div>
-                                                <div class="custom-option" data-value="custom"><i class="fas fa-edit"></i><span>Custom...</span></div>
-                                            </div>
+                                    <div class="toolbar-section">
+                                        <div class="toolbar-item">
+                                            <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
+                                            <label>Bold</label>
                                         </div>
-                                        <label>Size</label>
-                                    </div>
-                                    <div class="toolbar-item">
-                                        <div id="custom-color-dropdown" class="custom-dropdown">
-                                            <button id="custom-color-toggle" class="toolbar-btn"><i class="fas fa-palette"></i></button>
-                                            <div id="custom-color-options" class="custom-dropdown-options">
-                                                <div class="custom-option" data-value="red"><span class="color-swatch" style="background:red;"></span>Red</div>
-                                                <div class="custom-option" data-value="green"><span class="color-swatch" style="background:green;"></span>Green</div>
-                                                <div class="custom-option" data-value="blue"><span class="color-swatch" style="background:blue;"></span>Blue</div>
-                                                <div class="custom-option" data-value="yellow"><span class="color-swatch" style="background:yellow;"></span>Yellow</div>
-                                                <div class="custom-option" data-value="orange"><span class="color-swatch" style="background:orange;"></span>Orange</div>
-                                                <div class="custom-option" data-value="purple"><span class="color-swatch" style="background:purple;"></span>Purple</div>
-                                                <div class="custom-option" data-value="custom"><img src="/images/colourwheel.png" alt="Custom Color" class="color-wheel-icon">Custom...</div>
-                                            </div>
+                                        <div class="toolbar-item">
+                                            <button id="italic-btn" class="toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
+                                            <label>Italic</label>
                                         </div>
-                                        <label>Color</label>
-                                    </div>
-                                    <div class="toolbar-item">
-                                        <div id="custom-gradient-dropdown" class="custom-dropdown">
-                                            <button id="custom-gradient-toggle" class="toolbar-btn" title="Gradient">
-                                                <i class="fas fa-brush"></i>
-                                            </button>
-                                            <div id="custom-gradient-options" class="custom-dropdown-options">
-                                                <div class="gradient-picker-dropdown">
-                                                    <div class="color-input-group">
-                                                        <label for="gradient-color-1">Start</label>
-                                                        <input type="color" id="gradient-color-1" value="#3b82f6">
+                                        <div id="bold-italic-item" class="toolbar-item">
+                                            <button id="bold-italic-btn" class="toolbar-btn" title="Bold & Italic"><i class="fas fa-bold"></i><i class="fas fa-italic"></i></button>
+                                            <label>B+I</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <div id="custom-size-dropdown" class="custom-dropdown">
+                                                <button id="custom-size-toggle" class="toolbar-btn" title="Size">
+                                                    <i class="fas fa-text-height"></i>
+                                                </button>
+                                                <div id="custom-size-options" class="custom-dropdown-options">
+                                                    <div class="custom-option" data-value="12"><i class="fas fa-font fa-xs"></i><span>12</span></div>
+                                                    <div class="custom-option" data-value="16"><i class="fas fa-font fa-sm"></i><span>16</span></div>
+                                                    <div class="custom-option" data-value="20"><i class="fas fa-font"></i><span>20</span></div>
+                                                    <div class="custom-option" data-value="24"><i class="fas fa-font fa-lg"></i><span>24</span></div>
+                                                    <div class="custom-option" data-value="30"><i class="fas fa-font fa-xl"></i><span>30</span></div>
+                                                    <div class="custom-option" data-value="36"><i class="fas fa-font fa-2xl"></i><span>36</span></div>
+                                                    <div class="custom-option" data-value="custom"><i class="fas fa-edit"></i><span>Custom...</span></div>
+                                                </div>
+                                            </div>
+                                            <label>Size</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <div id="custom-color-dropdown" class="custom-dropdown">
+                                                <button id="custom-color-toggle" class="toolbar-btn"><i class="fas fa-palette"></i></button>
+                                                <div id="custom-color-options" class="custom-dropdown-options">
+                                                    <div class="custom-option" data-value="red"><span class="color-swatch" style="background:red;"></span>Red</div>
+                                                    <div class="custom-option" data-value="green"><span class="color-swatch" style="background:green;"></span>Green</div>
+                                                    <div class="custom-option" data-value="blue"><span class="color-swatch" style="background:blue;"></span>Blue</div>
+                                                    <div class="custom-option" data-value="yellow"><span class="color-swatch" style="background:yellow;"></span>Yellow</div>
+                                                    <div class="custom-option" data-value="orange"><span class="color-swatch" style="background:orange;"></span>Orange</div>
+                                                    <div class="custom-option" data-value="purple"><span class="color-swatch" style="background:purple;"></span>Purple</div>
+                                                    <div class="custom-option" data-value="custom"><img src="/images/colourwheel.png" alt="Custom Color" class="color-wheel-icon">Custom...</div>
+                                                </div>
+                                            </div>
+                                            <label>Color</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <div id="custom-gradient-dropdown" class="custom-dropdown">
+                                                <button id="custom-gradient-toggle" class="toolbar-btn" title="Gradient">
+                                                    <i class="fas fa-brush"></i>
+                                                </button>
+                                                <div id="custom-gradient-options" class="custom-dropdown-options">
+                                                    <div class="gradient-picker-dropdown">
+                                                        <div class="color-input-group">
+                                                            <label for="gradient-color-1">Start</label>
+                                                            <input type="color" id="gradient-color-1" value="#3b82f6">
+                                                        </div>
+                                                        <div class="color-input-group">
+                                                            <label for="gradient-color-2">End</label>
+                                                            <input type="color" id="gradient-color-2" value="#ffffff">
+                                                        </div>
                                                     </div>
-                                                    <div class="color-input-group">
-                                                        <label for="gradient-color-2">End</label>
-                                                        <input type="color" id="gradient-color-2" value="#ffffff">
+                                                    <div class="gradient-slider-container">
+                                                        <div id="gradient-preview-bar" class="gradient-preview-bar"></div>
+                                                        <input type="range" id="gradient-bias-slider" min="0.25" max="4" value="1" step="0.01">
+                                                    </div>
+                                                    <div class="dropdown-actions">
+                                                        <button id="apply-gradient-btn" class="btn-primary-small">Apply</button>
                                                     </div>
                                                 </div>
-                                                <div class="gradient-slider-container">
-                                                    <div id="gradient-preview-bar" class="gradient-preview-bar"></div>
-                                                    <input type="range" id="gradient-bias-slider" min="0.25" max="4" value="1" step="0.01">
-                                                </div>
-                                                <div id="gradient-live-preview" class="gradient-live-preview">Live Preview</div>
-                                                <div class="dropdown-actions">
-                                                    <button id="apply-gradient-btn" class="btn-primary-small">Apply</button>
-                                                </div>
                                             </div>
+                                            <label>Gradient</label>
                                         </div>
-                                        <label>Gradient</label>
                                     </div>
-                                    <div class="toolbar-item">
-                                        <button id="undo-btn" class="toolbar-btn" title="Undo"><i class="fas fa-undo"></i></button>
-                                        <label>Undo</label>
+                                    <div class="toolbar-section">
+                                        <div class="toolbar-item">
+                                            <button id="clear-btn" class="toolbar-btn" title="Clear All"><i class="fas fa-trash"></i></button>
+                                            <label>Clear</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <button id="undo-btn" class="toolbar-btn" title="Undo"><i class="fas fa-undo"></i></button>
+                                            <label>Undo</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <textarea id="mail-input" placeholder="Enter your alliance mail content here..."></textarea>
@@ -187,16 +194,16 @@
                 </div>
     
                 <div id="templates-view" class="generator-view">
-                    <div id="magnified-preview-container" class="magnified-preview-container">
-                        <img id="magnified-image" src="" alt="Magnified Template Preview">
-                    </div>
-                    <div class="template-gallery-container">
-                        <div class="template-filters">
-                            <button id="filter-toggle-btn" class="btn-secondary"><i class="fas fa-filter"></i> Filters</button>
+                    <div class="template-layout">
+                        <div class="template-gallery-wrapper">
+                            <div class="template-gallery-header">
+                                <button id="filter-toggle-btn" class="btn-secondary"><i class="fas fa-filter"></i> Filters</button>
+                                <button id="load-template-btn" class="btn-primary" disabled>Load Template</button>
+                            </div>
+                            <div id="template-gallery" class="template-gallery"></div>
                         </div>
-                        <div id="template-gallery" class="template-gallery"></div>
-                        <div class="template-actions">
-                            <button id="load-template-btn" class="btn-primary" disabled>Load Selected Template</button>
+                        <div id="magnified-preview-container" class="magnified-preview-container">
+                            <img id="magnified-image" src="" alt="Magnified Template Preview">
                         </div>
                     </div>
                 </div>
