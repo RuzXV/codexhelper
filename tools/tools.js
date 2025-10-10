@@ -144,6 +144,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     options.classList.add('visible');
                 }
             });
+            options.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
         }
     });
 
