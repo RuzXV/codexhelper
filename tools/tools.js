@@ -260,17 +260,27 @@ document.addEventListener('DOMContentLoaded', function() {
             return acc;
         }, {});
         filterOptionsContainer.innerHTML = '';
-        Object.keys(filters).sort().forEach(category => {
-            const categoryDiv = document.createElement('div');
-            categoryDiv.className = 'filter-category';
-            categoryDiv.innerHTML = `<h5>${category.replace(/_/g, ' ')}</h5>`;
-            Array.from(filters[category]).sort().forEach(value => {
-                 const label = document.createElement('label');
-                 label.className = 'filter-option';
-                 label.innerHTML = `<input type="checkbox" data-category="${category}" value="${value}"> ${value}`;
-                 categoryDiv.appendChild(label);
-            });
-            filterOptionsContainer.appendChild(categoryDiv);
+        
+        const categoryOrder = ['format', 'type'];
+
+        categoryOrder.forEach(category => {
+            if (filters[category]) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'filter-category';
+                
+                if (category === 'format') {
+                    categoryDiv.classList.add('has-divider');
+                }
+
+                categoryDiv.innerHTML = `<h5>${category.replace(/_/g, ' ')}</h5>`;
+                Array.from(filters[category]).sort().forEach(value => {
+                     const label = document.createElement('label');
+                     label.className = 'filter-option';
+                     label.innerHTML = `<input type="checkbox" data-category="${category}" value="${value}"> ${value}`;
+                     categoryDiv.appendChild(label);
+                });
+                filterOptionsContainer.appendChild(categoryDiv);
+            }
         });
         filterOptionsContainer.addEventListener('change', () => renderTemplates());
     }
@@ -437,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.addEventListener('click', (e) => {
-        if (!filterPanel.contains(e.target) && e.target !== filterToggleBtn) {
+        if (!filterPanel.contains(e.target) && !filterToggleBtn.contains(e.target)) {
             filterPanel.classList.remove('visible');
         }
     });
