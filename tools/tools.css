@@ -183,9 +183,6 @@
     gap: var(--spacing-4);
     align-items: center;
 }
-.toolbar-section:last-child {
-    margin-left: auto;
-}
 
 .toolbar-item {
     display: flex;
@@ -782,7 +779,7 @@ input[type="range"]::-moz-range-thumb {
     }
 
     .toolbar {
-        justify-content: space-between;
+        justify-content: center;
         gap: var(--spacing-2);
     }
     .toolbar-section {
