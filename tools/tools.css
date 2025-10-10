@@ -376,24 +376,19 @@
     min-height: 200px;
     position: relative;
     overflow: hidden;
-    padding: 15px 15px;
+    
+    border-style: solid;
+    border-width: 35px 25px;
+    border-image-slice: 35 25 fill;
+    border-image-repeat: stretch;
 }
-.mail-preview-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    z-index: 0;
+
+.mail-preview-container.mail-bg {
+    border-image-source: url('/images/tools_mail_preview.jpg');
 }
-.mail-preview-container.mail-bg::before {
-    background-image: url('/images/tools_mail_preview.jpg');
-}
-.mail-preview-container.board-bg::before {
-    background-image: url('/images/tools_board_preview.png');
+
+.mail-preview-container.board-bg {
+    border-image-source: url('/images/tools_board_preview.png');
 }
 
 #mail-preview {
