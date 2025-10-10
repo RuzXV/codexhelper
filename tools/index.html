@@ -165,12 +165,12 @@
                                     </div>
                                     <div class="toolbar-section">
                                         <div class="toolbar-item">
-                                            <button id="clear-btn" class="toolbar-btn" title="Clear All"><i class="fas fa-trash"></i></button>
-                                            <label>Clear</label>
-                                        </div>
-                                        <div class="toolbar-item">
                                             <button id="undo-btn" class="toolbar-btn" title="Undo"><i class="fas fa-undo"></i></button>
                                             <label>Undo</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <button id="clear-btn" class="toolbar-btn" title="Clear All"><i class="fas fa-trash"></i></button>
+                                            <label>Clear</label>
                                         </div>
                                     </div>
                                 </div>
@@ -202,8 +202,10 @@
                             </div>
                             <div id="template-gallery" class="template-gallery"></div>
                         </div>
-                        <div id="magnified-preview-container" class="magnified-preview-container">
+                        <div id="magnified-preview-container" class="magnified-preview-container placeholder">
+                            <p id="magnified-placeholder">Hover or tap on a template to view its design & content</p>
                             <img id="magnified-image" src="" alt="Magnified Template Preview">
+                            <h4 id="magnified-title"></h4>
                         </div>
                     </div>
                 </div>

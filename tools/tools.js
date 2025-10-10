@@ -10,14 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const italicBtn = document.getElementById('italic-btn');
     const boldItalicBtn = document.getElementById('bold-italic-btn');
     
-    const customSizeToggle = document.getElementById('custom-size-toggle');
     const customSizeOptions = document.getElementById('custom-size-options');
-
-    const customColorToggle = document.getElementById('custom-color-toggle');
     const customColorOptions = document.getElementById('custom-color-options');
 
-    const customGradientToggle = document.getElementById('custom-gradient-toggle');
-    const customGradientOptions = document.getElementById('custom-gradient-options');
     const applyGradientBtn = document.getElementById('apply-gradient-btn');
     const gradientBiasSlider = document.getElementById('gradient-bias-slider');
     const gradientPreviewBar = document.getElementById('gradient-preview-bar');
@@ -48,6 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const magnifiedPreviewContainer = document.getElementById('magnified-preview-container');
     const magnifiedImage = document.getElementById('magnified-image');
+    const magnifiedPlaceholder = document.getElementById('magnified-placeholder');
+    const magnifiedTitle = document.getElementById('magnified-title');
 
     let templates = [];
     let selectedTemplate = null;
@@ -423,13 +420,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     templateGallery.addEventListener('mouseover', (e) => {
-        if (e.target.tagName === 'IMG') {
-            magnifiedImage.src = e.target.src;
-            magnifiedPreviewContainer.classList.add('visible');
+        const item = e.target.closest('.template-item');
+        if (item) {
+            const index = parseInt(item.dataset.index, 10);
+            const template = templates[index];
+            magnifiedImage.src = template.image;
+            magnifiedTitle.textContent = template.title;
+            magnifiedPreviewContainer.classList.remove('placeholder');
         }
     });
     templateGallery.addEventListener('mouseout', () => {
-        magnifiedPreviewContainer.classList.remove('visible');
+        magnifiedPreviewContainer.classList.add('placeholder');
     });
 
     document.addEventListener('click', (e) => {

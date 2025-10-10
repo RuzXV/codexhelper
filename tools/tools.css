@@ -383,6 +383,7 @@
     min-height: 200px;
     position: relative;
     overflow: hidden;
+    padding: 10px 15px;
 }
 .mail-preview-container::before {
     content: '';
@@ -393,15 +394,10 @@
     height: 100%;
     background-size: 100% 100%;
     background-repeat: no-repeat;
-}
-.mail-preview-container.mail-bg {
-    padding: 5px 15px;
+    z-index: 0;
 }
 .mail-preview-container.mail-bg::before {
     background-image: url('/images/tools_mail_preview.jpg');
-}
-.mail-preview-container.board-bg {
-    padding: 5px 15px;
 }
 .mail-preview-container.board-bg::before {
     background-image: url('/images/tools_board_preview.png');
@@ -437,6 +433,7 @@
 }
 .template-gallery-wrapper {
     flex: 1;
+    min-width: 0;
 }
 .template-gallery-header {
     display: flex;
@@ -657,22 +654,42 @@ input[type="range"]::-moz-range-thumb {
 
 .magnified-preview-container {
     width: 400px;
-    opacity: 0;
-    visibility: hidden;
-    transform: scale(0.95);
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: filter 0.3s ease;
 }
-.magnified-preview-container.visible {
-    opacity: 1;
-    visibility: visible;
-    transform: scale(1);
+.magnified-preview-container:not(.placeholder) {
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.15));
 }
-.magnified-preview-container img {
+#magnified-placeholder {
+    color: var(--text-muted);
+    text-align: center;
+}
+#magnified-image {
     width: 100%;
     height: auto;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-hover);
-    filter: drop-shadow(0 0 25px rgba(59, 130, 246, 0.5));
+    border-radius: var(--radius-md);
+    display: none;
+}
+#magnified-title {
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-top: var(--spacing-3);
+    display: none;
+}
+
+.magnified-preview-container.placeholder #magnified-placeholder {
+    display: block;
+}
+.magnified-preview-container:not(.placeholder) #magnified-image,
+.magnified-preview-container:not(.placeholder) #magnified-title {
+    display: block;
 }
 
 
@@ -720,7 +737,7 @@ input[type="range"]::-moz-range-thumb {
         flex-direction: column;
     }
     #magnified-preview-container {
-        display: block;
+        display: flex;
         width: 100%;
         margin-top: var(--spacing-4);
         order: 2;
