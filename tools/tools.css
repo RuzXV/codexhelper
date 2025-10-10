@@ -383,7 +383,7 @@
     min-height: 200px;
     position: relative;
     overflow: hidden;
-    padding: 10px 15px;
+    padding: 12px 15px;
 }
 .mail-preview-container::before {
     content: '';
@@ -652,43 +652,63 @@ input[type="range"]::-moz-range-thumb {
     background: var(--accent-blue-hover);
 }
 
-.magnified-preview-container {
+.template-preview-wrapper {
     width: 400px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-4);
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.magnified-preview-container {
+    width: 100%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2);
+    display: flex;
+    align-items: center;
     justify-content: center;
-    transition: filter 0.3s ease;
+    transition: all 0.3s ease;
+    aspect-ratio: 16 / 9;
 }
-.magnified-preview-container:not(.placeholder) {
-    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.15));
+
+.magnified-preview-container.has-image {
+    filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
+    padding: var(--spacing-1);
+    aspect-ratio: auto;
 }
+
 #magnified-placeholder {
     color: var(--text-muted);
     text-align: center;
+    padding: var(--spacing-4);
+    transition: opacity 0.3s ease;
 }
+
 #magnified-image {
     width: 100%;
     height: auto;
     border-radius: var(--radius-md);
     display: none;
 }
+
 #magnified-title {
     color: var(--text-primary);
     font-weight: 500;
     margin-top: var(--spacing-3);
-    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    height: 1.5em;
 }
 
-.magnified-preview-container.placeholder #magnified-placeholder {
-    display: block;
+#magnified-title.visible {
+    opacity: 1;
 }
-.magnified-preview-container:not(.placeholder) #magnified-image,
-.magnified-preview-container:not(.placeholder) #magnified-title {
+
+.magnified-preview-container.has-image #magnified-placeholder {
+    display: none;
+}
+.magnified-preview-container.has-image #magnified-image {
     display: block;
 }
 

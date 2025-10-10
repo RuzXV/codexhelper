@@ -426,11 +426,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const template = templates[index];
             magnifiedImage.src = template.image;
             magnifiedTitle.textContent = template.title;
-            magnifiedPreviewContainer.classList.remove('placeholder');
+            magnifiedPreviewContainer.classList.add('has-image');
+            magnifiedTitle.classList.add('visible');
         }
     });
+    
     templateGallery.addEventListener('mouseout', () => {
-        magnifiedPreviewContainer.classList.add('placeholder');
+        magnifiedPreviewContainer.classList.remove('has-image');
+        magnifiedTitle.classList.remove('visible');
     });
 
     document.addEventListener('click', (e) => {
