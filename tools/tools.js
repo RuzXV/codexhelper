@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const applyGradientBtn = document.getElementById('apply-gradient-btn');
     const gradientBiasSlider = document.getElementById('gradient-bias-slider');
     const gradientPreviewBar = document.getElementById('gradient-preview-bar');
+    const gradientLivePreview = document.getElementById('gradient-live-preview');
+    const gradientColor1 = document.getElementById('gradient-color-1');
+    const gradientColor2 = document.getElementById('gradient-color-2');
 
     const hiddenColorPicker = document.createElement('input');
     hiddenColorPicker.type = 'color';
@@ -43,12 +46,13 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentCharLimit = 2000;
     const CACHE_KEY = 'mailGeneratorCache';
 
-    const imagePreviewOverlay = document.getElementById('image-preview-overlay');
-    const fullscreenImage = document.getElementById('fullscreen-image');
+    const magnifiedPreviewContainer = document.getElementById('magnified-preview-container');
+    const magnifiedImage = document.getElementById('magnified-image');
 
     let templates = [];
     let selectedTemplate = null;
 
+    // --- Undo History ---
     let historyStack = [];
     let historyIndex = -1;
     let inputTimeout = null;
@@ -80,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mailInput.value = cachedContent;
     }
     
+    // --- Core Functions ---
     function applyTag(tag, value = null, closingTag = null) {
         saveState();
         const start = mailInput.selectionStart;
@@ -110,14 +115,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updatePreview() {
         const text = mailInput.value;
-        
         localStorage.setItem(CACHE_KEY, text);
-
         const charCount = text.length;
-        
         charCounter.textContent = `${charCount}/${currentCharLimit}`;
         charCounter.style.color = charCount > currentCharLimit ? '#ff4d4d' : 'var(--text-secondary)';
-
         let previewText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         previewText = previewText.replace(/&lt;b&gt;(.*?)&lt;\/b&gt;/gis, '<strong>$1</strong>');
         previewText = previewText.replace(/&lt;i&gt;(.*?)&lt;\/i&gt;/gis, '<em>$1</em>');
@@ -132,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.custom-dropdown-options.visible').forEach(d => d.classList.remove('visible'));
     }
     
+    // --- Dropdown Toggles & Bug Fix ---
     document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
         const toggle = dropdown.querySelector('.toolbar-btn');
         const options = dropdown.querySelector('.custom-dropdown-options');
@@ -144,18 +146,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     options.classList.add('visible');
                 }
             });
-            options.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
+            options.addEventListener('click', (e) => e.stopPropagation());
         }
     });
 
     customColorOptions.addEventListener('click', (e) => {
         const target = e.target.closest('.custom-option');
         if (!target) return;
-    
         const value = target.dataset.value;
-    
         if (value === 'custom') {
             hiddenColorPicker.click();
         } else {
@@ -169,24 +167,20 @@ document.addEventListener('DOMContentLoaded', function() {
         closeAllDropdowns();
     });
 
-    document.addEventListener('click', () => {
-        closeAllDropdowns();
-    });
+    document.addEventListener('click', () => closeAllDropdowns());
 
     function applyGradient() {
         saveState();
-        const startColor = document.getElementById('gradient-color-1').value;
-        const endColor = document.getElementById('gradient-color-2').value;
+        const startColor = gradientColor1.value;
+        const endColor = gradientColor2.value;
         const bias = parseFloat(gradientBiasSlider.value);
         const startPos = mailInput.selectionStart;
         const endPos = mailInput.selectionEnd;
         const selectedText = mailInput.value.substring(startPos, endPos);
-
         if (!selectedText) {
             closeAllDropdowns();
             return;
         }
-
         const gradientTags = generateGradientTags(selectedText, startColor, endColor, bias);
         mailInput.value = mailInput.value.substring(0, startPos) + gradientTags + mailInput.value.substring(endPos);
         updatePreview();
@@ -199,11 +193,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const len = cleanText.length;
         if (len === 0) return "";
         if (len === 1) return `<color=${color1}>${cleanText}</color>`;
-        
         const start = hexToRgb(color1);
         const end = hexToRgb(color2);
         let output = '';
-
         for (let i = 0; i < len; i++) {
             const linearRatio = i / (len - 1);
             const biasedRatio = Math.pow(linearRatio, bias);
@@ -211,7 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const g = Math.round(start.g + biasedRatio * (end.g - start.g));
             const b = Math.round(start.b + biasedRatio * (end.b - start.b));
             const char = cleanText[i];
-            
             if (char === ' ' || char === '\n') {
                 output += char;
             } else {
@@ -221,10 +212,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return output;
     }
 
-    function updateGradientPreview() {
-        const startColor = document.getElementById('gradient-color-1').value;
-        const endColor = document.getElementById('gradient-color-2').value;
+    function updateGradientUI() {
+        const startColor = gradientColor1.value;
+        const endColor = gradientColor2.value;
+        const bias = parseFloat(gradientBiasSlider.value);
         gradientPreviewBar.style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
+        gradientLivePreview.innerHTML = generateGradientTags('Live Preview', startColor, endColor, bias)
+            .replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/&lt;color=([a-zA-Z0-9#]+)&gt;(.*?)&lt;\/color&gt;/gis, '<span style="color: $1;">$2</span>');
     }
 
     async function setupTemplatesAndFilters() {
@@ -251,13 +246,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             return acc;
         }, {});
-
         filterOptionsContainer.innerHTML = '';
         Object.keys(filters).sort().forEach(category => {
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'filter-category';
             categoryDiv.innerHTML = `<h5>${category.replace(/_/g, ' ')}</h5>`;
-            
             Array.from(filters[category]).sort().forEach(value => {
                  const label = document.createElement('label');
                  label.className = 'filter-option';
@@ -266,48 +259,25 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             filterOptionsContainer.appendChild(categoryDiv);
         });
-
         filterOptionsContainer.addEventListener('change', () => renderTemplates());
     }
 
     function renderTemplates() {
         const activeFilters = getActiveFilters();
-        let longPressTimer;
-
         templateGallery.innerHTML = '';
-        
         templates.forEach((template, index) => {
             const isVisible = checkVisibility(template.tags, activeFilters);
-            
             const item = document.createElement('div');
             item.className = 'template-item';
             item.dataset.index = index;
-            item.innerHTML = `
-                <img src="${template.image}" alt="${template.title} preview" onerror="this.parentElement.style.display='none'">
-                <h4>${template.title}</h4>
-            `;
+            item.innerHTML = `<img src="${template.image}" alt="${template.title} preview" onerror="this.parentElement.style.display='none'"><h4>${template.title}</h4>`;
             item.style.display = isVisible ? 'block' : 'none';
-
             item.addEventListener('click', () => {
                 document.querySelectorAll('.template-item.selected').forEach(el => el.classList.remove('selected'));
                 item.classList.add('selected');
                 selectedTemplate = template;
                 loadTemplateBtn.disabled = false;
             });
-            
-            const img = item.querySelector('img');
-            item.addEventListener('mouseenter', () => showImagePreview(img.src));
-            item.addEventListener('mouseleave', hideImagePreview);
-            item.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                longPressTimer = setTimeout(() => showImagePreview(img.src), 500);
-            });
-            item.addEventListener('touchend', () => {
-                clearTimeout(longPressTimer);
-                hideImagePreview();
-            });
-            item.addEventListener('touchmove', () => clearTimeout(longPressTimer));
-
             templateGallery.appendChild(item);
         });
     }
@@ -324,26 +294,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function checkVisibility(templateTags, activeFilters) {
         if (Object.keys(activeFilters).length === 0) return true;
-        
         return Object.keys(activeFilters).every(category => {
             const requiredTags = activeFilters[category];
             if (requiredTags.length === 0) return true;
-
-            const templateTagsInCategory = (templateTags || [])
-                .filter(t => t.startsWith(category + ':'))
-                .map(t => t.split(':')[1]);
-            
+            const templateTagsInCategory = (templateTags || []).filter(t => t.startsWith(category + ':')).map(t => t.split(':')[1]);
             return requiredTags.some(reqTag => templateTagsInCategory.includes(reqTag));
         });
     }
     
     function hexToRgb(hex) {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : { r: 255, g: 255, b: 255 };
+        return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : { r: 255, g: 255, b: 255 };
     }
 
     function componentToHex(c) {
@@ -362,14 +323,15 @@ document.addEventListener('DOMContentLoaded', function() {
         templatesTabBtn.classList.toggle('active', tabName === 'templates');
     }
 
-    function showImagePreview(src) {
-        fullscreenImage.src = src;
-        imagePreviewOverlay.classList.add('visible');
+    function showMagnifiedPreview(targetImage) {
+        magnifiedImage.src = targetImage.src;
+        magnifiedPreviewContainer.classList.add('visible');
     }
-    function hideImagePreview() {
-        imagePreviewOverlay.classList.remove('visible');
+    function hideMagnifiedPreview() {
+        magnifiedPreviewContainer.classList.remove('visible');
     }
     
+    // --- Event Listeners ---
     undoBtn.addEventListener('click', undo);
     
     mailInput.addEventListener('input', () => {
@@ -386,15 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
             previewTabBtns.forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
             previewContainer.className = 'mail-preview-container';
-
-            if (btn.dataset.bg === 'mail') {
-                previewContainer.classList.add('mail-bg');
-                currentCharLimit = 2000;
-            } else {
-                previewContainer.classList.add('board-bg');
-                currentCharLimit = 1000;
-            }
-            
+            currentCharLimit = (btn.dataset.bg === 'mail') ? 2000 : 1000;
             updatePreview();
         });
     });
@@ -406,7 +360,6 @@ document.addEventListener('DOMContentLoaded', function() {
     customSizeOptions.addEventListener('click', (e) => {
         const target = e.target.closest('.custom-option');
         if (!target) return;
-        
         const value = target.dataset.value;
         if (value === 'custom') {
             const customSize = prompt("Enter a custom font size (e.g., 22):");
@@ -416,13 +369,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             applyTag('size', value);
         }
-        
         closeAllDropdowns();
     });
 
     applyGradientBtn.addEventListener('click', applyGradient);
-    document.getElementById('gradient-color-1').addEventListener('input', updateGradientPreview);
-    document.getElementById('gradient-color-2').addEventListener('input', updateGradientPreview);
+    gradientColor1.addEventListener('input', updateGradientUI);
+    gradientColor2.addEventListener('input', updateGradientUI);
+    gradientBiasSlider.addEventListener('input', updateGradientUI);
 
     copyBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(mailInput.value).then(() => {
@@ -453,7 +406,12 @@ document.addEventListener('DOMContentLoaded', function() {
         renderTemplates();
     });
 
-    imagePreviewOverlay.addEventListener('click', hideImagePreview);
+    templateGallery.addEventListener('mouseover', (e) => {
+        if (e.target.tagName === 'IMG') {
+            showMagnifiedPreview(e.target);
+        }
+    });
+    templateGallery.addEventListener('mouseout', hideMagnifiedPreview);
 
     document.addEventListener('click', (e) => {
         if (!filterPanel.contains(e.target) && e.target !== filterToggleBtn) {
@@ -461,8 +419,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // --- Initial Load ---
     updatePreview();
     setupTemplatesAndFilters();
     saveState();
-    updateGradientPreview();
+    updateUndoButton();
+    updateGradientUI();
 });

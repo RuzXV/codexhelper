@@ -151,10 +151,10 @@
                                                     </div>
                                                 </div>
                                                 <div class="gradient-slider-container">
-                                                    <label for="gradient-bias-slider">Bias</label>
-                                                    <input type="range" id="gradient-bias-slider" min="0.25" max="4" value="1" step="0.01">
                                                     <div id="gradient-preview-bar" class="gradient-preview-bar"></div>
+                                                    <input type="range" id="gradient-bias-slider" min="0.25" max="4" value="1" step="0.01">
                                                 </div>
+                                                <div id="gradient-live-preview" class="gradient-live-preview">Live Preview</div>
                                                 <div class="dropdown-actions">
                                                     <button id="apply-gradient-btn" class="btn-primary-small">Apply</button>
                                                 </div>
@@ -164,6 +164,7 @@
                                     </div>
                                     <div class="toolbar-item">
                                         <button id="undo-btn" class="toolbar-btn" title="Undo"><i class="fas fa-undo"></i></button>
+                                        <label>Undo</label>
                                     </div>
                                 </div>
                                 <textarea id="mail-input" placeholder="Enter your alliance mail content here..."></textarea>
@@ -186,6 +187,9 @@
                 </div>
     
                 <div id="templates-view" class="generator-view">
+                    <div id="magnified-preview-container" class="magnified-preview-container">
+                        <img id="magnified-image" src="" alt="Magnified Template Preview">
+                    </div>
                     <div class="template-gallery-container">
                         <div class="template-filters">
                             <button id="filter-toggle-btn" class="btn-secondary"><i class="fas fa-filter"></i> Filters</button>
@@ -208,10 +212,6 @@
             </div>
         </section>
     </main>
-
-    <div id="image-preview-overlay" class="image-preview-overlay">
-        <img id="fullscreen-image" src="" alt="Template Preview">
-    </div>
 
     <footer class="footer">
         <div class="footer-container">
