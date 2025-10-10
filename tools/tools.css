@@ -499,7 +499,6 @@
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
 }
 
 .filter-panel.visible {
