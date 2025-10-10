@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let templates = [];
     let selectedTemplate = null;
+    let hoveredTemplate = null;
     let isLivePreviewingGradient = false;
     let gradientSelection = { start: 0, end: 0 };
 
@@ -304,13 +305,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (isAlreadySelected) {
                     selectedTemplate = null;
                     loadTemplateBtn.disabled = true;
-                    updateMagnifiedPreview(null, null);
                 } else {
                     item.classList.add('selected');
                     selectedTemplate = template;
                     loadTemplateBtn.disabled = false;
-                    updateMagnifiedPreview(template.image, template.title);
                 }
+                updateMagnifiedPreview();
             });
 
             templateGallery.appendChild(item);
@@ -358,10 +358,11 @@ document.addEventListener('DOMContentLoaded', function() {
         templatesTabBtn.classList.toggle('active', tabName === 'templates');
     }
     
-    function updateMagnifiedPreview(imageSrc, titleText) {
-        if (imageSrc && titleText) {
-            magnifiedImage.src = imageSrc;
-            magnifiedTitle.textContent = titleText;
+    function updateMagnifiedPreview() {
+        const templateToShow = hoveredTemplate || selectedTemplate;
+        if (templateToShow) {
+            magnifiedImage.src = templateToShow.image;
+            magnifiedTitle.textContent = templateToShow.title;
             magnifiedPreviewContainer.classList.add('has-image');
             magnifiedTitle.classList.add('visible');
         } else {
@@ -457,14 +458,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const item = e.target.closest('.template-item');
         if (item) {
             const index = parseInt(item.dataset.index, 10);
-            const template = templates[index];
-            updateMagnifiedPreview(template.image, template.title);
+            hoveredTemplate = templates[index];
+            updateMagnifiedPreview();
         }
     });
     
-    templateGallery.addEventListener('mouseout', () => {
-        magnifiedPreviewContainer.classList.remove('has-image');
-        magnifiedTitle.classList.remove('visible');
+    templateGallery.addEventListener('mouseleave', () => {
+        hoveredTemplate = null;
+        updateMagnifiedPreview();
     });
 
     document.addEventListener('click', (e) => {

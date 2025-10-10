@@ -449,7 +449,7 @@
 
 .template-item {
     background: var(--bg-tertiary);
-    border: 2px solid transparent;
+    border: 1px solid white;
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -480,6 +480,7 @@
     color: var(--text-primary);
     background: var(--bg-card);
     text-align: center;
+    border-top: 1px solid white;
 }
 
 .filter-panel {
@@ -696,8 +697,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .magnified-preview-container.has-image {
-    filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
-    padding: var(--spacing-1);
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
+    padding: var(--spacing-2);
     aspect-ratio: auto;
 }
 
