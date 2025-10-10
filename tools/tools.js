@@ -288,33 +288,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderTemplates() {
         const activeFilters = getActiveFilters();
-        templateGallery.innerHTML = '';
-        templates.forEach((template, index) => {
-            const isVisible = checkVisibility(template.tags, activeFilters);
-            const item = document.createElement('div');
-            item.className = 'template-item';
-            item.dataset.index = index;
-            item.innerHTML = `<img src="${template.image}" alt="${template.title} preview"><h4>${template.title}</h4>`;
-            item.style.display = isVisible ? 'block' : 'none';
-
-            item.addEventListener('click', () => {
-                const isAlreadySelected = item.classList.contains('selected');
-                
-                document.querySelectorAll('.template-item.selected').forEach(el => el.classList.remove('selected'));
-
-                if (isAlreadySelected) {
-                    selectedTemplate = null;
-                    loadTemplateBtn.disabled = true;
-                } else {
-                    item.classList.add('selected');
-                    selectedTemplate = template;
-                    loadTemplateBtn.disabled = false;
-                }
-                updateMagnifiedPreview();
+        if (!isGalleryPopulated) {
+            templateGallery.innerHTML = '';
+            templates.forEach((template, index) => {
+                const item = document.createElement('div');
+                item.className = 'template-item';
+                item.dataset.index = index;
+                item.innerHTML = `<img src="${template.image}" alt="${template.title} preview"><h4>${template.title}</h4>`;
+    
+                item.addEventListener('click', () => {
+                    const isAlreadySelected = item.classList.contains('selected');
+                    
+                    document.querySelectorAll('.template-item.selected').forEach(el => el.classList.remove('selected'));
+    
+                    if (isAlreadySelected) {
+                        selectedTemplate = null;
+                        loadTemplateBtn.disabled = true;
+                    } else {
+                        item.classList.add('selected');
+                        selectedTemplate = templates[index];
+                        loadTemplateBtn.disabled = false;
+                    }
+                    updateMagnifiedPreview();
+                });
+    
+                templateGallery.appendChild(item);
             });
-
-            templateGallery.appendChild(item);
-        });
+            isGalleryPopulated = true;
+        }
+    
+        const items = templateGallery.children;
+        for (const item of items) {
+            const index = parseInt(item.dataset.index, 10);
+            const template = templates[index];
+            const shouldBeVisible = checkVisibility(template.tags, activeFilters);
+            const isFadingOut = item.dataset.isFadingOut === 'true';
+    
+            if (shouldBeVisible) {
+                item.style.display = 'block';
+                delete item.dataset.isFadingOut;
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'scale(1)';
+                }, 10);
+            } else if (!isFadingOut) {
+                item.dataset.isFadingOut = 'true';
+                item.style.opacity = '0';
+                item.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    if (item.dataset.isFadingOut === 'true') {
+                        item.style.display = 'none';
+                    }
+                }, 300); 
+            }
+        }
     }
 
     function getActiveFilters() {

@@ -401,7 +401,11 @@
     word-wrap: break-word;
     color: #e0e0e0;
     overflow-y: auto;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
+
 .mail-bg #mail-preview {
     color: #000000;
 }
@@ -438,6 +442,7 @@
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: var(--spacing-4);
     max-height: 600px;
+    min-height: 600px;
     overflow-y: auto;
     padding-right: var(--spacing-2);
 }
@@ -447,7 +452,7 @@
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
     overflow: hidden;
 }
 
