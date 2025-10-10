@@ -697,7 +697,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .magnified-preview-container.has-image {
-    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
+    filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
     padding: var(--spacing-2);
     aspect-ratio: auto;
 }
