@@ -736,6 +736,17 @@ input[type="range"]::-moz-range-thumb {
     display: block;
 }
 
+#copy-btn, #load-template-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+}
+
+#copy-btn img, #load-template-btn img {
+    height: 1.2em;
+}
+
 .template-credits {
     margin-top: var(--spacing-8);
     padding: var(--spacing-4);

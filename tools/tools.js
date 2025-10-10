@@ -455,10 +455,15 @@ document.addEventListener('DOMContentLoaded', function() {
     gradientBiasSlider.addEventListener('input', updateGradientUI);
 
     copyBtn.addEventListener('click', () => {
+        const copyBtnText = copyBtn.querySelector('span');
+        if (!copyBtnText) return;
+    
         navigator.clipboard.writeText(mailInput.value).then(() => {
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => { copyBtn.textContent = originalText; }, 2000);
+            const originalText = copyBtnText.textContent;
+            copyBtnText.textContent = 'Copied!';
+            setTimeout(() => { 
+                copyBtnText.textContent = originalText; 
+            }, 2000);
         });
     });
 
