@@ -298,6 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             item.addEventListener('click', () => {
                 const isAlreadySelected = item.classList.contains('selected');
+                
                 document.querySelectorAll('.template-item.selected').forEach(el => el.classList.remove('selected'));
 
                 if (isAlreadySelected) {
