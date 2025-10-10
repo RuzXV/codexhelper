@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let templates = [];
     let selectedTemplate = null;
     let hoveredTemplate = null;
+    let isGalleryPopulated = false;
     let isLivePreviewingGradient = false;
     let gradientSelection = { start: 0, end: 0 };
 
@@ -288,6 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderTemplates() {
         const activeFilters = getActiveFilters();
+    
         if (!isGalleryPopulated) {
             templateGallery.innerHTML = '';
             templates.forEach((template, index) => {
