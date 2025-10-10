@@ -790,10 +790,10 @@ input[type="range"]::-moz-range-thumb {
         gap: var(--spacing-1);
     }
     .toolbar-btn {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
-        font-size: 14px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        font-size: var(--font-size-base);
     }
     #bold-italic-item {
         display: none;
