@@ -378,8 +378,8 @@
     overflow: hidden;
     
     border-style: solid;
-    border-width: 35px 25px;
-    border-image-slice: 35 25 fill;
+    border-width: 25px 25px; 
+    border-image-slice: 25 25 fill;
     border-image-repeat: stretch;
 }
 
