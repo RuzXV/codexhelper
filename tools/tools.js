@@ -4,14 +4,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const copyBtn = document.getElementById('copy-btn');
     const previewContainer = document.getElementById('mail-preview-container');
 
+    const undoBtn = document.getElementById('undo-btn');
     const boldBtn = document.getElementById('bold-btn');
     const italicBtn = document.getElementById('italic-btn');
-    const gradientBtn = document.getElementById('gradient-btn');
+    const boldItalicBtn = document.getElementById('bold-italic-btn');
+    
     const customSizeToggle = document.getElementById('custom-size-toggle');
     const customSizeOptions = document.getElementById('custom-size-options');
 
     const customColorToggle = document.getElementById('custom-color-toggle');
     const customColorOptions = document.getElementById('custom-color-options');
+
+    const customGradientToggle = document.getElementById('custom-gradient-toggle');
+    const customGradientOptions = document.getElementById('custom-gradient-options');
+    const applyGradientBtn = document.getElementById('apply-gradient-btn');
+    const gradientBiasSlider = document.getElementById('gradient-bias-slider');
+    const gradientPreviewBar = document.getElementById('gradient-preview-bar');
 
     const hiddenColorPicker = document.createElement('input');
     hiddenColorPicker.type = 'color';
@@ -24,10 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const templatesView = document.getElementById('templates-view');
     const previewTabBtns = document.querySelectorAll('.preview-tab-btn');
 
-    const gradientModal = document.getElementById('gradient-modal');
-    const applyGradientBtn = document.getElementById('apply-gradient-btn');
-    const cancelGradientBtn = document.getElementById('cancel-gradient-btn');
-
     const templateGallery = document.getElementById('template-gallery');
     const loadTemplateBtn = document.getElementById('load-template-btn');
     const filterToggleBtn = document.getElementById('filter-toggle-btn');
@@ -39,24 +43,69 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentCharLimit = 2000;
     const CACHE_KEY = 'mailGeneratorCache';
 
+    const imagePreviewOverlay = document.getElementById('image-preview-overlay');
+    const fullscreenImage = document.getElementById('fullscreen-image');
+
     let templates = [];
     let selectedTemplate = null;
+
+    let historyStack = [];
+    let historyIndex = -1;
+    let inputTimeout = null;
+
+    function saveState() {
+        if (historyIndex < historyStack.length - 1) {
+            historyStack = historyStack.slice(0, historyIndex + 1);
+        }
+        historyStack.push(mailInput.value);
+        historyIndex++;
+        updateUndoButton();
+    }
+
+    function undo() {
+        if (historyIndex > 0) {
+            historyIndex--;
+            mailInput.value = historyStack[historyIndex];
+            updatePreview();
+            updateUndoButton();
+        }
+    }
+
+    function updateUndoButton() {
+        undoBtn.disabled = historyIndex <= 0;
+    }
 
     const cachedContent = localStorage.getItem(CACHE_KEY);
     if (cachedContent) {
         mailInput.value = cachedContent;
     }
-
-    function applyTag(tag, value = null) {
+    
+    function applyTag(tag, value = null, closingTag = null) {
+        saveState();
         const start = mailInput.selectionStart;
         const end = mailInput.selectionEnd;
         const selectedText = mailInput.value.substring(start, end);
 
         if (!selectedText) return;
 
-        let replacement = value ? `<${tag}=${value}>${selectedText}</${tag}>` : `<${tag}>${selectedText}</${tag}>`;
+        closingTag = closingTag || tag;
+        let replacement = value ? `<${tag}=${value}>${selectedText}</${closingTag}>` : `<${tag}>${selectedText}</${closingTag}>`;
         mailInput.value = mailInput.value.substring(0, start) + replacement + mailInput.value.substring(end);
         updatePreview();
+        saveState();
+    }
+    
+    function applyDoubleTag(tag1, tag2) {
+        saveState();
+        const start = mailInput.selectionStart;
+        const end = mailInput.selectionEnd;
+        const selectedText = mailInput.value.substring(start, end);
+        if (!selectedText) return;
+
+        let replacement = `<${tag1}><${tag2}>${selectedText}</${tag2}></${tag1}>`;
+        mailInput.value = mailInput.value.substring(0, start) + replacement + mailInput.value.substring(end);
+        updatePreview();
+        saveState();
     }
 
     function updatePreview() {
@@ -80,25 +129,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function closeAllDropdowns() {
-        customColorOptions.classList.remove('visible');
-        customSizeOptions.classList.remove('visible');
+        document.querySelectorAll('.custom-dropdown-options.visible').forEach(d => d.classList.remove('visible'));
     }
-
-    customColorToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isVisible = customColorOptions.classList.contains('visible');
-        closeAllDropdowns();
-        if (!isVisible) {
-            customColorOptions.classList.add('visible');
-        }
-    });
-
-    customSizeToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isVisible = customSizeOptions.classList.contains('visible');
-        closeAllDropdowns();
-        if (!isVisible) {
-            customSizeOptions.classList.add('visible');
+    
+    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+        const toggle = dropdown.querySelector('.toolbar-btn');
+        const options = dropdown.querySelector('.custom-dropdown-options');
+        if (toggle && options) {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isVisible = options.classList.contains('visible');
+                closeAllDropdowns();
+                if (!isVisible) {
+                    options.classList.add('visible');
+                }
+            });
         }
     });
 
@@ -112,41 +157,41 @@ document.addEventListener('DOMContentLoaded', function() {
             hiddenColorPicker.click();
         } else {
             applyTag('color', value);
-            customColorOptions.classList.remove('visible');
+            closeAllDropdowns();
         }
     });
 
     hiddenColorPicker.addEventListener('change', (e) => {
         applyTag('color', e.target.value);
-        customColorOptions.classList.remove('visible');
+        closeAllDropdowns();
     });
 
     document.addEventListener('click', () => {
         closeAllDropdowns();
     });
 
-    function openGradientModal() { gradientModal.classList.add('visible'); }
-    function closeGradientModal() { gradientModal.classList.remove('visible'); }
-
     function applyGradient() {
+        saveState();
         const startColor = document.getElementById('gradient-color-1').value;
         const endColor = document.getElementById('gradient-color-2').value;
+        const bias = parseFloat(gradientBiasSlider.value);
         const startPos = mailInput.selectionStart;
         const endPos = mailInput.selectionEnd;
         const selectedText = mailInput.value.substring(startPos, endPos);
 
         if (!selectedText) {
-            closeGradientModal();
+            closeAllDropdowns();
             return;
         }
 
-        const gradientTags = generateGradientTags(selectedText, startColor, endColor);
+        const gradientTags = generateGradientTags(selectedText, startColor, endColor, bias);
         mailInput.value = mailInput.value.substring(0, startPos) + gradientTags + mailInput.value.substring(endPos);
         updatePreview();
-        closeGradientModal();
+        saveState();
+        closeAllDropdowns();
     }
 
-    function generateGradientTags(text, color1, color2) {
+    function generateGradientTags(text, color1, color2, bias = 1) {
         const cleanText = text.replace(/<[^>]*>/g, "");
         const len = cleanText.length;
         if (len === 0) return "";
@@ -157,10 +202,11 @@ document.addEventListener('DOMContentLoaded', function() {
         let output = '';
 
         for (let i = 0; i < len; i++) {
-            const ratio = i / (len - 1);
-            const r = Math.round(start.r + ratio * (end.r - start.r));
-            const g = Math.round(start.g + ratio * (end.g - start.g));
-            const b = Math.round(start.b + ratio * (end.b - start.b));
+            const linearRatio = i / (len - 1);
+            const biasedRatio = Math.pow(linearRatio, bias);
+            const r = Math.round(start.r + biasedRatio * (end.r - start.r));
+            const g = Math.round(start.g + biasedRatio * (end.g - start.g));
+            const b = Math.round(start.b + biasedRatio * (end.b - start.b));
             const char = cleanText[i];
             
             if (char === ' ' || char === '\n') {
@@ -170,6 +216,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         return output;
+    }
+
+    function updateGradientPreview() {
+        const startColor = document.getElementById('gradient-color-1').value;
+        const endColor = document.getElementById('gradient-color-2').value;
+        gradientPreviewBar.style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
     }
 
     async function setupTemplatesAndFilters() {
@@ -217,31 +269,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderTemplates() {
         const activeFilters = getActiveFilters();
+        let longPressTimer;
+
+        templateGallery.innerHTML = '';
         
         templates.forEach((template, index) => {
-            let item = templateGallery.querySelector(`[data-index='${index}']`);
             const isVisible = checkVisibility(template.tags, activeFilters);
+            
+            const item = document.createElement('div');
+            item.className = 'template-item';
+            item.dataset.index = index;
+            item.innerHTML = `
+                <img src="${template.image}" alt="${template.title} preview" onerror="this.parentElement.style.display='none'">
+                <h4>${template.title}</h4>
+            `;
+            item.style.display = isVisible ? 'block' : 'none';
 
-            if (!item) {
-                item = document.createElement('div');
-                item.className = 'template-item';
-                item.dataset.index = index;
-                item.innerHTML = `
-                    <img src="${template.image}" alt="${template.title} preview" onerror="this.parentElement.style.display='none'">
-                    <h4>${template.title}</h4>
-                `;
-                item.addEventListener('click', () => {
-                    document.querySelectorAll('.template-item.selected').forEach(el => el.classList.remove('selected'));
-                    item.classList.add('selected');
-                    selectedTemplate = template;
-                    loadTemplateBtn.disabled = false;
-                });
-                templateGallery.appendChild(item);
-            }
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.template-item.selected').forEach(el => el.classList.remove('selected'));
+                item.classList.add('selected');
+                selectedTemplate = template;
+                loadTemplateBtn.disabled = false;
+            });
+            
+            const img = item.querySelector('img');
+            item.addEventListener('mouseenter', () => showImagePreview(img.src));
+            item.addEventListener('mouseleave', hideImagePreview);
+            item.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                longPressTimer = setTimeout(() => showImagePreview(img.src), 500);
+            });
+            item.addEventListener('touchend', () => {
+                clearTimeout(longPressTimer);
+                hideImagePreview();
+            });
+            item.addEventListener('touchmove', () => clearTimeout(longPressTimer));
 
-            setTimeout(() => {
-                item.classList.toggle('hidden', !isVisible);
-            }, 0);
+            templateGallery.appendChild(item);
         });
     }
 
@@ -295,6 +359,22 @@ document.addEventListener('DOMContentLoaded', function() {
         templatesTabBtn.classList.toggle('active', tabName === 'templates');
     }
 
+    function showImagePreview(src) {
+        fullscreenImage.src = src;
+        imagePreviewOverlay.classList.add('visible');
+    }
+    function hideImagePreview() {
+        imagePreviewOverlay.classList.remove('visible');
+    }
+    
+    undoBtn.addEventListener('click', undo);
+    
+    mailInput.addEventListener('input', () => {
+        clearTimeout(inputTimeout);
+        inputTimeout = setTimeout(saveState, 500);
+        updatePreview();
+    });
+
     generatorTabBtn.addEventListener('click', () => switchView('generator'));
     templatesTabBtn.addEventListener('click', () => switchView('templates'));
 
@@ -318,6 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     boldBtn.addEventListener('click', () => applyTag('b'));
     italicBtn.addEventListener('click', () => applyTag('i'));
+    boldItalicBtn.addEventListener('click', () => applyDoubleTag('b', 'i'));
 
     customSizeOptions.addEventListener('click', (e) => {
         const target = e.target.closest('.custom-option');
@@ -333,18 +414,13 @@ document.addEventListener('DOMContentLoaded', function() {
             applyTag('size', value);
         }
         
-        customSizeOptions.classList.remove('visible');
+        closeAllDropdowns();
     });
-
-    gradientBtn.addEventListener('click', openGradientModal);
 
     applyGradientBtn.addEventListener('click', applyGradient);
-    cancelGradientBtn.addEventListener('click', closeGradientModal);
-    gradientModal.addEventListener('click', (e) => {
-        if (e.target === gradientModal) closeGradientModal();
-    });
+    document.getElementById('gradient-color-1').addEventListener('input', updateGradientPreview);
+    document.getElementById('gradient-color-2').addEventListener('input', updateGradientPreview);
 
-    mailInput.addEventListener('input', updatePreview);
     copyBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(mailInput.value).then(() => {
             const originalText = copyBtn.textContent;
@@ -356,6 +432,9 @@ document.addEventListener('DOMContentLoaded', function() {
     loadTemplateBtn.addEventListener('click', () => {
         if (selectedTemplate) {
             mailInput.value = selectedTemplate.content;
+            historyStack = [];
+            historyIndex = -1;
+            saveState();
             updatePreview();
             switchView('generator');
         }
@@ -371,6 +450,8 @@ document.addEventListener('DOMContentLoaded', function() {
         renderTemplates();
     });
 
+    imagePreviewOverlay.addEventListener('click', hideImagePreview);
+
     document.addEventListener('click', (e) => {
         if (!filterPanel.contains(e.target) && e.target !== filterToggleBtn) {
             filterPanel.classList.remove('visible');
@@ -379,4 +460,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updatePreview();
     setupTemplatesAndFilters();
+    saveState();
+    updateGradientPreview();
 });

@@ -215,6 +215,23 @@
     justify-content: center;
 }
 
+#bold-italic-btn i {
+    font-size: 0.8em;
+}
+#bold-italic-btn i:first-child {
+    margin-right: -4px;
+}
+
+.toolbar-btn:disabled {
+    cursor: not-allowed;
+    color: var(--text-muted);
+    background: var(--bg-card);
+}
+.toolbar-btn:disabled:hover {
+    border-color: var(--border-color);
+    box-shadow: none;
+}
+
 .toolbar-select {
     padding: 0 var(--spacing-3);
     -webkit-appearance: none;
@@ -517,49 +534,58 @@
     border-color: var(--border-color);
 }
 
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7);
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
-    will-change: opacity;
+#custom-gradient-options {
+    width: 220px;
+    padding: var(--spacing-3);
 }
 
-.modal-overlay.visible {
-    opacity: 1;
-    visibility: visible;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    transition: opacity 0.3s ease;
-}
-
-.modal-content {
-    background: var(--bg-secondary);
-    padding: var(--spacing-8);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-color);
-    width: 90%;
-    max-width: 450px;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
-    will-change: transform;
-}
-
-.modal-overlay.visible .modal-content {
-    transform: scale(1);
-}
-
-.gradient-picker {
+.gradient-picker-dropdown {
     display: flex;
     justify-content: space-around;
-    margin: var(--spacing-6) 0;
+    margin-bottom: var(--spacing-3);
+}
+
+.gradient-slider-container {
+    padding: 0 var(--spacing-2);
+}
+.gradient-slider-container label {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-1);
+    display: block;
+}
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: var(--bg-primary);
+    border-radius: 5px;
+    outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--accent-blue);
+    cursor: pointer;
+    border-radius: 50%;
+}
+input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--accent-blue);
+    cursor: pointer;
+    border-radius: 50%;
+}
+.gradient-preview-bar {
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    margin-top: var(--spacing-2);
+    margin-bottom: var(--spacing-4);
+    border: 1px solid var(--border-color);
 }
 
 .char-counter {
@@ -577,11 +603,12 @@
     display: block;
     margin-bottom: var(--spacing-2);
     color: var(--text-secondary);
+    font-size: var(--font-size-sm);
 }
 
 .color-input-group input[type="color"] {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: 2px solid var(--border-color);
     cursor: pointer;
@@ -597,12 +624,56 @@
     border: none;
 }
 
-.modal-actions {
+.dropdown-actions {
     display: flex;
     justify-content: flex-end;
-    gap: var(--spacing-3);
-    margin-top: var(--spacing-4);
 }
+
+.btn-primary-small {
+    padding: var(--spacing-1) var(--spacing-3);
+    font-size: var(--font-size-xs);
+    border-radius: var(--radius-sm);
+    background: var(--accent-blue);
+    color: var(--text-primary);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-primary-small:hover {
+    background: var(--accent-blue-hover);
+}
+
+.image-preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    cursor: pointer;
+}
+.image-preview-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+.image-preview-overlay img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+}
+
 
 @media (max-width: 820px) {
     .tool-container {
