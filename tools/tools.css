@@ -445,6 +445,7 @@
     min-height: 600px;
     overflow-y: auto;
     padding-right: var(--spacing-2);
+    align-content: start;
 }
 
 .template-item {
