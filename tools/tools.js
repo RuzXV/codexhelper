@@ -183,7 +183,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const startColor = gradientColor1.value;
         const endColor = gradientColor2.value;
         const bias = parseFloat(gradientBiasSlider.value);
-        const strength = parseInt(gradientStrengthSlider.value, 10);
+        
+        const strengthValue = parseInt(gradientStrengthSlider.value, 10);
+        const strengthMin = parseInt(gradientStrengthSlider.min, 10);
+        const strengthMax = parseInt(gradientStrengthSlider.max, 10);
+        const grouping = (strengthMax + strengthMin) - strengthValue;
+
         const startPos = mailInput.selectionStart;
         const endPos = mailInput.selectionEnd;
         const selectedText = mailInput.value.substring(startPos, endPos);
@@ -191,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
             closeAllDropdowns();
             return;
         }
-        const gradientTags = generateGradientTags(selectedText, startColor, endColor, bias, strength);
+        const gradientTags = generateGradientTags(selectedText, startColor, endColor, bias, grouping);
         mailInput.value = mailInput.value.substring(0, startPos) + gradientTags + mailInput.value.substring(endPos);
         isLivePreviewingGradient = false;
         updatePreview();
@@ -199,12 +204,12 @@ document.addEventListener('DOMContentLoaded', function() {
         closeAllDropdowns();
     }
 
-    function generateGradientTags(text, color1, color2, bias = 1, strength = 1) {
+    function generateGradientTags(text, color1, color2, bias = 1, grouping = 10) {
         const cleanText = text.replace(/<[^>]*>/g, "");
         const len = cleanText.length;
         if (len === 0) return "";
         
-        const chunkSize = strength;
+        const chunkSize = grouping;
         const start = hexToRgb(color1);
         const end = hexToRgb(color2);
         let output = '';
@@ -230,15 +235,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const startColor = gradientColor1.value;
         const endColor = gradientColor2.value;
         const bias = parseFloat(gradientBiasSlider.value);
-        const strength = parseInt(gradientStrengthSlider.value, 10);
-    
+        
+        const strengthValue = parseInt(gradientStrengthSlider.value, 10);
+        const strengthMin = parseInt(gradientStrengthSlider.min, 10);
+        const strengthMax = parseInt(gradientStrengthSlider.max, 10);
+        const grouping = (strengthMax + strengthMin) - strengthValue;
+
         gradientPreviewBar.style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
     
         const selectedText = mailInput.value.substring(gradientSelection.start, gradientSelection.end);
     
         if (selectedText) {
             const cleanSelectedText = selectedText.replace(/<[^>]*>/g, "");
-            const generatedTags = generateGradientTags(cleanSelectedText, startColor, endColor, bias, strength);
+            const generatedTags = generateGradientTags(cleanSelectedText, startColor, endColor, bias, grouping);
             const charCost = generatedTags.length - cleanSelectedText.length;
             gradientCharCounter.textContent = `+${charCost} chars`;
     
