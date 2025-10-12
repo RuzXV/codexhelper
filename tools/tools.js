@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const applyGradientBtn = document.getElementById('apply-gradient-btn');
     const gradientBiasSlider = document.getElementById('gradient-bias-slider');
+    const gradientStrengthSlider = document.getElementById('gradient-strength-slider');
+    const gradientCharCounter = document.getElementById('gradient-char-counter');
     const gradientPreviewBar = document.getElementById('gradient-preview-bar');
     const gradientColor1 = document.getElementById('gradient-color-1');
     const gradientColor2 = document.getElementById('gradient-color-2');
@@ -148,10 +150,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (dropdown.id === 'custom-gradient-dropdown') {
                         gradientSelection.start = mailInput.selectionStart;
                         gradientSelection.end = mailInput.selectionEnd;
-                        if (gradientSelection.start !== gradientSelection.end) {
-                            isLivePreviewingGradient = true;
-                            updateGradientUI();
-                        }
+                        isLivePreviewingGradient = (gradientSelection.start !== gradientSelection.end);
+                        updateGradientUI();
                     }
                 }
             });
@@ -183,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const startColor = gradientColor1.value;
         const endColor = gradientColor2.value;
         const bias = parseFloat(gradientBiasSlider.value);
+        const strength = parseInt(gradientStrengthSlider.value, 10);
         const startPos = mailInput.selectionStart;
         const endPos = mailInput.selectionEnd;
         const selectedText = mailInput.value.substring(startPos, endPos);
@@ -190,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             closeAllDropdowns();
             return;
         }
-        const gradientTags = generateGradientTags(selectedText, startColor, endColor, bias);
+        const gradientTags = generateGradientTags(selectedText, startColor, endColor, bias, strength);
         mailInput.value = mailInput.value.substring(0, startPos) + gradientTags + mailInput.value.substring(endPos);
         isLivePreviewingGradient = false;
         updatePreview();
@@ -198,26 +199,29 @@ document.addEventListener('DOMContentLoaded', function() {
         closeAllDropdowns();
     }
 
-    function generateGradientTags(text, color1, color2, bias = 1) {
+    function generateGradientTags(text, color1, color2, bias = 1, strength = 1) {
         const cleanText = text.replace(/<[^>]*>/g, "");
         const len = cleanText.length;
         if (len === 0) return "";
-        if (len === 1) return `<color=${color1}>${cleanText}</color>`;
+        
+        const chunkSize = strength;
         const start = hexToRgb(color1);
         const end = hexToRgb(color2);
         let output = '';
-        for (let i = 0; i < len; i++) {
-            const linearRatio = i / (len - 1);
+    
+        for (let i = 0; i < len; i += chunkSize) {
+            const chunk = cleanText.substring(i, Math.min(i + chunkSize, len));
+            if (!chunk) continue;
+    
+            const midpointIndex = i + (chunk.length / 2);
+            const linearRatio = len > 1 ? midpointIndex / (len - 1) : 0;
             const biasedRatio = Math.pow(linearRatio, bias);
+    
             const r = Math.round(start.r + biasedRatio * (end.r - start.r));
             const g = Math.round(start.g + biasedRatio * (end.g - start.g));
             const b = Math.round(start.b + biasedRatio * (end.b - start.b));
-            const char = cleanText[i];
-            if (char === ' ' || char === '\n') {
-                output += char;
-            } else {
-                output += `<color=${rgbToHex(r, g, b)}>${char}</color>`;
-            }
+            
+            output += `<color=${rgbToHex(r, g, b)}>${chunk}</color>`;
         }
         return output;
     }
@@ -225,16 +229,27 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateGradientUI() {
         const startColor = gradientColor1.value;
         const endColor = gradientColor2.value;
+        const bias = parseFloat(gradientBiasSlider.value);
+        const strength = parseInt(gradientStrengthSlider.value, 10);
+    
         gradientPreviewBar.style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
-
-        if (isLivePreviewingGradient && gradientSelection.start !== gradientSelection.end) {
-            const bias = parseFloat(gradientBiasSlider.value);
-            const fullText = mailInput.value;
-            const preSelection = fullText.substring(0, gradientSelection.start);
-            const selection = fullText.substring(gradientSelection.start, gradientSelection.end);
-            const postSelection = fullText.substring(gradientSelection.end);
-            const gradientText = generateGradientTags(selection, startColor, endColor, bias);
-            updatePreview(preSelection + gradientText + postSelection);
+    
+        const selectedText = mailInput.value.substring(gradientSelection.start, gradientSelection.end);
+    
+        if (selectedText) {
+            const cleanSelectedText = selectedText.replace(/<[^>]*>/g, "");
+            const generatedTags = generateGradientTags(cleanSelectedText, startColor, endColor, bias, strength);
+            const charCost = generatedTags.length - cleanSelectedText.length;
+            gradientCharCounter.textContent = `+${charCost} chars`;
+    
+            if (isLivePreviewingGradient) {
+                const fullText = mailInput.value;
+                const preSelection = fullText.substring(0, gradientSelection.start);
+                const postSelection = fullText.substring(gradientSelection.end);
+                updatePreview(preSelection + generatedTags + postSelection);
+            }
+        } else {
+            gradientCharCounter.textContent = `+0 chars`;
         }
     }
 
@@ -454,6 +469,7 @@ document.addEventListener('DOMContentLoaded', function() {
     gradientColor1.addEventListener('input', updateGradientUI);
     gradientColor2.addEventListener('input', updateGradientUI);
     gradientBiasSlider.addEventListener('input', updateGradientUI);
+    gradientStrengthSlider.addEventListener('input', updateGradientUI);
 
     copyBtn.addEventListener('click', () => {
         const copyBtnText = copyBtn.querySelector('span');

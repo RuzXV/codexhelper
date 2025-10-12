@@ -151,11 +151,24 @@
                                                             <input type="color" id="gradient-color-2" value="#ffffff">
                                                         </div>
                                                     </div>
+                                                    
+                                                    <div class="gradient-strength-container">
+                                                        <label for="gradient-strength-slider">Strength</label>
+                                                        <div class="slider-wrapper">
+                                                            <span>Low</span>
+                                                            <input type="range" id="gradient-strength-slider" min="1" max="10" value="10" step="1">
+                                                            <span>High</span>
+                                                        </div>
+                                                    </div>
+
                                                     <div class="gradient-slider-container">
+                                                        <label for="gradient-bias-slider">Bias</label>
                                                         <div id="gradient-preview-bar" class="gradient-preview-bar"></div>
                                                         <input type="range" id="gradient-bias-slider" min="0.25" max="4" value="1" step="0.01">
                                                     </div>
+
                                                     <div class="dropdown-actions">
+                                                        <span id="gradient-char-counter" class="gradient-char-counter">+0 chars</span>
                                                         <button id="apply-gradient-btn" class="btn-primary-small">Apply</button>
                                                     </div>
                                                 </div>
