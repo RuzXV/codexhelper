@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const customColorOptions = document.getElementById('custom-color-options');
 
     const applyGradientBtn = document.getElementById('apply-gradient-btn');
+    const gradientToggleBtn = document.getElementById('custom-gradient-toggle');
     const gradientBiasSlider = document.getElementById('gradient-bias-slider');
     const gradientStrengthSlider = document.getElementById('gradient-strength-slider');
     const gradientCharCounter = document.getElementById('gradient-char-counter');
@@ -58,6 +59,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let historyStack = [];
     let historyIndex = -1;
     let inputTimeout = null;
+
+    if (gradientToggleBtn) {
+        gradientToggleBtn.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+        });
+    }
 
     function saveState() {
         if (historyIndex < historyStack.length - 1) {
