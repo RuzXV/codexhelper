@@ -533,11 +533,11 @@ input[type="range"]::-webkit-slider-thumb {
     cursor: pointer;
     border-radius: 50%;
     border: 2px solid var(--bg-tertiary);
-    margin-top: -4px;
+    margin-top: -6px;
 }
 
 #gradient-strength-slider::-webkit-slider-thumb {
-    margin-top: -3px;
+    margin-top: -5px;
 }
 
 input[type="range"]::-moz-range-thumb {
