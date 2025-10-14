@@ -273,6 +273,6 @@
 
 .counting-blur {
     filter: blur(2px);
-    opacity: 0.8;
+    opacity: 0.5;
     transform: translateZ(0);
 }
