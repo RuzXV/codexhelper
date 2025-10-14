@@ -94,10 +94,34 @@
                         <div class="form-group">
                             <label>Commander Rarity</label>
                             <div class="rarity-selector">
-                                <label><input type="radio" name="rarity" value="legendary" checked><span>Legendary</span></label>
-                                <label><input type="radio" name="rarity" value="epic"><span>Epic</span></label>
-                                <label><input type="radio" name="rarity" value="elite"><span>Elite</span></label>
-                                <label><input type="radio" name="rarity" value="advanced"><span>Advanced</span></label>
+                                <label>
+                                    <input type="radio" name="rarity" value="legendary" checked>
+                                    <span class="rarity-btn legendary">
+                                        <img src="/images/calculators/legendary_sculpture.png" alt="Legendary Sculpture">
+                                        Legendary
+                                    </span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="rarity" value="epic">
+                                    <span class="rarity-btn epic">
+                                        <img src="/images/calculators/epic_sculpture.png" alt="Epic Sculpture">
+                                        Epic
+                                    </span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="rarity" value="elite">
+                                    <span class="rarity-btn elite">
+                                        <img src="/images/calculators/elite_sculpture.png" alt="Elite Sculpture">
+                                        Elite
+                                    </span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="rarity" value="advanced">
+                                    <span class="rarity-btn advanced">
+                                        <img src="/images/calculators/advanced_sculpture.png" alt="Advanced Sculpture">
+                                        Advanced
+                                    </span>
+                                </label>
                             </div>
                         </div>
                         <button id="calculate-skill-btn" class="btn-primary">Calculate</button>
@@ -113,10 +137,10 @@
                             <input type="text" id="power-input" placeholder="Example: 50,000,000">
                         </div>
                         <div class="form-group-checkbox">
-                           <label class="switch-label">
-                                <span>Same KvK / Vacation Mode</span>
+                           <label for="same-kvk-checkbox" class="custom-checkbox-label">
                                 <input type="checkbox" id="same-kvk-checkbox">
-                                <span class="slider"></span>
+                                <span class="checkbox-box"></span>
+                                <span>Same KvK / Vacation Mode</span>
                            </label>
                         </div>
                         <button id="calculate-passport-btn" class="btn-primary">Calculate</button>
