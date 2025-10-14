@@ -237,29 +237,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const calculateBuildingBtn = document.getElementById('calculate-building-btn');
     if(calculateBuildingBtn) {
         const buildingSelectors = document.querySelectorAll('input[name="building"]');
-        const buildingImage = document.getElementById('building-image');
+        const buildingTitleIcon = document.getElementById('building-title-icon');
         const currentLevelInput = document.getElementById('current-level');
         const desiredLevelInput = document.getElementById('desired-level');
         const currentCurrencyInput = document.getElementById('current-currency');
         const buildingResultDiv = document.getElementById('building-cost-result');
+        const currencyLabelText = document.getElementById('currency-label-text');
+        const currencyLabelIcon = document.getElementById('currency-label-icon');
 
         const buildingData = {
             castle: {
-                currencyName: "Book(s) of Covenant",
+                currencyName: "Books of Covenant",
                 currencyImage: "/images/calculators/book_of_covenant.webp",
-                buildingImage: "/images/calculators/castle.webp",
                 costs: [0, 2, 5, 8, 15, 20, 30, 40, 50, 70, 80, 100, 125, 150, 300, 500, 700, 900, 1200, 1500, 1750, 2000, 2500, 3000, 5000]
             },
             watchtower: {
-                currencyName: "Arrow(s) of Resistance",
+                currencyName: "Arrows of Resistance",
                 currencyImage: "/images/calculators/arrow_of_resistance.webp",
-                buildingImage: "/images/calculators/watchtower.webp",
                 costs: [0, 2, 5, 8, 15, 20, 30, 40, 50, 70, 80, 100, 125, 150, 300, 500, 700, 900, 1200, 1500, 1800, 2000, 2500, 3000, 5000]
             },
             stateForum: {
                 currencyName: "Sage's Testimony",
                 currencyImage: "/images/calculators/sages_testimony.webp",
-                buildingImage: "/images/calculators/stateforum.webp",
                 costs: [0, 0, 10, 15, 15, 20, 25, 40, 50, 60, 90, 120, 170, 205, 250, 310, 390, 450, 620, 540, 1000, 1400, 2400, 4400, 7430]
             }
         };
@@ -276,12 +275,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const selectedBuilding = document.querySelector('input[name="building"]:checked').value;
                 const data = buildingData[selectedBuilding];
                 
-                buildingImage.classList.add('fading');
-                setTimeout(() => {
-                    buildingImage.src = data.buildingImage;
-                    buildingImage.alt = selectedBuilding;
-                    buildingImage.classList.remove('fading');
-                }, 300);
+                currencyLabelText.textContent = `Current ${data.currencyName}`;
+                currencyLabelIcon.src = data.currencyImage;
+                currencyLabelIcon.alt = data.currencyName;
+                buildingTitleIcon.src = data.currencyImage;
+                buildingTitleIcon.alt = data.currencyName;
             });
         });
 
@@ -328,12 +326,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             buildingResultDiv.innerHTML = `
                 <div class="cost-line">
+                    <span>${data.currencyName}: <strong id="building-currency-value">0</strong></span>
                     <img src="${data.currencyImage}" alt="${data.currencyName}">
-                    <span><strong id="building-currency-value">0</strong> ${data.currencyName}</span>
                 </div>
                 <div class="cost-line">
+                    <span>Gem Cost: <strong id="building-gem-value">0</strong></span>
                     <img src="/images/calculators/gem.webp" alt="Gem">
-                    <span><strong id="building-gem-value">0</strong> Gems</span>
                 </div>
             `;
             

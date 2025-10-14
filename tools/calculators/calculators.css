@@ -84,14 +84,16 @@
 
 .island-content .btn-primary { width: 100%; margin-top: var(--spacing-2); }
 
-.rarity-selector, .building-selector {
+.rarity-selector {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-3);
 }
 
 .building-selector {
-    grid-template-columns: 1fr 1fr 1fr;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-3);
 }
 
 .rarity-selector label, .building-selector label {
@@ -108,9 +110,9 @@
 .rarity-btn, .building-btn {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: var(--spacing-2);
-    padding: var(--spacing-3);
+    padding: var(--spacing-2);
     border-radius: var(--radius-md);
     border: 1px solid rgba(255, 255, 255, 0.15);
     background-color: var(--bg-tertiary);
@@ -120,8 +122,11 @@
     position: relative;
     overflow: hidden;
     transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
-    justify-content: center;
+    flex-direction: column;
+    height: 100%;
+    font-size: var(--font-size-xs);
 }
+
 
 .rarity-btn::after {
     content: '';
@@ -152,7 +157,7 @@
     border-color: rgba(255, 255, 255, 0.4);
 }
 
-.rarity-btn img, .rarity-btn span, .building-btn span {
+.rarity-btn img, .rarity-btn span, .building-btn span, .building-btn img {
     position: relative;
     z-index: 1;
 }
@@ -163,10 +168,21 @@
     filter: drop-shadow(0 0 2px black);
 }
 
+.building-btn img {
+    height: 32px;
+    width: auto;
+}
+
 .rarity-selector input:checked + .rarity-btn,
 .building-selector input:checked + .building-btn {
     border-color: rgba(255, 255, 255, 0.7);
     transform: scale(0.98);
+}
+
+#currency-label-icon {
+    height: 1.2em;
+    vertical-align: -0.2em;
+    margin-left: 8px;
 }
 
 /* New Toggle Switch Styles */
@@ -266,6 +282,7 @@
     min-height: 110px;
     flex-direction: column;
     gap: var(--spacing-3);
+    padding: var(--spacing-2) 0;
 }
 
 .cost-line {
@@ -273,7 +290,8 @@
     align-items: center;
     gap: var(--spacing-2);
     width: 100%;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 0 var(--spacing-2);
 }
 
 .cost-line img {
@@ -298,23 +316,4 @@
     font-weight: 700;
     margin: 0 4px;
     text-shadow: 0 0 8px rgba(90, 160, 255, 0.5);
-}
-
-.building-image-container {
-    height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: var(--spacing-4) 0;
-}
-
-#building-image {
-    max-height: 100%;
-    max-width: 100%;
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out;
-}
-
-#building-image.fading {
-    opacity: 0;
 }
