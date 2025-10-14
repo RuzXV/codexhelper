@@ -87,14 +87,38 @@ document.addEventListener('DOMContentLoaded', function() {
         { maxPower: Infinity, normal: 75, discount: 73 }
     ];
 
-    calculatePassportBtn.addEventListener('click', () => {
-        const powerString = powerInput.value.replace(/,/g, '');
-        const power = parseInt(powerString, 10);
+    function calculateUSDCost(passportsToBuy) {
+        let usdCost = 0;
+        let passportsBought = 0;
+        const bundleTiers = [
+            { cost: 5, passports: 1 }, { cost: 10, passports: 2 },
+            { cost: 20, passports: 3 }, { cost: 50, passports: 4 }
+        ];
 
+        for (const tier of bundleTiers) {
+            if (passportsBought < passportsToBuy) {
+                usdCost += tier.cost;
+                passportsBought += tier.passports;
+            } else { break; }
+        }
+        
+        let hundredDollarTiers = 0;
+        while (passportsBought < passportsToBuy && hundredDollarTiers < 15) {
+            usdCost += 100;
+            passportsBought += 5;
+            hundredDollarTiers++;
+        }
+        return usdCost;
+    }
+
+    calculatePassportBtn.addEventListener('click', () => {
         passportResultDiv.innerHTML = '';
         costResultDiv.innerHTML = '';
         passportResultDiv.classList.remove('error');
         costResultDiv.classList.remove('error');
+
+        const powerString = powerInput.value.replace(/,/g, '');
+        const power = parseInt(powerString, 10);
 
         if (isNaN(power) || power <= 0) {
             passportResultDiv.textContent = 'Please enter a valid, positive power.';
@@ -102,63 +126,61 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        passportResultDiv.classList.remove('error');
-
         const isDiscounted = sameKvkCheckbox.checked;
         const bracket = passportBrackets.find(b => power <= b.maxPower);
         const requiredPassports = isDiscounted ? bracket.discount : bracket.normal;
 
-        passportResultDiv.innerHTML = `
-            <img src="/images/calculators/passport.webp" alt="Passport">
-            <span>Requires ${requiredPassports} Passports</span>
-        `;
-
-        const currentPassports = parseInt(currentPassportsInput.value, 10) || 0;
-    
-        if (currentPassports < 0) {
-            costResultDiv.textContent = 'Current passports cannot be negative.';
+        const currentPassportsStr = currentPassportsInput.value.trim();
+        const currentPassports = currentPassportsStr ? parseInt(currentPassportsStr, 10) : 0;
+        
+        if (isNaN(currentPassports) || currentPassports < 0) {
+            costResultDiv.textContent = 'Current passports must be a positive number.';
             costResultDiv.classList.add('error');
             return;
         }
 
         const passportsNeeded = requiredPassports - currentPassports;
 
-        if (passportsNeeded <= 0) {
-            costResultDiv.innerHTML = `
+        if (passportsNeeded <= 0 && currentPassportsStr) {
+            passportResultDiv.innerHTML = `
                 <i class="fas fa-check-circle"></i>
                 <span>You have enough passports!</span>
             `;
+        } else if (passportsNeeded > 0 && currentPassportsStr) {
+            passportResultDiv.innerHTML = `
+                <img src="/images/calculators/passport.webp" alt="Passport">
+                <span>Requires ${passportsNeeded} more Passports</span>
+            `;
+        } else {
+            passportResultDiv.innerHTML = `
+                <img src="/images/calculators/passport.webp" alt="Passport">
+                <span>Requires ${requiredPassports} Passports</span>
+            `;
+        }
+
+        if (passportsNeeded <= 0) {
+            costResultDiv.innerHTML = `<span>No additional cost required.</span>`;
         } else {
             const creditsCost = passportsNeeded * 600000;
-
-            let usdCost = 0;
-            let passportsBought = 0;
-            const bundleTiers = [
-                { cost: 5, passports: 1 }, { cost: 10, passports: 2 },
-                { cost: 20, passports: 3 }, { cost: 50, passports: 4 }
-            ];
-
-            for (const tier of bundleTiers) {
-                if (passportsBought < passportsNeeded) {
-                    usdCost += tier.cost;
-                    passportsBought += tier.passports;
-                } else { break; }
-            }
+            const usdCost = calculateUSDCost(passportsNeeded);
             
-            let hundredDollarTiers = 0;
-            while (passportsBought < passportsNeeded && hundredDollarTiers < 15) {
-                usdCost += 100;
-                passportsBought += 5;
-                hundredDollarTiers++;
-            }
-            
-            let costMessage = `You need <strong>${passportsNeeded}</strong> more. <br> Cost: <strong>${creditsCost.toLocaleString()}</strong> credits or <strong>$${usdCost}</strong> USD.`;
+            let usdCostHtml = `
+                <div class="cost-line">
+                    <span>New World Cost: <strong>$${usdCost}</strong></span>
+                    <img src="/images/calculators/bundle.webp" alt="Bundle">
+                </div>`;
             
             if (passportsNeeded > 85) {
-                costMessage += "<br><small style='color: var(--text-secondary);'>Note: Max passports from bundles per month is 85.</small>";
+                usdCostHtml += `<small style='color: var(--text-secondary); margin-top: 5px;'>Note: Max passports from bundles per month is 85.</small>`;
             }
 
-            costResultDiv.innerHTML = costMessage;
+            costResultDiv.innerHTML = `
+                <div class="cost-line">
+                    <span>Credit Cost: <strong>${creditsCost.toLocaleString()}</strong></span>
+                    <img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit">
+                </div>
+                ${usdCostHtml}
+            `;
         }
     });
 
