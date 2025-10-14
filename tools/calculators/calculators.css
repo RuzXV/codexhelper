@@ -105,7 +105,7 @@
 .rarity-btn {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: var(--spacing-2);
     padding: var(--spacing-3);
     border-radius: var(--radius-md);
