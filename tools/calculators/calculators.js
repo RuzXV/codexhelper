@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    function animateCounter(element, target, duration) {
+    function animateCounter(element, target, duration, prefix = '') {
         if (!element) return;
 
         element.classList.add('counting-blur');
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const range = target - start;
         
         if (range === 0) {
-            element.textContent = target.toLocaleString();
+            element.textContent = prefix + target.toLocaleString();
             element.classList.remove('counting-blur');
             return;
         }
@@ -26,10 +26,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
                 current = target;
                 clearInterval(timer);
-                element.textContent = Math.floor(current).toLocaleString();
+                element.textContent = prefix + Math.floor(current).toLocaleString();
                 element.classList.remove('counting-blur');
             } else {
-                element.textContent = Math.floor(current).toLocaleString();
+                element.textContent = prefix + Math.floor(current).toLocaleString();
             }
         }, stepTime);
     }
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         skillResultDiv.innerHTML = `
             <img src="${sculptureImage}" alt="${rarity} sculpture">
-            <span>Requires <em><strong id="skill-cost-value">0</strong></em> Sculptures</span>
+            <span>Requires <strong id="skill-cost-value">0</strong> Sculptures</span>
         `;
         
         const skillCostValueElement = document.getElementById('skill-cost-value');
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (passportsNeeded > 0 && currentPassportsStr) {
             passportResultDiv.innerHTML = `
                 <img src="/images/calculators/passport.webp" alt="Passport">
-                <span>Requires <em><strong id="passport-value">0</strong></em> more Passports</span>
+                <span>Requires <strong id="passport-value">0</strong> more Passports</span>
             `;
             const passportValueElement = document.getElementById('passport-value');
             animateCounter(passportValueElement, passportsNeeded, 700);
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             passportResultDiv.innerHTML = `
                 <img src="/images/calculators/passport.webp" alt="Passport">
-                <span>Requires <em><strong id="passport-value">0</strong></em> Passports</span>
+                <span>Requires <strong id="passport-value">0</strong> Passports</span>
             `;
             const passportValueElement = document.getElementById('passport-value');
             animateCounter(passportValueElement, requiredPassports, 700);
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let usdCostHtml = `
                 <div class="cost-line">
-                    <span>New World Cost: $<em><strong id="usd-cost-value">0</strong></em></span>
+                    <span>New World Cost: <strong id="usd-cost-value">0</strong></span>
                     <img src="/images/calculators/bundle.webp" alt="Bundle">
                 </div>`;
             
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             costResultDiv.innerHTML = `
                 <div class="cost-line">
-                    <span>Credit Cost: <em><strong id="credit-cost-value">0</strong></em></span>
+                    <span>Credit Cost: <strong id="credit-cost-value">0</strong></span>
                     <img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit">
                 </div>
                 ${usdCostHtml}
@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const usdCostValueElement = document.getElementById('usd-cost-value');
 
             animateCounter(creditCostValueElement, creditsCost, 700);
-            animateCounter(usdCostValueElement, usdCost, 700);
+            animateCounter(usdCostValueElement, usdCost, 700, '$');
         }
     });
 
