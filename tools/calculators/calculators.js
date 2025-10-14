@@ -2,31 +2,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function animateCounter(element, target, duration) {
         if (!element) return;
-        
-        let start = 0;
-        const initialText = element.textContent.replace(/,/g, '');
-        const initialValue = parseInt(initialText, 10);
-        if (!isNaN(initialValue)) {
-            start = initialValue;
-        }
 
+        element.classList.add('counting-blur');
+
+        let start = 0;
         let current = start;
         const range = target - start;
-        const increment = target > start ? 1 : -1;
-        const stepTime = Math.abs(Math.floor(duration / range));
+        
+        if (range === 0) {
+            element.textContent = target.toLocaleString();
+            element.classList.remove('counting-blur');
+            return;
+        }
 
-        if (range === 0) return;
+        const increment = target > start ? 1 : -1;
+        const stepTime = 16;
+        const totalSteps = duration / stepTime;
+        const incrementAmount = Math.max(1, Math.ceil(Math.abs(range) / totalSteps));
 
         const timer = setInterval(() => {
-            current += increment * Math.ceil(Math.abs(range / (duration / 16)));
+            current += increment * incrementAmount;
             
             if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
                 current = target;
                 clearInterval(timer);
+                element.textContent = Math.floor(current).toLocaleString();
+                element.classList.remove('counting-blur');
+            } else {
+                element.textContent = Math.floor(current).toLocaleString();
             }
-            
-            element.textContent = Math.floor(current).toLocaleString();
-        }, 16);
+        }, stepTime);
     }
     
     const calculateSkillBtn = document.getElementById('calculate-skill-btn');
@@ -84,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         const skillCostValueElement = document.getElementById('skill-cost-value');
-        animateCounter(skillCostValueElement, totalCost, 1000);
+        animateCounter(skillCostValueElement, totalCost, 700);
     });
 
 
@@ -184,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span>Requires <span id="passport-value">0</span> more Passports</span>
             `;
             const passportValueElement = document.getElementById('passport-value');
-            animateCounter(passportValueElement, passportsNeeded, 1000);
+            animateCounter(passportValueElement, passportsNeeded, 700);
 
         } else {
             passportResultDiv.innerHTML = `
@@ -192,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span>Requires <span id="passport-value">0</span> Passports</span>
             `;
             const passportValueElement = document.getElementById('passport-value');
-            animateCounter(passportValueElement, requiredPassports, 1000);
+            animateCounter(passportValueElement, requiredPassports, 700);
         }
 
         if (passportsNeeded <= 0) {
@@ -222,8 +227,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const creditCostValueElement = document.getElementById('credit-cost-value');
             const usdCostValueElement = document.getElementById('usd-cost-value');
 
-            animateCounter(creditCostValueElement, creditsCost, 1000);
-            animateCounter(usdCostValueElement, usdCost, 1000);
+            animateCounter(creditCostValueElement, creditsCost, 700);
+            animateCounter(usdCostValueElement, usdCost, 700);
         }
     });
 

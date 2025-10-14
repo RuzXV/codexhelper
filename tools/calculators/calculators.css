@@ -266,3 +266,13 @@
 }
 
 .island-content.placeholder { text-align: center; color: var(--text-muted); padding: var(--spacing-8) 0; }
+
+.calc-result span, .calc-result strong {
+    transition: filter 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+.counting-blur {
+    filter: blur(5px);
+    opacity: 0.6;
+    transform: translateZ(0);
+}
