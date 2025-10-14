@@ -37,8 +37,6 @@
 
 .calculator-island {
     background: rgba(20, 21, 24, 0.65);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
