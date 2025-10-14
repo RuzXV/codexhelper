@@ -1,4 +1,33 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+    function animateCounter(element, target, duration) {
+        if (!element) return;
+        
+        let start = 0;
+        const initialText = element.textContent.replace(/,/g, '');
+        const initialValue = parseInt(initialText, 10);
+        if (!isNaN(initialValue)) {
+            start = initialValue;
+        }
+
+        let current = start;
+        const range = target - start;
+        const increment = target > start ? 1 : -1;
+        const stepTime = Math.abs(Math.floor(duration / range));
+
+        if (range === 0) return;
+
+        const timer = setInterval(() => {
+            current += increment * Math.ceil(Math.abs(range / (duration / 16)));
+            
+            if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
+                current = target;
+                clearInterval(timer);
+            }
+            
+            element.textContent = Math.floor(current).toLocaleString();
+        }, 16);
+    }
     
     const calculateSkillBtn = document.getElementById('calculate-skill-btn');
     const startSkillInput = document.getElementById('start-skill');
@@ -51,8 +80,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         skillResultDiv.innerHTML = `
             <img src="${sculptureImage}" alt="${rarity} sculpture">
-            <span>Requires ${totalCost.toLocaleString()} Sculptures</span>
+            <span>Requires <span id="skill-cost-value">0</span> Sculptures</span>
         `;
+        
+        const skillCostValueElement = document.getElementById('skill-cost-value');
+        animateCounter(skillCostValueElement, totalCost, 1000);
     });
 
 
@@ -149,13 +181,18 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (passportsNeeded > 0 && currentPassportsStr) {
             passportResultDiv.innerHTML = `
                 <img src="/images/calculators/passport.webp" alt="Passport">
-                <span>Requires ${passportsNeeded} more Passports</span>
+                <span>Requires <span id="passport-value">0</span> more Passports</span>
             `;
+            const passportValueElement = document.getElementById('passport-value');
+            animateCounter(passportValueElement, passportsNeeded, 1000);
+
         } else {
             passportResultDiv.innerHTML = `
                 <img src="/images/calculators/passport.webp" alt="Passport">
-                <span>Requires ${requiredPassports} Passports</span>
+                <span>Requires <span id="passport-value">0</span> Passports</span>
             `;
+            const passportValueElement = document.getElementById('passport-value');
+            animateCounter(passportValueElement, requiredPassports, 1000);
         }
 
         if (passportsNeeded <= 0) {
@@ -166,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let usdCostHtml = `
                 <div class="cost-line">
-                    <span>New World Cost: <strong>$${usdCost}</strong></span>
+                    <span>New World Cost: <strong>$<span id="usd-cost-value">0</span></strong></span>
                     <img src="/images/calculators/bundle.webp" alt="Bundle">
                 </div>`;
             
@@ -176,11 +213,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
             costResultDiv.innerHTML = `
                 <div class="cost-line">
-                    <span>Credit Cost: <strong>${creditsCost.toLocaleString()}</strong></span>
+                    <span>Credit Cost: <strong><span id="credit-cost-value">0</span></strong></span>
                     <img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit">
                 </div>
                 ${usdCostHtml}
             `;
+
+            const creditCostValueElement = document.getElementById('credit-cost-value');
+            const usdCostValueElement = document.getElementById('usd-cost-value');
+
+            animateCounter(creditCostValueElement, creditsCost, 1000);
+            animateCounter(usdCostValueElement, usdCost, 1000);
         }
     });
 
