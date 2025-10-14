@@ -35,11 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     const calculateSkillBtn = document.getElementById('calculate-skill-btn');
-    const startSkillInput = document.getElementById('start-skill');
-    const desiredSkillInput = document.getElementById('desired-skill');
-    const skillResultDiv = document.getElementById('skill-result');
-
     if (calculateSkillBtn) {
+        const startSkillInput = document.getElementById('start-skill');
+        const desiredSkillInput = document.getElementById('desired-skill');
+        const skillResultDiv = document.getElementById('skill-result');
         const costs = {
             legendary: [10, 10, 15, 15, 30, 30, 40, 40, 45, 45, 50, 50, 75, 75, 80, 80],
             epic: [10, 10, 10, 20, 20, 20, 20, 30, 30, 30, 30, 40, 40, 40, 40, 50],
@@ -48,10 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         const cumulativeCosts = Object.keys(costs).reduce((acc, rarity) => {
-            acc[rarity] = costs[rarity].reduce((a, c, i) => {
-                a.push((a[i-1] || 0) + c);
-                return a;
-            }, []);
+            acc[rarity] = costs[rarity].reduce((a, c, i) => { a.push((a[i-1] || 0) + c); return a; }, []);
             return acc;
         }, {});
         
@@ -66,171 +62,120 @@ document.addEventListener('DOMContentLoaded', function() {
             const sculptureImage = `/images/calculators/${rarity}_sculpture.webp`;
 
             if (!/^[1-5]{4}$/.test(start) || !/^[1-5]{4}$/.test(desired)) {
-                skillResultDiv.textContent = 'Please enter valid 4-digit skill levels (e.g., 1111, 5511).';
+                skillResultDiv.textContent = 'Please enter valid 4-digit skill levels (Example: 1111, 5511).';
                 skillResultDiv.classList.add('error');
                 return;
             }
-
             const startPoints = getSkillPoints(start);
             const desiredPoints = getSkillPoints(desired);
-
             if (desiredPoints <= startPoints) {
                 skillResultDiv.textContent = 'Desired skill level must be higher than starting level.';
                 skillResultDiv.classList.add('error');
                 return;
             }
-
             skillResultDiv.classList.remove('error');
-            
             const totalCost = cumulativeCosts[rarity][desiredPoints - 1] - (startPoints > 0 ? cumulativeCosts[rarity][startPoints - 1] : 0);
-            
-            skillResultDiv.innerHTML = `
-                <img src="${sculptureImage}" alt="${rarity} sculpture">
-                <span>Requires <strong id="skill-cost-value">0</strong> Sculptures</span>
-            `;
-            
-            const skillCostValueElement = document.getElementById('skill-cost-value');
-            animateCounter(skillCostValueElement, totalCost, 700);
+            skillResultDiv.innerHTML = `<img src="${sculptureImage}" alt="${rarity} sculpture"><span>Requires <strong id="skill-cost-value">0</strong> Sculptures</span>`;
+            animateCounter(document.getElementById('skill-cost-value'), totalCost, 700);
         });
     }
 
     const calculatePassportBtn = document.getElementById('calculate-passport-btn');
-    const powerInput = document.getElementById('power-input');
-    const sameKvkCheckbox = document.getElementById('same-kvk-checkbox');
-    const passportResultDiv = document.getElementById('passport-result');
-    const currentPassportsInput = document.getElementById('current-passports-input');
-    const costResultDiv = document.getElementById('cost-result');
-
     if (calculatePassportBtn) {
-        const passportBrackets = [
-            { maxPower: 9999999, normal: 1, discount: 1 },
-            { maxPower: 14999999, normal: 2, discount: 1 },
-            { maxPower: 19999999, normal: 3, discount: 1 },
-            { maxPower: 24999999, normal: 4, discount: 1 },
-            { maxPower: 29999999, normal: 6, discount: 1 },
-            { maxPower: 34999999, normal: 9, discount: 2 },
-            { maxPower: 39999999, normal: 12, discount: 3 },
-            { maxPower: 44999999, normal: 15, discount: 5 },
-            { maxPower: 49999999, normal: 20, discount: 8 },
-            { maxPower: 54999999, normal: 25, discount: 12 },
-            { maxPower: 59999999, normal: 30, discount: 15 },
-            { maxPower: 64999999, normal: 35, discount: 20 },
-            { maxPower: 69999999, normal: 40, discount: 25 },
-            { maxPower: 74999999, normal: 45, discount: 32 },
-            { maxPower: 79999999, normal: 50, discount: 40 },
-            { maxPower: 84999999, normal: 55, discount: 47 },
-            { maxPower: 89999999, normal: 60, discount: 54 },
-            { maxPower: 94999999, normal: 65, discount: 61 },
-            { maxPower: 99999999, normal: 70, discount: 67 },
-            { maxPower: Infinity, normal: 75, discount: 73 }
-        ];
-
-        function calculateUSDCost(passportsToBuy) {
-            let usdCost = 0;
-            let passportsBought = 0;
-            const bundleTiers = [
-                { cost: 5, passports: 1 }, { cost: 10, passports: 2 },
-                { cost: 20, passports: 3 }, { cost: 50, passports: 4 }
-            ];
-
-            for (const tier of bundleTiers) {
-                if (passportsBought < passportsToBuy) {
-                    usdCost += tier.cost;
-                    passportsBought += tier.passports;
-                } else { break; }
-            }
-            
-            let hundredDollarTiers = 0;
-            while (passportsBought < passportsToBuy && hundredDollarTiers < 15) {
-                usdCost += 100;
-                passportsBought += 5;
-                hundredDollarTiers++;
-            }
-            return usdCost;
-        }
-
+        const powerInput = document.getElementById('power-input');
+        const sameKvkCheckbox = document.getElementById('same-kvk-checkbox');
+        const passportResultDiv = document.getElementById('passport-result');
+        const currentPassportsInput = document.getElementById('current-passports-input');
+        const costResultDiv = document.getElementById('cost-result');
+        const passportBrackets = [ { maxPower: 9999999, normal: 1, discount: 1 }, { maxPower: 14999999, normal: 2, discount: 1 }, { maxPower: 19999999, normal: 3, discount: 1 }, { maxPower: 24999999, normal: 4, discount: 1 }, { maxPower: 29999999, normal: 6, discount: 1 }, { maxPower: 34999999, normal: 9, discount: 2 }, { maxPower: 39999999, normal: 12, discount: 3 }, { maxPower: 44999999, normal: 15, discount: 5 }, { maxPower: 49999999, normal: 20, discount: 8 }, { maxPower: 54999999, normal: 25, discount: 12 }, { maxPower: 59999999, normal: 30, discount: 15 }, { maxPower: 64999999, normal: 35, discount: 20 }, { maxPower: 69999999, normal: 40, discount: 25 }, { maxPower: 74999999, normal: 45, discount: 32 }, { maxPower: 79999999, normal: 50, discount: 40 }, { maxPower: 84999999, normal: 55, discount: 47 }, { maxPower: 89999999, normal: 60, discount: 54 }, { maxPower: 94999999, normal: 65, discount: 61 }, { maxPower: 99999999, normal: 70, discount: 67 }, { maxPower: Infinity, normal: 75, discount: 73 } ];
         calculatePassportBtn.addEventListener('click', () => {
-            passportResultDiv.innerHTML = '';
-            costResultDiv.innerHTML = '';
-            passportResultDiv.classList.remove('error');
-            costResultDiv.classList.remove('error');
-
-            const powerString = powerInput.value.replace(/,/g, '');
-            const power = parseInt(powerString, 10);
-
-            if (isNaN(power) || power <= 0) {
-                passportResultDiv.textContent = 'Please enter a valid, positive power.';
-                passportResultDiv.classList.add('error');
-                return;
-            }
-            
+            passportResultDiv.innerHTML = ''; costResultDiv.innerHTML = ''; passportResultDiv.classList.remove('error'); costResultDiv.classList.remove('error');
+            const power = parseInt(powerInput.value.replace(/,/g, ''), 10);
+            if (isNaN(power) || power <= 0) { passportResultDiv.textContent = 'Please enter a valid, positive power.'; passportResultDiv.classList.add('error'); return; }
             const isDiscounted = sameKvkCheckbox.checked;
             const bracket = passportBrackets.find(b => power <= b.maxPower);
             const requiredPassports = isDiscounted ? bracket.discount : bracket.normal;
+            const currentPassports = parseInt(currentPassportsInput.value.trim(), 10) || 0;
+            if (isNaN(currentPassports) || currentPassports < 0) { costResultDiv.textContent = 'Current passports must be a positive number.'; costResultDiv.classList.add('error'); return; }
+            const passportsNeeded = requiredPassports - currentPassports;
+            if (passportsNeeded <= 0 && currentPassportsInput.value.trim()) { passportResultDiv.innerHTML = `<i class="fas fa-check-circle"></i><span>You have enough passports!</span>`; } else { passportResultDiv.innerHTML = `<img src="/images/calculators/passport.webp" alt="Passport"><span>Requires <strong id="passport-value">0</strong> Passports</span>`; animateCounter(document.getElementById('passport-value'), passportsNeeded > 0 ? passportsNeeded : requiredPassports, 700); }
+            if (passportsNeeded <= 0) { costResultDiv.innerHTML = `<span>No additional cost required.</span>`; } else {
+                costResultDiv.innerHTML = `<div class="cost-line"><span>Credit Cost: <strong id="credit-cost-value">0</strong></span><img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit"></div><div class="cost-line"><span>New World Cost: <strong id="usd-cost-value">0</strong></span><img src="/images/calculators/bundle.webp" alt="Bundle"></div>`;
+                if (passportsNeeded > 85) { costResultDiv.innerHTML += `<small style='color: var(--text-secondary); margin-top: 5px;'>Note: Max passports from bundles per month is 85.</small>`; }
+                animateCounter(document.getElementById('credit-cost-value'), passportsNeeded * 600000, 700);
+            }
+        });
+    }
 
-            const currentPassportsStr = currentPassportsInput.value.trim();
-            const currentPassports = currentPassportsStr ? parseInt(currentPassportsStr, 10) : 0;
+    const calculateVipBtn = document.getElementById('calculate-vip-btn');
+    if(calculateVipBtn) {
+        const currentVipPointsInput = document.getElementById('current-vip-points');
+        const desiredVipLevelSelect = document.getElementById('desired-vip-level');
+        const vipResultDiv = document.getElementById('vip-result');
+        const vipTokenToggle = document.getElementById('vip-token-toggle');
+        const vipTokenGrid = document.getElementById('vip-token-grid-container');
+        const vipTokenInputs = document.querySelectorAll('.vip-token-input');
+        
+        const vipLevels = [
+            { level: 1, points: 200 }, { level: 2, points: 400 }, { level: 3, points: 1200 }, { level: 4, points: 3500 }, { level: 5, points: 6000 }, { level: 6, points: 11500 }, { level: 7, points: 17500 }, { level: 8, points: 35000 }, { level: 9, points: 75000 }, { level: 10, points: 150000 }, { level: 11, points: 250000 }, { level: 12, points: 350000 }, { level: 13, points: 500000 }, { level: 14, points: 750000 }, { level: 15, points: 1000000 }, { level: 16, points: 1500000 }, { level: 17, points: 2500000 }, { level: 18, points: 4000000 }, { level: 19, points: 6000000 }, { level: 'SVIP', points: 9000000 }
+        ];
+
+        vipLevels.forEach(vip => {
+            const option = document.createElement('option');
+            option.value = vip.points;
+            option.textContent = `VIP ${vip.level}`;
+            option.dataset.level = vip.level;
+            desiredVipLevelSelect.appendChild(option);
+        });
+
+        vipTokenToggle.addEventListener('change', () => {
+            const isChecked = vipTokenToggle.checked;
+            vipTokenGrid.classList.toggle('visible', isChecked);
+            currentVipPointsInput.readOnly = isChecked;
+            if(isChecked) {
+                updateVipFromTokens();
+            }
+        });
+
+        function updateVipFromTokens() {
+            let total = 0;
+            vipTokenInputs.forEach(input => {
+                const value = parseInt(input.value, 10) || 0;
+                const tokenValue = parseInt(input.dataset.value, 10);
+                total += value * tokenValue;
+            });
+            currentVipPointsInput.value = total.toLocaleString();
+        }
+
+        vipTokenInputs.forEach(input => input.addEventListener('input', updateVipFromTokens));
+
+        calculateVipBtn.addEventListener('click', () => {
+            vipResultDiv.classList.remove('error');
+            const currentPoints = parseInt(currentVipPointsInput.value.replace(/,/g, ''), 10);
+            const targetPoints = parseInt(desiredVipLevelSelect.value, 10);
             
-            if (isNaN(currentPassports) || currentPassports < 0) {
-                costResultDiv.textContent = 'Current passports must be a positive number.';
-                costResultDiv.classList.add('error');
+            if(isNaN(currentPoints) || currentPoints < 0) {
+                vipResultDiv.textContent = 'Please enter your current VIP points.';
+                vipResultDiv.classList.add('error');
                 return;
             }
 
-            const passportsNeeded = requiredPassports - currentPassports;
+            const pointsNeeded = targetPoints - currentPoints;
 
-            if (passportsNeeded <= 0 && currentPassportsStr) {
-                passportResultDiv.innerHTML = `
-                    <i class="fas fa-check-circle"></i>
-                    <span>You have enough passports!</span>
-                `;
-            } else if (passportsNeeded > 0 && currentPassportsStr) {
-                passportResultDiv.innerHTML = `
-                    <img src="/images/calculators/passport.webp" alt="Passport">
-                    <span>Requires <strong id="passport-value">0</strong> more Passports</span>
-                `;
-                const passportValueElement = document.getElementById('passport-value');
-                animateCounter(passportValueElement, passportsNeeded, 700);
-
-            } else {
-                passportResultDiv.innerHTML = `
-                    <img src="/images/calculators/passport.webp" alt="Passport">
-                    <span>Requires <strong id="passport-value">0</strong> Passports</span>
-                `;
-                const passportValueElement = document.getElementById('passport-value');
-                animateCounter(passportValueElement, requiredPassports, 700);
+            if(pointsNeeded <= 0) {
+                vipResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have reached or surpassed this level!</span>`;
+                return;
             }
 
-            if (passportsNeeded <= 0) {
-                costResultDiv.innerHTML = `<span>No additional cost required.</span>`;
-            } else {
-                const creditsCost = passportsNeeded * 600000;
-                const usdCost = calculateUSDCost(passportsNeeded);
-                
-                let usdCostHtml = `
-                    <div class="cost-line">
-                        <span>New World Cost: <strong id="usd-cost-value">0</strong></span>
-                        <img src="/images/calculators/bundle.webp" alt="Bundle">
-                    </div>`;
-                
-                if (passportsNeeded > 85) {
-                    usdCostHtml += `<small style='color: var(--text-secondary); margin-top: 5px;'>Note: Max passports from bundles per month is 85.</small>`;
-                }
+            const selectedOption = desiredVipLevelSelect.options[desiredVipLevelSelect.selectedIndex];
+            const levelName = selectedOption.dataset.level;
+            const levelImage = `/images/calculators/vip/vip${levelName.toLowerCase()}.webp`;
 
-                costResultDiv.innerHTML = `
-                    <div class="cost-line">
-                        <span>Credit Cost: <strong id="credit-cost-value">0</strong></span>
-                        <img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit">
-                    </div>
-                    ${usdCostHtml}
-                `;
-
-                const creditCostValueElement = document.getElementById('credit-cost-value');
-                const usdCostValueElement = document.getElementById('usd-cost-value');
-
-                animateCounter(creditCostValueElement, creditsCost, 700);
-                animateCounter(usdCostValueElement, usdCost, 700, '$');
-            }
+            vipResultDiv.innerHTML = `
+                <img src="${levelImage}" alt="VIP ${levelName}">
+                <span>Needs <strong id="vip-points-needed">0</strong> more points for VIP ${levelName}</span>
+            `;
+            animateCounter(document.getElementById('vip-points-needed'), pointsNeeded, 700);
         });
     }
 
@@ -246,35 +191,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const currencyLabelIcon = document.getElementById('currency-label-icon');
 
         const buildingData = {
-            castle: {
-                currencyName: "Books of Covenant",
-                currencyImage: "/images/calculators/book_of_covenant.webp",
-                costs: [0, 2, 5, 8, 15, 20, 30, 40, 50, 70, 80, 100, 125, 150, 300, 500, 700, 900, 1200, 1500, 1750, 2000, 2500, 3000, 5000]
-            },
-            watchtower: {
-                currencyName: "Arrows of Resistance",
-                currencyImage: "/images/calculators/arrow_of_resistance.webp",
-                costs: [0, 2, 5, 8, 15, 20, 30, 40, 50, 70, 80, 100, 125, 150, 300, 500, 700, 900, 1200, 1500, 1800, 2000, 2500, 3000, 5000]
-            },
-            stateForum: {
-                currencyName: "Sage's Testimony",
-                currencyImage: "/images/calculators/sages_testimony.webp",
-                costs: [0, 0, 10, 15, 15, 20, 25, 40, 50, 60, 90, 120, 170, 205, 250, 310, 390, 450, 620, 540, 1000, 1400, 2400, 4400, 7430]
-            }
+            castle: { currencyName: "Books of Covenant", currencyImage: "/images/calculators/book_of_covenant.webp", costs: [0, 2, 5, 8, 15, 20, 30, 40, 50, 70, 80, 100, 125, 150, 300, 500, 700, 900, 1200, 1500, 1750, 2000, 2500, 3000, 5000] },
+            watchtower: { currencyName: "Arrows of Resistance", currencyImage: "/images/calculators/arrow_of_resistance.webp", costs: [0, 2, 5, 8, 15, 20, 30, 40, 50, 70, 80, 100, 125, 150, 300, 500, 700, 900, 1200, 1500, 1800, 2000, 2500, 3000, 5000] },
+            stateForum: { currencyName: "Sage's Testimony", currencyImage: "/images/calculators/sages_testimony.webp", costs: [0, 0, 10, 15, 15, 20, 25, 40, 50, 60, 90, 120, 170, 205, 250, 310, 390, 450, 620, 540, 1000, 1400, 2400, 4400, 7430] }
         };
 
         for (const building in buildingData) {
-            buildingData[building].cumulativeCosts = buildingData[building].costs.reduce((acc, cost, i) => {
-                acc.push((acc[i-1] || 0) + cost);
-                return acc;
-            }, []);
+            buildingData[building].cumulativeCosts = buildingData[building].costs.reduce((acc, cost, i) => { acc.push((acc[i-1] || 0) + cost); return acc; }, []);
         }
 
         buildingSelectors.forEach(selector => {
             selector.addEventListener('change', () => {
                 const selectedBuilding = document.querySelector('input[name="building"]:checked').value;
                 const data = buildingData[selectedBuilding];
-                
                 currencyLabelText.textContent = `Current ${data.currencyName}`;
                 currencyLabelIcon.src = data.currencyImage;
                 currencyLabelIcon.alt = data.currencyName;
@@ -284,62 +213,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         calculateBuildingBtn.addEventListener('click', () => {
-            buildingResultDiv.innerHTML = '';
-            buildingResultDiv.classList.remove('error');
-
+            buildingResultDiv.innerHTML = ''; buildingResultDiv.classList.remove('error');
             const selectedBuilding = document.querySelector('input[name="building"]:checked').value;
             const currentLevel = parseInt(currentLevelInput.value, 10);
             const desiredLevel = parseInt(desiredLevelInput.value, 10);
             const currentCurrency = parseInt(currentCurrencyInput.value, 10) || 0;
             
-            if (isNaN(currentLevel) || isNaN(desiredLevel) || currentLevel < 1 || desiredLevel > 25) {
-                buildingResultDiv.textContent = 'Please enter valid levels between 1 and 25.';
-                buildingResultDiv.classList.add('error');
-                return;
-            }
-
-            if (desiredLevel <= currentLevel) {
-                buildingResultDiv.textContent = 'Desired level must be higher than the current level.';
-                buildingResultDiv.classList.add('error');
-                return;
-            }
-
-            if (isNaN(currentCurrency) || currentCurrency < 0) {
-                buildingResultDiv.textContent = 'Current currency must be a positive number.';
-                buildingResultDiv.classList.add('error');
-                return;
-            }
+            if (isNaN(currentLevel) || isNaN(desiredLevel) || currentLevel < 1 || desiredLevel > 25) { buildingResultDiv.textContent = 'Please enter valid levels between 1 and 25.'; buildingResultDiv.classList.add('error'); return; }
+            if (desiredLevel <= currentLevel) { buildingResultDiv.textContent = 'Desired level must be higher than the current level.'; buildingResultDiv.classList.add('error'); return; }
+            if (isNaN(currentCurrency) || currentCurrency < 0) { buildingResultDiv.textContent = 'Current currency must be a positive number.'; buildingResultDiv.classList.add('error'); return; }
 
             const data = buildingData[selectedBuilding];
             const totalCost = data.cumulativeCosts[desiredLevel - 1] - data.cumulativeCosts[currentLevel - 1];
             const neededCurrency = Math.max(0, totalCost - currentCurrency);
 
-            if (neededCurrency <= 0) {
-                buildingResultDiv.innerHTML = `
-                    <i class="fas fa-check-circle"></i>
-                    <span>You have enough currency to reach level ${desiredLevel}!</span>
-                `;
-                return;
-            }
+            if (neededCurrency <= 0) { buildingResultDiv.innerHTML = `<i class="fas fa-check-circle"></i><span>You have enough currency to reach level ${desiredLevel}!</span>`; return; }
 
             const gemCost = neededCurrency * 10;
-
             buildingResultDiv.innerHTML = `
-                <div class="cost-line">
-                    <span>${data.currencyName}: <strong id="building-currency-value">0</strong></span>
-                    <img src="${data.currencyImage}" alt="${data.currencyName}">
-                </div>
-                <div class="cost-line">
-                    <span>Gem Cost: <strong id="building-gem-value">0</strong></span>
-                    <img src="/images/calculators/gem.webp" alt="Gem">
-                </div>
-            `;
-            
-            const currencyValueElement = document.getElementById('building-currency-value');
-            const gemValueElement = document.getElementById('building-gem-value');
-
-            animateCounter(currencyValueElement, neededCurrency, 700);
-            animateCounter(gemValueElement, gemCost, 700);
+                <div class="cost-line"><span>${data.currencyName}: <strong id="building-currency-value">0</strong></span><img src="${data.currencyImage}" alt="${data.currencyName}"></div>
+                <div class="cost-line"><span>Gem Cost: <strong id="building-gem-value">0</strong></span><img src="/images/calculators/gem.webp" alt="Gem"></div>`;
+            animateCounter(document.getElementById('building-currency-value'), neededCurrency, 700);
+            animateCounter(document.getElementById('building-gem-value'), gemCost, 700);
         });
     }
 });

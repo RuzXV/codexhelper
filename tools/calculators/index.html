@@ -130,6 +130,57 @@
                 </div>
 
                 <div class="calculator-island">
+                    <h2 class="island-title"><img src="/images/calculators/vip_icon.webp" alt="VIP Icon" width="28" height="28"> VIP Level Requirements</h2>
+                    <div class="island-content">
+                        <div class="form-group">
+                            <label for="current-vip-points">Current VIP Points</label>
+                            <input type="text" id="current-vip-points" placeholder="Example: 1,500,000">
+                        </div>
+
+                        <div class="form-group-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="vip-token-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label for="vip-token-toggle" class="toggle-label">Calculate from VIP Tokens</label>
+                        </div>
+
+                        <div id="vip-token-grid-container" class="vip-token-grid-container">
+                            <div class="vip-token-grid">
+                                <div class="vip-token-item common">
+                                    <img src="/images/calculators/vip/vip_token_10.webp" alt="10 VIP Token">
+                                    <input type="number" class="vip-token-input" data-value="10" placeholder="0">
+                                </div>
+                                <div class="vip-token-item advanced">
+                                    <img src="/images/calculators/vip/vip_token_100.webp" alt="100 VIP Token">
+                                    <input type="number" class="vip-token-input" data-value="100" placeholder="0">
+                                </div>
+                                <div class="vip-token-item elite">
+                                    <img src="/images/calculators/vip/vip_token_500.webp" alt="500 VIP Token">
+                                    <input type="number" class="vip-token-input" data-value="500" placeholder="0">
+                                </div>
+                                <div class="vip-token-item epic">
+                                    <img src="/images/calculators/vip/vip_token_1000.webp" alt="1000 VIP Token">
+                                    <input type="number" class="vip-token-input" data-value="1000" placeholder="0">
+                                </div>
+                                <div class="vip-token-item legendary">
+                                    <img src="/images/calculators/vip/vip_token_5000.webp" alt="5000 VIP Token">
+                                    <input type="number" class="vip-token-input" data-value="5000" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="desired-vip-level">Desired VIP Level</label>
+                            <select id="desired-vip-level">
+                            </select>
+                        </div>
+                        <button id="calculate-vip-btn" class="btn-primary">Calculate</button>
+                        <div id="vip-result" class="calc-result"></div>
+                    </div>
+                </div>
+                
+                <div class="calculator-island">
                     <h2 class="island-title"><img src="/images/calculators/passport.webp" alt="Passport Icon" width="28" height="28"> Passport Cost</h2>
                     <div class="island-content">
                         <div class="form-group">
@@ -184,18 +235,18 @@
                         </div>
                         <div class="form-group">
                             <label for="current-level">Current Level</label>
-                            <input type="number" id="current-level" placeholder="e.g., 1" min="1" max="24">
+                            <input type="number" id="current-level" placeholder="Example: 1" min="1" max="24">
                         </div>
                         <div class="form-group">
                             <label for="desired-level">Desired Level</label>
-                            <input type="number" id="desired-level" placeholder="e.g., 25" min="2" max="25">
+                            <input type="number" id="desired-level" placeholder="Example: 25" min="2" max="25">
                         </div>
                         <div class="form-group">
                             <label for="current-currency">
                                 <span id="currency-label-text">Current Books of Covenant</span>
                                 <img id="currency-label-icon" src="/images/calculators/book_of_covenant.webp" alt="Currency Icon">
                             </label>
-                            <input type="number" id="current-currency" placeholder="e.g., 500" min="0">
+                            <input type="number" id="current-currency" placeholder="Example: 500" min="0">
                         </div>
                         <button id="calculate-building-btn" class="btn-primary">Calculate</button>
                         <div id="building-cost-result" class="calc-result"></div>
