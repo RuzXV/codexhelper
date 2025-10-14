@@ -384,11 +384,11 @@
 }
 
 .mail-preview-container.mail-bg {
-    border-image-source: url('/images/tools_mail_preview.jpg');
+    border-image-source: url('/images/tools_mail_preview.webp');
 }
 
 .mail-preview-container.board-bg {
-    border-image-source: url('/images/tools_board_preview.png');
+    border-image-source: url('/images/tools_board_preview.webp');
 }
 
 #mail-preview {

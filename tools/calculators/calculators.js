@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const start = startSkillInput.value;
         const desired = desiredSkillInput.value;
         const rarity = document.querySelector('input[name="rarity"]:checked').value;
-        const sculptureImage = `/images/calculators/${rarity}_sculpture.png`;
+        const sculptureImage = `/images/calculators/${rarity}_sculpture.webp`;
 
         if (!/^[1-5]{4}$/.test(start) || !/^[1-5]{4}$/.test(desired)) {
             skillResultDiv.textContent = 'Please enter valid 4-digit skill levels (e.g., 1111, 5511).';
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const cost = isDiscounted ? bracket.discount : bracket.normal;
 
         passportResultDiv.innerHTML = `
-            <img src="/images/calculators/passport.png" alt="Passport">
+            <img src="/images/calculators/passport.webp" alt="Passport">
             <span>Requires ${cost} Passports</span>
         `;
     });
