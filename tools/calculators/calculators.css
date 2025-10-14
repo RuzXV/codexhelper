@@ -155,7 +155,6 @@
     transform: scale(0.98);
 }
 
-/* New Toggle Switch Styles */
 .form-group-toggle {
     display: flex;
     align-items: center;
@@ -272,7 +271,15 @@
 }
 
 .counting-blur {
-    filter: blur(1px);
-    opacity: 0.5;
+    filter: blur(2px);
+    opacity: 0.8;
     transform: translateZ(0);
+}
+
+.calc-result em strong {
+    color: var(--accent-blue-bright);
+    font-weight: 700;
+    font-style: italic;
+    margin: 0 4px;
+    text-shadow: 0 0 8px rgba(90, 160, 255, 0.5);
 }

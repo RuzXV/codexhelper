@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         skillResultDiv.innerHTML = `
             <img src="${sculptureImage}" alt="${rarity} sculpture">
-            <span>Requires <span id="skill-cost-value">0</span> Sculptures</span>
+            <span>Requires <em><strong id="skill-cost-value">0</strong></em> Sculptures</span>
         `;
         
         const skillCostValueElement = document.getElementById('skill-cost-value');
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (passportsNeeded > 0 && currentPassportsStr) {
             passportResultDiv.innerHTML = `
                 <img src="/images/calculators/passport.webp" alt="Passport">
-                <span>Requires <span id="passport-value">0</span> more Passports</span>
+                <span>Requires <em><strong id="passport-value">0</strong></em> more Passports</span>
             `;
             const passportValueElement = document.getElementById('passport-value');
             animateCounter(passportValueElement, passportsNeeded, 700);
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             passportResultDiv.innerHTML = `
                 <img src="/images/calculators/passport.webp" alt="Passport">
-                <span>Requires <span id="passport-value">0</span> Passports</span>
+                <span>Requires <em><strong id="passport-value">0</strong></em> Passports</span>
             `;
             const passportValueElement = document.getElementById('passport-value');
             animateCounter(passportValueElement, requiredPassports, 700);
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let usdCostHtml = `
                 <div class="cost-line">
-                    <span>New World Cost: <strong>$<span id="usd-cost-value">0</span></strong></span>
+                    <span>New World Cost: $<em><strong id="usd-cost-value">0</strong></em></span>
                     <img src="/images/calculators/bundle.webp" alt="Bundle">
                 </div>`;
             
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             costResultDiv.innerHTML = `
                 <div class="cost-line">
-                    <span>Credit Cost: <strong><span id="credit-cost-value">0</span></strong></span>
+                    <span>Credit Cost: <em><strong id="credit-cost-value">0</strong></em></span>
                     <img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit">
                 </div>
                 ${usdCostHtml}
