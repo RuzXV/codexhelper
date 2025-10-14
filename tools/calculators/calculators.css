@@ -47,7 +47,6 @@
 
 .calculator-island:hover {
     transform: translateY(-4px);
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
     border-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -85,24 +84,28 @@
 
 .island-content .btn-primary { width: 100%; margin-top: var(--spacing-2); }
 
-.rarity-selector {
+.rarity-selector, .building-selector {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-3);
 }
 
-.rarity-selector label {
+.building-selector {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.rarity-selector label, .building-selector label {
     position: relative;
     cursor: pointer;
 }
 
-.rarity-selector input {
+.rarity-selector input, .building-selector input {
     position: absolute;
     opacity: 0;
     width: 0; height: 0;
 }
 
-.rarity-btn {
+.rarity-btn, .building-btn {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -116,7 +119,8 @@
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
     position: relative;
     overflow: hidden;
-    transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    justify-content: center;
 }
 
 .rarity-btn::after {
@@ -139,7 +143,16 @@
     opacity: 1;
 }
 
-.rarity-btn img, .rarity-btn span {
+.building-selector input:checked + .building-btn {
+    background-color: var(--accent-blue-light);
+    border-color: var(--accent-blue);
+}
+
+.building-selector label:hover .building-btn {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.rarity-btn img, .rarity-btn span, .building-btn span {
     position: relative;
     z-index: 1;
 }
@@ -150,7 +163,8 @@
     filter: drop-shadow(0 0 2px black);
 }
 
-.rarity-selector input:checked + .rarity-btn {
+.rarity-selector input:checked + .rarity-btn,
+.building-selector input:checked + .building-btn {
     border-color: rgba(255, 255, 255, 0.7);
     transform: scale(0.98);
 }
@@ -246,7 +260,7 @@
     color: var(--accent-green);
 }
 
-#cost-result {
+#cost-result, #building-cost-result {
     margin-top: var(--spacing-3);
     font-size: var(--font-size-base);
     min-height: 110px;
@@ -258,6 +272,8 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-2);
+    width: 100%;
+    justify-content: center;
 }
 
 .cost-line img {
@@ -282,4 +298,23 @@
     font-weight: 700;
     margin: 0 4px;
     text-shadow: 0 0 8px rgba(90, 160, 255, 0.5);
+}
+
+.building-image-container {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: var(--spacing-4) 0;
+}
+
+#building-image {
+    max-height: 100%;
+    max-width: 100%;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#building-image.fading {
+    opacity: 0;
 }

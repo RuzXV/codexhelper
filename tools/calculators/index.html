@@ -155,8 +155,41 @@
 
                 <div class="calculator-island">
                     <h2 class="island-title"><img src="/images/calculators/book_of_covenant.webp" alt="Book of Covenant Icon" width="28" height="28"> Building Costs</h2>
-                    <div class="island-content placeholder">
-                        <p>Coming Soon...</p>
+                    <div class="island-content">
+                        <div class="form-group">
+                            <label>Building</label>
+                            <div class="building-selector">
+                                <label>
+                                    <input type="radio" name="building" value="castle" checked>
+                                    <span class="building-btn castle">Castle</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="building" value="watchtower">
+                                    <span class="building-btn watchtower">Watchtower</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="building" value="stateForum">
+                                    <span class="building-btn state-forum">State Forum</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="current-level">Current Level</label>
+                            <input type="number" id="current-level" placeholder="e.g., 1" min="1" max="24">
+                        </div>
+                        <div class="form-group">
+                            <label for="desired-level">Desired Level</label>
+                            <input type="number" id="desired-level" placeholder="e.g., 25" min="2" max="25">
+                        </div>
+                        <div class="form-group">
+                            <label for="current-currency">Current Amount of Currency</label>
+                            <input type="number" id="current-currency" placeholder="e.g., 500" min="0">
+                        </div>
+                        <div class="building-image-container">
+                            <img src="/images/calculators/castle.webp" alt="Selected Building" id="building-image">
+                        </div>
+                        <button id="calculate-building-btn" class="btn-primary">Calculate</button>
+                        <div id="building-cost-result" class="calc-result"></div>
                     </div>
                 </div>
 
