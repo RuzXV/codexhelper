@@ -1,31 +1,31 @@
 [
     {
         "title": "Ark of Osiris Registration",
-        "image": "/images/template_previews/aoo_template.webp",
+        "image": "/images/mail/templates/aoo_template.webp",
         "content": "<b><color=orange>Ark of Osiris Registration</color></b>\n\nHello Governors!\n\nPlease register for the upcoming Ark of Osiris match. Sign up with your in-game name below.\n\n<i>Let's aim for victory!</i>",
         "tags": ["format:Coloured", "type:AoO", "type:Event"]
     },
     {
         "title": "Kingdom-wide Buff Notice",
-        "image": "/images/template_previews/buff_template.webp",
+        "image": "/images/mail/templates/buff_template.webp",
         "content": "<b><color=green>Kingdom Buff Activated!</color></b>\n\n<size=18><b>TRAINING BUFF IS NOW ACTIVE</b></size>\n\nFor the next 8 hours, all troop training speed is increased by 10%.\n\nUtilize this opportunity to strengthen your armies!",
         "tags": ["format:Coloured", "type:Announcement", "type:Kingdom"]
     },
     {
         "title": "Alliance Fortress Build",
-        "image": "/images/template_previews/fort_template.webp",
+        "image": "/images/mail/templates/fort_template.webp",
         "content": "<b><color=red>URGENT: Alliance Fortress</color></b>\n\nWe are building a new Fortress in <b>[Coordinates]</b>.\n\nAll members are required to send builders to assist. Your contribution is crucial for our territory expansion.",
         "tags": ["format:Coloured", "type:Alliance", "type:Building"]
     },
     {
         "title": "Pre-KvK Rally Cry",
-        "image": "/images/template_previews/kvk_template.webp",
+        "image": "/images/mail/templates/kvk_template.webp",
         "content": "<size=24><color=#FFD700>FOR THE KINGDOM!</color></size>\n\nWar is upon us. Prepare your troops, check your equipment, and be ready for the fight of your lives.\n\n<i><color=grey>No mercy, no retreat.</color></i>",
         "tags": ["format:Fancy", "type:KvK", "type:War", "type:Announcement"]
     },
     {
         "title": "Barbarian Fort Rally",
-        "image": "/images/template_previews/barb_template.webp",
+        "image": "/images/mail/templates/barb_template.webp",
         "content": "<b>Barbarian Fort Rally</b>\n\nStarting rallies on Barbarian Forts near the flag.\n\nJoin up!",
         "tags": ["format:Basic", "type:Barbarian Forts", "type:Event"]
     }

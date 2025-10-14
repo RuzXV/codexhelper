@@ -275,13 +275,13 @@ body.home .navbar {
 }
 
 .hero::before {
-    background-image: url('/images/mulan.webp');
+    background-image: url('/images/global/hero_mulan.webp');
     background-position: bottom 4rem left;
     left: -5vw;
 }
 
 .hero::after {
-    background-image: url('/images/caesar.webp');
+    background-image: url('/images/global/hero_caesar.webp');
     background-position: bottom right;
     right: -2vw;
 }
@@ -672,7 +672,7 @@ body.home .navbar {
 
 .feature-dotpoints li {
     padding-left: 28px;
-    background-image: url('/images/dotpoint.webp');
+    background-image: url('/images/global/dotpoint.webp');
     background-position: 0 5px;
     background-repeat: no-repeat;
     background-size: 16px 16px;
