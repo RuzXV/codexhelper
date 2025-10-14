@@ -401,6 +401,7 @@
     word-wrap: break-word;
     color: #e0e0e0;
     overflow-y: auto;
+    white-space: pre-wrap;
 
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
