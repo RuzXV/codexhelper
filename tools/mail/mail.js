@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function setupTemplatesAndFilters() {
         try {
-            const response = await fetch('/tools/templates.json');
+            const response = await fetch('templates.json');
             if (!response.ok) throw new Error('Network response was not ok');
             templates = await response.json();
             populateFilters();
