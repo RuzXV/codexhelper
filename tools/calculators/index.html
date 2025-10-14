@@ -81,23 +81,23 @@
             <div class="calculators-container">
 
                 <div class="calculator-island">
-                    <h2 class="island-title"><i class="fas fa-star"></i> Skill Upgrade Cost</h2>
+                    <h2 class="island-title"><img src="/images/calculators/legendary_sculpture.png" alt="Legendary Sculpture Icon"> Skill Upgrade Cost</h2>
                     <div class="island-content">
                         <div class="form-group">
                             <label for="start-skill">Starting Skill Level</label>
-                            <input type="text" id="start-skill" placeholder="e.g., 1111" maxlength="4">
+                            <input type="text" id="start-skill" placeholder="Example: 1111" maxlength="4">
                         </div>
                         <div class="form-group">
                             <label for="desired-skill">Desired Skill Level</label>
-                            <input type="text" id="desired-skill" placeholder="e.g., 5555" maxlength="4">
+                            <input type="text" id="desired-skill" placeholder="Example: 5555" maxlength="4">
                         </div>
                         <div class="form-group">
                             <label>Commander Rarity</label>
                             <div class="rarity-selector">
-                                <label><input type="radio" name="rarity" value="legendary" checked> Legendary</label>
-                                <label><input type="radio" name="rarity" value="epic"> Epic</label>
-                                <label><input type="radio" name="rarity" value="elite"> Elite</label>
-                                <label><input type="radio" name="rarity" value="advanced"> Advanced</label>
+                                <label><input type="radio" name="rarity" value="legendary" checked><span>Legendary</span></label>
+                                <label><input type="radio" name="rarity" value="epic"><span>Epic</span></label>
+                                <label><input type="radio" name="rarity" value="elite"><span>Elite</span></label>
+                                <label><input type="radio" name="rarity" value="advanced"><span>Advanced</span></label>
                             </div>
                         </div>
                         <button id="calculate-skill-btn" class="btn-primary">Calculate</button>
@@ -110,12 +110,13 @@
                     <div class="island-content">
                         <div class="form-group">
                             <label for="power-input">Your Power</label>
-                            <input type="number" id="power-input" placeholder="e.g., 50000000">
+                            <input type="text" id="power-input" placeholder="Example: 50,000,000">
                         </div>
                         <div class="form-group-checkbox">
-                           <label>
+                           <label class="switch-label">
+                                <span>Same KvK / Vacation Mode</span>
                                 <input type="checkbox" id="same-kvk-checkbox">
-                                <span>Same KvK / Vacation Mode?</span>
+                                <span class="slider"></span>
                            </label>
                         </div>
                         <button id="calculate-passport-btn" class="btn-primary">Calculate</button>
@@ -124,7 +125,7 @@
                 </div>
 
                 <div class="calculator-island">
-                    <h2 class="island-title"><i class="fas fa-hammer"></i> Building Costs</h2>
+                    <h2 class="island-title"><img src="/images/calculators/book_of_covenant.png" alt="Book of Covenant Icon"> Building Costs</h2>
                     <div class="island-content placeholder">
                         <p>Coming Soon...</p>
                     </div>

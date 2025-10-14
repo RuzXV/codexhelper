@@ -85,7 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     calculatePassportBtn.addEventListener('click', () => {
-        const power = parseInt(powerInput.value, 10);
+        const powerString = powerInput.value.replace(/,/g, '');
+        const power = parseInt(powerString, 10);
 
         if (isNaN(power) || power <= 0) {
             passportResultDiv.textContent = 'Please enter a valid, positive power.';

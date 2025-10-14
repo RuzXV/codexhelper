@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             setTimeout(() => {
                 this.innerHTML = originalText;
-            }, 1000);
+            }, 500);
         });
     });
 
