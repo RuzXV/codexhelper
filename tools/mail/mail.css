@@ -384,11 +384,11 @@
 }
 
 .mail-preview-container.mail-bg {
-    border-image-source: url('/images/mail/mail_preview_bg.webp');
+    border-image-source: url('/images/mail/tools_mail_preview.webp')
 }
 
 .mail-preview-container.board-bg {
-    border-image-source: url('/images/mail/board_preview_bg.webp');
+    border-image-source: url('/images/mail/tools_board_preview.webp')
 }
 
 #mail-preview {

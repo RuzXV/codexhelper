@@ -547,7 +547,7 @@ function renderTopServers(servers) {
         serverItem.className = 'server-item';
         
         serverItem.innerHTML = `
-            <img src="${server.icon_url}" alt="${server.name} Icon" class="server-logo" onerror="this.src='images/logo.webp'">
+            <img src="${server.icon_url}" alt="${server.name} Icon" class="server-logo" onerror="this.src='/images/global/logo-new.webp'"
             <div class="server-info">
                 <p class="server-name">${server.name}</p>
                 <span class="server-members">
