@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Alliance Mail Generator - Codex Helper</title>
+        <meta name="description" content="A collection of community tools made to make players lives easier.">
+    
+        <meta property="og:title" content="Tools - Codex Helper">
+        <meta property="og:description" content="A collection of community tools made to make players lives easier.">
+        <meta property="og:image" content="https://codexhelper.com/images/logo_meta.png">
+        <meta property="og:url" content="https://codexhelper.com/tools/mail">
+        <meta property="og:type" content="website">
+        <meta name="theme-color" content="#3b82f6">
+    
+        <link rel="stylesheet" href="/styles.css">
+        <link rel="stylesheet" href="mail.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+        <link rel="manifest" href="/images/favicon/site.webmanifest">
+
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-156DRH9ZB0"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-156DRH9ZB0');
+        </script>
+    </head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--spacing-2);">
+                    <img src="/images/logo-new.png" alt="Codex Helper Logo" class="logo-image">
+                    <span>Codex Helper</span>
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">
+                    <img src="/images/navi_home.png" alt="Home" class="nav-icon">
+                    <span>Home</span>
+                </a>
+                <a href="/faq/" class="nav-link">
+                    <img src="/images/navi_question.png" alt="FAQ" class="nav-icon">
+                    <span>FAQ</span>
+                </a>
+                <a href="/tools/" class="nav-link active">
+                    <img src="/images/navi_tools.png" alt="Tools" class="nav-icon">
+                    <span>Tools</span>
+                </a>
+                <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="patreon-btn">
+                    <img src="/images/patreon.png" alt="Patreon Logo" class="patreon-logo">
+                    <span>Subscribe</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="sub-navbar">
+            <div class="sub-nav-container">
+                <a href="/tools/mail/" class="sub-nav-link active">Alliance Mail Generator</a>
+                <a href="/tools/calculators/" class="sub-nav-link">General Calculators</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="tool-page-wrapper">
+        <section class="tool-hero">
+            <div class="tool-hero-container">
+                <div class="section-badge">Community Tools</div>
+                <h1>Alliance Mail Generator</h1>
+                <p>Create formatted in-game mails for your alliance with ease.</p>
+            </div>
+        </section>
+    
+        <section class="tool-content">
+            <div class="tool-container">
+    
+                <div class="generator-tabs">
+                    <button class="generator-tab-btn active" data-tab="generator">Mail Generator</button>
+                    <button class="generator-tab-btn" data-tab="templates">Load Template</button>
+                </div>
+    
+                <div id="generator-view" class="generator-view active">
+                    <div class="generator-layout">
+                        <div class="generator-panel">
+                            <div class="mail-generator">
+                                <div class="toolbar">
+                                    <div class="toolbar-section">
+                                        <div class="toolbar-item">
+                                            <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
+                                            <label>Bold</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <button id="italic-btn" class="toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
+                                            <label>Italic</label>
+                                        </div>
+                                        <div id="bold-italic-item" class="toolbar-item">
+                                            <button id="bold-italic-btn" class="toolbar-btn" title="Bold & Italic"><i class="fas fa-bold"></i><i class="fas fa-italic"></i></button>
+                                            <label>B+I</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <div id="custom-size-dropdown" class="custom-dropdown">
+                                                <button id="custom-size-toggle" class="toolbar-btn" title="Size">
+                                                    <i class="fas fa-text-height"></i>
+                                                </button>
+                                                <div id="custom-size-options" class="custom-dropdown-options">
+                                                    <div class="custom-option" data-value="12"><i class="fas fa-font fa-xs"></i><span>12</span></div>
+                                                    <div class="custom-option" data-value="16"><i class="fas fa-font fa-sm"></i><span>16</span></div>
+                                                    <div class="custom-option" data-value="20"><i class="fas fa-font"></i><span>20</span></div>
+                                                    <div class="custom-option" data-value="24"><i class="fas fa-font fa-lg"></i><span>24</span></div>
+                                                    <div class="custom-option" data-value="30"><i class="fas fa-font fa-xl"></i><span>30</span></div>
+                                                    <div class="custom-option" data-value="36"><i class="fas fa-font fa-2xl"></i><span>36</span></div>
+                                                    <div class="custom-option" data-value="custom"><i class="fas fa-edit"></i><span>Custom...</span></div>
+                                                </div>
+                                            </div>
+                                            <label>Size</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <div id="custom-color-dropdown" class="custom-dropdown">
+                                                <button id="custom-color-toggle" class="toolbar-btn"><i class="fas fa-palette"></i></button>
+                                                <div id="custom-color-options" class="custom-dropdown-options">
+                                                    <div class="custom-option" data-value="red"><span class="color-swatch" style="background:red;"></span>Red</div>
+                                                    <div class="custom-option" data-value="green"><span class="color-swatch" style="background:green;"></span>Green</div>
+                                                    <div class="custom-option" data-value="blue"><span class="color-swatch" style="background:blue;"></span>Blue</div>
+                                                    <div class="custom-option" data-value="yellow"><span class="color-swatch" style="background:yellow;"></span>Yellow</div>
+                                                    <div class="custom-option" data-value="orange"><span class="color-swatch" style="background:orange;"></span>Orange</div>
+                                                    <div class="custom-option" data-value="purple"><span class="color-swatch" style="background:purple;"></span>Purple</div>
+                                                    <div class="custom-option" data-value="custom"><img src="/images/colourwheel.png" alt="Custom Color" class="color-wheel-icon">Custom...</div>
+                                                </div>
+                                            </div>
+                                            <label>Color</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <div id="custom-gradient-dropdown" class="custom-dropdown">
+                                                <button id="custom-gradient-toggle" class="toolbar-btn" title="Gradient">
+                                                    <i class="fas fa-brush"></i>
+                                                </button>
+                                                <div id="custom-gradient-options" class="custom-dropdown-options">
+                                                    <div class="gradient-picker-dropdown">
+                                                        <div class="color-input-group">
+                                                            <label for="gradient-color-1">Start</label>
+                                                            <input type="color" id="gradient-color-1" value="#3b82f6">
+                                                        </div>
+                                                        <div class="color-input-group">
+                                                            <label for="gradient-color-2">End</label>
+                                                            <input type="color" id="gradient-color-2" value="#ffffff">
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="gradient-strength-container">
+                                                        <label for="gradient-strength-slider" class="gradient-control-label">Strength</label>
+                                                        <div class="slider-wrapper">
+                                                            <span>Low</span>
+                                                            <input type="range" id="gradient-strength-slider" min="1" max="10" value="1" step="1">
+                                                            <span>High</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="gradient-slider-container">
+                                                        <label for="gradient-bias-slider" class="gradient-control-label">Bias</label>
+                                                        <div class="slider-wrapper">
+                                                            <div id="gradient-preview-bar" class="gradient-preview-bar"></div>
+                                                            <input type="range" id="gradient-bias-slider" min="0.25" max="4" value="1" step="0.01">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="dropdown-actions">
+                                                        <span id="gradient-char-counter" class="gradient-char-counter">+0 chars</span>
+                                                        <button id="apply-gradient-btn" class="btn-primary-small">Apply</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label>Gradient</label>
+                                        </div>
+                                    </div>
+                                    <div class="toolbar-section">
+                                        <div class="toolbar-item">
+                                            <button id="undo-btn" class="toolbar-btn" title="Undo"><i class="fas fa-undo"></i></button>
+                                            <label>Undo</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <button id="clear-btn" class="toolbar-btn" title="Clear All"><i class="fas fa-trash"></i></button>
+                                            <label>Clear</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <textarea id="mail-input" placeholder="Enter the content you wish to format here..."></textarea>
+                                <div id="char-counter" class="char-counter">0/2000</div>
+                            </div>
+                        </div>
+                        <div class="preview-panel">
+                            <div class="preview-header">
+                                <div class="preview-tabs">
+                                    <button class="preview-tab-btn active" data-bg="mail">Mail Preview</button>
+                                    <button class="preview-tab-btn" data-bg="board">Board Preview</button>
+                                </div>
+                                <button id="copy-btn" class="btn-primary">
+                                    <img src="/images/tools_copy_icon.png" alt="Copy Icon">
+                                    <span>Copy Code</span>
+                                </button>
+                            </div>
+                            <div id="mail-preview-container" class="mail-preview-container mail-bg">
+                                <div id="mail-preview"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div id="templates-view" class="generator-view">
+                    <div class="template-layout">
+                        <div class="template-gallery-wrapper">
+                            <div class="template-gallery-header">
+                                <button id="filter-toggle-btn" class="btn-secondary"><i class="fas fa-filter"></i> Filters</button>
+                                <div id="filter-panel" class="filter-panel">
+                                    <div class="filter-panel-header">
+                                        <h3>Filter Templates</h3>
+                                        <button id="filter-reset-btn" class="btn-secondary">Reset</button>
+                                    </div>
+                                    <div id="filter-options" class="filter-options"></div>
+                                </div>
+                                <button id="load-template-btn" class="btn-primary" disabled>
+                                    <img src="/images/tools_load_icon.png" alt="Load Icon">
+                                    <span>Load Template</span>
+                                </button>
+                            </div>
+                            <div id="template-gallery" class="template-gallery"></div>
+
+                            <div class="template-credits">
+                                <h4>Community Contributions</h4>
+                                <p>A special thank you to the governors who helped gather, build & consolidate this collection of templates:</p>
+                                <ul>
+                                    <li>[1049] SECHSkies</li>
+                                    <li>[1215] Kat</li>
+                                    <li>[3542] Daysii</li>
+                                </ul>
+                            </div>
+
+                        </div>
+                        <div class="template-preview-wrapper">
+                            <div id="magnified-preview-container" class="magnified-preview-container">
+                                <p id="magnified-placeholder">Hover or tap on a template to view its design & content</p>
+                                <img id="magnified-image" src="" alt="Magnified Template Preview">
+                            </div>
+                            <h4 id="magnified-title"></h4>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <img src="/images/logo-new.png" alt="Codex Helper Logo" class="logo-image">
+                        <span>Codex Helper</span>
+                    </div>
+                    <p>The ultimate Discord bot for Rise of Kingdoms players and gaming communities.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Website Pages</h4>
+                        <a href="/">Home</a>
+                        <a href="/faq/">FAQ</a>
+                        <a href="/tools/">Tools</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Support</h4>
+                        <a href="https://discord.com/channels/1031515159627300924/1314193270078967829" target="_blank">Discord Support</a>
+                        <a href="https://discord.com/channels/1031515159627300924/1320650068751155200" target="_blank">Feedback</a>
+                        <a href="https://www.patreon.com/settings/apps" target="_blank">Link Patreon</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="/terms/">Terms of Service</a>
+                        <a href="/privacy/">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Copyright © 2025 The King's Codex - All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+    <script src="mail.js"></script>
+</body>
+</html>

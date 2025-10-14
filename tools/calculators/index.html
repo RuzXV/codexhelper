@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tools - Codex Helper</title>
+    <title>General Calculators - Codex Helper</title>
     <meta name="description" content="A collection of community tools made to make players lives easier.">
     
     <meta property="og:title" content="Tools - Codex Helper">
     <meta property="og:description" content="A collection of community tools made to make players lives easier.">
     <meta property="og:image" content="https://codexhelper.com/images/logo_meta.png">
-    <meta property="og:url" content="https://codexhelper.com/tools">
+    <meta property="og:url" content="https://codexhelper.com/tools/calculators">
     <meta property="og:type" content="website">
     <meta name="theme-color" content="#3b82f6">
 
     <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/tools/tools.css">
+    <link rel="stylesheet" href="calculators.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
@@ -62,7 +63,7 @@
         <div class="sub-navbar">
             <div class="sub-nav-container">
                 <a href="/tools/mail/" class="sub-nav-link">Alliance Mail Generator</a>
-                <a href="/tools/calculators/" class="sub-nav-link">General Calculators</a>
+                <a href="/tools/calculators/" class="sub-nav-link active">General Calculators</a>
             </div>
         </div>
     </nav>
@@ -71,31 +72,64 @@
         <section class="tool-hero">
             <div class="tool-hero-container">
                 <div class="section-badge">Community Tools</div>
-                <h1>Codex Helper Tools</h1>
-                <p>A collection of community tools designed to make your Rise of Kingdoms life easier.</p>
+                <h1>General Calculators</h1>
+                <p>Calculate skill upgrade costs, passport requirements, and more.</p>
             </div>
         </section>
     
         <section class="tool-content">
-            <div class="tool-grid">
-                <a href="/tools/mail/" class="tool-card">
-                    <div class="tool-card-icon-wrapper">
-                        <i class="fas fa-envelope-open-text tool-card-icon"></i>
+            <div class="calculators-container">
+
+                <div class="calculator-island">
+                    <h2 class="island-title"><i class="fas fa-star"></i> Skill Upgrade Cost</h2>
+                    <div class="island-content">
+                        <div class="form-group">
+                            <label for="start-skill">Starting Skill Level</label>
+                            <input type="text" id="start-skill" placeholder="e.g., 1111" maxlength="4">
+                        </div>
+                        <div class="form-group">
+                            <label for="desired-skill">Desired Skill Level</label>
+                            <input type="text" id="desired-skill" placeholder="e.g., 5555" maxlength="4">
+                        </div>
+                        <div class="form-group">
+                            <label>Commander Rarity</label>
+                            <div class="rarity-selector">
+                                <label><input type="radio" name="rarity" value="legendary" checked> Legendary</label>
+                                <label><input type="radio" name="rarity" value="epic"> Epic</label>
+                                <label><input type="radio" name="rarity" value="elite"> Elite</label>
+                                <label><input type="radio" name="rarity" value="advanced"> Advanced</label>
+                            </div>
+                        </div>
+                        <button id="calculate-skill-btn" class="btn-primary">Calculate</button>
+                        <div id="skill-result" class="calc-result"></div>
                     </div>
-                    <div class="tool-card-content">
-                        <h3>Alliance Mail Generator</h3>
-                        <p>Create formatted in-game mails for your alliance with ease.</p>
+                </div>
+
+                <div class="calculator-island">
+                    <h2 class="island-title"><img src="/images/calculators/passport.png" alt="Passport Icon"> Passport Cost</h2>
+                    <div class="island-content">
+                        <div class="form-group">
+                            <label for="power-input">Your Power</label>
+                            <input type="number" id="power-input" placeholder="e.g., 50000000">
+                        </div>
+                        <div class="form-group-checkbox">
+                           <label>
+                                <input type="checkbox" id="same-kvk-checkbox">
+                                <span>Same KvK / Vacation Mode?</span>
+                           </label>
+                        </div>
+                        <button id="calculate-passport-btn" class="btn-primary">Calculate</button>
+                        <div id="passport-result" class="calc-result"></div>
                     </div>
-                </a>
-                <a href="/tools/calculators/" class="tool-card">
-                    <div class="tool-card-icon-wrapper">
-                        <i class="fas fa-calculator tool-card-icon"></i>
+                </div>
+
+                <div class="calculator-island">
+                    <h2 class="island-title"><i class="fas fa-hammer"></i> Building Costs</h2>
+                    <div class="island-content placeholder">
+                        <p>Coming Soon...</p>
                     </div>
-                    <div class="tool-card-content">
-                        <h3>General Calculators</h3>
-                        <p>Calculate skill upgrade costs, passport requirements, and more.</p>
-                    </div>
-                </a>
+                </div>
+
             </div>
         </section>
     </main>
@@ -137,5 +171,6 @@
     </footer>
 
     <script src="/script.js"></script>
+    <script src="calculators.js"></script>
 </body>
 </html>
