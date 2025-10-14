@@ -60,6 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const powerInput = document.getElementById('power-input');
     const sameKvkCheckbox = document.getElementById('same-kvk-checkbox');
     const passportResultDiv = document.getElementById('passport-result');
+    const currentPassportsInput = document.getElementById('current-passports-input');
+    const costResultDiv = document.getElementById('cost-result');
+
 
     const passportBrackets = [
         { maxPower: 9999999, normal: 1, discount: 1 },
@@ -88,6 +91,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const powerString = powerInput.value.replace(/,/g, '');
         const power = parseInt(powerString, 10);
 
+        passportResultDiv.innerHTML = '';
+        costResultDiv.innerHTML = '';
+        passportResultDiv.classList.remove('error');
+        costResultDiv.classList.remove('error');
+
         if (isNaN(power) || power <= 0) {
             passportResultDiv.textContent = 'Please enter a valid, positive power.';
             passportResultDiv.classList.add('error');
@@ -98,12 +106,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const isDiscounted = sameKvkCheckbox.checked;
         const bracket = passportBrackets.find(b => power <= b.maxPower);
-        const cost = isDiscounted ? bracket.discount : bracket.normal;
+        const requiredPassports = isDiscounted ? bracket.discount : bracket.normal;
 
         passportResultDiv.innerHTML = `
             <img src="/images/calculators/passport.webp" alt="Passport">
-            <span>Requires ${cost} Passports</span>
+            <span>Requires ${requiredPassports} Passports</span>
         `;
+
+        const currentPassports = parseInt(currentPassportsInput.value, 10) || 0;
+    
+        if (currentPassports < 0) {
+            costResultDiv.textContent = 'Current passports cannot be negative.';
+            costResultDiv.classList.add('error');
+            return;
+        }
+
+        const passportsNeeded = requiredPassports - currentPassports;
+
+        if (passportsNeeded <= 0) {
+            costResultDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>You have enough passports!</span>
+            `;
+        } else {
+            const creditsCost = passportsNeeded * 600000;
+
+            let usdCost = 0;
+            let passportsBought = 0;
+            const bundleTiers = [
+                { cost: 5, passports: 1 }, { cost: 10, passports: 2 },
+                { cost: 20, passports: 3 }, { cost: 50, passports: 4 }
+            ];
+
+            for (const tier of bundleTiers) {
+                if (passportsBought < passportsNeeded) {
+                    usdCost += tier.cost;
+                    passportsBought += tier.passports;
+                } else { break; }
+            }
+            
+            let hundredDollarTiers = 0;
+            while (passportsBought < passportsNeeded && hundredDollarTiers < 15) {
+                usdCost += 100;
+                passportsBought += 5;
+                hundredDollarTiers++;
+            }
+            
+            let costMessage = `You need <strong>${passportsNeeded}</strong> more. <br> Cost: <strong>${creditsCost.toLocaleString()}</strong> credits or <strong>$${usdCost}</strong> USD.`;
+            
+            if (passportsNeeded > 85) {
+                costMessage += "<br><small style='color: var(--text-secondary);'>Note: Max passports from bundles per month is 85.</small>";
+            }
+
+            costResultDiv.innerHTML = costMessage;
+        }
     });
 
 });
