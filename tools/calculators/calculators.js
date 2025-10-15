@@ -13,15 +13,18 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentIndex = 0;
     
     const moveToSlide = (targetIndex) => {
-        if (!slides.length) return;
+        if (!slides.length || !slides[targetIndex]) return;
 
         const containerWidth = container.getBoundingClientRect().width;
-        const slideWidth = slides[0].getBoundingClientRect().width;
+        const targetSlide = slides[targetIndex];
+        const slideWidth = targetSlide.getBoundingClientRect().width;
         
-        const offset = (containerWidth - slideWidth) / 2;
-        const targetPosition = slides[targetIndex].offsetLeft;
-        
-        track.style.transform = `translateX(-${targetPosition - offset}px)`;
+        // Calculate the position needed to center the target slide
+        const targetCenter = targetSlide.offsetLeft + (slideWidth / 2);
+        const containerCenter = containerWidth / 2;
+        const translation = containerCenter - targetCenter;
+
+        track.style.transform = `translateX(${translation}px)`;
         
         slides.forEach((slide, index) => {
             slide.classList.toggle('is-active', index === targetIndex);
@@ -66,12 +69,22 @@ document.addEventListener('DOMContentLoaded', function() {
         quickNav.appendChild(button);
     });
     
-    setTimeout(() => {
-        moveToSlide(0);
-    }, 100);
+    const initCarousel = () => {
+        setTimeout(() => moveToSlide(0), 100);
+    };
+    
+    if (document.readyState === 'complete') {
+        initCarousel();
+    } else {
+        window.addEventListener('load', initCarousel);
+    }
 
     window.addEventListener('resize', () => {
-        moveToSlide(currentIndex);
+        let resizeTimer;
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            moveToSlide(currentIndex);
+        }, 100);
     });
 
     function triggerSuccessAnimation(element) {
