@@ -12,11 +12,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentIndex = 0;
 
-    const moveToSlide = (targetIndex) => {
+    const moveToSlide = (targetIndex, animate = true) => {
         if (!slides.length || !slides[targetIndex]) return;
 
         let newTransform;
-        if (window.innerWidth <= 768) {
+        const isMobile = window.innerWidth <= 768;
+
+        if (isMobile) {
             const slideWidth = container.clientWidth;
             newTransform = -(targetIndex * slideWidth);
         } else {
@@ -26,7 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const targetLeft = targetSlide.offsetLeft;
             newTransform = -(targetLeft - (containerWidth / 2) + (slideWidth / 2));
         }
-
+        
+        track.style.transition = animate ? 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
         track.style.transform = `translateX(${newTransform}px)`;
         
         slides.forEach((slide, index) => {
@@ -415,14 +418,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     const initAndResize = () => {
-        setTimeout(() => moveToSlide(currentIndex), 50);
+        moveToSlide(currentIndex, false);
     };
 
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    window.requestAnimationFrame(() => {
         initAndResize();
-    } else {
-        window.addEventListener('load', initAndResize);
-    }
+    });
 
     let resizeTimer;
     window.addEventListener('resize', () => {
