@@ -130,58 +130,60 @@
                 </div>
 
                 <div class="calculator-island">
-                    <h2 class="island-title"><img src="/images/calculators/vip/vip_icon.webp" alt="VIP Icon" width="28" height="28"> VIP Level Requirements</h2>
+                    <h2 class="island-title"><img src="/images/calculators/experience_book.webp" alt="Commander EXP Icon" width="28" height="28"> Commander EXP Cost</h2>
                     <div class="island-content">
                         <div class="form-group">
-                            <label for="current-vip-points">Current VIP Points</label>
-                            <input type="text" id="current-vip-points" placeholder="Example: 1,500,000">
+                            <label>Commander Rarity</label>
+                            <div class="rarity-selector">
+                                <label>
+                                    <input type="radio" name="exp-rarity" value="legendary" checked>
+                                    <span class="rarity-btn legendary"><img src="/images/calculators/legendary_sculpture.webp" alt="Legendary Commander"><span>Legendary</span></span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="exp-rarity" value="epic">
+                                    <span class="rarity-btn epic"><img src="/images/calculators/epic_sculpture.webp" alt="Epic Commander"><span>Epic</span></span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="exp-rarity" value="elite">
+                                    <span class="rarity-btn elite"><img src="/images/calculators/elite_sculpture.webp" alt="Elite Commander"><span>Elite</span></span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="exp-rarity" value="advanced">
+                                    <span class="rarity-btn advanced"><img src="/images/calculators/advanced_sculpture.webp" alt="Advanced Commander"><span>Advanced</span></span>
+                                </label>
+                            </div>
                         </div>
-
+                        <div class="form-group">
+                            <label for="current-exp-level">Current Level</label>
+                            <input type="number" id="current-exp-level" placeholder="Example: 45" min="1" max="60">
+                        </div>
+                        <div class="form-group">
+                            <label for="current-exp-amount">Current EXP Amount</label>
+                            <input type="text" id="current-exp-amount" placeholder="Example: 500,000">
+                        </div>
                         <div class="form-group-toggle">
                             <label class="toggle-switch">
-                                <input type="checkbox" id="vip-token-toggle">
+                                <input type="checkbox" id="exp-tome-toggle">
                                 <span class="toggle-slider"></span>
                             </label>
-                            <label for="vip-token-toggle" class="toggle-label">Calculate VIP Tokens</label>
+                            <label for="exp-tome-toggle" class="toggle-label">Calculate Experience Tomes</label>
                         </div>
-
-                        <div id="vip-token-grid-container" class="vip-token-grid-container">
-                            <div class="vip-token-grid">
-                                <div class="vip-token-item common">
-                                    <img src="/images/calculators/vip/vip_token_10.webp" alt="10 VIP Token">
-                                    <input type="number" class="vip-token-input" data-value="10" placeholder="0">
-                                </div>
-                                <div class="vip-token-item advanced">
-                                    <img src="/images/calculators/vip/vip_token_100.webp" alt="100 VIP Token">
-                                    <input type="number" class="vip-token-input" data-value="100" placeholder="0">
-                                </div>
-                                <div class="vip-token-item elite">
-                                    <img src="/images/calculators/vip/vip_token_500.webp" alt="500 VIP Token">
-                                    <input type="number" class="vip-token-input" data-value="500" placeholder="0">
-                                </div>
-                                <div class="vip-token-item epic">
-                                    <img src="/images/calculators/vip/vip_token_1000.webp" alt="1000 VIP Token">
-                                    <input type="number" class="vip-token-input" data-value="1000" placeholder="0">
-                                </div>
-                                <div class="vip-token-item legendary">
-                                    <img src="/images/calculators/vip/vip_token_5000.webp" alt="5000 VIP Token">
-                                    <input type="number" class="vip-token-input" data-value="5000" placeholder="0">
-                                </div>
+                        <div id="exp-tome-grid-container" class="exp-tome-grid-container">
+                            <div class="exp-tome-grid">
+                                <div class="exp-tome-item advanced"><img src="/images/calculators/vip/experience_token_100.webp" alt="100 EXP"><input type="number" class="exp-tome-input" data-value="100" placeholder="0"></div>
+                                <div class="exp-tome-item elite"><img src="/images/calculators/vip/experience_token_500.webp" alt="500 EXP"><input type="number" class="exp-tome-input" data-value="500" placeholder="0"></div>
+                                <div class="exp-tome-item epic"><img src="/images/calculators/vip/experience_token_1000.webp" alt="1k EXP"><input type="number" class="exp-tome-input" data-value="1000" placeholder="0"></div>
+                                <div class="exp-tome-item epic"><img src="/images/calculators/vip/experience_token_5000.webp" alt="5k EXP"><input type="number" class="exp-tome-input" data-value="5000" placeholder="0"></div>
+                                <div class="exp-tome-item epic"><img src="/images/calculators/vip/experience_token_10000.webp" alt="10k EXP"><input type="number" class="exp-tome-input" data-value="10000" placeholder="0"></div>
+                                <div class="exp-tome-item legendary"><img src="/images/calculators/vip/experience_token_20000.webp" alt="20k EXP"><input type="number" class="exp-tome-input" data-value="20000" placeholder="0"></div>
+                                <div class="exp-tome-item legendary"><img src="/images/calculators/vip/experience_token_50000.webp" alt="50k EXP"><input type="number" class="exp-tome-input" data-value="50000" placeholder="0"></div>
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="desired-vip-level">Desired VIP Level</label>
-                            <div class="custom-select-container">
-                                <select id="desired-vip-level" style="display: none;">
-                                </select>
-                            </div>
-                        </div>
-                        <button id="calculate-vip-btn" class="btn-primary">Calculate</button>
-                        <div id="vip-result" class="calc-result"></div>
+                        <button id="calculate-exp-btn" class="btn-primary">Calculate</button>
+                        <div id="exp-result" class="calc-result"></div>
                     </div>
                 </div>
-                
+
                 <div class="calculator-island">
                     <h2 class="island-title"><img src="/images/calculators/passport.webp" alt="Passport Icon" width="28" height="28"> Passport Cost</h2>
                     <div class="island-content">
@@ -203,6 +205,91 @@
                         <button id="calculate-passport-btn" class="btn-primary">Calculate</button>
                         <div id="passport-result" class="calc-result"></div>
                         <div id="cost-result" class="calc-result"></div>
+                    </div>
+                </div>
+
+                <div class="calculator-island">
+                    <h2 class="island-title"><img src="/images/calculators/vip/vip_icon.webp" alt="VIP Icon" width="28" height="28"> VIP Level Requirements</h2>
+                    <div class="island-content">
+                        <div class="form-group">
+                            <label for="current-vip-points">Current VIP Points</label>
+                            <input type="text" id="current-vip-points" placeholder="Example: 1,500,000">
+                        </div>
+                        <div class="form-group-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="vip-token-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label for="vip-token-toggle" class="toggle-label">Calculate VIP Tokens</label>
+                        </div>
+                        <div id="vip-token-grid-container" class="vip-token-grid-container">
+                            <div class="vip-token-grid">
+                                <div class="vip-token-item common">
+                                    <img src="/images/calculators/vip/vip_token_5.webp" alt="5 VIP Token">
+                                    <div class="vip-token-info">
+                                        <label>5 VIP</label>
+                                        <input type="number" class="vip-token-input" data-value="5" placeholder="0">
+                                    </div>
+                                </div>
+                                <div class="vip-token-item common">
+                                    <img src="/images/calculators/vip/vip_token_10.webp" alt="10 VIP Token">
+                                    <div class="vip-token-info">
+                                        <label>10 VIP</label>
+                                        <input type="number" class="vip-token-input" data-value="10" placeholder="0">
+                                    </div>
+                                </div>
+                                <div class="vip-token-item common">
+                                    <img src="/images/calculators/vip/vip_token_50.webp" alt="50 VIP Token">
+                                    <div class="vip-token-info">
+                                        <label>50 VIP</label>
+                                        <input type="number" class="vip-token-input" data-value="50" placeholder="0">
+                                    </div>
+                                </div>
+                                <div class="vip-token-item advanced">
+                                    <img src="/images/calculators/vip/vip_token_100.webp" alt="100 VIP Token">
+                                    <div class="vip-token-info">
+                                        <label>100 VIP</label>
+                                        <input type="number" class="vip-token-input" data-value="100" placeholder="0">
+                                    </div>
+                                </div>
+                                <div class="vip-token-item advanced">
+                                    <img src="/images/calculators/vip/vip_token_200.webp" alt="200 VIP Token">
+                                    <div class="vip-token-info">
+                                        <label>200 VIP</label>
+                                        <input type="number" class="vip-token-input" data-value="200" placeholder="0">
+                                    </div>
+                                </div>
+                                <div class="vip-token-item elite">
+                                    <img src="/images/calculators/vip/vip_token_500.webp" alt="500 VIP Token">
+                                    <div class="vip-token-info">
+                                        <label>500 VIP</label>
+                                        <input type="number" class="vip-token-input" data-value="500" placeholder="0">
+                                    </div>
+                                </div>
+                                <div class="vip-token-item epic">
+                                    <img src="/images/calculators/vip/vip_token_1000.webp" alt="1000 VIP Token">
+                                    <div class="vip-token-info">
+                                        <label>1k VIP</label>
+                                        <input type="number" class="vip-token-input" data-value="1000" placeholder="0">
+                                    </div>
+                                </div>
+                                <div class="vip-token-item legendary">
+                                    <img src="/images/calculators/vip/vip_token_5000.webp" alt="5000 VIP Token">
+                                    <div class="vip-token-info">
+                                        <label>5k VIP</label>
+                                        <input type="number" class="vip-token-input" data-value="5000" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="desired-vip-level">Desired VIP Level</label>
+                            <div class="custom-select-container">
+                                <select id="desired-vip-level" style="display: none;"></select>
+                            </div>
+                        </div>
+                        <button id="calculate-vip-btn" class="btn-primary">Calculate</button>
+                        <div id="vip-result" class="calc-result"></div>
                     </div>
                 </div>
 

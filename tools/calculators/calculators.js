@@ -69,6 +69,62 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const calculateExpBtn = document.getElementById('calculate-exp-btn');
+    if (calculateExpBtn) {
+        const currentLevelInput = document.getElementById('current-exp-level');
+        const currentExpInput = document.getElementById('current-exp-amount');
+        const expResultDiv = document.getElementById('exp-result');
+        const expTomeToggle = document.getElementById('exp-tome-toggle');
+        const expTomeGrid = document.getElementById('exp-tome-grid-container');
+        const expCosts = {
+            legendary: [0, 120, 360, 720, 1200, 3600, 7200, 10800, 14400, 18000, 22200, 27000, 32400, 38400, 45000, 52200, 60000, 67800, 75600, 84000, 90000, 96000, 103200, 110400, 117600, 126000, 134400, 142800, 151200, 162000, 180000, 204000, 234000, 270000, 312000, 360000, 414000, 474000, 540000, 660000, 810000, 960000, 1140000, 1320000, 1530000, 1740000, 1980000, 2220000, 2520000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000],
+            epic: [0, 100, 300, 600, 1000, 3000, 6000, 9000, 12000, 15000, 18500, 22500, 27000, 32000, 37500, 43500, 50000, 56500, 63000, 70000, 75000, 80000, 86000, 92000, 98000, 105000, 112000, 119000, 126000, 135000, 150000, 170000, 195000, 225000, 260000, 300000, 345000, 395000, 450000, 550000, 675000, 800000, 950000, 1100000, 1275000, 1450000, 1650000, 1850000, 2100000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000],
+            elite: [0, 80, 240, 480, 800, 2400, 4800, 7200, 9600, 12000, 14800, 18000, 21600, 25600, 30000, 34800, 40000, 45200, 50400, 56000, 60000, 64000, 68800, 73600, 78400, 84000, 89600, 95200, 100800, 108000, 120000, 136000, 156000, 180000, 208000, 240000, 276000, 316000, 360000, 440000, 540000, 640000, 760000, 880000, 1020000, 1160000, 1320000, 1480000, 1680000, 1880000, 1880000, 1880000, 1880000, 1880000, 1880000, 1880000, 1880000, 1880000, 1880000],
+            advanced: [0, 60, 180, 360, 600, 1800, 3600, 5400, 7200, 9000, 11100, 13500, 16200, 19200, 22500, 26100, 30000, 33900, 37800, 42000, 45000, 48000, 51600, 55200, 58800, 63000, 67200, 71400, 75600, 81000, 90000, 102000, 117000, 135000, 156000, 180000, 207000, 237000, 270000, 330000, 405000, 480000, 570000, 660000, 765000, 870000, 990000, 1110000, 1245000, 1380000]
+        };
+        const cumulativeExp = Object.keys(expCosts).reduce((acc, rarity) => {
+            acc[rarity] = expCosts[rarity].reduce((a, c, i) => { a.push((a[i-1] || 0) + c); return a; }, []);
+            return acc;
+        }, {});
+        expTomeToggle.addEventListener('change', () => {
+            expTomeGrid.classList.toggle('visible', expTomeToggle.checked);
+        });
+        calculateExpBtn.addEventListener('click', () => {
+            expResultDiv.innerHTML = '';
+            expResultDiv.classList.remove('error');
+            const rarity = document.querySelector('input[name="exp-rarity"]:checked').value;
+            const currentLevel = parseInt(currentLevelInput.value, 10);
+            const currentExp = parseInt(currentExpInput.value.replace(/,/g, ''), 10) || 0;
+            const maxLevel = rarity === 'advanced' ? 50 : 60;
+            if (isNaN(currentLevel) || currentLevel < 1 || currentLevel > maxLevel) {
+                expResultDiv.textContent = `Please enter a valid level between 1 and ${maxLevel}.`;
+                expResultDiv.classList.add('error'); return;
+            }
+            if (currentLevel === maxLevel) {
+                expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>This commander is already at max level!</span>`;
+                return;
+            }
+            const expForCurrentLevel = cumulativeExp[rarity][currentLevel - 1];
+            const totalCurrentExp = expForCurrentLevel + currentExp;
+            const totalMaxExp = cumulativeExp[rarity][maxLevel - 1];
+            let expNeeded = totalMaxExp - totalCurrentExp;
+            if (expTomeToggle.checked) {
+                const expTomeInputs = document.querySelectorAll('.exp-tome-input');
+                let tomeExp = 0;
+                expTomeInputs.forEach(input => {
+                    tomeExp += (parseInt(input.value, 10) || 0) * (parseInt(input.dataset.value, 10));
+                });
+                expNeeded -= tomeExp;
+            }
+            if (expNeeded <= 0) {
+                expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have enough EXP to reach level ${maxLevel}!</span>`;
+                return;
+            }
+            expResultDiv.innerHTML = `<img src="/images/calculators/experience_book.webp" alt="EXP Book"><span>Requires <strong id="exp-needed-value">0</strong> more EXP to max</span>`;
+            animateCounter(document.getElementById('exp-needed-value'), expNeeded, 700);
+        });
+    }
+
     const calculatePassportBtn = document.getElementById('calculate-passport-btn');
     if (calculatePassportBtn) {
         const powerInput = document.getElementById('power-input');
@@ -116,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let totalPoints = parseInt(currentVipPointsInput.value.replace(/,/g, ''), 10) || 0;
             
             if(vipTokenToggle.checked) {
-                vipTokenInputs.forEach(input => {
+                document.querySelectorAll('.vip-token-input').forEach(input => {
                     const count = parseInt(input.value, 10) || 0;
                     const value = parseInt(input.dataset.value, 10);
                     totalPoints += count * value;
@@ -152,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 input.style.fontSize = `${currentFontSize}px`;
             }
         }
-        vipTokenInputs.forEach(input => {
+        document.querySelectorAll('.vip-token-input').forEach(input => {
             input.addEventListener('input', () => adjustInputFontSize(input));
             adjustInputFontSize(input);
         });
