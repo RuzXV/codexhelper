@@ -111,7 +111,7 @@
 
 .carousel-slide.is-active::before {
     opacity: 0;
-    transition: opacity 0.2s ease-out; /* Makes the fade-out much faster */
+    transition: opacity 0.2s ease-out;
 }
 
 .carousel-arrow {
