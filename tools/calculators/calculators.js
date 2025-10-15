@@ -182,6 +182,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
             const totalExpToReachMaxLevel = cumulativeExp[rarity][maxLevel - 2];
             
+            if (typeof totalExpToReachMaxLevel === 'undefined' || typeof totalCurrentExp === 'undefined') {
+                expResultDiv.textContent = 'Error in calculation. Please check commander data.';
+                expResultDiv.classList.add('error'); 
+                return;
+            }
+
             let expNeeded = totalExpToReachMaxLevel - totalCurrentExp;
     
             let totalTomeExp = 0;
