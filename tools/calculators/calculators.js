@@ -1,5 +1,103 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    const track = document.querySelector('.carousel-track');
+    const slides = Array.from(track.children);
+    const nextButton = document.getElementById('next-slide');
+    const prevButton = document.getElementById('prev-slide');
+    const quickNav = document.getElementById('quick-access-nav');
+    const mainTitle = document.getElementById('calculator-main-title');
+    const mainDescription = document.getElementById('calculator-main-description');
+
+    let currentIndex = 0;
+    
+    if (slides.length > 0) {
+        const slideWidth = slides[0].getBoundingClientRect().width;
+
+        const setSlidePosition = (slide, index) => {
+            slide.style.left = slideWidth * index + 'px';
+        };
+        slides.forEach(setSlidePosition);
+
+        const moveToSlide = (targetIndex) => {
+            if (track) {
+                 track.style.transform = 'translateX(-' + (slideWidth * targetIndex) + 'px)';
+            }
+            if (slides[currentIndex]) {
+                slides[currentIndex].classList.remove('current-slide');
+            }
+            if (slides[targetIndex]) {
+                slides[targetIndex].classList.add('current-slide');
+            }
+            currentIndex = targetIndex;
+            updateUI();
+        };
+
+        const updateUI = () => {
+            const currentSlide = slides[currentIndex];
+            if (currentSlide) {
+                mainTitle.textContent = currentSlide.dataset.title;
+                mainDescription.textContent = currentSlide.dataset.description;
+            }
+
+            const quickNavButtons = document.querySelectorAll('.quick-access-btn');
+            quickNavButtons.forEach((btn, index) => {
+                btn.classList.toggle('active', index === currentIndex);
+            });
+
+            const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+            const nextIndex = (currentIndex + 1) % slides.length;
+            
+            updateArrowPreview(prevButton, slides[prevIndex]);
+            updateArrowPreview(nextButton, slides[nextIndex]);
+        };
+
+        const updateArrowPreview = (arrow, slide) => {
+            const preview = arrow.querySelector('.arrow-preview');
+            const img = preview.querySelector('img');
+            const text = preview.querySelector('.arrow-preview-text');
+            img.src = slide.dataset.icon;
+            img.alt = slide.dataset.title;
+            text.textContent = slide.dataset.title;
+        };
+
+        if (prevButton) {
+            prevButton.addEventListener('click', e => {
+                const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+                moveToSlide(prevIndex);
+            });
+        }
+        if (nextButton) {
+            nextButton.addEventListener('click', e => {
+                const nextIndex = (currentIndex + 1) % slides.length;
+                moveToSlide(nextIndex);
+            });
+        }
+
+        if (quickNav) {
+            slides.forEach((slide, index) => {
+                const button = document.createElement('button');
+                button.classList.add('quick-access-btn');
+                button.innerHTML = `<img src="${slide.dataset.icon}" alt="${slide.dataset.title}"><span>${slide.dataset.title}</span>`;
+                button.addEventListener('click', () => moveToSlide(index));
+                quickNav.appendChild(button);
+            });
+        }
+        
+        moveToSlide(0);
+
+        window.addEventListener('resize', () => {
+            const newSlideWidth = slides[0].getBoundingClientRect().width;
+            slides.forEach((slide, index) => {
+                 slide.style.left = newSlideWidth * index + 'px';
+            });
+            track.style.transition = 'none';
+            track.style.transform = 'translateX(-' + (newSlideWidth * currentIndex) + 'px)';
+            setTimeout(() => {
+                track.style.transition = 'transform 0.5s ease-in-out';
+            }, 50);
+        });
+    }
+
     function animateCounter(element, target, duration, prefix = '') {
         if (!element) return;
         element.classList.add('counting-blur');
@@ -96,8 +194,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentLevel = parseInt(currentLevelInput.value, 10);
             const currentExp = parseInt(currentExpInput.value.replace(/,/g, ''), 10) || 0;
             const maxLevel = rarity === 'advanced' ? 50 : 60;
-            if (isNaN(currentLevel) || currentLevel < 1 || currentLevel > maxLevel) {
-                expResultDiv.textContent = `Please enter a valid level between 1 and ${maxLevel}.`;
+            if (isNaN(currentLevel) || currentLevel < 1 || currentLevel >= maxLevel) {
+                expResultDiv.textContent = `Please enter a valid level between 1 and ${maxLevel - 1}.`;
                 expResultDiv.classList.add('error'); return;
             }
             if (currentLevel === maxLevel) {
@@ -159,7 +257,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const vipResultDiv = document.getElementById('vip-result');
         const vipTokenToggle = document.getElementById('vip-token-toggle');
         const vipTokenGrid = document.getElementById('vip-token-grid-container');
-        const vipTokenInputs = document.querySelectorAll('.vip-token-input');
         
         const vipLevels = [ { level: 1, points: 200 }, { level: 2, points: 400 }, { level: 3, points: 1200 }, { level: 4, points: 3500 }, { level: 5, points: 6000 }, { level: 6, points: 11500 }, { level: 7, points: 17500 }, { level: 8, points: 35000 }, { level: 9, points: 75000 }, { level: 10, points: 150000 }, { level: 11, points: 250000 }, { level: 12, points: 350000 }, { level: 13, points: 500000 }, { level: 14, points: 750000 }, { level: 15, points: 1000000 }, { level: 16, points: 1500000 }, { level: 17, points: 2500000 }, { level: 18, points: 4000000 }, { level: 19, points: 6000000 }, { level: 'SVIP', points: 9000000 } ];
 
@@ -198,72 +295,59 @@ document.addEventListener('DOMContentLoaded', function() {
             animateCounter(document.getElementById('vip-points-needed'), pointsNeeded, 700);
         });
 
-        function adjustInputFontSize(input) {
-            const defaultFontSize = 14;
-            const minFontSize = 10;
-            let currentFontSize = defaultFontSize;
-            input.style.fontSize = `${defaultFontSize}px`;
-            while (input.scrollWidth > input.clientWidth && currentFontSize > minFontSize) {
-                currentFontSize--;
-                input.style.fontSize = `${currentFontSize}px`;
-            }
-        }
-        document.querySelectorAll('.vip-token-input').forEach(input => {
-            input.addEventListener('input', () => adjustInputFontSize(input));
-            adjustInputFontSize(input);
-        });
-
         const customSelectContainer = document.querySelector('.custom-select-container');
-        const selectEl = customSelectContainer.querySelector('select');
-        const selectedDiv = document.createElement("DIV");
-        selectedDiv.setAttribute("class", "select-selected");
-        customSelectContainer.appendChild(selectedDiv);
-        const optionsDiv = document.createElement("DIV");
-        optionsDiv.setAttribute("class", "select-items select-hide");
+        if (customSelectContainer) {
+            const selectEl = customSelectContainer.querySelector('select');
+            const selectedDiv = document.createElement("DIV");
+            selectedDiv.setAttribute("class", "select-selected");
+            customSelectContainer.appendChild(selectedDiv);
+            const optionsDiv = document.createElement("DIV");
+            optionsDiv.setAttribute("class", "select-items select-hide");
 
-        vipLevels.forEach((vip, index) => {
-            const option = document.createElement('option');
-            option.value = vip.points;
-            option.dataset.level = vip.level;
-            selectEl.appendChild(option);
+            vipLevels.forEach((vip, index) => {
+                const option = document.createElement('option');
+                option.value = vip.points;
+                option.dataset.level = vip.level;
+                selectEl.appendChild(option);
 
-            const itemDiv = document.createElement("DIV");
-            const levelName = vip.level === 'SVIP' ? 'SVIP' : `VIP ${vip.level}`;
-            const iconName = vip.level.toString().toLowerCase();
-            const iconPath = `/images/calculators/vip/${iconName === 'svip' ? 'svip' : 'vip' + iconName}.webp`;
-            itemDiv.innerHTML = `<img src="${iconPath}" alt="${levelName}">${levelName}`;
-            itemDiv.addEventListener("click", function() {
-                selectEl.selectedIndex = index;
-                selectedDiv.innerHTML = this.innerHTML;
-                Array.from(optionsDiv.getElementsByClassName("same-as-selected")).forEach(el => el.classList.remove("same-as-selected"));
-                this.classList.add("same-as-selected");
-                closeAllSelect();
+                const itemDiv = document.createElement("DIV");
+                const levelName = vip.level === 'SVIP' ? 'SVIP' : `VIP ${vip.level}`;
+                const iconName = vip.level.toString().toLowerCase();
+                const iconPath = `/images/calculators/vip/${iconName === 'svip' ? 'svip' : 'vip' + iconName}.webp`;
+                itemDiv.innerHTML = `<img src="${iconPath}" alt="${levelName}">${levelName}`;
+                itemDiv.addEventListener("click", function() {
+                    selectEl.selectedIndex = index;
+                    selectedDiv.innerHTML = this.innerHTML;
+                    Array.from(optionsDiv.getElementsByClassName("same-as-selected")).forEach(el => el.classList.remove("same-as-selected"));
+                    this.classList.add("same-as-selected");
+                    closeAllSelect();
+                });
+                optionsDiv.appendChild(itemDiv);
             });
-            optionsDiv.appendChild(itemDiv);
-        });
-        
-        customSelectContainer.appendChild(optionsDiv);
-        selectedDiv.innerHTML = optionsDiv.querySelector('div:last-child').innerHTML;
-        selectEl.selectedIndex = vipLevels.length - 1;
-        
-        selectedDiv.addEventListener("click", function(e) {
-            e.stopPropagation();
-            closeAllSelect(this);
-            optionsDiv.classList.toggle("select-hide");
-            this.classList.toggle("select-arrow-active");
-        });
+            
+            customSelectContainer.appendChild(optionsDiv);
+            selectedDiv.innerHTML = optionsDiv.querySelector('div:last-child').innerHTML;
+            selectEl.selectedIndex = vipLevels.length - 1;
+            
+            selectedDiv.addEventListener("click", function(e) {
+                e.stopPropagation();
+                closeAllSelect(this);
+                optionsDiv.classList.toggle("select-hide");
+                this.classList.toggle("select-arrow-active");
+            });
 
-        function closeAllSelect(elmnt) {
-            const selectItems = document.getElementsByClassName("select-items");
-            const selectSelected = document.getElementsByClassName("select-selected");
-            for (let i = 0; i < selectSelected.length; i++) {
-                if (elmnt != selectSelected[i]) selectSelected[i].classList.remove("select-arrow-active");
+            function closeAllSelect(elmnt) {
+                const selectItems = document.getElementsByClassName("select-items");
+                const selectSelected = document.getElementsByClassName("select-selected");
+                for (let i = 0; i < selectSelected.length; i++) {
+                    if (elmnt != selectSelected[i]) selectSelected[i].classList.remove("select-arrow-active");
+                }
+                for (let i = 0; i < selectItems.length; i++) {
+                    if (elmnt == null || selectItems[i].previousElementSibling != elmnt) selectItems[i].classList.add("select-hide");
+                }
             }
-            for (let i = 0; i < selectItems.length; i++) {
-                if (elmnt == null || selectItems[i].previousElementSibling != elmnt) selectItems[i].classList.add("select-hide");
-            }
+            document.addEventListener("click", closeAllSelect);
         }
-        document.addEventListener("click", closeAllSelect);
     }
 
     const calculateBuildingBtn = document.getElementById('calculate-building-btn');
@@ -291,11 +375,17 @@ document.addEventListener('DOMContentLoaded', function() {
             selector.addEventListener('change', () => {
                 const selectedBuilding = document.querySelector('input[name="building"]:checked').value;
                 const data = buildingData[selectedBuilding];
-                currencyLabelText.textContent = `Current ${data.currencyName}`;
-                currencyLabelIcon.src = data.currencyImage;
-                currencyLabelIcon.alt = data.currencyName;
-                buildingTitleIcon.src = data.currencyImage;
-                buildingTitleIcon.alt = data.currencyName;
+                if(currencyLabelText) currencyLabelText.textContent = `Current ${data.currencyName}`;
+                if(currencyLabelIcon) {
+                    currencyLabelIcon.src = data.currencyImage;
+                    currencyLabelIcon.alt = data.currencyName;
+                }
+                
+                const buildingSlide = selector.closest('.carousel-slide');
+                if (buildingSlide) {
+                    buildingSlide.dataset.icon = data.currencyImage;
+                    updateUI();
+                }
             });
         });
 

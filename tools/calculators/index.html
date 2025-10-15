@@ -72,277 +72,175 @@
         <section class="tool-hero">
             <div class="tool-hero-container">
                 <div class="section-badge">Community Tools</div>
-                <h1>General Calculators</h1>
-                <p>Calculate skill upgrade costs, passport requirements, and more.</p>
+                <h1 id="calculator-main-title">Skill Upgrade Cost</h1>
+                <p id="calculator-main-description">Calculate the total number of sculptures required to upgrade a commander's skills.</p>
             </div>
         </section>
     
         <section class="tool-content">
-            <div class="calculators-container">
+            <div class="carousel-container">
+                <div class="carousel-track-container">
+                    <div class="carousel-track">
 
-                <div class="calculator-island">
-                    <h2 class="island-title"><img src="/images/calculators/legendary_sculpture.webp" alt="Legendary Sculpture Icon" width="28" height="28"> Skill Upgrade Cost</h2>
-                    <div class="island-content">
-                        <div class="form-group">
-                            <label for="start-skill">Starting Skill Level</label>
-                            <input type="text" id="start-skill" placeholder="Example: 1111" maxlength="4">
-                        </div>
-                        <div class="form-group">
-                            <label for="desired-skill">Desired Skill Level</label>
-                            <input type="text" id="desired-skill" placeholder="Example: 5555" maxlength="4">
-                        </div>
-                        <div class="form-group">
-                            <label>Commander Rarity</label>
-                            <div class="rarity-selector">
-                                <label>
-                                    <input type="radio" name="rarity" value="legendary" checked>
-                                    <span class="rarity-btn legendary">
-                                        <img src="/images/calculators/legendary_sculpture.webp" alt="Legendary Sculpture" width="24" height="24">
-                                        <span>Legendary</span>
-                                    </span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="rarity" value="epic">
-                                    <span class="rarity-btn epic">
-                                        <img src="/images/calculators/epic_sculpture.webp" alt="Epic Sculpture" width="24" height="24">
-                                        <span>Epic</span>
-                                    </span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="rarity" value="elite">
-                                    <span class="rarity-btn elite">
-                                        <img src="/images/calculators/elite_sculpture.webp" alt="Elite Sculpture" width="24" height="24">
-                                        <span>Elite</span>
-                                    </span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="rarity" value="advanced">
-                                    <span class="rarity-btn advanced">
-                                        <img src="/images/calculators/advanced_sculpture.webp" alt="Advanced Sculpture" width="24" height="24">
-                                        <span>Advanced</span>
-                                    </span>
-                                </label>
+                        <div class="carousel-slide" data-title="Skill Upgrade Cost" data-description="Calculate the total number of sculptures required to upgrade a commander's skills." data-icon="/images/calculators/legendary_sculpture.webp">
+                            <div class="calculator-island">
+                                <div class="island-content">
+                                    <div class="form-group">
+                                        <label for="start-skill">Starting Skill Level</label>
+                                        <input type="text" id="start-skill" placeholder="Example: 1111" maxlength="4">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="desired-skill">Desired Skill Level</label>
+                                        <input type="text" id="desired-skill" placeholder="Example: 5555" maxlength="4">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Commander Rarity</label>
+                                        <div class="rarity-selector">
+                                            <label><input type="radio" name="rarity" value="legendary" checked><span class="rarity-btn legendary"><img src="/images/calculators/legendary_sculpture.webp" alt="Legendary"><span>Legendary</span></span></label>
+                                            <label><input type="radio" name="rarity" value="epic"><span class="rarity-btn epic"><img src="/images/calculators/epic_sculpture.webp" alt="Epic"><span>Epic</span></span></label>
+                                            <label><input type="radio" name="rarity" value="elite"><span class="rarity-btn elite"><img src="/images/calculators/elite_sculpture.webp" alt="Elite"><span>Elite</span></span></label>
+                                            <label><input type="radio" name="rarity" value="advanced"><span class="rarity-btn advanced"><img src="/images/calculators/advanced_sculpture.webp" alt="Advanced"><span>Advanced</span></span></label>
+                                        </div>
+                                    </div>
+                                    <button id="calculate-skill-btn" class="btn-primary">Calculate</button>
+                                    <div id="skill-result" class="calc-result"></div>
+                                </div>
                             </div>
                         </div>
-                        <button id="calculate-skill-btn" class="btn-primary">Calculate</button>
-                        <div id="skill-result" class="calc-result"></div>
+
+                        <div class="carousel-slide" data-title="Commander EXP Cost" data-description="Calculate the total experience needed to max out your commander's level." data-icon="/images/calculators/experience_book.webp">
+                            <div class="calculator-island">
+                                <div class="island-content">
+                                     <div class="form-group">
+                                        <label for="current-exp-level">Current Level</label>
+                                        <input type="number" id="current-exp-level" placeholder="Example: 45" min="1" max="60">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="current-exp-amount">Current EXP on Level</label>
+                                        <input type="text" id="current-exp-amount" placeholder="Example: 500,000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Commander Rarity</label>
+                                        <div class="rarity-selector">
+                                            <label><input type="radio" name="exp-rarity" value="legendary" checked><span class="rarity-btn legendary"><img src="/images/calculators/legendary_sculpture.webp" alt="Legendary"><span>Legendary</span></span></label>
+                                            <label><input type="radio" name="exp-rarity" value="epic"><span class="rarity-btn epic"><img src="/images/calculators/epic_sculpture.webp" alt="Epic"><span>Epic</span></span></label>
+                                            <label><input type="radio" name="exp-rarity" value="elite"><span class="rarity-btn elite"><img src="/images/calculators/elite_sculpture.webp" alt="Elite"><span>Elite</span></span></label>
+                                            <label><input type="radio" name="exp-rarity" value="advanced"><span class="rarity-btn advanced"><img src="/images/calculators/advanced_sculpture.webp" alt="Advanced"><span>Advanced</span></span></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group-toggle">
+                                        <label class="toggle-switch"><input type="checkbox" id="exp-tome-toggle"><span class="toggle-slider"></span></label>
+                                        <label for="exp-tome-toggle" class="toggle-label">Calculate with Experience Tomes</label>
+                                    </div>
+                                    <div id="exp-tome-grid-container" class="exp-tome-grid-container">
+                                        <div class="exp-tome-grid">
+                                            <div class="exp-tome-item advanced"><img src="/images/calculators/vip/experience_token_100.webp" alt="100 EXP"><div class="exp-tome-info"><label>100 EXP</label><input type="number" class="exp-tome-input" data-value="100" placeholder="0"></div></div>
+                                            <div class="exp-tome-item elite"><img src="/images/calculators/vip/experience_token_500.webp" alt="500 EXP"><div class="exp-tome-info"><label>500 EXP</label><input type="number" class="exp-tome-input" data-value="500" placeholder="0"></div></div>
+                                            <div class="exp-tome-item epic"><img src="/images/calculators/vip/experience_token_1000.webp" alt="1k EXP"><div class="exp-tome-info"><label>1k EXP</label><input type="number" class="exp-tome-input" data-value="1000" placeholder="0"></div></div>
+                                            <div class="exp-tome-item epic"><img src="/images/calculators/vip/experience_token_5000.webp" alt="5k EXP"><div class="exp-tome-info"><label>5k EXP</label><input type="number" class="exp-tome-input" data-value="5000" placeholder="0"></div></div>
+                                            <div class="exp-tome-item epic"><img src="/images/calculators/vip/experience_token_10000.webp" alt="10k EXP"><div class="exp-tome-info"><label>10k EXP</label><input type="number" class="exp-tome-input" data-value="10000" placeholder="0"></div></div>
+                                            <div class="exp-tome-item legendary"><img src="/images/calculators/vip/experience_token_20000.webp" alt="20k EXP"><div class="exp-tome-info"><label>20k EXP</label><input type="number" class="exp-tome-input" data-value="20000" placeholder="0"></div></div>
+                                            <div class="exp-tome-item legendary"><img src="/images/calculators/vip/experience_token_50000.webp" alt="50k EXP"><div class="exp-tome-info"><label>50k EXP</label><input type="number" class="exp-tome-input" data-value="50000" placeholder="0"></div></div>
+                                        </div>
+                                    </div>
+                                    <button id="calculate-exp-btn" class="btn-primary">Calculate</button>
+                                    <div id="exp-result" class="calc-result"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="carousel-slide" data-title="Passport Cost" data-description="Calculate the number of passports required to migrate kingdoms." data-icon="/images/calculators/passport.webp">
+                            <div class="calculator-island">
+                                <div class="island-content">
+                                    <div class="form-group">
+                                        <label for="power-input">Your Power</label>
+                                        <input type="text" id="power-input" placeholder="Example: 50,000,000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="current-passports-input">Current Passports You Own</label>
+                                        <input type="number" id="current-passports-input" placeholder="Example: 10" min="0">
+                                    </div>
+                                    <div class="form-group-toggle">
+                                        <label class="toggle-switch"><input type="checkbox" id="same-kvk-checkbox"><span class="toggle-slider"></span></label>
+                                        <label for="same-kvk-checkbox" class="toggle-label">Same KvK / Vacation Mode</label>
+                                    </div>
+                                    <button id="calculate-passport-btn" class="btn-primary">Calculate</button>
+                                    <div id="passport-result" class="calc-result"></div>
+                                    <div id="cost-result" class="calc-result"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-slide" data-title="VIP Level Requirements" data-description="Calculate the VIP points needed to reach your desired VIP level." data-icon="/images/calculators/vip/vip_icon.webp">
+                            <div class="calculator-island">
+                                <div class="island-content">
+                                    <div class="form-group">
+                                        <label for="current-vip-points">Current VIP Points</label>
+                                        <input type="text" id="current-vip-points" placeholder="Example: 1,500,000">
+                                    </div>
+                                    <div class="form-group-toggle">
+                                        <label class="toggle-switch"><input type="checkbox" id="vip-token-toggle"><span class="toggle-slider"></span></label>
+                                        <label for="vip-token-toggle" class="toggle-label">Calculate with VIP Tokens</label>
+                                    </div>
+                                    <div id="vip-token-grid-container" class="vip-token-grid-container">
+                                        <div class="vip-token-grid">
+                                            <div class="vip-token-item common"><img src="/images/calculators/vip/vip_token_5.webp" alt="5 VIP"><div class="vip-token-info"><label>5 VIP</label><input type="number" class="vip-token-input" data-value="5" placeholder="0"></div></div>
+                                            <div class="vip-token-item common"><img src="/images/calculators/vip/vip_token_10.webp" alt="10 VIP"><div class="vip-token-info"><label>10 VIP</label><input type="number" class="vip-token-input" data-value="10" placeholder="0"></div></div>
+                                            <div class="vip-token-item common"><img src="/images/calculators/vip/vip_token_50.webp" alt="50 VIP"><div class="vip-token-info"><label>50 VIP</label><input type="number" class="vip-token-input" data-value="50" placeholder="0"></div></div>
+                                            <div class="vip-token-item advanced"><img src="/images/calculators/vip/vip_token_100.webp" alt="100 VIP"><div class="vip-token-info"><label>100 VIP</label><input type="number" class="vip-token-input" data-value="100" placeholder="0"></div></div>
+                                            <div class="vip-token-item advanced"><img src="/images/calculators/vip/vip_token_200.webp" alt="200 VIP"><div class="vip-token-info"><label>200 VIP</label><input type="number" class="vip-token-input" data-value="200" placeholder="0"></div></div>
+                                            <div class="vip-token-item elite"><img src="/images/calculators/vip/vip_token_500.webp" alt="500 VIP"><div class="vip-token-info"><label>500 VIP</label><input type="number" class="vip-token-input" data-value="500" placeholder="0"></div></div>
+                                            <div class="vip-token-item epic"><img src="/images/calculators/vip/vip_token_1000.webp" alt="1k VIP"><div class="vip-token-info"><label>1k VIP</label><input type="number" class="vip-token-input" data-value="1000" placeholder="0"></div></div>
+                                            <div class="vip-token-item legendary"><img src="/images/calculators/vip/vip_token_5000.webp" alt="5k VIP"><div class="vip-token-info"><label>5k VIP</label><input type="number" class="vip-token-input" data-value="5000" placeholder="0"></div></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="desired-vip-level">Desired VIP Level</label>
+                                        <div class="custom-select-container">
+                                            <select id="desired-vip-level" style="display: none;"></select>
+                                        </div>
+                                    </div>
+                                    <button id="calculate-vip-btn" class="btn-primary">Calculate</button>
+                                    <div id="vip-result" class="calc-result"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-slide" data-title="Building Costs" data-description="Calculate the resource costs for upgrading your Castle, Watchtower, or State Forum." data-icon="/images/calculators/book_of_covenant.webp">
+                           <div class="calculator-island">
+                                <div class="island-content">
+                                    <div class="form-group">
+                                        <label>Building</label>
+                                        <div class="building-selector">
+                                            <label><input type="radio" name="building" value="castle" checked><span class="building-btn castle"><img src="/images/calculators/castle.webp" alt="Castle"><span>Castle</span></span></label>
+                                            <label><input type="radio" name="building" value="watchtower"><span class="building-btn watchtower"><img src="/images/calculators/watchtower.webp" alt="Watchtower"><span>Watchtower</span></span></label>
+                                            <label><input type="radio" name="building" value="stateForum"><span class="building-btn state-forum"><img src="/images/calculators/stateforum.webp" alt="State Forum"><span>State Forum</span></span></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="current-level">Current Level</label>
+                                        <input type="number" id="current-level" placeholder="Example: 1" min="1" max="24">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="desired-level">Desired Level</label>
+                                        <input type="number" id="desired-level" placeholder="Example: 25" min="2" max="25">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="current-currency"><span id="currency-label-text">Current Books of Covenant</span><img id="currency-label-icon" src="/images/calculators/book_of_covenant.webp" alt="Currency Icon"></label>
+                                        <input type="number" id="current-currency" placeholder="Example: 500" min="0">
+                                    </div>
+                                    <button id="calculate-building-btn" class="btn-primary">Calculate</button>
+                                    <div id="building-cost-result" class="calc-result"></div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-
-                <div class="calculator-island">
-                    <h2 class="island-title"><img src="/images/calculators/experience_book.webp" alt="Commander EXP Icon" width="28" height="28"> Commander EXP Cost</h2>
-                    <div class="island-content">
-                        <div class="form-group">
-                            <label>Commander Rarity</label>
-                            <div class="rarity-selector">
-                                <label>
-                                    <input type="radio" name="exp-rarity" value="legendary" checked>
-                                    <span class="rarity-btn legendary"><img src="/images/calculators/legendary_sculpture.webp" alt="Legendary Commander"><span>Legendary</span></span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="exp-rarity" value="epic">
-                                    <span class="rarity-btn epic"><img src="/images/calculators/epic_sculpture.webp" alt="Epic Commander"><span>Epic</span></span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="exp-rarity" value="elite">
-                                    <span class="rarity-btn elite"><img src="/images/calculators/elite_sculpture.webp" alt="Elite Commander"><span>Elite</span></span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="exp-rarity" value="advanced">
-                                    <span class="rarity-btn advanced"><img src="/images/calculators/advanced_sculpture.webp" alt="Advanced Commander"><span>Advanced</span></span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="current-exp-level">Current Level</label>
-                            <input type="number" id="current-exp-level" placeholder="Example: 45" min="1" max="60">
-                        </div>
-                        <div class="form-group">
-                            <label for="current-exp-amount">Current EXP Amount</label>
-                            <input type="text" id="current-exp-amount" placeholder="Example: 500,000">
-                        </div>
-                        <div class="form-group-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="exp-tome-toggle">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <label for="exp-tome-toggle" class="toggle-label">Calculate Experience Tomes</label>
-                        </div>
-                        <div id="exp-tome-grid-container" class="exp-tome-grid-container">
-                            <div class="exp-tome-grid">
-                                <div class="exp-tome-item advanced"><img src="/images/calculators/vip/experience_token_100.webp" alt="100 EXP"><input type="number" class="exp-tome-input" data-value="100" placeholder="0"></div>
-                                <div class="exp-tome-item elite"><img src="/images/calculators/vip/experience_token_500.webp" alt="500 EXP"><input type="number" class="exp-tome-input" data-value="500" placeholder="0"></div>
-                                <div class="exp-tome-item epic"><img src="/images/calculators/vip/experience_token_1000.webp" alt="1k EXP"><input type="number" class="exp-tome-input" data-value="1000" placeholder="0"></div>
-                                <div class="exp-tome-item epic"><img src="/images/calculators/vip/experience_token_5000.webp" alt="5k EXP"><input type="number" class="exp-tome-input" data-value="5000" placeholder="0"></div>
-                                <div class="exp-tome-item epic"><img src="/images/calculators/vip/experience_token_10000.webp" alt="10k EXP"><input type="number" class="exp-tome-input" data-value="10000" placeholder="0"></div>
-                                <div class="exp-tome-item legendary"><img src="/images/calculators/vip/experience_token_20000.webp" alt="20k EXP"><input type="number" class="exp-tome-input" data-value="20000" placeholder="0"></div>
-                                <div class="exp-tome-item legendary"><img src="/images/calculators/vip/experience_token_50000.webp" alt="50k EXP"><input type="number" class="exp-tome-input" data-value="50000" placeholder="0"></div>
-                            </div>
-                        </div>
-                        <button id="calculate-exp-btn" class="btn-primary">Calculate</button>
-                        <div id="exp-result" class="calc-result"></div>
-                    </div>
-                </div>
-
-                <div class="calculator-island">
-                    <h2 class="island-title"><img src="/images/calculators/passport.webp" alt="Passport Icon" width="28" height="28"> Passport Cost</h2>
-                    <div class="island-content">
-                        <div class="form-group">
-                            <label for="power-input">Your Power</label>
-                            <input type="text" id="power-input" placeholder="Example: 50,000,000">
-                        </div>
-                        <div class="form-group">
-                            <label for="current-passports-input">Current Passports You Own</label>
-                            <input type="number" id="current-passports-input" placeholder="Example: 10" min="0">
-                        </div>
-                        <div class="form-group-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="same-kvk-checkbox">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <label for="same-kvk-checkbox" class="toggle-label">Same KvK / Vacation Mode</label>
-                        </div>
-                        <button id="calculate-passport-btn" class="btn-primary">Calculate</button>
-                        <div id="passport-result" class="calc-result"></div>
-                        <div id="cost-result" class="calc-result"></div>
-                    </div>
-                </div>
-
-                <div class="calculator-island">
-                    <h2 class="island-title"><img src="/images/calculators/vip/vip_icon.webp" alt="VIP Icon" width="28" height="28"> VIP Level Requirements</h2>
-                    <div class="island-content">
-                        <div class="form-group">
-                            <label for="current-vip-points">Current VIP Points</label>
-                            <input type="text" id="current-vip-points" placeholder="Example: 1,500,000">
-                        </div>
-                        <div class="form-group-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="vip-token-toggle">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <label for="vip-token-toggle" class="toggle-label">Calculate VIP Tokens</label>
-                        </div>
-                        <div id="vip-token-grid-container" class="vip-token-grid-container">
-                            <div class="vip-token-grid">
-                                <div class="vip-token-item common">
-                                    <img src="/images/calculators/vip/vip_token_5.webp" alt="5 VIP Token">
-                                    <div class="vip-token-info">
-                                        <label>5 VIP</label>
-                                        <input type="number" class="vip-token-input" data-value="5" placeholder="0">
-                                    </div>
-                                </div>
-                                <div class="vip-token-item common">
-                                    <img src="/images/calculators/vip/vip_token_10.webp" alt="10 VIP Token">
-                                    <div class="vip-token-info">
-                                        <label>10 VIP</label>
-                                        <input type="number" class="vip-token-input" data-value="10" placeholder="0">
-                                    </div>
-                                </div>
-                                <div class="vip-token-item common">
-                                    <img src="/images/calculators/vip/vip_token_50.webp" alt="50 VIP Token">
-                                    <div class="vip-token-info">
-                                        <label>50 VIP</label>
-                                        <input type="number" class="vip-token-input" data-value="50" placeholder="0">
-                                    </div>
-                                </div>
-                                <div class="vip-token-item advanced">
-                                    <img src="/images/calculators/vip/vip_token_100.webp" alt="100 VIP Token">
-                                    <div class="vip-token-info">
-                                        <label>100 VIP</label>
-                                        <input type="number" class="vip-token-input" data-value="100" placeholder="0">
-                                    </div>
-                                </div>
-                                <div class="vip-token-item advanced">
-                                    <img src="/images/calculators/vip/vip_token_200.webp" alt="200 VIP Token">
-                                    <div class="vip-token-info">
-                                        <label>200 VIP</label>
-                                        <input type="number" class="vip-token-input" data-value="200" placeholder="0">
-                                    </div>
-                                </div>
-                                <div class="vip-token-item elite">
-                                    <img src="/images/calculators/vip/vip_token_500.webp" alt="500 VIP Token">
-                                    <div class="vip-token-info">
-                                        <label>500 VIP</label>
-                                        <input type="number" class="vip-token-input" data-value="500" placeholder="0">
-                                    </div>
-                                </div>
-                                <div class="vip-token-item epic">
-                                    <img src="/images/calculators/vip/vip_token_1000.webp" alt="1000 VIP Token">
-                                    <div class="vip-token-info">
-                                        <label>1k VIP</label>
-                                        <input type="number" class="vip-token-input" data-value="1000" placeholder="0">
-                                    </div>
-                                </div>
-                                <div class="vip-token-item legendary">
-                                    <img src="/images/calculators/vip/vip_token_5000.webp" alt="5000 VIP Token">
-                                    <div class="vip-token-info">
-                                        <label>5k VIP</label>
-                                        <input type="number" class="vip-token-input" data-value="5000" placeholder="0">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="desired-vip-level">Desired VIP Level</label>
-                            <div class="custom-select-container">
-                                <select id="desired-vip-level" style="display: none;"></select>
-                            </div>
-                        </div>
-                        <button id="calculate-vip-btn" class="btn-primary">Calculate</button>
-                        <div id="vip-result" class="calc-result"></div>
-                    </div>
-                </div>
-
-                <div class="calculator-island">
-                    <h2 class="island-title"><img src="/images/calculators/book_of_covenant.webp" alt="Book of Covenant Icon" id="building-title-icon" width="28" height="28"> Building Costs</h2>
-                    <div class="island-content">
-                        <div class="form-group">
-                            <label>Building</label>
-                            <div class="building-selector">
-                                <label>
-                                    <input type="radio" name="building" value="castle" checked>
-                                    <span class="building-btn castle">
-                                        <img src="/images/calculators/castle.webp" alt="Castle">
-                                        <span>Castle</span>
-                                    </span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="building" value="watchtower">
-                                    <span class="building-btn watchtower">
-                                        <img src="/images/calculators/watchtower.webp" alt="Watchtower">
-                                        <span>Watchtower</span>
-                                    </span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="building" value="stateForum">
-                                    <span class="building-btn state-forum">
-                                        <img src="/images/calculators/stateforum.webp" alt="State Forum">
-                                        <span>State Forum</span>
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="current-level">Current Level</label>
-                            <input type="number" id="current-level" placeholder="Example: 1" min="1" max="24">
-                        </div>
-                        <div class="form-group">
-                            <label for="desired-level">Desired Level</label>
-                            <input type="number" id="desired-level" placeholder="Example: 25" min="2" max="25">
-                        </div>
-                        <div class="form-group">
-                            <label for="current-currency">
-                                <span id="currency-label-text">Current Books of Covenant</span>
-                                <img id="currency-label-icon" src="/images/calculators/book_of_covenant.webp" alt="Currency Icon">
-                            </label>
-                            <input type="number" id="current-currency" placeholder="Example: 500" min="0">
-                        </div>
-                        <button id="calculate-building-btn" class="btn-primary">Calculate</button>
-                        <div id="building-cost-result" class="calc-result"></div>
-                    </div>
-                </div>
-
+                <button class="carousel-arrow prev" id="prev-slide"><div class="arrow-preview"><img src="" alt=""><span class="arrow-preview-text"></span></div><i class="fas fa-chevron-left"></i></button>
+                <button class="carousel-arrow next" id="next-slide"><i class="fas fa-chevron-right"></i><div class="arrow-preview"><img src="" alt=""><span class="arrow-preview-text"></span></div></button>
             </div>
+            <div class="quick-access-nav" id="quick-access-nav"></div>
         </section>
     </main>
 
