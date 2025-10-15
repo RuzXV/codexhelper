@@ -123,9 +123,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (overrideText === null) {
             localStorage.setItem(CACHE_KEY, text);
         }
-        const charCount = mailInput.value.length;
+
+        const newlines = (text.match(/\n/g) || []).length;
+        const charCount = text.length + newlines;
+
         charCounter.textContent = `${charCount}/${currentCharLimit}`;
         charCounter.style.color = charCount > currentCharLimit ? '#ff4d4d' : 'var(--text-secondary)';
+        
         let previewText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         previewText = previewText.replace(/&lt;b&gt;(.*?)&lt;\/b&gt;/gis, '<strong>$1</strong>');
         previewText = previewText.replace(/&lt;i&gt;(.*?)&lt;\/i&gt;/gis, '<em>$1</em>');
