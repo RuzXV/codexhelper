@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-
     const track = document.querySelector('.carousel-track');
     const slides = Array.from(track.children);
     const nextButton = document.getElementById('next-slide');
@@ -11,91 +10,77 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentIndex = 0;
     
     if (slides.length > 0) {
-        const slideWidth = slides[0].getBoundingClientRect().width;
-
-        const setSlidePosition = (slide, index) => {
-            slide.style.left = slideWidth * index + 'px';
+        const setSlidePositions = () => {
+            const slideWidth = track.clientWidth;
+            slides.forEach((slide, index) => {
+                slide.style.left = slideWidth * index + 'px';
+            });
         };
-        slides.forEach(setSlidePosition);
 
         const moveToSlide = (targetIndex) => {
-            if (track) {
-                 track.style.transform = 'translateX(-' + (slideWidth * targetIndex) + 'px)';
-            }
+            const slideWidth = track.clientWidth;
+            track.style.transform = 'translateX(-' + (slideWidth * targetIndex) + 'px)';
+            
             if (slides[currentIndex]) {
-                slides[currentIndex].classList.remove('current-slide');
+                slides[currentIndex].classList.remove('is-active');
             }
             if (slides[targetIndex]) {
-                slides[targetIndex].classList.add('current-slide');
+                slides[targetIndex].classList.add('is-active');
             }
+            
             currentIndex = targetIndex;
             updateUI();
         };
 
         const updateUI = () => {
             const currentSlide = slides[currentIndex];
-            if (currentSlide) {
-                mainTitle.textContent = currentSlide.dataset.title;
-                mainDescription.textContent = currentSlide.dataset.description;
-            }
+            if (!currentSlide) return;
 
-            const quickNavButtons = document.querySelectorAll('.quick-access-btn');
-            quickNavButtons.forEach((btn, index) => {
+            const calculatorIsland = currentSlide.querySelector('.calculator-island');
+
+            mainTitle.innerHTML = `<img src="${currentSlide.dataset.icon}" alt=""> ${currentSlide.dataset.title}`;
+            mainDescription.textContent = currentSlide.dataset.description;
+
+            Array.from(quickNav.children).forEach((btn, index) => {
                 btn.classList.toggle('active', index === currentIndex);
             });
 
-            const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
-            const nextIndex = (currentIndex + 1) % slides.length;
-            
-            updateArrowPreview(prevButton, slides[prevIndex]);
-            updateArrowPreview(nextButton, slides[nextIndex]);
+            if (calculatorIsland) {
+                const islandHeight = calculatorIsland.offsetHeight;
+                const topPosition = (islandHeight / 2) + 'px';
+                prevButton.style.top = topPosition;
+                nextButton.style.top = topPosition;
+            }
         };
 
-        const updateArrowPreview = (arrow, slide) => {
-            const preview = arrow.querySelector('.arrow-preview');
-            const img = preview.querySelector('img');
-            const text = preview.querySelector('.arrow-preview-text');
-            img.src = slide.dataset.icon;
-            img.alt = slide.dataset.title;
-            text.textContent = slide.dataset.title;
-        };
+        prevButton.addEventListener('click', () => moveToSlide((currentIndex - 1 + slides.length) % slides.length));
+        nextButton.addEventListener('click', () => moveToSlide((currentIndex + 1) % slides.length));
 
-        if (prevButton) {
-            prevButton.addEventListener('click', e => {
-                const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
-                moveToSlide(prevIndex);
-            });
-        }
-        if (nextButton) {
-            nextButton.addEventListener('click', e => {
-                const nextIndex = (currentIndex + 1) % slides.length;
-                moveToSlide(nextIndex);
-            });
-        }
-
-        if (quickNav) {
-            slides.forEach((slide, index) => {
-                const button = document.createElement('button');
-                button.classList.add('quick-access-btn');
-                button.innerHTML = `<img src="${slide.dataset.icon}" alt="${slide.dataset.title}"><span>${slide.dataset.title}</span>`;
-                button.addEventListener('click', () => moveToSlide(index));
-                quickNav.appendChild(button);
-            });
-        }
+        slides.forEach((slide, index) => {
+            const button = document.createElement('button');
+            button.classList.add('quick-access-btn');
+            button.innerHTML = `<img src="${slide.dataset.icon}" alt=""><span>${slide.dataset.title}</span>`;
+            button.addEventListener('click', () => moveToSlide(index));
+            quickNav.appendChild(button);
+        });
         
+        setSlidePositions();
         moveToSlide(0);
-
         window.addEventListener('resize', () => {
-            const newSlideWidth = slides[0].getBoundingClientRect().width;
-            slides.forEach((slide, index) => {
-                 slide.style.left = newSlideWidth * index + 'px';
-            });
+            setSlidePositions();
             track.style.transition = 'none';
-            track.style.transform = 'translateX(-' + (newSlideWidth * currentIndex) + 'px)';
+            moveToSlide(currentIndex);
             setTimeout(() => {
-                track.style.transition = 'transform 0.5s ease-in-out';
+                track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
             }, 50);
         });
+    }
+
+    function triggerSuccessAnimation(element) {
+        if (!element) return;
+        element.classList.remove('result-success');
+        void element.offsetWidth; 
+        element.classList.add('result-success');
     }
 
     function animateCounter(element, target, duration, prefix = '') {
@@ -164,6 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const totalCost = cumulativeCosts[rarity][desiredPoints - 1] - (startPoints > 0 ? cumulativeCosts[rarity][startPoints - 1] : 0);
             skillResultDiv.innerHTML = `<img src="${sculptureImage}" alt="${rarity} sculpture"><span>Requires <strong id="skill-cost-value">0</strong> Sculptures</span>`;
             animateCounter(document.getElementById('skill-cost-value'), totalCost, 700);
+            triggerSuccessAnimation(skillResultDiv);
         });
     }
 
@@ -200,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (currentLevel === maxLevel) {
                 expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>This commander is already at max level!</span>`;
+                triggerSuccessAnimation(expResultDiv);
                 return;
             }
             const expForCurrentLevel = cumulativeExp[rarity][currentLevel - 1];
@@ -216,10 +203,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (expNeeded <= 0) {
                 expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have enough EXP to reach level ${maxLevel}!</span>`;
-                return;
+            } else {
+                expResultDiv.innerHTML = `<img src="/images/calculators/experience_book.webp" alt="EXP Book"><span>Requires <strong id="exp-needed-value">0</strong> more EXP to max</span>`;
+                animateCounter(document.getElementById('exp-needed-value'), expNeeded, 700);
             }
-            expResultDiv.innerHTML = `<img src="/images/calculators/experience_book.webp" alt="EXP Book"><span>Requires <strong id="exp-needed-value">0</strong> more EXP to max</span>`;
-            animateCounter(document.getElementById('exp-needed-value'), expNeeded, 700);
+            triggerSuccessAnimation(expResultDiv);
         });
     }
 
@@ -246,7 +234,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 costResultDiv.innerHTML = `<div class="cost-line"><span>Credit Cost: <strong id="credit-cost-value">0</strong></span><img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit"></div><div class="cost-line"><span>New World Cost: <strong id="usd-cost-value">0</strong></span><img src="/images/calculators/bundle.webp" alt="Bundle"></div>`;
                 if (passportsNeeded > 85) { costResultDiv.innerHTML += `<small style='color: var(--text-secondary); margin-top: 5px;'>Note: Max passports from bundles per month is 85.</small>`; }
                 animateCounter(document.getElementById('credit-cost-value'), passportsNeeded * 600000, 700);
+                 triggerSuccessAnimation(costResultDiv);
             }
+             triggerSuccessAnimation(passportResultDiv);
         });
     }
 
@@ -283,16 +273,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if(pointsNeeded <= 0) {
                 vipResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have reached or surpassed this level!</span>`;
-                return;
+            } else {
+                const selectedOption = desiredVipLevelSelect.options[desiredVipLevelSelect.selectedIndex];
+                const levelName = selectedOption.dataset.level;
+                const levelImage = `/images/calculators/vip/${levelName.toLowerCase() === 'svip' ? 'svip' : 'vip' + levelName}.webp`;
+                const levelText = levelName === 'SVIP' ? 'SVIP' : `VIP ${levelName}`;
+                vipResultDiv.innerHTML = `<img src="${levelImage}" alt="${levelText}"><span>Needs <strong id="vip-points-needed">0</strong> more points for ${levelText}</span>`;
+                animateCounter(document.getElementById('vip-points-needed'), pointsNeeded, 700);
             }
-
-            const selectedOption = desiredVipLevelSelect.options[desiredVipLevelSelect.selectedIndex];
-            const levelName = selectedOption.dataset.level;
-            const levelImage = `/images/calculators/vip/${levelName.toLowerCase() === 'svip' ? 'svip' : 'vip' + levelName}.webp`;
-
-            const levelText = levelName === 'SVIP' ? 'SVIP' : `VIP ${levelName}`;
-            vipResultDiv.innerHTML = `<img src="${levelImage}" alt="${levelText}"><span>Needs <strong id="vip-points-needed">0</strong> more points for ${levelText}</span>`;
-            animateCounter(document.getElementById('vip-points-needed'), pointsNeeded, 700);
+            triggerSuccessAnimation(vipResultDiv);
         });
 
         const customSelectContainer = document.querySelector('.custom-select-container');
@@ -353,7 +342,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const calculateBuildingBtn = document.getElementById('calculate-building-btn');
     if(calculateBuildingBtn) {
         const buildingSelectors = document.querySelectorAll('input[name="building"]');
-        const buildingTitleIcon = document.getElementById('building-title-icon');
         const currentLevelInput = document.getElementById('current-level');
         const desiredLevelInput = document.getElementById('desired-level');
         const currentCurrencyInput = document.getElementById('current-currency');
@@ -380,7 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     currencyLabelIcon.src = data.currencyImage;
                     currencyLabelIcon.alt = data.currencyName;
                 }
-                
                 const buildingSlide = selector.closest('.carousel-slide');
                 if (buildingSlide) {
                     buildingSlide.dataset.icon = data.currencyImage;
@@ -404,14 +391,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const totalCost = data.cumulativeCosts[desiredLevel - 1] - data.cumulativeCosts[currentLevel - 1];
             const neededCurrency = Math.max(0, totalCost - currentCurrency);
 
-            if (neededCurrency <= 0) { buildingResultDiv.innerHTML = `<i class="fas fa-check-circle"></i><span>You have enough currency to reach level ${desiredLevel}!</span>`; return; }
-
-            const gemCost = neededCurrency * 10;
-            buildingResultDiv.innerHTML = `
-                <div class="cost-line"><span>${data.currencyName}: <strong id="building-currency-value">0</strong></span><img src="${data.currencyImage}" alt="${data.currencyName}"></div>
-                <div class="cost-line"><span>Gem Cost: <strong id="building-gem-value">0</strong></span><img src="/images/calculators/gem.webp" alt="Gem"></div>`;
-            animateCounter(document.getElementById('building-currency-value'), neededCurrency, 700);
-            animateCounter(document.getElementById('building-gem-value'), gemCost, 700);
+            if (neededCurrency <= 0) {
+                buildingResultDiv.innerHTML = `<i class="fas fa-check-circle"></i><span>You have enough currency to reach level ${desiredLevel}!</span>`;
+            } else {
+                const gemCost = neededCurrency * 10;
+                buildingResultDiv.innerHTML = `
+                    <div class="cost-line"><span>${data.currencyName}: <strong id="building-currency-value">0</strong></span><img src="${data.currencyImage}" alt="${data.currencyName}"></div>
+                    <div class="cost-line"><span>Gem Cost: <strong id="building-gem-value">0</strong></span><img src="/images/calculators/gem.webp" alt="Gem"></div>`;
+                animateCounter(document.getElementById('building-currency-value'), neededCurrency, 700);
+                animateCounter(document.getElementById('building-gem-value'), gemCost, 700);
+            }
+            triggerSuccessAnimation(buildingResultDiv);
         });
     }
 });

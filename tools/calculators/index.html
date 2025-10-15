@@ -72,8 +72,11 @@
         <section class="tool-hero">
             <div class="tool-hero-container">
                 <div class="section-badge">Community Tools</div>
-                <h1 id="calculator-main-title">Skill Upgrade Cost</h1>
-                <p id="calculator-main-description">Calculate the total number of sculptures required to upgrade a commander's skills.</p>
+                <div class="quick-access-container">
+                    <div class="quick-access-nav" id="quick-access-nav"></div>
+                </div>
+                <h1 id="calculator-main-title" class="calculator-main-title"></h1>
+                <p id="calculator-main-description"></p>
             </div>
         </section>
     
@@ -119,6 +122,10 @@
                                         <label for="current-exp-amount">Current EXP on Level</label>
                                         <input type="text" id="current-exp-amount" placeholder="Example: 500,000">
                                     </div>
+                                     <div class="form-group-toggle">
+                                        <label class="toggle-switch"><input type="checkbox" id="exp-tome-toggle"><span class="toggle-slider"></span></label>
+                                        <label for="exp-tome-toggle" class="toggle-label">Calculate with Experience Tomes</label>
+                                    </div>
                                     <div class="form-group">
                                         <label>Commander Rarity</label>
                                         <div class="rarity-selector">
@@ -127,10 +134,6 @@
                                             <label><input type="radio" name="exp-rarity" value="elite"><span class="rarity-btn elite"><img src="/images/calculators/elite_sculpture.webp" alt="Elite"><span>Elite</span></span></label>
                                             <label><input type="radio" name="exp-rarity" value="advanced"><span class="rarity-btn advanced"><img src="/images/calculators/advanced_sculpture.webp" alt="Advanced"><span>Advanced</span></span></label>
                                         </div>
-                                    </div>
-                                    <div class="form-group-toggle">
-                                        <label class="toggle-switch"><input type="checkbox" id="exp-tome-toggle"><span class="toggle-slider"></span></label>
-                                        <label for="exp-tome-toggle" class="toggle-label">Calculate with Experience Tomes</label>
                                     </div>
                                     <div id="exp-tome-grid-container" class="exp-tome-grid-container">
                                         <div class="exp-tome-grid">
@@ -237,10 +240,9 @@
 
                     </div>
                 </div>
-                <button class="carousel-arrow prev" id="prev-slide"><div class="arrow-preview"><img src="" alt=""><span class="arrow-preview-text"></span></div><i class="fas fa-chevron-left"></i></button>
-                <button class="carousel-arrow next" id="next-slide"><i class="fas fa-chevron-right"></i><div class="arrow-preview"><img src="" alt=""><span class="arrow-preview-text"></span></div></button>
+                <button class="carousel-arrow prev" id="prev-slide"><i class="fas fa-chevron-left"></i></button>
+                <button class="carousel-arrow next" id="next-slide"><i class="fas fa-chevron-right"></i></button>
             </div>
-            <div class="quick-access-nav" id="quick-access-nav"></div>
         </section>
     </main>
 
