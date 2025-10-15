@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const track = document.querySelector('.carousel-track');
     if (!track) return;
 
+    const container = document.querySelector('.carousel-container');
     const slides = Array.from(track.children);
     const nextButton = document.getElementById('next-slide');
     const prevButton = document.getElementById('prev-slide');
@@ -12,8 +13,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentIndex = 0;
     
     const moveToSlide = (targetIndex) => {
+        if (!slides.length) return;
+
+        const containerWidth = container.getBoundingClientRect().width;
         const slideWidth = slides[0].getBoundingClientRect().width;
-        track.style.transform = 'translateX(-' + slideWidth * targetIndex + 'px)';
+        
+        const offset = (containerWidth - slideWidth) / 2;
+        const targetPosition = slides[targetIndex].offsetLeft;
+        
+        track.style.transform = `translateX(-${targetPosition - offset}px)`;
         
         slides.forEach((slide, index) => {
             slide.classList.toggle('is-active', index === targetIndex);
@@ -58,7 +66,9 @@ document.addEventListener('DOMContentLoaded', function() {
         quickNav.appendChild(button);
     });
     
-    moveToSlide(0);
+    setTimeout(() => {
+        moveToSlide(0);
+    }, 100);
 
     window.addEventListener('resize', () => {
         moveToSlide(currentIndex);
