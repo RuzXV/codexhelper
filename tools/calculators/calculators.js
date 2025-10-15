@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-    document.body.style.overflowX = 'visible';
     const track = document.querySelector('.carousel-track');
+    if (!track) return;
+
     const slides = Array.from(track.children);
     const nextButton = document.getElementById('next-slide');
     const prevButton = document.getElementById('prev-slide');
@@ -8,96 +9,60 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainTitle = document.getElementById('calculator-main-title');
     const mainDescription = document.getElementById('calculator-main-description');
     
-    if (slides.length > 1) {
-        const firstClone = slides[0].cloneNode(true);
-        const lastClone = slides[slides.length - 1].cloneNode(true);
-        firstClone.id = 'first-clone';
-        lastClone.id = 'last-clone';
-        track.appendChild(firstClone);
-        track.insertBefore(lastClone, slides[0]);
-
-        const allSlides = Array.from(track.children);
-        let currentIndex = 1;
-        let isTransitioning = false;
-
-        const setSlidePositions = () => {
-             const slideWidth = track.clientWidth;
-             allSlides.forEach((slide, index) => {
-                slide.style.left = slideWidth * index + 'px';
-            });
-        };
-
-        const moveToSlide = (targetIndex, useTransition = true) => {
-            isTransitioning = true;
-            const slideWidth = track.clientWidth;
-            track.style.transition = useTransition ? 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
-            track.style.transform = `translateX(-${slideWidth * targetIndex}px)`;
-            
-            allSlides.forEach(s => s.classList.remove('is-active'));
-            allSlides[targetIndex].classList.add('is-active');
-
-            currentIndex = targetIndex;
-            updateUI();
-        };
-
-        const updateUI = () => {
-            const currentRealIndex = (currentIndex - 1 + slides.length) % slides.length;
-            const currentSlide = slides[currentRealIndex];
-            if (!currentSlide) return;
-
-            const calculatorIsland = allSlides[currentIndex].querySelector('.calculator-island');
-
-            mainTitle.innerHTML = `<img src="${currentSlide.dataset.icon}" alt=""> ${currentSlide.dataset.title}`;
-            mainDescription.textContent = currentSlide.dataset.description;
-
-            Array.from(quickNav.children).forEach((btn, index) => {
-                btn.classList.toggle('active', index === currentRealIndex);
-            });
-
-            if (calculatorIsland) {
-                const islandHeight = calculatorIsland.offsetHeight;
-                const topPosition = (islandHeight / 2) + 'px';
-                prevButton.style.top = topPosition;
-                nextButton.style.top = topPosition;
-            }
-        };
-
-        nextButton.addEventListener('click', () => {
-            if (isTransitioning) return;
-            moveToSlide(currentIndex + 1);
-        });
-
-        prevButton.addEventListener('click', () => {
-            if (isTransitioning) return;
-            moveToSlide(currentIndex - 1);
-        });
-
-        track.addEventListener('transitionend', () => {
-            isTransitioning = false;
-            if (allSlides[currentIndex].id === 'first-clone') {
-                moveToSlide(1, false);
-            }
-            if (allSlides[currentIndex].id === 'last-clone') {
-                moveToSlide(slides.length, false);
-            }
-        });
-
+    let currentIndex = 0;
+    
+    const moveToSlide = (targetIndex) => {
+        const slideWidth = slides[0].getBoundingClientRect().width;
+        track.style.transform = 'translateX(-' + slideWidth * targetIndex + 'px)';
+        
         slides.forEach((slide, index) => {
-            const button = document.createElement('button');
-            button.classList.add('quick-access-btn');
-            button.innerHTML = `<img src="${slide.dataset.icon}" alt=""><span>${slide.dataset.title}</span>`;
-            button.addEventListener('click', () => moveToSlide(index + 1));
-            quickNav.appendChild(button);
+            slide.classList.toggle('is-active', index === targetIndex);
         });
         
-        setSlidePositions();
-        moveToSlide(currentIndex, false);
+        currentIndex = targetIndex;
+        updateUI();
+    };
 
-        window.addEventListener('resize', () => {
-            setSlidePositions();
-            moveToSlide(currentIndex, false);
+    const updateUI = () => {
+        const currentSlide = slides[currentIndex];
+        if (!currentSlide) return;
+
+        mainTitle.innerHTML = `<img src="${currentSlide.dataset.icon}" alt=""> ${currentSlide.dataset.title}`;
+        mainDescription.textContent = currentSlide.dataset.description;
+
+        Array.from(quickNav.children).forEach((btn, index) => {
+            btn.classList.toggle('active', index === currentIndex);
         });
-    }
+        
+        prevButton.classList.toggle('disabled', currentIndex === 0);
+        nextButton.classList.toggle('disabled', currentIndex === slides.length - 1);
+    };
+
+    nextButton.addEventListener('click', () => {
+        if (currentIndex < slides.length - 1) {
+            moveToSlide(currentIndex + 1);
+        }
+    });
+
+    prevButton.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            moveToSlide(currentIndex - 1);
+        }
+    });
+
+    slides.forEach((slide, index) => {
+        const button = document.createElement('button');
+        button.classList.add('quick-access-btn');
+        button.innerHTML = `<img src="${slide.dataset.icon}" alt=""><span>${slide.dataset.title}</span>`;
+        button.addEventListener('click', () => moveToSlide(index));
+        quickNav.appendChild(button);
+    });
+    
+    moveToSlide(0);
+
+    window.addEventListener('resize', () => {
+        moveToSlide(currentIndex);
+    });
 
     function triggerSuccessAnimation(element) {
         if (!element) return;
@@ -390,11 +355,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(currencyLabelIcon) {
                     currencyLabelIcon.src = data.currencyImage;
                     currencyLabelIcon.alt = data.currencyName;
-                }
-                const buildingSlide = selector.closest('.carousel-slide');
-                if (buildingSlide) {
-                    buildingSlide.dataset.icon = data.currencyImage;
-                    updateUI();
                 }
             });
         });
