@@ -11,20 +11,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainDescription = document.getElementById('calculator-main-description');
     
     let currentIndex = 0;
-    
+
     const moveToSlide = (targetIndex) => {
         if (!slides.length || !slides[targetIndex]) return;
 
         const containerWidth = container.getBoundingClientRect().width;
         const targetSlide = slides[targetIndex];
-        const slideWidth = targetSlide.getBoundingClientRect().width;
         
-        // Calculate the position needed to center the target slide
-        const targetCenter = targetSlide.offsetLeft + (slideWidth / 2);
-        const containerCenter = containerWidth / 2;
-        const translation = containerCenter - targetCenter;
-
-        track.style.transform = `translateX(${translation}px)`;
+        const slideWidth = 600; 
+        const targetLeft = targetSlide.offsetLeft;
+        
+        const newTransform = -(targetLeft - (containerWidth / 2) + (slideWidth / 2));
+        track.style.transform = `translateX(${newTransform}px)`;
         
         slides.forEach((slide, index) => {
             slide.classList.toggle('is-active', index === targetIndex);
@@ -32,6 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         currentIndex = targetIndex;
         updateUI();
+        
+        initializeCalculator(targetIndex);
     };
 
     const updateUI = () => {
@@ -50,15 +50,11 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     nextButton.addEventListener('click', () => {
-        if (currentIndex < slides.length - 1) {
-            moveToSlide(currentIndex + 1);
-        }
+        if (currentIndex < slides.length - 1) moveToSlide(currentIndex + 1);
     });
 
     prevButton.addEventListener('click', () => {
-        if (currentIndex > 0) {
-            moveToSlide(currentIndex - 1);
-        }
+        if (currentIndex > 0) moveToSlide(currentIndex - 1);
     });
 
     slides.forEach((slide, index) => {
@@ -68,61 +64,28 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', () => moveToSlide(index));
         quickNav.appendChild(button);
     });
-    
-    const initCarousel = () => {
-        setTimeout(() => moveToSlide(0), 100);
-    };
-    
-    if (document.readyState === 'complete') {
-        initCarousel();
-    } else {
-        window.addEventListener('load', initCarousel);
-    }
 
-    window.addEventListener('resize', () => {
-        let resizeTimer;
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            moveToSlide(currentIndex);
-        }, 100);
-    });
-
-    function triggerSuccessAnimation(element) {
-        if (!element) return;
-        element.classList.remove('result-success');
-        void element.offsetWidth; 
-        element.classList.add('result-success');
-    }
-
-    function animateCounter(element, target, duration, prefix = '') {
-        if (!element) return;
-        element.classList.add('counting-blur');
-        let current = 0;
-        const range = target - current;
-        if (range === 0) {
-            element.textContent = prefix + target.toLocaleString();
-            element.classList.remove('counting-blur');
+    function initializeCalculator(index) {
+        const targetSlide = slides[index];
+        if (!targetSlide || targetSlide.dataset.initialized === 'true') {
             return;
         }
-        const increment = target > current ? 1 : -1;
-        const stepTime = 16;
-        const totalSteps = duration / stepTime;
-        const incrementAmount = Math.max(1, Math.ceil(Math.abs(range) / totalSteps));
-        const timer = setInterval(() => {
-            current += increment * incrementAmount;
-            if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
-                current = target;
-                clearInterval(timer);
-                element.textContent = prefix + Math.floor(current).toLocaleString();
-                element.classList.remove('counting-blur');
-            } else {
-                element.textContent = prefix + Math.floor(current).toLocaleString();
-            }
-        }, stepTime);
+
+        switch(index) {
+            case 0: initSkillCalculator(); break;
+            case 1: initExpCalculator(); break;
+            case 2: initPassportCalculator(); break;
+            case 3: initVipCalculator(); break;
+            case 4: initBuildingCalculator(); break;
+        }
+        
+        targetSlide.dataset.initialized = 'true';
     }
-    
-    const calculateSkillBtn = document.getElementById('calculate-skill-btn');
-    if (calculateSkillBtn) {
+
+    function initSkillCalculator() {
+        const calculateSkillBtn = document.getElementById('calculate-skill-btn');
+        if (!calculateSkillBtn) return;
+        
         const startSkillInput = document.getElementById('start-skill');
         const desiredSkillInput = document.getElementById('desired-skill');
         const skillResultDiv = document.getElementById('skill-result');
@@ -164,8 +127,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const calculateExpBtn = document.getElementById('calculate-exp-btn');
-    if (calculateExpBtn) {
+    function initExpCalculator() {
+        const calculateExpBtn = document.getElementById('calculate-exp-btn');
+        if (!calculateExpBtn) return;
+
         const currentLevelInput = document.getElementById('current-exp-level');
         const currentExpInput = document.getElementById('current-exp-amount');
         const expResultDiv = document.getElementById('exp-result');
@@ -181,9 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
             acc[rarity] = expCosts[rarity].reduce((a, c, i) => { a.push((a[i-1] || 0) + c); return a; }, []);
             return acc;
         }, {});
-        expTomeToggle.addEventListener('change', () => {
-            expTomeGrid.classList.toggle('visible', expTomeToggle.checked);
-        });
+        expTomeToggle.addEventListener('change', () => expTomeGrid.classList.toggle('visible', expTomeToggle.checked));
         calculateExpBtn.addEventListener('click', () => {
             expResultDiv.innerHTML = '';
             expResultDiv.classList.remove('error');
@@ -222,8 +185,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const calculatePassportBtn = document.getElementById('calculate-passport-btn');
-    if (calculatePassportBtn) {
+    function initPassportCalculator() {
+        const calculatePassportBtn = document.getElementById('calculate-passport-btn');
+        if (!calculatePassportBtn) return;
+        
         const powerInput = document.getElementById('power-input');
         const sameKvkCheckbox = document.getElementById('same-kvk-checkbox');
         const passportResultDiv = document.getElementById('passport-result');
@@ -251,8 +216,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const calculateVipBtn = document.getElementById('calculate-vip-btn');
-    if(calculateVipBtn) {
+    function initVipCalculator() {
+        const calculateVipBtn = document.getElementById('calculate-vip-btn');
+        if(!calculateVipBtn) return;
+        
         const currentVipPointsInput = document.getElementById('current-vip-points');
         const desiredVipLevelSelect = document.getElementById('desired-vip-level');
         const vipResultDiv = document.getElementById('vip-result');
@@ -261,9 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const vipLevels = [ { level: 1, points: 200 }, { level: 2, points: 400 }, { level: 3, points: 1200 }, { level: 4, points: 3500 }, { level: 5, points: 6000 }, { level: 6, points: 11500 }, { level: 7, points: 17500 }, { level: 8, points: 35000 }, { level: 9, points: 75000 }, { level: 10, points: 150000 }, { level: 11, points: 250000 }, { level: 12, points: 350000 }, { level: 13, points: 500000 }, { level: 14, points: 750000 }, { level: 15, points: 1000000 }, { level: 16, points: 1500000 }, { level: 17, points: 2500000 }, { level: 18, points: 4000000 }, { level: 19, points: 6000000 }, { level: 'SVIP', points: 9000000 } ];
 
-        vipTokenToggle.addEventListener('change', () => {
-            vipTokenGrid.classList.toggle('visible', vipTokenToggle.checked);
-        });
+        vipTokenToggle.addEventListener('change', () => vipTokenGrid.classList.toggle('visible', vipTokenToggle.checked));
 
         calculateVipBtn.addEventListener('click', () => {
             vipResultDiv.classList.remove('error');
@@ -295,8 +260,8 @@ document.addEventListener('DOMContentLoaded', function() {
             triggerSuccessAnimation(vipResultDiv);
         });
 
-        const customSelectContainer = document.querySelector('.custom-select-container');
-        if (customSelectContainer) {
+        const customSelectContainer = document.querySelector('.carousel-slide.is-active .custom-select-container');
+        if (customSelectContainer && !customSelectContainer.querySelector('.select-selected')) {
             const selectEl = customSelectContainer.querySelector('select');
             const selectedDiv = document.createElement("DIV");
             selectedDiv.setAttribute("class", "select-selected");
@@ -337,21 +302,23 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             function closeAllSelect(elmnt) {
-                const selectItems = document.getElementsByClassName("select-items");
-                const selectSelected = document.getElementsByClassName("select-selected");
-                for (let i = 0; i < selectSelected.length; i++) {
-                    if (elmnt != selectSelected[i]) selectSelected[i].classList.remove("select-arrow-active");
+                const allSelectItems = document.querySelectorAll(".select-items");
+                const allSelectSelected = document.querySelectorAll(".select-selected");
+                for (let i = 0; i < allSelectSelected.length; i++) {
+                    if (elmnt != allSelectSelected[i]) allSelectSelected[i].classList.remove("select-arrow-active");
                 }
-                for (let i = 0; i < selectItems.length; i++) {
-                    if (elmnt == null || selectItems[i].previousElementSibling != elmnt) selectItems[i].classList.add("select-hide");
+                for (let i = 0; i < allSelectItems.length; i++) {
+                    if (elmnt == null || allSelectItems[i].previousElementSibling != elmnt) allSelectItems[i].classList.add("select-hide");
                 }
             }
             document.addEventListener("click", closeAllSelect);
         }
     }
 
-    const calculateBuildingBtn = document.getElementById('calculate-building-btn');
-    if(calculateBuildingBtn) {
+    function initBuildingCalculator() {
+        const calculateBuildingBtn = document.getElementById('calculate-building-btn');
+        if(!calculateBuildingBtn) return;
+        
         const buildingSelectors = document.querySelectorAll('input[name="building"]');
         const currentLevelInput = document.getElementById('current-level');
         const desiredLevelInput = document.getElementById('desired-level');
@@ -410,4 +377,56 @@ document.addEventListener('DOMContentLoaded', function() {
             triggerSuccessAnimation(buildingResultDiv);
         });
     }
+
+    function triggerSuccessAnimation(element) {
+        if (!element) return;
+        element.classList.remove('result-success');
+        void element.offsetWidth; 
+        element.classList.add('result-success');
+    }
+
+    function animateCounter(element, target, duration, prefix = '') {
+        if (!element) return;
+        element.classList.add('counting-blur');
+        let current = 0;
+        const range = target - current;
+        if (range === 0) {
+            element.textContent = prefix + target.toLocaleString();
+            element.classList.remove('counting-blur');
+            return;
+        }
+        const increment = target > current ? 1 : -1;
+        const stepTime = 16;
+        const totalSteps = duration / stepTime;
+        const incrementAmount = Math.max(1, Math.ceil(Math.abs(range) / totalSteps));
+        const timer = setInterval(() => {
+            current += increment * incrementAmount;
+            if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
+                current = target;
+                clearInterval(timer);
+                element.textContent = prefix + Math.floor(current).toLocaleString();
+                element.classList.remove('counting-blur');
+            } else {
+                element.textContent = prefix + Math.floor(current).toLocaleString();
+            }
+        }, stepTime);
+    }
+    
+    const initCarousel = () => {
+        setTimeout(() => moveToSlide(0), 100);
+    };
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        initCarousel();
+    } else {
+        window.addEventListener('load', initCarousel);
+    }
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            moveToSlide(currentIndex);
+        }, 100);
+    });
 });

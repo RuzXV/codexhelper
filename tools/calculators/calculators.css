@@ -79,16 +79,19 @@
     will-change: transform;
 }
 .carousel-slide {
-    flex: 0 0 50%;
+    flex: 0 0 600px;
+    padding: 0 25px;
     box-sizing: border-box;
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease, filter 0.5s ease;
     transform: scale(0.8);
     opacity: 0.5;
+    filter: blur(2px);
     pointer-events: none;
 }
 .carousel-slide.is-active {
     transform: scale(1);
     opacity: 1;
+    filter: blur(0);
     pointer-events: auto;
 }
 .carousel-arrow {
@@ -112,10 +115,10 @@
     pointer-events: none;
 }
 .carousel-arrow.prev {
-    left: 24%;
+    left: calc(50% - 400px);
 }
 .carousel-arrow.next {
-    right: 24%;
+    right: calc(50% - 400px);
 }
 
 .calculator-island {
@@ -270,13 +273,13 @@
 .select-items div:hover, .same-as-selected { background-color: var(--accent-blue-light); color: var(--text-primary); }
 .select-items div img { width: 24px; height: 24px; }
 
-@media (max-width: 1100px) {
-    .carousel-arrow.prev { left: 20%; }
-    .carousel-arrow.next { right: 20%; }
+@media (max-width: 1200px) {
+    .carousel-arrow.prev { left: calc(50% - 350px); }
+    .carousel-arrow.next { right: calc(50% - 350px); }
 }
 
 @media (max-width: 768px) {
-    .carousel-slide { flex-basis: 100%; transform: scale(1); opacity: 1;}
+    .carousel-slide { flex-basis: 100%; transform: scale(1); opacity: 1; filter: none; padding: 0 10px;}
     .carousel-arrow { display: none; }
 }
 
