@@ -114,10 +114,10 @@
     pointer-events: none;
 }
 .carousel-arrow.prev {
-    left: calc(50% - 375px);
+    left: calc(50% - 360px);
 }
 .carousel-arrow.next {
-    right: calc(50% - 375px);
+    right: calc(50% - 360px);
 }
 
 .calculator-island {
@@ -293,13 +293,13 @@
     .carousel-arrow {
         display: block;
         top: 40%;
-        font-size: 2.5rem;
+        font-size: 2.2rem;
     }
     .carousel-arrow.prev {
-        left: 5px;
+        left: 10px;
     }
     .carousel-arrow.next {
-        right: 5px;
+        right: 10px;
     }
     .calculator-island {
         min-height: auto;
