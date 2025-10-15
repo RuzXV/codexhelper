@@ -142,7 +142,7 @@
                                 <input type="checkbox" id="vip-token-toggle">
                                 <span class="toggle-slider"></span>
                             </label>
-                            <label for="vip-token-toggle" class="toggle-label">Calculate from VIP Tokens</label>
+                            <label for="vip-token-toggle" class="toggle-label">Calculate VIP Tokens</label>
                         </div>
 
                         <div id="vip-token-grid-container" class="vip-token-grid-container">
@@ -172,8 +172,10 @@
                         
                         <div class="form-group">
                             <label for="desired-vip-level">Desired VIP Level</label>
-                            <select id="desired-vip-level">
-                            </select>
+                            <div class="custom-select-container">
+                                <select id="desired-vip-level" style="display: none;">
+                                </select>
+                            </div>
                         </div>
                         <button id="calculate-vip-btn" class="btn-primary">Calculate</button>
                         <div id="vip-result" class="calc-result"></div>

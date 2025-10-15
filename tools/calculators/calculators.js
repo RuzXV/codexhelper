@@ -2,27 +2,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function animateCounter(element, target, duration, prefix = '') {
         if (!element) return;
-
         element.classList.add('counting-blur');
-
-        let start = 0;
-        let current = start;
-        const range = target - start;
-        
+        let current = 0;
+        const range = target - current;
         if (range === 0) {
             element.textContent = prefix + target.toLocaleString();
             element.classList.remove('counting-blur');
             return;
         }
-
-        const increment = target > start ? 1 : -1;
+        const increment = target > current ? 1 : -1;
         const stepTime = 16;
         const totalSteps = duration / stepTime;
         const incrementAmount = Math.max(1, Math.ceil(Math.abs(range) / totalSteps));
-
         const timer = setInterval(() => {
             current += increment * incrementAmount;
-            
             if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
                 current = target;
                 clearInterval(timer);
@@ -45,22 +38,18 @@ document.addEventListener('DOMContentLoaded', function() {
             elite: [10, 10, 10, 10, 10, 20, 20, 20, 20, 20, 30, 30, 30, 30, 30, 40],
             advanced: [10, 10, 10, 10, 10, 10, 10, 10, 10, 20, 20, 20, 20, 20, 20, 30]
         };
-
         const cumulativeCosts = Object.keys(costs).reduce((acc, rarity) => {
             acc[rarity] = costs[rarity].reduce((a, c, i) => { a.push((a[i-1] || 0) + c); return a; }, []);
             return acc;
         }, {});
-        
         function getSkillPoints(skillString) {
             return skillString.split('').reduce((sum, digit) => sum + parseInt(digit, 10), 0) - 4;
         }
-
         calculateSkillBtn.addEventListener('click', () => {
             const start = startSkillInput.value;
             const desired = desiredSkillInput.value;
             const rarity = document.querySelector('input[name="rarity"]:checked').value;
             const sculptureImage = `/images/calculators/${rarity}_sculpture.webp`;
-
             if (!/^[1-5]{4}$/.test(start) || !/^[1-5]{4}$/.test(desired)) {
                 skillResultDiv.textContent = 'Please enter valid 4-digit skill levels (Example: 1111, 5511).';
                 skillResultDiv.classList.add('error');
@@ -116,51 +105,28 @@ document.addEventListener('DOMContentLoaded', function() {
         const vipTokenGrid = document.getElementById('vip-token-grid-container');
         const vipTokenInputs = document.querySelectorAll('.vip-token-input');
         
-        const vipLevels = [
-            { level: 1, points: 200 }, { level: 2, points: 400 }, { level: 3, points: 1200 }, { level: 4, points: 3500 }, { level: 5, points: 6000 }, { level: 6, points: 11500 }, { level: 7, points: 17500 }, { level: 8, points: 35000 }, { level: 9, points: 75000 }, { level: 10, points: 150000 }, { level: 11, points: 250000 }, { level: 12, points: 350000 }, { level: 13, points: 500000 }, { level: 14, points: 750000 }, { level: 15, points: 1000000 }, { level: 16, points: 1500000 }, { level: 17, points: 2500000 }, { level: 18, points: 4000000 }, { level: 19, points: 6000000 }, { level: 'SVIP', points: 9000000 }
-        ];
-
-        vipLevels.forEach(vip => {
-            const option = document.createElement('option');
-            option.value = vip.points;
-            option.textContent = `VIP ${vip.level}`;
-            option.dataset.level = vip.level;
-            desiredVipLevelSelect.appendChild(option);
-        });
+        const vipLevels = [ { level: 1, points: 200 }, { level: 2, points: 400 }, { level: 3, points: 1200 }, { level: 4, points: 3500 }, { level: 5, points: 6000 }, { level: 6, points: 11500 }, { level: 7, points: 17500 }, { level: 8, points: 35000 }, { level: 9, points: 75000 }, { level: 10, points: 150000 }, { level: 11, points: 250000 }, { level: 12, points: 350000 }, { level: 13, points: 500000 }, { level: 14, points: 750000 }, { level: 15, points: 1000000 }, { level: 16, points: 1500000 }, { level: 17, points: 2500000 }, { level: 18, points: 4000000 }, { level: 19, points: 6000000 }, { level: 'SVIP', points: 9000000 } ];
 
         vipTokenToggle.addEventListener('change', () => {
-            const isChecked = vipTokenToggle.checked;
-            vipTokenGrid.classList.toggle('visible', isChecked);
-            currentVipPointsInput.readOnly = isChecked;
-            if(isChecked) {
-                updateVipFromTokens();
-            }
+            vipTokenGrid.classList.toggle('visible', vipTokenToggle.checked);
         });
-
-        function updateVipFromTokens() {
-            let total = 0;
-            vipTokenInputs.forEach(input => {
-                const value = parseInt(input.value, 10) || 0;
-                const tokenValue = parseInt(input.dataset.value, 10);
-                total += value * tokenValue;
-            });
-            currentVipPointsInput.value = total.toLocaleString();
-        }
-
-        vipTokenInputs.forEach(input => input.addEventListener('input', updateVipFromTokens));
 
         calculateVipBtn.addEventListener('click', () => {
             vipResultDiv.classList.remove('error');
-            const currentPoints = parseInt(currentVipPointsInput.value.replace(/,/g, ''), 10);
-            const targetPoints = parseInt(desiredVipLevelSelect.value, 10);
+            let totalPoints = parseInt(currentVipPointsInput.value.replace(/,/g, ''), 10) || 0;
             
-            if(isNaN(currentPoints) || currentPoints < 0) {
-                vipResultDiv.textContent = 'Please enter your current VIP points.';
-                vipResultDiv.classList.add('error');
-                return;
+            if(vipTokenToggle.checked) {
+                vipTokenInputs.forEach(input => {
+                    const count = parseInt(input.value, 10) || 0;
+                    const value = parseInt(input.dataset.value, 10);
+                    totalPoints += count * value;
+                });
             }
 
-            const pointsNeeded = targetPoints - currentPoints;
+            const targetPoints = parseInt(desiredVipLevelSelect.value, 10);
+            if (isNaN(targetPoints)) { vipResultDiv.textContent = 'Please select a desired VIP level.'; vipResultDiv.classList.add('error'); return; }
+
+            const pointsNeeded = targetPoints - totalPoints;
 
             if(pointsNeeded <= 0) {
                 vipResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have reached or surpassed this level!</span>`;
@@ -169,14 +135,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const selectedOption = desiredVipLevelSelect.options[desiredVipLevelSelect.selectedIndex];
             const levelName = selectedOption.dataset.level;
-            const levelImage = `/images/calculators/vip/vip${levelName.toLowerCase()}.webp`;
+            const levelImage = `/images/calculators/vip/${levelName.toLowerCase() === 'svip' ? 'svip' : 'vip' + levelName}.webp`;
 
-            vipResultDiv.innerHTML = `
-                <img src="${levelImage}" alt="VIP ${levelName}">
-                <span>Needs <strong id="vip-points-needed">0</strong> more points for VIP ${levelName}</span>
-            `;
+            const levelText = levelName === 'SVIP' ? 'SVIP' : `VIP ${levelName}`;
+            vipResultDiv.innerHTML = `<img src="${levelImage}" alt="${levelText}"><span>Needs <strong id="vip-points-needed">0</strong> more points for ${levelText}</span>`;
             animateCounter(document.getElementById('vip-points-needed'), pointsNeeded, 700);
         });
+
+        const customSelectContainer = document.querySelector('.custom-select-container');
+        const selectEl = customSelectContainer.querySelector('select');
+
+        const selectedDiv = document.createElement("DIV");
+        selectedDiv.setAttribute("class", "select-selected");
+        customSelectContainer.appendChild(selectedDiv);
+
+        const optionsDiv = document.createElement("DIV");
+        optionsDiv.setAttribute("class", "select-items select-hide");
+
+        vipLevels.forEach((vip, index) => {
+            const option = document.createElement('option');
+            option.value = vip.points;
+            option.dataset.level = vip.level;
+            selectEl.appendChild(option);
+
+            const itemDiv = document.createElement("DIV");
+            const levelName = vip.level === 'SVIP' ? 'SVIP' : `VIP ${vip.level}`;
+            const iconName = vip.level.toString().toLowerCase();
+            const iconPath = `/images/calculators/vip/${iconName === 'svip' ? 'svip' : 'vip' + iconName}.webp`;
+            itemDiv.innerHTML = `<img src="${iconPath}" alt="${levelName}">${levelName}`;
+            itemDiv.addEventListener("click", function() {
+                selectEl.selectedIndex = index;
+                selectedDiv.innerHTML = this.innerHTML;
+                const sameAsSelected = optionsDiv.getElementsByClassName("same-as-selected");
+                for (let i = 0; i < sameAsSelected.length; i++) {
+                    sameAsSelected[i].classList.remove("same-as-selected");
+                }
+                this.setAttribute("class", "same-as-selected");
+                closeAllSelect();
+            });
+            optionsDiv.appendChild(itemDiv);
+        });
+        
+        customSelectContainer.appendChild(optionsDiv);
+        selectedDiv.innerHTML = optionsDiv.querySelector('div:last-child').innerHTML;
+        selectEl.selectedIndex = vipLevels.length -1;
+        
+        selectedDiv.addEventListener("click", function(e) {
+            e.stopPropagation();
+            closeAllSelect(this);
+            optionsDiv.classList.toggle("select-hide");
+            this.classList.toggle("select-arrow-active");
+        });
+
+        function closeAllSelect(elmnt) {
+            const selectItems = document.getElementsByClassName("select-items");
+            const selectSelected = document.getElementsByClassName("select-selected");
+            for (let i = 0; i < selectSelected.length; i++) {
+                if (elmnt != selectSelected[i]) {
+                    selectSelected[i].classList.remove("select-arrow-active");
+                }
+            }
+            for (let i = 0; i < selectItems.length; i++) {
+                if (elmnt == null || selectItems[i].previousElementSibling != elmnt) {
+                    selectItems[i].classList.add("select-hide");
+                }
+            }
+        }
+        document.addEventListener("click", closeAllSelect);
     }
 
     const calculateBuildingBtn = document.getElementById('calculate-building-btn');

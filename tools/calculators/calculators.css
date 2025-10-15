@@ -65,8 +65,7 @@
 .island-content .form-group { margin-bottom: var(--spacing-4); }
 .island-content label { display: block; font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-2); }
 .island-content input[type="text"],
-.island-content input[type="number"],
-.island-content select {
+.island-content input[type="number"] {
     width: 100%;
     background: var(--bg-primary);
     border: 1px solid var(--border-hover);
@@ -76,23 +75,21 @@
     font-size: var(--font-size-base);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
+.island-content input[type="number"]::-webkit-outer-spin-button,
+.island-content input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.island-content input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 .island-content input[type="text"]:focus,
-.island-content input[type="number"]:focus,
-.island-content select:focus {
+.island-content input[type="number"]:focus {
     outline: none;
     border-color: var(--accent-blue);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-.island-content select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
 }
 
 .island-content .btn-primary { width: 100%; margin-top: var(--spacing-2); }
@@ -198,7 +195,6 @@
     margin-left: 8px;
 }
 
-/* New Toggle Switch Styles */
 .form-group-toggle {
     display: flex;
     align-items: center;
@@ -296,6 +292,7 @@
     flex-direction: column;
     gap: var(--spacing-3);
     align-items: center;
+    justify-content: center;
 }
 
 .cost-line {
@@ -334,67 +331,112 @@
     overflow: hidden;
     transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out;
 }
-
 .vip-token-grid-container.visible {
     max-height: 300px;
     margin-top: var(--spacing-4);
 }
-
 .vip-token-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: var(--spacing-3);
 }
-
 .vip-token-item {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-hover);
     border-radius: var(--radius-md);
-    padding: var(--spacing-3);
-    text-align: center;
+    padding: var(--spacing-2);
     position: relative;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
 }
-
-.vip-token-item:nth-child(1),
-.vip-token-item:nth-child(2),
-.vip-token-item:nth-child(3) {
-    grid-column: span 2;
-}
-.vip-token-item:nth-child(4),
-.vip-token-item:nth-child(5) {
-    grid-column: span 3;
-}
-
-
+.vip-token-item:nth-child(1), .vip-token-item:nth-child(2) { grid-column: span 3; }
+.vip-token-item:nth-child(3), .vip-token-item:nth-child(4), .vip-token-item:nth-child(5) { grid-column: span 2; }
 .vip-token-item::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    border-radius: inherit;
-    z-index: 0;
-    opacity: 0.2;
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    border-radius: inherit; z-index: 0; opacity: 0.2;
 }
-
 .vip-token-item.legendary::after { background-image: radial-gradient(circle, #f28d00 0%, #d55800 100%); }
 .vip-token-item.epic::after { background-image: radial-gradient(circle, #ca62e6 0%, #8113a7 100%); }
 .vip-token-item.elite::after { background-image: radial-gradient(circle, #00a2d4 0%, #006d97 100%); }
 .vip-token-item.advanced::after { background-image: radial-gradient(circle, #00be21 0%, #046c04 100%); }
 .vip-token-item.common::after { background-image: radial-gradient(circle, #a1a7b7 0%, #4b5260 100%); }
-
 .vip-token-item img {
-    width: 32px;
-    height: 32px;
-    margin: 0 auto var(--spacing-2);
-    position: relative;
-    z-index: 1;
+    width: 28px; height: 28px; position: relative; z-index: 1; flex-shrink: 0;
+}
+.vip-token-item input {
+    padding: var(--spacing-2); text-align: center; position: relative; z-index: 1;
+    font-size: var(--font-size-sm); border-radius: var(--radius-sm); width: 100%;
 }
 
-.vip-token-item input {
-    padding: var(--spacing-2);
-    text-align: center;
+.custom-select-container {
     position: relative;
-    z-index: 1;
-    font-size: var(--font-size-sm);
+}
+.select-selected {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-3);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.select-selected.select-arrow-active {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+.select-selected img {
+    width: 24px;
+    height: 24px;
+}
+.select-selected::after {
+    content: "";
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    width: 1.5em;
+    height: 1.5em;
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+.select-selected.select-arrow-active::after {
+    transform: rotate(180deg);
+}
+.select-items {
+    position: absolute;
+    background-color: var(--bg-tertiary);
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 99;
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius-sm);
+    max-height: 200px;
+    overflow-y: auto;
+}
+.select-hide {
+    display: none;
+}
+.select-items div {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    color: var(--text-secondary);
+    padding: var(--spacing-3);
+    cursor: pointer;
+}
+.select-items div:hover, .same-as-selected {
+    background-color: var(--accent-blue-light);
+    color: var(--text-primary);
+}
+.select-items div img {
+    width: 24px;
+    height: 24px;
 }
