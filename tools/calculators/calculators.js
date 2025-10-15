@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    document.body.style.overflowX = 'visible';
     const track = document.querySelector('.carousel-track');
     const slides = Array.from(track.children);
     const nextButton = document.getElementById('next-slide');
