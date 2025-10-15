@@ -343,6 +343,7 @@
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: var(--spacing-3);
+    align-content: start;
 }
 
 .vip-token-item {
