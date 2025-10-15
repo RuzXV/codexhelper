@@ -6,43 +6,51 @@ document.addEventListener('DOMContentLoaded', function() {
     const quickNav = document.getElementById('quick-access-nav');
     const mainTitle = document.getElementById('calculator-main-title');
     const mainDescription = document.getElementById('calculator-main-description');
-
-    let currentIndex = 0;
     
-    if (slides.length > 0) {
+    if (slides.length > 1) {
+        const firstClone = slides[0].cloneNode(true);
+        const lastClone = slides[slides.length - 1].cloneNode(true);
+        firstClone.id = 'first-clone';
+        lastClone.id = 'last-clone';
+        track.appendChild(firstClone);
+        track.insertBefore(lastClone, slides[0]);
+
+        const allSlides = Array.from(track.children);
+        let currentIndex = 1;
+        let isTransitioning = false;
+
         const setSlidePositions = () => {
-            const slideWidth = track.clientWidth;
-            slides.forEach((slide, index) => {
+             const slideWidth = track.clientWidth;
+             allSlides.forEach((slide, index) => {
                 slide.style.left = slideWidth * index + 'px';
             });
         };
 
-        const moveToSlide = (targetIndex) => {
+        const moveToSlide = (targetIndex, useTransition = true) => {
+            isTransitioning = true;
             const slideWidth = track.clientWidth;
-            track.style.transform = 'translateX(-' + (slideWidth * targetIndex) + 'px)';
+            track.style.transition = useTransition ? 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
+            track.style.transform = `translateX(-${slideWidth * targetIndex}px)`;
             
-            if (slides[currentIndex]) {
-                slides[currentIndex].classList.remove('is-active');
-            }
-            if (slides[targetIndex]) {
-                slides[targetIndex].classList.add('is-active');
-            }
-            
+            allSlides.forEach(s => s.classList.remove('is-active'));
+            allSlides[targetIndex].classList.add('is-active');
+
             currentIndex = targetIndex;
             updateUI();
         };
 
         const updateUI = () => {
-            const currentSlide = slides[currentIndex];
+            const currentRealIndex = (currentIndex - 1 + slides.length) % slides.length;
+            const currentSlide = slides[currentRealIndex];
             if (!currentSlide) return;
 
-            const calculatorIsland = currentSlide.querySelector('.calculator-island');
+            const calculatorIsland = allSlides[currentIndex].querySelector('.calculator-island');
 
             mainTitle.innerHTML = `<img src="${currentSlide.dataset.icon}" alt=""> ${currentSlide.dataset.title}`;
             mainDescription.textContent = currentSlide.dataset.description;
 
             Array.from(quickNav.children).forEach((btn, index) => {
-                btn.classList.toggle('active', index === currentIndex);
+                btn.classList.toggle('active', index === currentRealIndex);
             });
 
             if (calculatorIsland) {
@@ -53,26 +61,40 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
 
-        prevButton.addEventListener('click', () => moveToSlide((currentIndex - 1 + slides.length) % slides.length));
-        nextButton.addEventListener('click', () => moveToSlide((currentIndex + 1) % slides.length));
+        nextButton.addEventListener('click', () => {
+            if (isTransitioning) return;
+            moveToSlide(currentIndex + 1);
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (isTransitioning) return;
+            moveToSlide(currentIndex - 1);
+        });
+
+        track.addEventListener('transitionend', () => {
+            isTransitioning = false;
+            if (allSlides[currentIndex].id === 'first-clone') {
+                moveToSlide(1, false);
+            }
+            if (allSlides[currentIndex].id === 'last-clone') {
+                moveToSlide(slides.length, false);
+            }
+        });
 
         slides.forEach((slide, index) => {
             const button = document.createElement('button');
             button.classList.add('quick-access-btn');
             button.innerHTML = `<img src="${slide.dataset.icon}" alt=""><span>${slide.dataset.title}</span>`;
-            button.addEventListener('click', () => moveToSlide(index));
+            button.addEventListener('click', () => moveToSlide(index + 1));
             quickNav.appendChild(button);
         });
         
         setSlidePositions();
-        moveToSlide(0);
+        moveToSlide(currentIndex, false);
+
         window.addEventListener('resize', () => {
             setSlidePositions();
-            track.style.transition = 'none';
-            moveToSlide(currentIndex);
-            setTimeout(() => {
-                track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-            }, 50);
+            moveToSlide(currentIndex, false);
         });
     }
 
