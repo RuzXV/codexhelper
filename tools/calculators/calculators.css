@@ -330,8 +330,7 @@
 .vip-token-grid-container {
     display: grid;
     grid-template-rows: 0fr;
-    overflow: hidden;
-    transition: grid-template-rows 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-bottom 0.5s ease-in-out;
+    transition: grid-template-rows 0.4s ease-out, margin-top 0.4s ease-out, margin-bottom 0.4s ease-out;
 }
 .vip-token-grid-container.visible {
     grid-template-rows: 1fr;
@@ -339,11 +338,13 @@
     margin-bottom: var(--spacing-4);
 }
 .vip-token-grid {
+    overflow: hidden;
+    min-height: 0;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: var(--spacing-3);
-    min-height: 0;
 }
+
 .vip-token-item {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-hover);
