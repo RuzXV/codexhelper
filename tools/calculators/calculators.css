@@ -328,20 +328,21 @@
 }
 
 .vip-token-grid-container {
-    max-height: 0;
+    display: grid;
+    grid-template-rows: 0fr;
     overflow: hidden;
-    transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out;
+    transition: grid-template-rows 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-bottom 0.5s ease-in-out;
 }
 .vip-token-grid-container.visible {
-    max-height: 300px;
+    grid-template-rows: 1fr;
     margin-top: var(--spacing-4);
     margin-bottom: var(--spacing-4);
 }
-
 .vip-token-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: var(--spacing-3);
+    min-height: 0;
 }
 .vip-token-item {
     background: var(--bg-tertiary);
