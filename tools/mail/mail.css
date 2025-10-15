@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'NotoSansHans DemiLight';
+    src: url('NotoSansHans-DemiLight.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 .navbar {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -378,8 +385,8 @@
     overflow: hidden;
     
     border-style: solid;
-    border-width: 25px 25px; 
-    border-image-slice: 25 25 fill;
+    border-width: 25px 15px;
+    border-image-slice: 25 15 fill;
     border-image-repeat: stretch;
 }
 
@@ -392,17 +399,18 @@
 }
 
 #mail-preview {
+    font-family: 'NotoSansHans DemiLight', var(--font-family);
     position: relative;
     z-index: 1;
     width: 100%;
     height: 100%;
-    line-height: 1.6;
-    font-size: 15px;
+    line-height: 1.5;
+    font-size: 14.5px;
     word-wrap: break-word;
     color: #e0e0e0;
     overflow-y: auto;
     white-space: pre-wrap;
-
+    padding: 0 2px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
