@@ -114,10 +114,10 @@
     pointer-events: none;
 }
 .carousel-arrow.prev {
-    left: calc(50% - 450px);
+    left: calc(50% - 375px);
 }
 .carousel-arrow.next {
-    right: calc(50% - 450px);
+    right: calc(50% - 375px);
 }
 
 .calculator-island {
@@ -221,7 +221,7 @@
     transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-bottom 0.5s ease-in-out;
 }
 .vip-token-grid-container.visible { max-height: 300px; margin: var(--spacing-4) 0; }
-.exp-tome-grid-container.visible { max-height: 300px; margin: var(--spacing-4) 0; }
+.exp-tome-grid-container.visible { max-height: 400px; margin: var(--spacing-4) 0; }
 .vip-token-grid, .exp-tome-grid {
     display: grid; gap: var(--spacing-3);
 }
@@ -283,11 +283,11 @@
         align-items: flex-start;
     }
     .carousel-slide {
-        flex: 0 0 85%;
+        flex: 0 0 100%;
         transform: none;
         opacity: 1;
         filter: none;
-        padding: 0;
+        padding: 0 var(--spacing-12);
         pointer-events: auto;
     }
     .carousel-arrow {
@@ -296,10 +296,10 @@
         font-size: 2.5rem;
     }
     .carousel-arrow.prev {
-        left: -5px;
+        left: 5px;
     }
     .carousel-arrow.next {
-        right: -5px;
+        right: 5px;
     }
     .calculator-island {
         min-height: auto;

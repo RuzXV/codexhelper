@@ -200,6 +200,36 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentPassportsInput = document.getElementById('current-passports-input');
         const costResultDiv = document.getElementById('cost-result');
         const passportBrackets = [ { maxPower: 9999999, normal: 1, discount: 1 }, { maxPower: 14999999, normal: 2, discount: 1 }, { maxPower: 19999999, normal: 3, discount: 1 }, { maxPower: 24999999, normal: 4, discount: 1 }, { maxPower: 29999999, normal: 6, discount: 1 }, { maxPower: 34999999, normal: 9, discount: 2 }, { maxPower: 39999999, normal: 12, discount: 3 }, { maxPower: 44999999, normal: 15, discount: 5 }, { maxPower: 49999999, normal: 20, discount: 8 }, { maxPower: 54999999, normal: 25, discount: 12 }, { maxPower: 59999999, normal: 30, discount: 15 }, { maxPower: 64999999, normal: 35, discount: 20 }, { maxPower: 69999999, normal: 40, discount: 25 }, { maxPower: 74999999, normal: 45, discount: 32 }, { maxPower: 79999999, normal: 50, discount: 40 }, { maxPower: 84999999, normal: 55, discount: 47 }, { maxPower: 89999999, normal: 60, discount: 54 }, { maxPower: 94999999, normal: 65, discount: 61 }, { maxPower: 99999999, normal: 70, discount: 67 }, { maxPower: Infinity, normal: 75, discount: 73 } ];
+        
+        function calculateBundleCost(passportsNeeded) {
+            if (passportsNeeded <= 0) return 0;
+
+            let cost = 0;
+            let passportsObtained = 0;
+            const tiers = [
+                { cost: 5, passports: 1 },
+                { cost: 10, passports: 2 },
+                { cost: 20, passports: 3 },
+                { cost: 50, passports: 4 },
+            ];
+
+            for (const tier of tiers) {
+                if (passportsObtained < passportsNeeded) {
+                    cost += tier.cost;
+                    passportsObtained += tier.passports;
+                } else {
+                    break;
+                }
+            }
+
+            if (passportsObtained < passportsNeeded) {
+                const remainingPassports = passportsNeeded - passportsObtained;
+                const hundredDollarBundlesNeeded = Math.ceil(remainingPassports / 5);
+                cost += hundredDollarBundlesNeeded * 100;
+            }
+            return cost;
+        }
+
         calculatePassportBtn.addEventListener('click', () => {
             passportResultDiv.innerHTML = ''; costResultDiv.innerHTML = ''; passportResultDiv.classList.remove('error'); costResultDiv.classList.remove('error');
             const power = parseInt(powerInput.value.replace(/,/g, ''), 10);
@@ -210,14 +240,28 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentPassports = parseInt(currentPassportsInput.value.trim(), 10) || 0;
             if (isNaN(currentPassports) || currentPassports < 0) { costResultDiv.textContent = 'Current passports must be a positive number.'; costResultDiv.classList.add('error'); return; }
             const passportsNeeded = requiredPassports - currentPassports;
-            if (passportsNeeded <= 0 && currentPassportsInput.value.trim()) { passportResultDiv.innerHTML = `<i class="fas fa-check-circle"></i><span>You have enough passports!</span>`; } else { passportResultDiv.innerHTML = `<img src="/images/calculators/passport.webp" alt="Passport"><span>Requires <strong id="passport-value">0</strong> Passports</span>`; animateCounter(document.getElementById('passport-value'), passportsNeeded > 0 ? passportsNeeded : requiredPassports, 700); }
-            if (passportsNeeded <= 0) { costResultDiv.innerHTML = `<span>No additional cost required.</span>`; } else {
-                costResultDiv.innerHTML = `<div class="cost-line"><span>Credit Cost: <strong id="credit-cost-value">0</strong></span><img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit"></div><div class="cost-line"><span>New World Cost: <strong id="usd-cost-value">0</strong></span><img src="/images/calculators/bundle.webp" alt="Bundle"></div>`;
-                if (passportsNeeded > 85) { costResultDiv.innerHTML += `<small style='color: var(--text-secondary); margin-top: 5px;'>Note: Max passports from bundles per month is 85.</small>`; }
-                animateCounter(document.getElementById('credit-cost-value'), passportsNeeded * 600000, 700);
-                 triggerSuccessAnimation(costResultDiv);
+
+            if (passportsNeeded <= 0 && currentPassportsInput.value.trim()) { 
+                passportResultDiv.innerHTML = `<i class="fas fa-check-circle"></i><span>You have enough passports!</span>`; 
+            } else { 
+                passportResultDiv.innerHTML = `<img src="/images/calculators/passport.webp" alt="Passport"><span>Requires <strong id="passport-value">0</strong> Passports</span>`; 
+                animateCounter(document.getElementById('passport-value'), passportsNeeded > 0 ? passportsNeeded : requiredPassports, 700); 
             }
-             triggerSuccessAnimation(passportResultDiv);
+
+            if (passportsNeeded <= 0) { 
+                costResultDiv.innerHTML = `<span>No additional cost required.</span>`; 
+            } else {
+                costResultDiv.innerHTML = `<div class="cost-line"><span>Credit Cost: <strong id="credit-cost-value">0</strong></span><img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit"></div><div class="cost-line"><span>New World Cost: <strong id="usd-cost-value">0</strong></span><img src="/images/calculators/bundle.webp" alt="Bundle"></div>`;
+                const totalPassportsFromBundles = (1 + 2 + 3 + 4) + (15 * 5); // 85
+                if (passportsNeeded > totalPassportsFromBundles) { 
+                    costResultDiv.innerHTML += `<small style='color: var(--text-secondary); margin-top: 5px;'>Note: Max passports from bundles per month is ${totalPassportsFromBundles}.</small>`; 
+                }
+                const bundleCost = calculateBundleCost(passportsNeeded);
+                animateCounter(document.getElementById('credit-cost-value'), passportsNeeded * 600000, 700);
+                animateCounter(document.getElementById('usd-cost-value'), bundleCost, 700, '$');
+                triggerSuccessAnimation(costResultDiv);
+            }
+            triggerSuccessAnimation(passportResultDiv);
         });
     }
 
