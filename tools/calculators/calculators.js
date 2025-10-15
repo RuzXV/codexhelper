@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
     
-            const totalExpToReachCurrentLevel = currentLevel > 1 ? cumulativeExp[rarity][currentLevel - 2] : 0;
+            const totalExpToReachCurrentLevel = currentLevel > 2 ? cumulativeExp[rarity][currentLevel - 3] : 0;
             const totalCurrentExp = totalExpToReachCurrentLevel + currentExp;
     
             const totalExpToReachMaxLevel = cumulativeExp[rarity][maxLevel - 2];
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 expResultDiv.classList.add('error'); 
                 return;
             }
-
+    
             let expNeeded = totalExpToReachMaxLevel - totalCurrentExp;
     
             let totalTomeExp = 0;
