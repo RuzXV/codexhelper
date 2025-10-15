@@ -83,6 +83,7 @@
 }
 .island-content input[type="number"] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .island-content input[type="text"]:focus,
@@ -326,6 +327,7 @@
     text-shadow: 0 0 8px rgba(90, 160, 255, 0.5);
 }
 
+/* VIP Token Grid */
 .vip-token-grid-container {
     max-height: 0;
     overflow: hidden;
@@ -368,8 +370,10 @@
 .vip-token-item input {
     padding: var(--spacing-2); text-align: center; position: relative; z-index: 1;
     font-size: var(--font-size-sm); border-radius: var(--radius-sm); width: 100%;
+    transition: font-size 0.1s ease-out;
 }
 
+/* Custom Select Menu */
 .custom-select-container {
     position: relative;
 }

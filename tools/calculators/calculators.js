@@ -142,13 +142,26 @@ document.addEventListener('DOMContentLoaded', function() {
             animateCounter(document.getElementById('vip-points-needed'), pointsNeeded, 700);
         });
 
+        function adjustInputFontSize(input) {
+            const defaultFontSize = 14;
+            const minFontSize = 10;
+            let currentFontSize = defaultFontSize;
+            input.style.fontSize = `${defaultFontSize}px`;
+            while (input.scrollWidth > input.clientWidth && currentFontSize > minFontSize) {
+                currentFontSize--;
+                input.style.fontSize = `${currentFontSize}px`;
+            }
+        }
+        vipTokenInputs.forEach(input => {
+            input.addEventListener('input', () => adjustInputFontSize(input));
+            adjustInputFontSize(input);
+        });
+
         const customSelectContainer = document.querySelector('.custom-select-container');
         const selectEl = customSelectContainer.querySelector('select');
-
         const selectedDiv = document.createElement("DIV");
         selectedDiv.setAttribute("class", "select-selected");
         customSelectContainer.appendChild(selectedDiv);
-
         const optionsDiv = document.createElement("DIV");
         optionsDiv.setAttribute("class", "select-items select-hide");
 
@@ -166,11 +179,8 @@ document.addEventListener('DOMContentLoaded', function() {
             itemDiv.addEventListener("click", function() {
                 selectEl.selectedIndex = index;
                 selectedDiv.innerHTML = this.innerHTML;
-                const sameAsSelected = optionsDiv.getElementsByClassName("same-as-selected");
-                for (let i = 0; i < sameAsSelected.length; i++) {
-                    sameAsSelected[i].classList.remove("same-as-selected");
-                }
-                this.setAttribute("class", "same-as-selected");
+                Array.from(optionsDiv.getElementsByClassName("same-as-selected")).forEach(el => el.classList.remove("same-as-selected"));
+                this.classList.add("same-as-selected");
                 closeAllSelect();
             });
             optionsDiv.appendChild(itemDiv);
@@ -178,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         customSelectContainer.appendChild(optionsDiv);
         selectedDiv.innerHTML = optionsDiv.querySelector('div:last-child').innerHTML;
-        selectEl.selectedIndex = vipLevels.length -1;
+        selectEl.selectedIndex = vipLevels.length - 1;
         
         selectedDiv.addEventListener("click", function(e) {
             e.stopPropagation();
@@ -191,14 +201,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const selectItems = document.getElementsByClassName("select-items");
             const selectSelected = document.getElementsByClassName("select-selected");
             for (let i = 0; i < selectSelected.length; i++) {
-                if (elmnt != selectSelected[i]) {
-                    selectSelected[i].classList.remove("select-arrow-active");
-                }
+                if (elmnt != selectSelected[i]) selectSelected[i].classList.remove("select-arrow-active");
             }
             for (let i = 0; i < selectItems.length; i++) {
-                if (elmnt == null || selectItems[i].previousElementSibling != elmnt) {
-                    selectItems[i].classList.add("select-hide");
-                }
+                if (elmnt == null || selectItems[i].previousElementSibling != elmnt) selectItems[i].classList.add("select-hide");
             }
         }
         document.addEventListener("click", closeAllSelect);
