@@ -15,13 +15,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const moveToSlide = (targetIndex) => {
         if (!slides.length || !slides[targetIndex]) return;
 
-        const containerWidth = container.getBoundingClientRect().width;
-        const targetSlide = slides[targetIndex];
-        
-        const slideWidth = 600; 
-        const targetLeft = targetSlide.offsetLeft;
-        
-        const newTransform = -(targetLeft - (containerWidth / 2) + (slideWidth / 2));
+        let newTransform;
+        if (window.innerWidth <= 768) {
+            const slideWidth = container.clientWidth;
+            newTransform = -(targetIndex * slideWidth);
+        } else {
+            const containerWidth = container.clientWidth;
+            const targetSlide = slides[targetIndex];
+            const slideWidth = targetSlide.clientWidth;
+            const targetLeft = targetSlide.offsetLeft;
+            newTransform = -(targetLeft - (containerWidth / 2) + (slideWidth / 2));
+        }
+
         track.style.transform = `translateX(${newTransform}px)`;
         
         slides.forEach((slide, index) => {
@@ -30,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         currentIndex = targetIndex;
         updateUI();
-        
         initializeCalculator(targetIndex);
     };
 
@@ -67,9 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function initializeCalculator(index) {
         const targetSlide = slides[index];
-        if (!targetSlide || targetSlide.dataset.initialized === 'true') {
-            return;
-        }
+        if (!targetSlide || targetSlide.dataset.initialized === 'true') return;
 
         switch(index) {
             case 0: initSkillCalculator(); break;
@@ -412,21 +414,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }, stepTime);
     }
     
-    const initCarousel = () => {
-        setTimeout(() => moveToSlide(0), 100);
+    const initAndResize = () => {
+        setTimeout(() => moveToSlide(currentIndex), 50);
     };
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        initCarousel();
+        initAndResize();
     } else {
-        window.addEventListener('load', initCarousel);
+        window.addEventListener('load', initAndResize);
     }
 
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            moveToSlide(currentIndex);
-        }, 100);
+        resizeTimer = setTimeout(initAndResize, 100);
     });
 });

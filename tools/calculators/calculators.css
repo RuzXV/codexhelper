@@ -96,7 +96,7 @@
 }
 .carousel-arrow {
     position: absolute;
-    top: 50%;
+    top: 35%;
     transform: translateY(-50%);
     background: transparent;
     border: none;
@@ -115,10 +115,10 @@
     pointer-events: none;
 }
 .carousel-arrow.prev {
-    left: calc(50% - 400px);
+    left: calc(50% - 420px);
 }
 .carousel-arrow.next {
-    right: calc(50% - 400px);
+    right: calc(50% - 420px);
 }
 
 .calculator-island {
@@ -129,6 +129,7 @@
     width: 100%;
     max-width: 550px;
     margin: 0 auto;
+    min-height: 550px;
 }
 
 .island-content .form-group { margin-bottom: var(--spacing-4); }
@@ -274,13 +275,40 @@
 .select-items div img { width: 24px; height: 24px; }
 
 @media (max-width: 1200px) {
-    .carousel-arrow.prev { left: calc(50% - 350px); }
-    .carousel-arrow.next { right: calc(50% - 350px); }
+    .carousel-arrow.prev { left: calc(50% - 380px); }
+    .carousel-arrow.next { right: calc(50% - 380px); }
 }
 
 @media (max-width: 768px) {
-    .carousel-slide { flex-basis: 100%; transform: scale(1); opacity: 1; filter: none; padding: 0 10px;}
-    .carousel-arrow { display: none; }
+    .carousel-track {
+        align-items: flex-start;
+    }
+    .carousel-slide {
+        flex: 0 0 100%;
+        transform: none;
+        opacity: 1;
+        filter: none;
+        padding: 0 15px;
+        pointer-events: auto;
+    }
+    .carousel-arrow {
+        display: block;
+        top: 40%;
+        font-size: 2.5rem;
+    }
+    .carousel-arrow.prev {
+        left: 5px;
+    }
+    .carousel-arrow.next {
+        right: 5px;
+    }
+    .calculator-island {
+        min-height: auto;
+    }
+    .quick-access-nav {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
 }
 
 @media (max-width: 480px) {
