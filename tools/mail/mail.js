@@ -133,7 +133,12 @@ document.addEventListener('DOMContentLoaded', function() {
         let previewText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         previewText = previewText.replace(/&lt;b&gt;(.*?)&lt;\/b&gt;/gis, '<strong>$1</strong>');
         previewText = previewText.replace(/&lt;i&gt;(.*?)&lt;\/i&gt;/gis, '<em>$1</em>');
-        previewText = previewText.replace(/&lt;size=(\d+)&gt;(.*?)&lt;\/size&gt;/gis, '<span style="font-size: $1px;">$2</span>');
+        
+        previewText = previewText.replace(/&lt;size=(\d+)&gt;(.*?)&lt;\/size&gt;/gis, (match, size, content) => {
+            const scaledSize = parseFloat(size) * 0.9;
+            return `<span style="font-size: ${scaledSize}px;">${content}</span>`;
+        });
+
         previewText = previewText.replace(/&lt;color=([a-zA-Z0-9#]+)&gt;(.*?)&lt;\/color&gt;/gis, (match, colorValue, content) => {
             return `<span style="color: ${colorValue};">${content}</span>`;
         });
