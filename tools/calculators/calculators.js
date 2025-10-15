@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function initExpCalculator() {
         const calculateExpBtn = document.getElementById('calculate-exp-btn');
         if (!calculateExpBtn) return;
-
+    
         const currentLevelInput = document.getElementById('current-exp-level');
         const currentExpInput = document.getElementById('current-exp-amount');
         const expResultDiv = document.getElementById('exp-result');
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
             advanced: [0, 60, 180, 360, 600, 1800, 3600, 5400, 7200, 9000, 11100, 13500, 16200, 19200, 22500, 26100, 30000, 33900, 37800, 42000, 45000, 48000, 51600, 55200, 58800, 63000, 67200, 71400, 75600, 81000, 90000, 102000, 117000, 135000, 156000, 180000, 207000, 237000, 270000, 330000, 405000, 480000, 570000, 660000, 765000, 870000, 990000, 1110000, 1245000, 1380000]
         };
         const cumulativeExp = Object.keys(expCosts).reduce((acc, rarity) => {
-            acc[rarity] = expCosts[rarity].reduce((a, c, i) => { a.push((a[i-1] || 0) + c); return a; }, []);
+            acc[rarity] = expCosts[rarity].reduce((a, c, i) => { a.push((a[i - 1] || 0) + c); return a; }, []);
             return acc;
         }, {});
         expTomeToggle.addEventListener('change', () => expTomeGrid.classList.toggle('visible', expTomeToggle.checked));
@@ -157,21 +157,30 @@ document.addEventListener('DOMContentLoaded', function() {
             expResultDiv.classList.remove('error');
             const rarity = document.querySelector('input[name="exp-rarity"]:checked').value;
             const currentLevel = parseInt(currentLevelInput.value, 10);
-            const currentExp = parseInt(currentExpInput.value.replace(/,/g, ''), 10) || 0;
+            const currentExpInputValue = currentExpInput.value.replace(/,/g, '');
+            const currentExp = parseFloat(currentExpInputValue);
             const maxLevel = rarity === 'advanced' ? 50 : 60;
+    
             if (isNaN(currentLevel) || currentLevel < 1 || currentLevel >= maxLevel) {
                 expResultDiv.textContent = `Please enter a valid level between 1 and ${maxLevel - 1}.`;
                 expResultDiv.classList.add('error'); return;
             }
-            if (currentLevel === maxLevel) {
-                expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>This commander is already at max level!</span>`;
-                triggerSuccessAnimation(expResultDiv);
+    
+            if (Number.isNaN(currentExp) && currentExpInputValue.trim() !== "") {
+                expResultDiv.textContent = "Please enter a valid number for current EXP.";
+                expResultDiv.classList.add('error');
                 return;
             }
+            
+            if (Number.isNaN(currentExp) && currentExpInputValue.trim() === "") {
+              currentExp = 0;
+            }
+    
             const expForCurrentLevel = cumulativeExp[rarity][currentLevel - 1];
             const totalCurrentExp = expForCurrentLevel + currentExp;
             const totalMaxExp = cumulativeExp[rarity][maxLevel - 1];
             let expNeeded = totalMaxExp - totalCurrentExp;
+    
             if (expTomeToggle.checked) {
                 const expTomeInputs = document.querySelectorAll('.exp-tome-input');
                 let tomeExp = 0;
@@ -180,6 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 expNeeded -= tomeExp;
             }
+    
             if (expNeeded <= 0) {
                 expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have enough EXP to reach level ${maxLevel}!</span>`;
             } else {
