@@ -63,7 +63,7 @@
 .quick-access-btn:hover { background: var(--bg-tertiary); border-color: var(--border-hover); }
 .quick-access-btn.active { background: var(--accent-blue-light); border-color: var(--accent-blue); color: var(--text-primary); }
 .quick-access-btn img { width: 24px; height: 24px; }
-.quick-access-btn span { font-weight: 500; font-size: var(--font-size-sm); }
+.quick-access-btn span { font-weight: 600; font-size: var(--font-size-sm); }
 
 
 .carousel-container {
@@ -81,18 +81,37 @@
     flex: 0 0 600px;
     padding: 0 25px;
     box-sizing: border-box;
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease, filter 0.5s ease;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
     transform: scale(0.8);
     opacity: 0.5;
-    filter: blur(2px);
+    pointer-events: none;
+    position: relative; 
+}
+
+.carousel-slide::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(20, 21, 24, 0.5);
+    z-index: 2;
+    opacity: 1;
+    transition: opacity 0.5s ease;
     pointer-events: none;
 }
+
 .carousel-slide.is-active {
     transform: scale(1);
     opacity: 1;
-    filter: blur(0);
     pointer-events: auto;
 }
+
+.carousel-slide.is-active::before {
+    opacity: 0;
+}
+
 .carousel-arrow {
     position: absolute;
     top: 35%;

@@ -141,7 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const expResultDiv = document.getElementById('exp-result');
         const expTomeToggle = document.getElementById('exp-tome-toggle');
         const expTomeGrid = document.getElementById('exp-tome-grid-container');
-        
         const expCosts = {
             legendary: [120, 360, 720, 1200, 3600, 7200, 10800, 14400, 18000, 22200, 27000, 32400, 38400, 45000, 52200, 60000, 67800, 75600, 84000, 90000, 96000, 103200, 110400, 117600, 126000, 134400, 142800, 151200, 162000, 180000, 204000, 234000, 270000, 312000, 360000, 414000, 474000, 540000, 660000, 810000, 960000, 1140000, 1320000, 1530000, 1740000, 1980000, 2220000, 2520000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000],
             epic: [100, 300, 600, 1000, 3000, 6000, 9000, 12000, 15000, 18500, 22500, 27000, 32000, 37500, 43500, 50000, 56500, 63000, 70000, 75000, 80000, 86000, 92000, 98000, 105000, 112000, 119000, 126000, 135000, 150000, 170000, 195000, 225000, 260000, 300000, 345000, 395000, 450000, 550000, 675000, 800000, 950000, 1100000, 1275000, 1450000, 1650000, 1850000, 2100000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000],
@@ -203,6 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (expNeeded <= 0) {
                 const extraExp = Math.abs(expNeeded);
                 expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have enough EXP to reach level ${maxLevel}! You will have <strong id="exp-needed-value">${extraExp.toLocaleString()}</strong> EXP left over.</span>`;
+    
             } else {
                 expResultDiv.innerHTML = `<img src="/images/calculators/experience_book.webp" alt="EXP Book"><span>Requires <strong id="exp-needed-value">0</strong> more EXP to max</span>`;
                 animateCounter(document.getElementById('exp-needed-value'), Math.round(expNeeded), 700);
@@ -458,28 +458,34 @@ document.addEventListener('DOMContentLoaded', function() {
     function animateCounter(element, target, duration, prefix = '') {
         if (!element) return;
         element.classList.add('counting-blur');
-        let current = 0;
-        const range = target - current;
+        
+        const start = 0;
+        const range = target - start;
+        let startTime = null;
+
         if (range === 0) {
             element.textContent = prefix + target.toLocaleString();
             element.classList.remove('counting-blur');
             return;
         }
-        const increment = target > current ? 1 : -1;
-        const stepTime = 16;
-        const totalSteps = duration / stepTime;
-        const incrementAmount = Math.max(1, Math.ceil(Math.abs(range) / totalSteps));
-        const timer = setInterval(() => {
-            current += increment * incrementAmount;
-            if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
-                current = target;
-                clearInterval(timer);
-                element.textContent = prefix + Math.floor(current).toLocaleString();
-                element.classList.remove('counting-blur');
+
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / duration, 1);
+            
+            const current = Math.floor(start + range * percentage);
+            element.textContent = prefix + current.toLocaleString();
+
+            if (progress < duration) {
+                window.requestAnimationFrame(step);
             } else {
-                element.textContent = prefix + Math.floor(current).toLocaleString();
+                element.textContent = prefix + target.toLocaleString();
+                element.classList.remove('counting-blur');
             }
-        }, stepTime);
+        }
+
+        window.requestAnimationFrame(step);
     }
     
     const initAndResize = () => {
