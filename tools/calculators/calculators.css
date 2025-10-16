@@ -216,13 +216,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: var(--accent-blue-bright);
     text-decoration: none;
     font-weight: 600;
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
     margin-top: 0;
     white-space: nowrap;
 }
 
 .hoh-link-label-top {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
     color: var(--text-primary);
     font-weight: 500;
     margin-bottom: 0;
@@ -498,7 +498,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .date-input-container {
     display: flex;
-    align-items: center;
     gap: var(--spacing-3);
 }
 
