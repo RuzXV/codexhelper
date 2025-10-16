@@ -223,8 +223,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     flex-direction: row;
     align-items: center;
     gap: var(--spacing-1);
-    margin-bottom: 0;
+    margin-bottom: 5px;
 }
+
 
 .hoh-link-label-top {
     font-size: var(--font-size-base);
@@ -239,11 +240,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: var(--accent-blue-bright);
     text-decoration: none;
     font-weight: 600;
-    font-size: var(--font-size-base); /* FIX: Larger font size to align visually */
-    margin-top: 0; /* Remove vertical margin from old column layout */
+    font-size: var(--font-size-base);
+    margin-top: 0;
     white-space: nowrap;
+    position: relative;
+    top: -1px;
 }
-/* END OF PASSPORT LAYOUT FIXES */
 
 .rarity-selector, .building-selector { display: grid; gap: var(--spacing-3); }
 .rarity-selector { grid-template-columns: 1fr 1fr; }
@@ -533,8 +535,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .calendar-icon-label img {
-    max-width: 80%;
-    max-height: 80%;
+    max-width: 90%;
+    max-height: 90%;
     object-fit: contain;
     opacity: 0.9;
     transition: opacity 0.2s ease;
