@@ -208,7 +208,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     flex-direction: row;
     align-items: baseline;
-    gap: 4px;
+    gap: 1px;
     margin-bottom: 0;
 }
 
@@ -228,6 +228,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-bottom: 0;
     cursor: default;
     white-space: nowrap;
+}
+
+.hoh-link-anchor img {
+    height: 1.1em;
+    width: auto;
+    margin-left: 5px;
+    vertical-align: text-bottom;
 }
 
 .rarity-selector, .building-selector { display: grid; gap: var(--spacing-3); }
