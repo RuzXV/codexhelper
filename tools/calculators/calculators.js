@@ -640,7 +640,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const troopInputs = form.querySelectorAll('.hoh-input');
         const returnRateInputs = form.querySelectorAll('input[name="hoh-return-rate"]');
         
-        troopInputs.forEach(formatNumberInput);
+        const adjustInputFontSize = (input) => {
+            const initialFontSize = parseFloat(getComputedStyle(input).fontSize);
+            if (!input.dataset.initialFontSize) {
+                input.dataset.initialFontSize = initialFontSize;
+            }
+            
+            input.style.fontSize = `${input.dataset.initialFontSize}px`;
+            let currentFontSize = parseFloat(input.dataset.initialFontSize);
+
+            while (input.scrollWidth > input.clientWidth && currentFontSize > 8) {
+                currentFontSize -= 1;
+                input.style.fontSize = `${currentFontSize}px`;
+            }
+        };
+
+        troopInputs.forEach(input => {
+            formatNumberInput(input);
+            input.addEventListener('input', () => adjustInputFontSize(input));
+            if(input.value) adjustInputFontSize(input);
+        });
 
         const performCalculation = () => {
             const returnRate = parseFloat(document.querySelector('input[name="hoh-return-rate"]:checked').value);

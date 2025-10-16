@@ -152,51 +152,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="carousel-slide" data-title="Passports" data-description="Calculate the number of passports required to migrate kingdoms." data-icon="/images/calculators/passport.webp">
-                            <div class="calculator-island">
-                                <div class="island-content">
-                                    <div class="form-group-horizontal-power">
-                                        <div class="form-group">
-                                            <label for="power-input">Your Power</label>
-                                            <input type="text" id="power-input" placeholder="Example: 50,000,000">
-                                        </div>
-                                        <div class="form-group-toggle">
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="hoh-link-toggle">
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                            <label for="hoh-link-toggle" class="toggle-label">Link <a href="#" id="hoh-hyperlink">HoH</a></label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group-horizontal">
-                                        <div class="form-group">
-                                            <label for="hospital-capacity">Max Hospital Capacity</label>
-                                            <input type="text" id="hospital-capacity" placeholder="Example: 700,000">
-                                        </div>
-                                        <label class="toggle-switch">
-                                            <input type="checkbox" id="hospital-tier-toggle" disabled>
-                                            <span class="toggle-slider" data-on="T5" data-off="T4"></span>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="current-passports-input">Current Passports You Own</label>
-                                        <input type="text" id="current-passports-input" placeholder="Example: 10" min="0">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="migration-date">Planned Migration Date</label>
-                                        <input type="date" id="migration-date">
-                                    </div>
-                                    <div class="form-group-toggle">
-                                        <label class="toggle-switch"><input type="checkbox" id="same-kvk-checkbox"><span class="toggle-slider"></span></label>
-                                        <label for="same-kvk-checkbox" class="toggle-label">Same KvK / Vacation Mode</label>
-                                    </div>
-                                    <button id="calculate-passport-btn" class="btn-primary">Calculate</button>
-                                    <div id="passport-result" class="calc-result"></div>
-                                    <div id="cost-result" class="calc-result"></div>
-                                </div>
-                            </div>
-                        </div>
                         
                         <div class="carousel-slide" data-title="VIP Level" data-description="Calculate the VIP points needed to reach your desired VIP level." data-icon="/images/calculators/vip/vip_icon.webp">
                             <div class="calculator-island">
@@ -262,16 +217,61 @@
                             </div>
                         </div>
 
+                        <div class="carousel-slide" data-title="Passports" data-description="Calculate the number of passports required to migrate kingdoms." data-icon="/images/calculators/passport.webp">
+                            <div class="calculator-island">
+                                <div class="island-content">
+                                    <div class="form-group-horizontal-power">
+                                        <div class="form-group">
+                                            <label for="power-input">Your Power</label>
+                                            <input type="text" id="power-input" placeholder="Example: 50,000,000">
+                                        </div>
+                                        <div class="form-group-toggle">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="hoh-link-toggle">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <label for="hoh-link-toggle" class="toggle-label">Link <a href="#" id="hoh-hyperlink">HoH</a></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group-horizontal">
+                                        <div class="form-group">
+                                            <label for="hospital-capacity">Max Hospital Capacity</label>
+                                            <input type="text" id="hospital-capacity" placeholder="Example: 700,000">
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="hospital-tier-toggle" disabled>
+                                            <span class="toggle-slider" data-on="T5" data-off="T4"></span>
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="current-passports-input">Current Passports You Own</label>
+                                        <input type="text" id="current-passports-input" placeholder="Example: 10" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="migration-date">Planned Migration Date</label>
+                                        <input type="date" id="migration-date">
+                                    </div>
+                                    <div class="form-group-toggle">
+                                        <label class="toggle-switch"><input type="checkbox" id="same-kvk-checkbox"><span class="toggle-slider"></span></label>
+                                        <label for="same-kvk-checkbox" class="toggle-label">Same KvK / Vacation Mode</label>
+                                    </div>
+                                    <button id="calculate-passport-btn" class="btn-primary">Calculate</button>
+                                    <div id="passport-result" class="calc-result"></div>
+                                    <div id="cost-result" class="calc-result"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="carousel-slide" data-title="Hall of Heroes" data-description="Calculate the total power returned from your dead troops in KvK." data-icon="/images/calculators/hoh_icon.webp">
                             <div class="calculator-island">
                                 <div class="island-content">
                                     <div class="form-group">
                                         <label>KvK Troop Return Rate</label>
                                         <div class="hoh-return-selector">
-                                            <label><input type="radio" name="hoh-return-rate" value="0.30"><span class="hoh-return-btn">30%</span></label>
-                                            <label><input type="radio" name="hoh-return-rate" value="0.50" checked><span class="hoh-return-btn">50%</span></label>
-                                            <label><input type="radio" name="hoh-return-rate" value="0.55"><span class="hoh-return-btn">55%</span></label>
-                                            <label><input type="radio" name="hoh-return-rate" value="0.60"><span class="hoh-return-btn">60%</span></label>
+                                            <label><input type="radio" name="hoh-return-rate" value="0.30"><span class="hoh-return-btn">30%<span class="hoh-return-sublabel">Pre-SoC KvK</span></span></label>
+                                            <label><input type="radio" name="hoh-return-rate" value="0.50" checked><span class="hoh-return-btn">50%<span class="hoh-return-sublabel">SoC KvK</span></span></label>
+                                            <label><input type="radio" name="hoh-return-rate" value="0.55"><span class="hoh-return-btn">55%<span class="hoh-return-sublabel">S Tier KvK</span></span></label>
+                                            <label><input type="radio" name="hoh-return-rate" value="0.60"><span class="hoh-return-btn">60%<span class="hoh-return-sublabel">S+ Tier KvK</span></span></label>
                                         </div>
                                     </div>
                                     <div class="form-group">
