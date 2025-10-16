@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const commandersToMax = totalTomeExp > 0 && totalExpToMax > 0 ? Math.floor(totalTomeExp / totalExpToMax) : 0;
                 
                 expResultDiv.innerHTML = `
-                    <div class="cost-line">You have <strong id="total-tome-exp">${totalTomeExp.toLocaleString()}</strong> total EXP in tomes.</div>
+                    <div class="cost-line"><img src="/images/calculators/experience_book.webp" alt="EXP Book"> You have <strong id="total-tome-exp">${totalTomeExp.toLocaleString()}</strong> total EXP in tomes.</div>
                     <div class="cost-line">This can max <strong id="commanders-to-max">${commandersToMax}</strong> ${rarity} commanders.</div>`;
                 triggerSuccessAnimation(expResultDiv);
                 return;
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 availableBundles.push(...bundles);
             }
         
-            availableBundles.sort((a, b) => a.cost - b.cost);
+            availableBundles.sort((a, b) => (a.cost / a.passports) - (b.cost / b.passports));
         
             let cost = 0;
             let passportsObtained = 0;
@@ -303,7 +303,9 @@ document.addEventListener('DOMContentLoaded', function() {
                  return { cost: cost, details: `Could not meet passport requirement. Still need ${passportsNeeded - passportsObtained} passports.` };
             }
 
-            const detailStr = Object.entries(purchased).map(([key, val]) => `${val}x ${key} bundle`).join(', ');
+            const detailStr = Object.entries(purchased)
+                .sort((a,b) => parseInt(a[0].substring(1)) - parseInt(b[0].substring(1)))
+                .map(([key, val]) => `${val}x ${key} bundle`).join(', ');
             return { cost: cost, details: `Optimal purchase: ${detailStr}` };
         }
 
@@ -314,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let effectivePower = power;
             const hospitalCapacity = parseInt(hospitalCapacityInput.value.replace(/,/g, ''), 10) || 0;
-            if (hospitalCapacity > 0) {
+            if (hospitalCapacity > 0 && !hospitalTierToggle.disabled) {
                 const isT5 = hospitalTierToggle.checked;
                 const troopPower = isT5 ? 10 : 4;
                 const powerReduction = hospitalCapacity * troopPower;
@@ -342,11 +344,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const today = new Date();
+            today.setHours(0,0,0,0);
             const migrationDate = migrationDateInput.value ? new Date(migrationDateInput.value) : today;
             let monthsAvailable = 1;
             if (migrationDate > today) {
-                monthsAvailable = (migrationDate.getFullYear() - today.getFullYear()) * 12 + (migrationDate.getMonth() - today.getMonth()) + 1;
+                monthsAvailable = (migrationDate.getFullYear() - today.getFullYear()) * 12 + (migrationDate.getMonth() - today.getMonth());
+                if(today.getDate() === 1) {
+                    monthsAvailable +=1;
+                } else if (migrationDate.getDate() >= 1) {
+                    monthsAvailable +=1;
+                }
             }
+
 
             if (passportsNeeded <= 0) { 
                 costResultDiv.innerHTML = `<span>No additional cost required.</span>`; 
@@ -571,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const count = parseInt(input.value.replace(/,/g, ''), 10) || 0;
                 const tier = input.dataset.tier;
                 
-                const returnedTroops = Math.ceil(count * returnRate);
+                const returnedTroops = Math.round(count * returnRate);
                 const powerPerTroop = tier === 't4' ? 4 : 10;
                 totalPower += returnedTroops * powerPerTroop;
             });
