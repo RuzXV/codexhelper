@@ -676,6 +676,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             hohReturnedPower = totalPower;
             resultDiv.innerHTML = `<img src="/images/calculators/power_icon.webp" alt="Power Icon"><span>Total Power Returned: <strong>${totalPower.toLocaleString()}</strong></span>`;
+            triggerSuccessAnimation(resultDiv);
             
             const hohLinkToggle = document.getElementById('hoh-link-toggle');
             if(hohLinkToggle && hohLinkToggle.checked) {

@@ -200,7 +200,7 @@
 }
 .form-group-horizontal-power {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: var(--spacing-3);
 }
 .form-group-horizontal-power .form-group {
@@ -209,7 +209,7 @@
     min-width: 0;
 }
 .form-group-horizontal-power .form-group-toggle {
-    margin-top: 22px;
+    margin-bottom: 5px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -272,7 +272,8 @@
     background-color: var(--text-muted);
 }
 
-.toggle-slider[data-off]::after, .toggle-slider[data-on]::after {
+.toggle-slider[data-on]::before,
+.toggle-slider[data-off]::after {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -292,17 +293,15 @@
     opacity: 0;
 }
 
-.toggle-slider[data-on]::after {
+.toggle-slider[data-on]::before {
     content: attr(data-on);
     left: 8px;
     color: white;
     opacity: 0;
 }
-.toggle-switch input:checked + .toggle-slider[data-on]::after {
+.toggle-switch input:checked + .toggle-slider[data-on]::before {
     opacity: 1;
 }
-
-
 
 .calc-result {
     margin-top: var(--spacing-4); padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-md);
