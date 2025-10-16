@@ -1,6 +1,6 @@
 @font-face {
-    font-family: 'NotoSansHans Regular';
-    src: url('NotoSansHans-Medium.otf') format('opentype');
+    font-family: 'NotoSansHans DemiLight';
+    src: url('NotoSansHans-DemiLight.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
 }
@@ -110,10 +110,10 @@
     gap: var(--spacing-6);
 }
 .generator-panel {
-    flex: 1 1 55%;
+    flex: 1 1 57%;
 }
 .preview-panel {
-    flex: 1 1 45%;
+    flex: 1 1 43%;
     display: flex;
     flex-direction: column;
 }
@@ -406,7 +406,7 @@
 }
 
 #mail-preview {
-    font-family: 'NotoSansHans Regular', var(--font-family);
+    font-family: 'NotoSansHans DemiLight', var(--font-family);
     position: relative;
     z-index: 1;
     width: 100%;
@@ -420,6 +420,8 @@
     padding: 14px 14px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transform: scaleY(0.95);
+    transform-origin: top;
 }
 
 .mail-bg #mail-preview {
@@ -427,8 +429,9 @@
 }
 
 #mail-preview strong { 
-    font-family: 'NotoSansHans Bold', 'NotoSansHans Regular', var(--font-family);
+    font-family: 'NotoSansHans Bold', 'NotoSansHans DemiLight', var(--font-family);
     font-weight: normal;
+    -webkit-text-stroke: 0.3px currentColor;
 }
 #mail-preview em { font-style: italic; }
 
