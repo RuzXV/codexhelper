@@ -10,6 +10,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainTitle = document.getElementById('calculator-main-title');
     const mainDescription = document.getElementById('calculator-main-description');
     
+    const calendarIconLabel = document.querySelector('.calendar-icon-label');
+    const migrationDateInputJs = document.getElementById('migration-date');
+
+    if (calendarIconLabel && migrationDateInputJs) {
+        calendarIconLabel.addEventListener('click', (e) => {
+            e.preventDefault();
+            try {
+                migrationDateInputJs.showPicker();
+            } catch (error) {
+                console.error("showPicker() is not supported by this browser.", error);
+                migrationDateInputJs.focus();
+            }
+        });
+    }
+
     let currentIndex = 0;
     let hohReturnedPower = 0;
 
