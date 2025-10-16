@@ -208,7 +208,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     flex-direction: row;
     align-items: baseline;
-    gap: 3.5px;
+    gap: 4px;
     margin-bottom: 0;
 }
 
@@ -538,6 +538,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #migration-date {
     flex-grow: 1;
     min-width: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .custom-select-container { position: relative; }
