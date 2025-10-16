@@ -1,13 +1,13 @@
 @font-face {
-    font-family: 'NotoSansHans DemiLight';
-    src: url('NotoSansHans-DemiLight.otf') format('opentype');
+    font-family: 'NotoSansHans Medium';
+    src: url('NotoSansHans-Medium.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'NotoSansHans Black';
-    src: url('NotoSansHans-Black.otf') format('opentype');
+    font-family: 'NotoSansHans Bold';
+    src: url('NotoSansHans-Bold.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
 }
@@ -406,7 +406,7 @@
 }
 
 #mail-preview {
-    font-family: 'NotoSansHans DemiLight', var(--font-family);
+    font-family: 'NotoSansHans Medium', var(--font-family);
     position: relative;
     z-index: 1;
     width: 100%;
@@ -427,7 +427,7 @@
 }
 
 #mail-preview strong { 
-    font-family: 'NotoSansHans Black', 'NotoSansHans DemiLight', var(--font-family);
+    font-family: 'NotoSansHans Bold', 'NotoSansHans Medium', var(--font-family);
     font-weight: normal;
 }
 #mail-preview em { font-style: italic; }
