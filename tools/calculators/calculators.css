@@ -206,8 +206,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .form-group-horizontal-power {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: var(--spacing-3);
+    margin-bottom: var(--spacing-6);
 }
 
 .form-group-horizontal-power .form-group {
@@ -219,30 +220,30 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .hoh-link-group {
     flex-shrink: 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    margin-bottom: 2px;
+    gap: var(--spacing-1);
+    margin-bottom: 0;
 }
 
 .hoh-link-label-top {
-    font-size: var(--font-size-xs);
-    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
     font-weight: 500;
-    margin-bottom: var(--spacing-1);
-    cursor: pointer;
+    margin-bottom: 0;
+    cursor: default;
+    white-space: nowrap;
 }
 
 .hoh-link-anchor {
     color: var(--accent-blue-bright);
     text-decoration: none;
     font-weight: 600;
-    font-size: var(--font-size-sm);
-    margin-top: var(--spacing-1);
+    font-size: var(--font-size-base); /* FIX: Larger font size to align visually */
+    margin-top: 0; /* Remove vertical margin from old column layout */
+    white-space: nowrap;
 }
-
-.hoh-link-anchor:hover {
-    text-decoration: underline;
-}
+/* END OF PASSPORT LAYOUT FIXES */
 
 .rarity-selector, .building-selector { display: grid; gap: var(--spacing-3); }
 .rarity-selector { grid-template-columns: 1fr 1fr; }
@@ -531,14 +532,22 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     flex-shrink: 0;
 }
 
+.calendar-icon-label img {
+    max-width: 60%;
+    max-height: 60%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
 .calendar-icon-label:hover {
     background: var(--border-hover);
     border-color: var(--accent-blue);
-    color: var(--accent-blue-bright);
 }
 
-.calendar-icon-label i {
-    font-size: 1.2rem;
+.calendar-icon-label:hover img {
+    opacity: 1;
 }
 
 #migration-date {
