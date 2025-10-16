@@ -93,14 +93,31 @@ document.addEventListener('DOMContentLoaded', function() {
         mailInput.value = cachedContent;
     }
     
-    function applyTag(tag, value = null, closingTag = null) {
+    function applyTag(tag, value = null) {
         saveState();
         const start = mailInput.selectionStart;
         const end = mailInput.selectionEnd;
-        const selectedText = mailInput.value.substring(start, end);
+        let selectedText = mailInput.value.substring(start, end);
         if (!selectedText) return;
-        closingTag = closingTag || tag;
-        let replacement = value ? `<${tag}=${value}>${selectedText}</${closingTag}>` : `<${tag}>${selectedText}</${closingTag}>`;
+
+        let replacement = '';
+        const simpleTagRegex = new RegExp(`^<${tag}>([\\s\\S]*?)<\\/${tag}>$`);
+        const valueTagRegex = new RegExp(`^<${tag}=[^>]+>([\\s\\S]*?)<\\/${tag}>$`);
+
+        if (value) {
+            if (valueTagRegex.test(selectedText)) {
+                replacement = selectedText.replace(new RegExp(`^<${tag}=[^>]+>`), `<${tag}=${value}>`);
+            } else {
+                replacement = `<${tag}=${value}>${selectedText}</${tag}>`;
+            }
+        } else {
+            if (simpleTagRegex.test(selectedText)) {
+                replacement = selectedText.match(simpleTagRegex)[1];
+            } else {
+                replacement = `<${tag}>${selectedText}</${tag}>`;
+            }
+        }
+
         mailInput.value = mailInput.value.substring(0, start) + replacement + mailInput.value.substring(end);
         updatePreview();
         saveState();
@@ -112,7 +129,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const end = mailInput.selectionEnd;
         const selectedText = mailInput.value.substring(start, end);
         if (!selectedText) return;
-        let replacement = `<${tag1}><${tag2}>${selectedText}</${tag2}></${tag1}>`;
+
+        const doubleTagRegex = new RegExp(`^<${tag1}><${tag2}>([\\s\\S]*?)<\\/${tag2}><\\/${tag1}>$`);
+        let replacement = '';
+
+        if(doubleTagRegex.test(selectedText)) {
+            replacement = selectedText.match(doubleTagRegex)[1];
+        } else {
+            replacement = `<${tag1}><${tag2}>${selectedText}</${tag2}></${tag1}>`;
+        }
+        
         mailInput.value = mailInput.value.substring(0, start) + replacement + mailInput.value.substring(end);
         updatePreview();
         saveState();
@@ -555,4 +581,4 @@ document.addEventListener('DOMContentLoaded', function() {
     saveState();
     updateUndoButton();
     updateGradientUI();
-});
+})

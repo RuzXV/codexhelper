@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainDescription = document.getElementById('calculator-main-description');
     
     let currentIndex = 0;
+    let hohReturnedPower = 0;
 
     const moveToSlide = (targetIndex, animate = true) => {
         if (!slides.length || !slides[targetIndex]) return;
@@ -82,18 +83,28 @@ document.addEventListener('DOMContentLoaded', function() {
             case 2: initPassportCalculator(); break;
             case 3: initVipCalculator(); break;
             case 4: initBuildingCalculator(); break;
+            case 5: initHohCalculator(); break;
         }
         
         targetSlide.dataset.initialized = 'true';
     }
 
+    function setupAutoCalculation(formElements, calculationFunction) {
+        formElements.forEach(element => {
+            element.addEventListener('input', calculationFunction);
+        });
+    }
+
     function initSkillCalculator() {
+        const form = document.querySelector('.carousel-slide[data-title="Skill Upgrades"]');
         const calculateSkillBtn = document.getElementById('calculate-skill-btn');
         if (!calculateSkillBtn) return;
         
         const startSkillInput = document.getElementById('start-skill');
         const desiredSkillInput = document.getElementById('desired-skill');
         const skillResultDiv = document.getElementById('skill-result');
+        const rarityInputs = form.querySelectorAll('input[name="rarity"]');
+
         const costs = {
             legendary: [10, 10, 15, 15, 30, 30, 40, 40, 45, 45, 50, 50, 75, 75, 80, 80],
             epic: [10, 10, 10, 20, 20, 20, 20, 30, 30, 30, 30, 40, 40, 40, 40, 50],
@@ -107,11 +118,12 @@ document.addEventListener('DOMContentLoaded', function() {
         function getSkillPoints(skillString) {
             return skillString.split('').reduce((sum, digit) => sum + parseInt(digit, 10), 0) - 4;
         }
-        calculateSkillBtn.addEventListener('click', () => {
+        const performCalculation = () => {
             const start = startSkillInput.value;
             const desired = desiredSkillInput.value;
             const rarity = document.querySelector('input[name="rarity"]:checked').value;
             const sculptureImage = `/images/calculators/${rarity}_sculpture.webp`;
+
             if (!/^[1-5]{4}$/.test(start) || !/^[1-5]{4}$/.test(desired)) {
                 skillResultDiv.textContent = 'Please enter valid 4-digit skill levels (Example: 1111, 5511).';
                 skillResultDiv.classList.add('error');
@@ -129,10 +141,18 @@ document.addEventListener('DOMContentLoaded', function() {
             skillResultDiv.innerHTML = `<img src="${sculptureImage}" alt="${rarity} sculpture"><span>Requires <strong id="skill-cost-value">0</strong> Sculptures</span>`;
             animateCounter(document.getElementById('skill-cost-value'), totalCost, 700);
             triggerSuccessAnimation(skillResultDiv);
+        };
+        
+        calculateSkillBtn.addEventListener('click', () => {
+            performCalculation();
+            calculateSkillBtn.style.display = 'none';
+            const formElements = [startSkillInput, desiredSkillInput, ...rarityInputs];
+            setupAutoCalculation(formElements, performCalculation);
         });
     }
 
     function initExpCalculator() {
+        const form = document.querySelector('.carousel-slide[data-title="Commander EXP"]');
         const calculateExpBtn = document.getElementById('calculate-exp-btn');
         if (!calculateExpBtn) return;
     
@@ -141,6 +161,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const expResultDiv = document.getElementById('exp-result');
         const expTomeToggle = document.getElementById('exp-tome-toggle');
         const expTomeGrid = document.getElementById('exp-tome-grid-container');
+        const expTomeInputs = form.querySelectorAll('.exp-tome-input');
+        const rarityInputs = form.querySelectorAll('input[name="exp-rarity"]');
+        
         const expCosts = {
             legendary: [120, 360, 720, 1200, 3600, 7200, 10800, 14400, 18000, 22200, 27000, 32400, 38400, 45000, 52200, 60000, 67800, 75600, 84000, 90000, 96000, 103200, 110400, 117600, 126000, 134400, 142800, 151200, 162000, 180000, 204000, 234000, 270000, 312000, 360000, 414000, 474000, 540000, 660000, 810000, 960000, 1140000, 1320000, 1530000, 1740000, 1980000, 2220000, 2520000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000],
             epic: [100, 300, 600, 1000, 3000, 6000, 9000, 12000, 15000, 18500, 22500, 27000, 32000, 37500, 43500, 50000, 56500, 63000, 70000, 75000, 80000, 86000, 92000, 98000, 105000, 112000, 119000, 126000, 135000, 150000, 170000, 195000, 225000, 260000, 300000, 345000, 395000, 450000, 550000, 675000, 800000, 950000, 1100000, 1275000, 1450000, 1650000, 1850000, 2100000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000],
@@ -154,16 +177,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }, {});
     
         expTomeToggle.addEventListener('change', () => expTomeGrid.classList.toggle('visible', expTomeToggle.checked));
-    
-        calculateExpBtn.addEventListener('click', () => {
+
+        const performCalculation = () => {
             expResultDiv.innerHTML = '';
             expResultDiv.classList.remove('error');
     
             const rarity = document.querySelector('input[name="exp-rarity"]:checked').value;
             const currentLevel = parseInt(currentLevelInput.value, 10);
             const currentExp = parseFloat(currentExpInput.value.replace(/,/g, '')) || 0;
-            
             const maxLevel = 60;
+            const isTomeOnlyMode = expTomeToggle.checked && !currentLevelInput.value && !currentExpInput.value;
+
+            let totalTomeExp = 0;
+            expTomeInputs.forEach(input => {
+                totalTomeExp += (parseInt(input.value, 10) || 0) * (parseInt(input.dataset.value, 10));
+            });
+
+            if (isTomeOnlyMode) {
+                const totalExpToMax = cumulativeExp[rarity][maxLevel - 2];
+                const commandersToMax = totalTomeExp > 0 && totalExpToMax > 0 ? Math.floor(totalTomeExp / totalExpToMax) : 0;
+                
+                expResultDiv.innerHTML = `
+                    <div class="cost-line">You have <strong id="total-tome-exp">${totalTomeExp.toLocaleString()}</strong> total EXP in tomes.</div>
+                    <div class="cost-line">This can max <strong id="commanders-to-max">${commandersToMax}</strong> ${rarity} commanders.</div>`;
+                triggerSuccessAnimation(expResultDiv);
+                return;
+            }
     
             if (isNaN(currentLevel) || currentLevel < 1 || currentLevel > maxLevel) {
                 expResultDiv.textContent = `Please enter a valid level between 1 and ${maxLevel}.`;
@@ -179,7 +218,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
             const totalExpToReachCurrentLevel = currentLevel > 1 ? cumulativeExp[rarity][currentLevel - 2] : 0;
             const totalCurrentExp = totalExpToReachCurrentLevel + currentExp;
-    
             const totalExpToReachMaxLevel = cumulativeExp[rarity][maxLevel - 2];
             
             if (typeof totalExpToReachMaxLevel === 'undefined' || typeof totalCurrentExp === 'undefined') {
@@ -190,28 +228,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
             let expNeeded = totalExpToReachMaxLevel - totalCurrentExp;
     
-            let totalTomeExp = 0;
             if (expTomeToggle.checked) {
-                const expTomeInputs = document.querySelectorAll('.exp-tome-input');
-                expTomeInputs.forEach(input => {
-                    totalTomeExp += (parseInt(input.value, 10) || 0) * (parseInt(input.dataset.value, 10));
-                });
                 expNeeded -= totalTomeExp;
             }
     
             if (expNeeded <= 0) {
-                const extraExp = Math.abs(expNeeded);
-                expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have enough EXP to reach level ${maxLevel}! You will have <strong id="exp-needed-value">${extraExp.toLocaleString()}</strong> EXP left over.</span>`;
-    
+                expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have enough EXP to reach level ${maxLevel}!</span>`;
             } else {
                 expResultDiv.innerHTML = `<img src="/images/calculators/experience_book.webp" alt="EXP Book"><span>Requires <strong id="exp-needed-value">0</strong> more EXP to max</span>`;
                 animateCounter(document.getElementById('exp-needed-value'), Math.round(expNeeded), 700);
             }
             triggerSuccessAnimation(expResultDiv);
+        };
+
+        calculateExpBtn.addEventListener('click', () => {
+            performCalculation();
+            calculateExpBtn.style.display = 'none';
+            const formElements = [currentLevelInput, currentExpInput, expTomeToggle, ...expTomeInputs, ...rarityInputs];
+            setupAutoCalculation(formElements, performCalculation);
         });
     }
 
     function initPassportCalculator() {
+        const form = document.querySelector('.carousel-slide[data-title="Passports"]');
         const calculatePassportBtn = document.getElementById('calculate-passport-btn');
         if (!calculatePassportBtn) return;
         
@@ -220,73 +259,121 @@ document.addEventListener('DOMContentLoaded', function() {
         const passportResultDiv = document.getElementById('passport-result');
         const currentPassportsInput = document.getElementById('current-passports-input');
         const costResultDiv = document.getElementById('cost-result');
+        const migrationDateInput = document.getElementById('migration-date');
+        const hospitalCapacityInput = document.getElementById('hospital-capacity');
+        const hospitalTierToggle = document.getElementById('hospital-tier-toggle');
+        const hohLinkToggle = document.getElementById('hoh-link-toggle');
+
+
         const passportBrackets = [ { maxPower: 9999999, normal: 1, discount: 1 }, { maxPower: 14999999, normal: 2, discount: 1 }, { maxPower: 19999999, normal: 3, discount: 1 }, { maxPower: 24999999, normal: 4, discount: 1 }, { maxPower: 29999999, normal: 6, discount: 1 }, { maxPower: 34999999, normal: 9, discount: 2 }, { maxPower: 39999999, normal: 12, discount: 3 }, { maxPower: 44999999, normal: 15, discount: 5 }, { maxPower: 49999999, normal: 20, discount: 8 }, { maxPower: 54999999, normal: 25, discount: 12 }, { maxPower: 59999999, normal: 30, discount: 15 }, { maxPower: 64999999, normal: 35, discount: 20 }, { maxPower: 69999999, normal: 40, discount: 25 }, { maxPower: 74999999, normal: 45, discount: 32 }, { maxPower: 79999999, normal: 50, discount: 40 }, { maxPower: 84999999, normal: 55, discount: 47 }, { maxPower: 89999999, normal: 60, discount: 54 }, { maxPower: 94999999, normal: 65, discount: 61 }, { maxPower: 99999999, normal: 70, discount: 67 }, { maxPower: Infinity, normal: 75, discount: 73 } ];
         
-        function calculateBundleCost(passportsNeeded) {
-            if (passportsNeeded <= 0) return 0;
+        hospitalCapacityInput.addEventListener('input', () => {
+            hospitalTierToggle.disabled = !hospitalCapacityInput.value;
+        });
 
+        function calculateBundleCost(passportsNeeded, months) {
+            if (passportsNeeded <= 0) return { cost: 0, details: "No bundles needed." };
+        
+            const bundles = [
+                { cost: 5, passports: 1 }, { cost: 10, passports: 2 },
+                { cost: 20, passports: 3 }, { cost: 50, passports: 4 }, { cost: 100, passports: 5 }
+            ];
+        
+            let availableBundles = [];
+            for (let i = 0; i < months; i++) {
+                availableBundles.push(...bundles);
+            }
+        
+            availableBundles.sort((a, b) => a.cost - b.cost);
+        
             let cost = 0;
             let passportsObtained = 0;
-            const tiers = [
-                { cost: 5, passports: 1 },
-                { cost: 10, passports: 2 },
-                { cost: 20, passports: 3 },
-                { cost: 50, passports: 4 },
-            ];
-
-            for (const tier of tiers) {
-                if (passportsObtained < passportsNeeded) {
-                    cost += tier.cost;
-                    passportsObtained += tier.passports;
-                } else {
-                    break;
-                }
+            let purchased = {};
+        
+            for (const bundle of availableBundles) {
+                if (passportsObtained >= passportsNeeded) break;
+                
+                cost += bundle.cost;
+                passportsObtained += bundle.passports;
+                const key = `$${bundle.cost}`;
+                purchased[key] = (purchased[key] || 0) + 1;
             }
-
+        
             if (passportsObtained < passportsNeeded) {
-                const remainingPassports = passportsNeeded - passportsObtained;
-                const hundredDollarBundlesNeeded = Math.ceil(remainingPassports / 5);
-                cost += hundredDollarBundlesNeeded * 100;
+                 return { cost: cost, details: `Could not meet passport requirement. Still need ${passportsNeeded - passportsObtained} passports.` };
             }
-            return cost;
+
+            const detailStr = Object.entries(purchased).map(([key, val]) => `${val}x ${key} bundle`).join(', ');
+            return { cost: cost, details: `Optimal purchase: ${detailStr}` };
         }
 
-        calculatePassportBtn.addEventListener('click', () => {
+        const performCalculation = () => {
             passportResultDiv.innerHTML = ''; costResultDiv.innerHTML = ''; passportResultDiv.classList.remove('error'); costResultDiv.classList.remove('error');
             const power = parseInt(powerInput.value.replace(/,/g, ''), 10);
             if (isNaN(power) || power <= 0) { passportResultDiv.textContent = 'Please enter a valid, positive power.'; passportResultDiv.classList.add('error'); return; }
+            
+            let effectivePower = power;
+            const hospitalCapacity = parseInt(hospitalCapacityInput.value.replace(/,/g, ''), 10) || 0;
+            if (hospitalCapacity > 0) {
+                const isT5 = hospitalTierToggle.checked;
+                const troopPower = isT5 ? 10 : 4;
+                const powerReduction = hospitalCapacity * troopPower;
+                effectivePower -= powerReduction;
+            }
+            
+            if(hohLinkToggle.checked) {
+                effectivePower += hohReturnedPower;
+            }
+
             const isDiscounted = sameKvkCheckbox.checked;
-            const bracket = passportBrackets.find(b => power <= b.maxPower);
+            const bracket = passportBrackets.find(b => effectivePower <= b.maxPower);
+            if(!bracket) { passportResultDiv.textContent = 'Could not determine passport bracket.'; passportResultDiv.classList.add('error'); return; }
+
             const requiredPassports = isDiscounted ? bracket.discount : bracket.normal;
             const currentPassports = parseInt(currentPassportsInput.value.trim(), 10) || 0;
             if (isNaN(currentPassports) || currentPassports < 0) { costResultDiv.textContent = 'Current passports must be a positive number.'; costResultDiv.classList.add('error'); return; }
             const passportsNeeded = requiredPassports - currentPassports;
 
-            if (passportsNeeded <= 0 && currentPassportsInput.value.trim()) { 
+            if (passportsNeeded <= 0) { 
                 passportResultDiv.innerHTML = `<i class="fas fa-check-circle"></i><span>You have enough passports!</span>`; 
             } else { 
                 passportResultDiv.innerHTML = `<img src="/images/calculators/passport.webp" alt="Passport"><span>Requires <strong id="passport-value">0</strong> Passports</span>`; 
-                animateCounter(document.getElementById('passport-value'), passportsNeeded > 0 ? passportsNeeded : requiredPassports, 700); 
+                animateCounter(document.getElementById('passport-value'), passportsNeeded, 700); 
+            }
+
+            const today = new Date();
+            const migrationDate = migrationDateInput.value ? new Date(migrationDateInput.value) : today;
+            let monthsAvailable = 1;
+            if (migrationDate > today) {
+                monthsAvailable = (migrationDate.getFullYear() - today.getFullYear()) * 12 + (migrationDate.getMonth() - today.getMonth()) + 1;
             }
 
             if (passportsNeeded <= 0) { 
                 costResultDiv.innerHTML = `<span>No additional cost required.</span>`; 
             } else {
-                costResultDiv.innerHTML = `<div class="cost-line"><span>Credit Cost: <strong id="credit-cost-value">0</strong></span><img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit"></div><div class="cost-line"><span>New World Cost: <strong id="usd-cost-value">0</strong></span><img src="/images/calculators/bundle.webp" alt="Bundle"></div>`;
-                const totalPassportsFromBundles = (1 + 2 + 3 + 4) + (15 * 5); // 85
-                if (passportsNeeded > totalPassportsFromBundles) { 
-                    costResultDiv.innerHTML += `<small style='color: var(--text-secondary); margin-top: 5px;'>Note: Max passports from bundles per month is ${totalPassportsFromBundles}.</small>`; 
-                }
-                const bundleCost = calculateBundleCost(passportsNeeded);
+                const bundleResult = calculateBundleCost(passportsNeeded, monthsAvailable);
+                costResultDiv.innerHTML = `
+                    <div class="cost-line"><span>Credit Cost: <strong id="credit-cost-value">0</strong></span><img src="/images/calculators/alliance_credit.webp" alt="Alliance Credit"></div>
+                    <div class="cost-line"><span>New World Cost: <strong id="usd-cost-value">0</strong></span><img src="/images/calculators/bundle.webp" alt="Bundle"></div>
+                    <small style='color: var(--text-secondary); margin-top: 5px;'>${bundleResult.details}</small>`;
+
                 animateCounter(document.getElementById('credit-cost-value'), passportsNeeded * 600000, 700);
-                animateCounter(document.getElementById('usd-cost-value'), bundleCost, 700, '$');
+                animateCounter(document.getElementById('usd-cost-value'), bundleResult.cost, 700, '$');
                 triggerSuccessAnimation(costResultDiv);
             }
             triggerSuccessAnimation(passportResultDiv);
+        };
+
+        calculatePassportBtn.addEventListener('click', () => {
+            performCalculation();
+            calculatePassportBtn.style.display = 'none';
+            const formElements = [powerInput, sameKvkCheckbox, currentPassportsInput, migrationDateInput, hospitalCapacityInput, hospitalTierToggle, hohLinkToggle];
+            setupAutoCalculation(formElements, performCalculation);
         });
     }
 
     function initVipCalculator() {
+        const form = document.querySelector('.carousel-slide[data-title="VIP Level"]');
         const calculateVipBtn = document.getElementById('calculate-vip-btn');
         if(!calculateVipBtn) return;
         
@@ -295,17 +382,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const vipResultDiv = document.getElementById('vip-result');
         const vipTokenToggle = document.getElementById('vip-token-toggle');
         const vipTokenGrid = document.getElementById('vip-token-grid-container');
+        const vipTokenInputs = form.querySelectorAll('.vip-token-input');
         
         const vipLevels = [ { level: 1, points: 200 }, { level: 2, points: 400 }, { level: 3, points: 1200 }, { level: 4, points: 3500 }, { level: 5, points: 6000 }, { level: 6, points: 11500 }, { level: 7, points: 17500 }, { level: 8, points: 35000 }, { level: 9, points: 75000 }, { level: 10, points: 150000 }, { level: 11, points: 250000 }, { level: 12, points: 350000 }, { level: 13, points: 500000 }, { level: 14, points: 750000 }, { level: 15, points: 1000000 }, { level: 16, points: 1500000 }, { level: 17, points: 2500000 }, { level: 18, points: 4000000 }, { level: 19, points: 6000000 }, { level: 'SVIP', points: 9000000 } ];
 
         vipTokenToggle.addEventListener('change', () => vipTokenGrid.classList.toggle('visible', vipTokenToggle.checked));
 
-        calculateVipBtn.addEventListener('click', () => {
+        const performCalculation = () => {
             vipResultDiv.classList.remove('error');
             let totalPoints = parseInt(currentVipPointsInput.value.replace(/,/g, ''), 10) || 0;
             
             if(vipTokenToggle.checked) {
-                document.querySelectorAll('.vip-token-input').forEach(input => {
+                vipTokenInputs.forEach(input => {
                     const count = parseInt(input.value, 10) || 0;
                     const value = parseInt(input.dataset.value, 10);
                     totalPoints += count * value;
@@ -328,8 +416,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 animateCounter(document.getElementById('vip-points-needed'), pointsNeeded, 700);
             }
             triggerSuccessAnimation(vipResultDiv);
-        });
-
+        };
+        
         const customSelectContainer = document.querySelector('.carousel-slide.is-active .custom-select-container');
         if (customSelectContainer && !customSelectContainer.querySelector('.select-selected')) {
             const selectEl = customSelectContainer.querySelector('select');
@@ -356,6 +444,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     Array.from(optionsDiv.getElementsByClassName("same-as-selected")).forEach(el => el.classList.remove("same-as-selected"));
                     this.classList.add("same-as-selected");
                     closeAllSelect();
+                    // Manually trigger calculation for custom select
+                    if (calculateVipBtn.style.display === 'none') performCalculation();
                 });
                 optionsDiv.appendChild(itemDiv);
             });
@@ -383,9 +473,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             document.addEventListener("click", closeAllSelect);
         }
+
+        calculateVipBtn.addEventListener('click', () => {
+            performCalculation();
+            calculateVipBtn.style.display = 'none';
+            const formElements = [currentVipPointsInput, vipTokenToggle, ...vipTokenInputs];
+            setupAutoCalculation(formElements, performCalculation);
+        });
     }
 
     function initBuildingCalculator() {
+        const form = document.querySelector('.carousel-slide[data-title="Buildings"]');
         const calculateBuildingBtn = document.getElementById('calculate-building-btn');
         if(!calculateBuildingBtn) return;
         
@@ -407,19 +505,7 @@ document.addEventListener('DOMContentLoaded', function() {
             buildingData[building].cumulativeCosts = buildingData[building].costs.reduce((acc, cost, i) => { acc.push((acc[i-1] || 0) + cost); return acc; }, []);
         }
 
-        buildingSelectors.forEach(selector => {
-            selector.addEventListener('change', () => {
-                const selectedBuilding = document.querySelector('input[name="building"]:checked').value;
-                const data = buildingData[selectedBuilding];
-                if(currencyLabelText) currencyLabelText.textContent = `Current ${data.currencyName}`;
-                if(currencyLabelIcon) {
-                    currencyLabelIcon.src = data.currencyImage;
-                    currencyLabelIcon.alt = data.currencyName;
-                }
-            });
-        });
-
-        calculateBuildingBtn.addEventListener('click', () => {
+        const performCalculation = () => {
             buildingResultDiv.innerHTML = ''; buildingResultDiv.classList.remove('error');
             const selectedBuilding = document.querySelector('input[name="building"]:checked').value;
             const currentLevel = parseInt(currentLevelInput.value, 10);
@@ -445,8 +531,69 @@ document.addEventListener('DOMContentLoaded', function() {
                 animateCounter(document.getElementById('building-gem-value'), gemCost, 700);
             }
             triggerSuccessAnimation(buildingResultDiv);
+        };
+        
+        buildingSelectors.forEach(selector => {
+            selector.addEventListener('change', () => {
+                const selectedBuilding = document.querySelector('input[name="building"]:checked').value;
+                const data = buildingData[selectedBuilding];
+                if(currencyLabelText) currencyLabelText.textContent = `Current ${data.currencyName}`;
+                if(currencyLabelIcon) {
+                    currencyLabelIcon.src = data.currencyImage;
+                    currencyLabelIcon.alt = data.currencyName;
+                }
+                if (calculateBuildingBtn.style.display === 'none') performCalculation();
+            });
+        });
+
+        calculateBuildingBtn.addEventListener('click', () => {
+            performCalculation();
+            calculateBuildingBtn.style.display = 'none';
+            const formElements = [currentLevelInput, desiredLevelInput, currentCurrencyInput, ...buildingSelectors];
+            setupAutoCalculation(formElements, performCalculation);
         });
     }
+
+    function initHohCalculator() {
+        const form = document.querySelector('.carousel-slide[data-title="Hall of Heroes"]');
+        const calculateBtn = document.getElementById('calculate-hoh-btn');
+        if(!calculateBtn) return;
+
+        const resultDiv = document.getElementById('hoh-result');
+        const troopInputs = form.querySelectorAll('.hoh-input');
+        const returnRateInputs = form.querySelectorAll('input[name="hoh-return-rate"]');
+        
+        const performCalculation = () => {
+            const returnRate = parseFloat(document.querySelector('input[name="hoh-return-rate"]:checked').value);
+            let totalPower = 0;
+
+            troopInputs.forEach(input => {
+                const count = parseInt(input.value.replace(/,/g, ''), 10) || 0;
+                const tier = input.dataset.tier;
+                
+                const returnedTroops = Math.ceil(count * returnRate);
+                const powerPerTroop = tier === 't4' ? 4 : 10;
+                totalPower += returnedTroops * powerPerTroop;
+            });
+
+            hohReturnedPower = totalPower;
+            resultDiv.innerHTML = `<img src="/images/calculators/power_icon.webp" alt="Power Icon"><span>Total Power Returned: <strong id="hoh-power-value">${totalPower.toLocaleString()}</strong></span>`;
+            
+            const hohLinkToggle = document.getElementById('hoh-link-toggle');
+            if(hohLinkToggle && hohLinkToggle.checked) {
+                const passportPowerInput = document.getElementById('power-input');
+                if (passportPowerInput) passportPowerInput.dispatchEvent(new Event('input'));
+            }
+        };
+
+        calculateBtn.addEventListener('click', () => {
+            performCalculation();
+            calculateBtn.style.display = 'none';
+            const formElements = [...troopInputs, ...returnRateInputs];
+            setupAutoCalculation(formElements, performCalculation);
+        });
+    }
+
 
     function triggerSuccessAnimation(element) {
         if (!element) return;
