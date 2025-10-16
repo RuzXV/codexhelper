@@ -80,9 +80,9 @@ document.addEventListener('DOMContentLoaded', function() {
         switch(index) {
             case 0: initSkillCalculator(); break;
             case 1: initExpCalculator(); break;
-            case 2: initPassportCalculator(); break;
-            case 3: initVipCalculator(); break;
-            case 4: initBuildingCalculator(); break;
+            case 2: initVipCalculator(); break;
+            case 3: initBuildingCalculator(); break;
+            case 4: initPassportCalculator(); break;
             case 5: initHohCalculator(); break;
         }
         

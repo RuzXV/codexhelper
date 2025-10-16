@@ -200,7 +200,7 @@
 }
 .form-group-horizontal-power {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: var(--spacing-3);
 }
 .form-group-horizontal-power .form-group {
@@ -209,8 +209,11 @@
     min-width: 0;
 }
 .form-group-horizontal-power .form-group-toggle {
-    margin: 0;
+    margin: 0 0 5px 0;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
 }
 .form-group-horizontal-power .toggle-label {
     white-space: nowrap;
