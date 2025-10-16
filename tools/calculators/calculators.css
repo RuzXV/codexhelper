@@ -191,30 +191,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-bottom: var(--spacing-4);
     text-align: center;
 }
-.form-group-horizontal {
+
+.label-with-toggle {
     display: flex;
-    align-items: flex-end;
-    gap: var(--spacing-3);
-}
-.form-group-horizontal .form-group {
-    flex-grow: 1;
-    margin-bottom: 0;
-}
-.form-group-horizontal .toggle-switch {
-    margin-bottom: 5px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-2);
 }
 
-.form-group-horizontal-power {
-    display: flex;
-    align-items: flex-end;
-    gap: var(--spacing-3);
-    margin-bottom: var(--spacing-6);
-}
-
-.form-group-horizontal-power .form-group {
-    flex: 1 1 auto;
+.label-with-toggle > label {
     margin-bottom: 0;
-    min-width: 0;
 }
 
 .hoh-link-group {
@@ -223,17 +209,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     flex-direction: row;
     align-items: center;
     gap: var(--spacing-1);
-    margin-bottom: 5px;
-}
-
-
-.hoh-link-label-top {
-    font-size: var(--font-size-base);
-    color: var(--text-primary);
-    font-weight: 500;
     margin-bottom: 0;
-    cursor: default;
-    white-space: nowrap;
 }
 
 .hoh-link-anchor {
@@ -243,8 +219,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: var(--font-size-base);
     margin-top: 0;
     white-space: nowrap;
-    position: relative;
-    top: -1px;
+}
+
+.hoh-link-label-top {
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 0;
+    cursor: default;
+    white-space: nowrap;
 }
 
 .rarity-selector, .building-selector { display: grid; gap: var(--spacing-3); }
@@ -524,31 +507,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
-    width: 44px;
-    height: 44px;
     color: var(--text-secondary);
     transition: all 0.2s ease;
     flex-shrink: 0;
 }
 
 .calendar-icon-label img {
-    max-width: 90%;
-    max-height: 90%;
+    width: 38px;
+    height: 38px;
     object-fit: contain;
     opacity: 0.9;
-    transition: opacity 0.2s ease;
-}
-
-.calendar-icon-label:hover {
-    background: var(--border-hover);
-    border-color: var(--accent-blue);
+    transition: all 0.2s ease;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.7));
 }
 
 .calendar-icon-label:hover img {
     opacity: 1;
+    transform: scale(1.1);
 }
 
 #migration-date {
