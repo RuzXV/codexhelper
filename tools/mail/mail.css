@@ -5,6 +5,13 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'NotoSansHans Bold';
+    src: url('NotoSansHans-Bold.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 .navbar {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -94,7 +101,7 @@
 }
 
 .tool-container {
-    max-width: 1000px;
+    max-width: 700px;
     margin: 0 auto;
 }
 
@@ -404,13 +411,13 @@
     z-index: 1;
     width: 100%;
     height: 100%;
-    line-height: 1.4;
-    font-size: 13.5px;
+    line-height: 1.45;
+    font-size: 13px;
     word-wrap: break-word;
     color: #e0e0e0;
     overflow-y: auto;
     white-space: pre-wrap;
-    padding: 5px 8px;
+    padding: 12px 12px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -419,7 +426,10 @@
     color: #000000;
 }
 
-#mail-preview strong { font-weight: bold; }
+#mail-preview strong { 
+    font-family: 'NotoSansHans Bold', 'NotoSansHans DemiLight', var(--font-family);
+    font-weight: normal;
+}
 #mail-preview em { font-style: italic; }
 
 #custom-gradient-options {
