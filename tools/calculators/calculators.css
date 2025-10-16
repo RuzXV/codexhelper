@@ -218,7 +218,7 @@
     gap: var(--spacing-2);
 }
 .form-group-horizontal-power .toggle-label {
-    white-space: nowrap;
+    white-space: nowrap; 
 }
 
 #hoh-hyperlink {
@@ -281,7 +281,7 @@
     transform: translateY(-50%);
     font-size: 10px;
     font-weight: bold;
-    transition: opacity 0.2s ease;
+    transition: all 0.4s ease;
     z-index: 1;
 }
 
@@ -299,14 +299,11 @@
     transform: translateX(22px);
     background-color: white;
 }
-.toggle-slider[data-on]::after {
+.toggle-switch input:checked + .toggle-slider[data-on]::after {
     content: attr(data-on);
     left: 8px;
+    right: auto;
     color: white;
-    opacity: 0;
-}
-.toggle-switch input:checked + .toggle-slider[data-on]::after {
-    opacity: 1;
 }
 .toggle-switch input:checked + .toggle-slider[data-off]::after {
     opacity: 0;
