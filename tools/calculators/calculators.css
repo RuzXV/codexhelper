@@ -178,6 +178,45 @@
 .island-content input[type="number"]:focus,
 .island-content input[type="date"]:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
 
+#migration-date {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+input[type="date"] {
+    flex-grow: 1;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+
+input[type="date"]::after {
+    content: '\f073';
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+input[type="date"]:hover::after {
+    background: var(--border-hover);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue-bright);
+}
+
 .island-content .btn-primary { width: 100%; margin-top: var(--spacing-2); }
 .island-content .disclaimer {
     font-size: var(--font-size-xs);
@@ -199,10 +238,9 @@
     margin-bottom: 5px;
 }
 
-/* START: FIX FOR LINK HOH ALIGNMENT */
 .form-group-horizontal-power {
     display: flex;
-    align-items: center; /* Vertically center the flex items */
+    align-items: center;
     gap: var(--spacing-3);
 }
 .form-group-horizontal-power .form-group {
@@ -211,17 +249,16 @@
     min-width: 0;
 }
 .form-group-horizontal-power .form-group-toggle {
-    margin-top: 29px; /* This margin pushes the toggle group down to align with the input box */
-    margin-bottom: 0; /* Reset bottom margin */
+    margin-top: 29px;
+    margin-bottom: 0;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     gap: var(--spacing-2);
 }
 .form-group-horizontal-power .toggle-label {
-    white-space: nowrap; /* Prevents "Link HoH" from breaking into two lines */
+    white-space: nowrap;
 }
-/* END: FIX FOR LINK HOH ALIGNMENT */
 
 #hoh-hyperlink {
     color: var(--accent-blue-bright);
@@ -264,8 +301,6 @@
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
 .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-primary); border: 1px solid var(--border-hover); border-radius: 28px; transition: .4s; overflow: hidden; }
 
-/* START: FIX FOR T4/T5 TOGGLE SWITCH */
-/* This is the sliding dot. It uses ::before. */
 .toggle-slider:before {
     position: absolute;
     content: "";
@@ -279,7 +314,6 @@
     z-index: 2;
 }
 
-/* This is the text label. It uses ::after. */
 .toggle-slider::after {
     position: absolute;
     top: 50%;
@@ -288,15 +322,11 @@
     font-weight: bold;
     transition: all 0.4s ease;
     z-index: 1;
-    /* Default state (OFF / T4) */
     content: attr(data-off);
     right: 8px;
     color: var(--text-secondary);
 }
 
-/* --- TOGGLE STATES --- */
-
-/* CHECKED ("ON" / "T5") STATE */
 .toggle-switch input:checked + .toggle-slider {
     background-color: var(--accent-blue);
     border-color: var(--accent-blue);
@@ -305,7 +335,7 @@
     transform: translateX(22px);
     background-color: white;
 }
-/* When checked, change the ::after content and position */
+
 .toggle-switch input:checked + .toggle-slider::after {
     content: attr(data-on);
     left: 8px;
@@ -313,18 +343,16 @@
     color: white;
 }
 
-/* DISABLED STATE */
 .toggle-switch input:disabled + .toggle-slider {
     cursor: not-allowed;
     background-color: var(--bg-secondary);
 }
 .toggle-switch input:disabled + .toggle-slider:before {
-    background-color: var(--border-hover); /* A lighter grey so the dot is visible */
+    background-color: var(--border-hover);
 }
 .toggle-switch input:focus-visible + .toggle-slider {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
-/* END: FIX FOR T4/T5 TOGGLE SWITCH */
 
 
 .calc-result {
