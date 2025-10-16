@@ -6,8 +6,8 @@
 }
 
 @font-face {
-    font-family: 'NotoSansHans Bold';
-    src: url('NotoSansHans-Bold.otf') format('opentype');
+    font-family: 'NotoSansHans Black';
+    src: url('NotoSansHans-Black.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
 }
@@ -427,7 +427,7 @@
 }
 
 #mail-preview strong { 
-    font-family: 'NotoSansHans Bold', 'NotoSansHans DemiLight', var(--font-family);
+    font-family: 'NotoSansHans Black', 'NotoSansHans DemiLight', var(--font-family);
     font-weight: normal;
 }
 #mail-preview em { font-style: italic; }

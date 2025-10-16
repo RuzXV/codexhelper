@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         previewText = previewText.replace(/&lt;i&gt;(.*?)&lt;\/i&gt;/gis, '<em>$1</em>');
         
         previewText = previewText.replace(/&lt;size=(\d+)&gt;(.*?)&lt;\/size&gt;/gis, (match, size, content) => {
-            const scaledSize = parseFloat(size) * 0.5;
+            const scaledSize = parseFloat(size) * 0.55;
             return `<span style="font-size: ${scaledSize}px;">${content}</span>`;
         });
 
