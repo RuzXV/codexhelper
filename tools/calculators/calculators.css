@@ -206,49 +206,41 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .form-group-horizontal-power {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: var(--spacing-3);
 }
+
 .form-group-horizontal-power .form-group {
-    flex-grow: 1;
+    flex: 1 1 auto;
     margin-bottom: 0;
     min-width: 0;
 }
-.form-group-horizontal-power .form-group-toggle {
+
+.hoh-link-group {
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    margin: 0;
+    margin-bottom: 2px;
 }
-.toggle-label-top {
+
+.hoh-link-label-top {
     font-size: var(--font-size-xs);
     color: var(--text-secondary);
     font-weight: 500;
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-}
-.toggle-label-bottom a {
-    font-size: var(--font-size-sm);
-    color: var(--accent-blue-bright);
-    font-weight: 600;
-    text-decoration: none;
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-}
-.toggle-label-bottom a:hover {
-    text-decoration: underline;
+    margin-bottom: var(--spacing-1);
+    cursor: pointer;
 }
 
-#hoh-hyperlink {
+.hoh-link-anchor {
     color: var(--accent-blue-bright);
     text-decoration: none;
     font-weight: 600;
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-1);
 }
-#hoh-hyperlink:hover {
+
+.hoh-link-anchor:hover {
     text-decoration: underline;
 }
 
@@ -547,9 +539,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .calendar-icon-label i {
     font-size: 1.2rem;
-    line-height: 1;
-    margin: 0;
-    padding: 0;
 }
 
 #migration-date {
