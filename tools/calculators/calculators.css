@@ -199,9 +199,10 @@
     margin-bottom: 5px;
 }
 
+/* START: FIX FOR LINK HOH ALIGNMENT */
 .form-group-horizontal-power {
     display: flex;
-    align-items: flex-end;
+    align-items: center; /* Vertically center the flex items */
     gap: var(--spacing-3);
 }
 .form-group-horizontal-power .form-group {
@@ -210,16 +211,17 @@
     min-width: 0;
 }
 .form-group-horizontal-power .form-group-toggle {
-    margin-top: 0;
-    margin-bottom: 5px;
+    margin-top: 29px; /* This margin pushes the toggle group down to align with the input box */
+    margin-bottom: 0; /* Reset bottom margin */
     flex-shrink: 0;
     display: flex;
     align-items: center;
     gap: var(--spacing-2);
 }
 .form-group-horizontal-power .toggle-label {
-    white-space: nowrap; 
+    white-space: nowrap; /* Prevents "Link HoH" from breaking into two lines */
 }
+/* END: FIX FOR LINK HOH ALIGNMENT */
 
 #hoh-hyperlink {
     color: var(--accent-blue-bright);
@@ -262,6 +264,8 @@
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
 .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-primary); border: 1px solid var(--border-hover); border-radius: 28px; transition: .4s; overflow: hidden; }
 
+/* START: FIX FOR T4/T5 TOGGLE SWITCH */
+/* This is the sliding dot. It uses ::before. */
 .toggle-slider:before {
     position: absolute;
     content: "";
@@ -275,6 +279,7 @@
     z-index: 2;
 }
 
+/* This is the text label. It uses ::after. */
 .toggle-slider::after {
     position: absolute;
     top: 50%;
@@ -283,14 +288,15 @@
     font-weight: bold;
     transition: all 0.4s ease;
     z-index: 1;
-}
-
-.toggle-slider[data-off]::after {
+    /* Default state (OFF / T4) */
     content: attr(data-off);
     right: 8px;
     color: var(--text-secondary);
 }
 
+/* --- TOGGLE STATES --- */
+
+/* CHECKED ("ON" / "T5") STATE */
 .toggle-switch input:checked + .toggle-slider {
     background-color: var(--accent-blue);
     border-color: var(--accent-blue);
@@ -299,26 +305,27 @@
     transform: translateX(22px);
     background-color: white;
 }
-.toggle-switch input:checked + .toggle-slider[data-on]::after {
+/* When checked, change the ::after content and position */
+.toggle-switch input:checked + .toggle-slider::after {
     content: attr(data-on);
     left: 8px;
     right: auto;
     color: white;
 }
-.toggle-switch input:checked + .toggle-slider[data-off]::after {
-    opacity: 0;
-}
 
+/* DISABLED STATE */
 .toggle-switch input:disabled + .toggle-slider {
     cursor: not-allowed;
     background-color: var(--bg-secondary);
 }
 .toggle-switch input:disabled + .toggle-slider:before {
-    background-color: var(--border-hover);
+    background-color: var(--border-hover); /* A lighter grey so the dot is visible */
 }
 .toggle-switch input:focus-visible + .toggle-slider {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
+/* END: FIX FOR T4/T5 TOGGLE SWITCH */
+
 
 .calc-result {
     margin-top: var(--spacing-4); padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-md);
