@@ -417,7 +417,7 @@
     color: #e0e0e0;
     overflow-y: auto;
     white-space: pre-wrap;
-    padding: 20px 20px;
+    padding: 15px 20px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transform: scaleY(0.95);
