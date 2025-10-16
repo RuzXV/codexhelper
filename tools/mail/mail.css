@@ -417,7 +417,7 @@
     color: #e0e0e0;
     overflow-y: auto;
     white-space: pre-wrap;
-    padding: 16px 16px;
+    padding: 20px 20px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transform: scaleY(0.95);
@@ -431,7 +431,7 @@
 #mail-preview strong { 
     font-family: 'NotoSansHans Bold', 'NotoSansHans DemiLight', var(--font-family);
     font-weight: normal;
-    -webkit-text-stroke: 0.3px currentColor;
+    -webkit-text-stroke: 0.2px currentColor;
 }
 #mail-preview em { font-style: italic; }
 
