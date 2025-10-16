@@ -91,9 +91,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function setupAutoCalculation(formElements, calculationFunction) {
         formElements.forEach(element => {
-            element.addEventListener('input', calculationFunction);
+            const eventType = (element.type === 'radio' || element.type === 'checkbox') ? 'change' : 'input';
+            element.addEventListener(eventType, calculationFunction);
         });
     }
+
+    function formatNumberInput(input) {
+        const format = () => {
+            let value = input.value;
+            let cursorPosition = input.selectionStart;
+            let originalLength = value.length;
+
+            let rawValue = value.replace(/,/g, '');
+            if (isNaN(rawValue) || rawValue.trim() === '') {
+                input.value = '';
+                return;
+            }
+
+            let formattedValue = Number(rawValue).toLocaleString('en-US');
+            
+            if (value === formattedValue) return;
+
+            input.value = formattedValue;
+
+            let newLength = formattedValue.length;
+            let lengthDiff = newLength - originalLength;
+            
+            if (cursorPosition > 0 && lengthDiff !== 0) {
+                let newCursorPosition = cursorPosition + lengthDiff;
+                if (lengthDiff < 0 && value.charAt(cursorPosition-1) === ',') {
+                    newCursorPosition++;
+                }
+                input.setSelectionRange(newCursorPosition, newCursorPosition);
+            }
+        };
+        input.addEventListener('input', format);
+    }
+
 
     function initSkillCalculator() {
         const form = document.querySelector('.carousel-slide[data-title="Skill Upgrades"]');
@@ -164,6 +198,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const expTomeInputs = form.querySelectorAll('.exp-tome-input');
         const rarityInputs = form.querySelectorAll('input[name="exp-rarity"]');
         
+        formatNumberInput(currentExpInput);
+        expTomeInputs.forEach(formatNumberInput);
+        
         const expCosts = {
             legendary: [120, 360, 720, 1200, 3600, 7200, 10800, 14400, 18000, 22200, 27000, 32400, 38400, 45000, 52200, 60000, 67800, 75600, 84000, 90000, 96000, 103200, 110400, 117600, 126000, 134400, 142800, 151200, 162000, 180000, 204000, 234000, 270000, 312000, 360000, 414000, 474000, 540000, 660000, 810000, 960000, 1140000, 1320000, 1530000, 1740000, 1980000, 2220000, 2520000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000],
             epic: [100, 300, 600, 1000, 3000, 6000, 9000, 12000, 15000, 18500, 22500, 27000, 32000, 37500, 43500, 50000, 56500, 63000, 70000, 75000, 80000, 86000, 92000, 98000, 105000, 112000, 119000, 126000, 135000, 150000, 170000, 195000, 225000, 260000, 300000, 345000, 395000, 450000, 550000, 675000, 800000, 950000, 1100000, 1275000, 1450000, 1650000, 1850000, 2100000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000, 2350000],
@@ -190,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             let totalTomeExp = 0;
             expTomeInputs.forEach(input => {
-                totalTomeExp += (parseInt(input.value, 10) || 0) * (parseInt(input.dataset.value, 10));
+                totalTomeExp += (parseInt(input.value.replace(/,/g, ''), 10) || 0) * (parseInt(input.dataset.value, 10));
             });
 
             if (isTomeOnlyMode) {
@@ -198,15 +235,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const commandersToMax = totalTomeExp > 0 && totalExpToMax > 0 ? Math.floor(totalTomeExp / totalExpToMax) : 0;
                 
                 expResultDiv.innerHTML = `
-                    <div class="cost-line"><img src="/images/calculators/experience_book.webp" alt="EXP Book"> You have <strong id="total-tome-exp">${totalTomeExp.toLocaleString()}</strong> total EXP in tomes.</div>
-                    <div class="cost-line">This can max <strong id="commanders-to-max">${commandersToMax}</strong> ${rarity} commanders.</div>`;
+                    <div class="cost-line"><img src="/images/calculators/experience_book.webp" alt="EXP Book"> You have <strong>${totalTomeExp.toLocaleString()}</strong> total EXP in tomes.</div>
+                    <div class="cost-line">This can max <strong>${commandersToMax}</strong> ${rarity} commanders.</div>`;
                 triggerSuccessAnimation(expResultDiv);
                 return;
             }
     
             if (isNaN(currentLevel) || currentLevel < 1 || currentLevel > maxLevel) {
-                expResultDiv.textContent = `Please enter a valid level between 1 and ${maxLevel}.`;
-                expResultDiv.classList.add('error'); 
+                if(currentLevelInput.value) {
+                    expResultDiv.textContent = `Please enter a valid level between 1 and ${maxLevel}.`;
+                    expResultDiv.classList.add('error'); 
+                }
                 return;
             }
     
@@ -263,12 +302,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const hospitalCapacityInput = document.getElementById('hospital-capacity');
         const hospitalTierToggle = document.getElementById('hospital-tier-toggle');
         const hohLinkToggle = document.getElementById('hoh-link-toggle');
-
+        const hohHyperlink = document.getElementById('hoh-hyperlink');
+        
+        formatNumberInput(powerInput);
+        formatNumberInput(hospitalCapacityInput);
+        formatNumberInput(currentPassportsInput);
 
         const passportBrackets = [ { maxPower: 9999999, normal: 1, discount: 1 }, { maxPower: 14999999, normal: 2, discount: 1 }, { maxPower: 19999999, normal: 3, discount: 1 }, { maxPower: 24999999, normal: 4, discount: 1 }, { maxPower: 29999999, normal: 6, discount: 1 }, { maxPower: 34999999, normal: 9, discount: 2 }, { maxPower: 39999999, normal: 12, discount: 3 }, { maxPower: 44999999, normal: 15, discount: 5 }, { maxPower: 49999999, normal: 20, discount: 8 }, { maxPower: 54999999, normal: 25, discount: 12 }, { maxPower: 59999999, normal: 30, discount: 15 }, { maxPower: 64999999, normal: 35, discount: 20 }, { maxPower: 69999999, normal: 40, discount: 25 }, { maxPower: 74999999, normal: 45, discount: 32 }, { maxPower: 79999999, normal: 50, discount: 40 }, { maxPower: 84999999, normal: 55, discount: 47 }, { maxPower: 89999999, normal: 60, discount: 54 }, { maxPower: 94999999, normal: 65, discount: 61 }, { maxPower: 99999999, normal: 70, discount: 67 }, { maxPower: Infinity, normal: 75, discount: 73 } ];
         
         hospitalCapacityInput.addEventListener('input', () => {
             hospitalTierToggle.disabled = !hospitalCapacityInput.value;
+        });
+
+        hohHyperlink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const hohSlideIndex = slides.findIndex(slide => slide.dataset.title === "Hall of Heroes");
+            if (hohSlideIndex !== -1) {
+                moveToSlide(hohSlideIndex);
+            }
         });
 
         function calculateBundleCost(passportsNeeded, months) {
@@ -290,19 +341,19 @@ document.addEventListener('DOMContentLoaded', function() {
             let passportsObtained = 0;
             let purchased = {};
         
+            let tempPassportsNeeded = passportsNeeded;
+            
             for (const bundle of availableBundles) {
-                if (passportsObtained >= passportsNeeded) break;
+                if (tempPassportsNeeded <= 0) break;
                 
                 cost += bundle.cost;
                 passportsObtained += bundle.passports;
+                tempPassportsNeeded -= bundle.passports;
+
                 const key = `$${bundle.cost}`;
                 purchased[key] = (purchased[key] || 0) + 1;
             }
         
-            if (passportsObtained < passportsNeeded) {
-                 return { cost: cost, details: `Could not meet passport requirement. Still need ${passportsNeeded - passportsObtained} passports.` };
-            }
-
             const detailStr = Object.entries(purchased)
                 .sort((a,b) => parseInt(a[0].substring(1)) - parseInt(b[0].substring(1)))
                 .map(([key, val]) => `${val}x ${key} bundle`).join(', ');
@@ -312,7 +363,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const performCalculation = () => {
             passportResultDiv.innerHTML = ''; costResultDiv.innerHTML = ''; passportResultDiv.classList.remove('error'); costResultDiv.classList.remove('error');
             const power = parseInt(powerInput.value.replace(/,/g, ''), 10);
-            if (isNaN(power) || power <= 0) { passportResultDiv.textContent = 'Please enter a valid, positive power.'; passportResultDiv.classList.add('error'); return; }
+            if (isNaN(power) || power <= 0) { 
+                if (powerInput.value) {
+                    passportResultDiv.textContent = 'Please enter a valid, positive power.'; passportResultDiv.classList.add('error');
+                }
+                return; 
+            }
             
             let effectivePower = power;
             const hospitalCapacity = parseInt(hospitalCapacityInput.value.replace(/,/g, ''), 10) || 0;
@@ -332,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(!bracket) { passportResultDiv.textContent = 'Could not determine passport bracket.'; passportResultDiv.classList.add('error'); return; }
 
             const requiredPassports = isDiscounted ? bracket.discount : bracket.normal;
-            const currentPassports = parseInt(currentPassportsInput.value.trim(), 10) || 0;
+            const currentPassports = parseInt(currentPassportsInput.value.replace(/,/g, ''), 10) || 0;
             if (isNaN(currentPassports) || currentPassports < 0) { costResultDiv.textContent = 'Current passports must be a positive number.'; costResultDiv.classList.add('error'); return; }
             const passportsNeeded = requiredPassports - currentPassports;
 
@@ -345,15 +401,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const today = new Date();
             today.setHours(0,0,0,0);
-            const migrationDate = migrationDateInput.value ? new Date(migrationDateInput.value) : today;
-            let monthsAvailable = 1;
-            if (migrationDate > today) {
-                monthsAvailable = (migrationDate.getFullYear() - today.getFullYear()) * 12 + (migrationDate.getMonth() - today.getMonth());
-                if(today.getDate() === 1) {
-                    monthsAvailable +=1;
-                } else if (migrationDate.getDate() >= 1) {
-                    monthsAvailable +=1;
+            const migrationDateVal = migrationDateInput.value;
+            const migrationDate = migrationDateVal ? new Date(migrationDateVal + 'T00:00:00') : today;
+            let monthsAvailable = 0;
+
+            if (migrationDateVal) {
+                if(migrationDate < today) {
+                    monthsAvailable = 0;
+                } else {
+                    let startMonth = today.getMonth();
+                    let startYear = today.getFullYear();
+                    let endMonth = migrationDate.getMonth();
+                    let endYear = migrationDate.getFullYear();
+                    monthsAvailable = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
                 }
+            } else {
+                monthsAvailable = 1;
             }
 
 
@@ -393,6 +456,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const vipTokenGrid = document.getElementById('vip-token-grid-container');
         const vipTokenInputs = form.querySelectorAll('.vip-token-input');
         
+        formatNumberInput(currentVipPointsInput);
+        vipTokenInputs.forEach(formatNumberInput);
+        
         const vipLevels = [ { level: 1, points: 200 }, { level: 2, points: 400 }, { level: 3, points: 1200 }, { level: 4, points: 3500 }, { level: 5, points: 6000 }, { level: 6, points: 11500 }, { level: 7, points: 17500 }, { level: 8, points: 35000 }, { level: 9, points: 75000 }, { level: 10, points: 150000 }, { level: 11, points: 250000 }, { level: 12, points: 350000 }, { level: 13, points: 500000 }, { level: 14, points: 750000 }, { level: 15, points: 1000000 }, { level: 16, points: 1500000 }, { level: 17, points: 2500000 }, { level: 18, points: 4000000 }, { level: 19, points: 6000000 }, { level: 'SVIP', points: 9000000 } ];
 
         vipTokenToggle.addEventListener('change', () => vipTokenGrid.classList.toggle('visible', vipTokenToggle.checked));
@@ -403,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if(vipTokenToggle.checked) {
                 vipTokenInputs.forEach(input => {
-                    const count = parseInt(input.value, 10) || 0;
+                    const count = parseInt(input.value.replace(/,/g, ''), 10) || 0;
                     const value = parseInt(input.dataset.value, 10);
                     totalPoints += count * value;
                 });
@@ -504,6 +570,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const currencyLabelText = document.getElementById('currency-label-text');
         const currencyLabelIcon = document.getElementById('currency-label-icon');
 
+        formatNumberInput(currentCurrencyInput);
+
         const buildingData = {
             castle: { currencyName: "Books of Covenant", currencyImage: "/images/calculators/book_of_covenant.webp", costs: [0, 2, 5, 8, 15, 20, 30, 40, 50, 70, 80, 100, 125, 150, 300, 500, 700, 900, 1200, 1500, 1750, 2000, 2500, 3000, 5000] },
             watchtower: { currencyName: "Arrows of Resistance", currencyImage: "/images/calculators/arrow_of_resistance.webp", costs: [0, 2, 5, 8, 15, 20, 30, 40, 50, 70, 80, 100, 125, 150, 300, 500, 700, 900, 1200, 1500, 1800, 2000, 2500, 3000, 5000] },
@@ -519,9 +587,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const selectedBuilding = document.querySelector('input[name="building"]:checked').value;
             const currentLevel = parseInt(currentLevelInput.value, 10);
             const desiredLevel = parseInt(desiredLevelInput.value, 10);
-            const currentCurrency = parseInt(currentCurrencyInput.value, 10) || 0;
+            const currentCurrency = parseInt(currentCurrencyInput.value.replace(/,/g, ''), 10) || 0;
             
-            if (isNaN(currentLevel) || isNaN(desiredLevel) || currentLevel < 1 || desiredLevel > 25) { buildingResultDiv.textContent = 'Please enter valid levels between 1 and 25.'; buildingResultDiv.classList.add('error'); return; }
+            if (isNaN(currentLevel) || isNaN(desiredLevel) || currentLevel < 1 || desiredLevel > 25) { if(currentLevelInput.value || desiredLevelInput.value) {buildingResultDiv.textContent = 'Please enter valid levels between 1 and 25.'; buildingResultDiv.classList.add('error');} return; }
             if (desiredLevel <= currentLevel) { buildingResultDiv.textContent = 'Desired level must be higher than the current level.'; buildingResultDiv.classList.add('error'); return; }
             if (isNaN(currentCurrency) || currentCurrency < 0) { buildingResultDiv.textContent = 'Current currency must be a positive number.'; buildingResultDiv.classList.add('error'); return; }
 
@@ -572,6 +640,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const troopInputs = form.querySelectorAll('.hoh-input');
         const returnRateInputs = form.querySelectorAll('input[name="hoh-return-rate"]');
         
+        troopInputs.forEach(formatNumberInput);
+
         const performCalculation = () => {
             const returnRate = parseFloat(document.querySelector('input[name="hoh-return-rate"]:checked').value);
             let totalPower = 0;
@@ -586,7 +656,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             hohReturnedPower = totalPower;
-            resultDiv.innerHTML = `<img src="/images/calculators/power_icon.webp" alt="Power Icon"><span>Total Power Returned: <strong id="hoh-power-value">${totalPower.toLocaleString()}</strong></span>`;
+            resultDiv.innerHTML = `<img src="/images/calculators/power_icon.webp" alt="Power Icon"><span>Total Power Returned: <strong>${totalPower.toLocaleString()}</strong></span>`;
             
             const hohLinkToggle = document.getElementById('hoh-link-toggle');
             if(hohLinkToggle && hohLinkToggle.checked) {
