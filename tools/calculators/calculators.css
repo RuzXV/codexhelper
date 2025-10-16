@@ -240,7 +240,7 @@ input[type="date"]:hover::after {
 
 .form-group-horizontal-power {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: var(--spacing-3);
 }
 .form-group-horizontal-power .form-group {
@@ -249,8 +249,7 @@ input[type="date"]:hover::after {
     min-width: 0;
 }
 .form-group-horizontal-power .form-group-toggle {
-    margin-top: 29px;
-    margin-bottom: 0;
+    margin-bottom: 5px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
