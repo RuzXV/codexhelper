@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const customSizeOptions = document.getElementById('custom-size-options');
     const customColorOptions = document.getElementById('custom-color-options');
+    const customColorPickerContainer = document.getElementById('custom-color-picker-container');
+    const customColorInput = document.getElementById('custom-color-input');
+    const applyCustomColorBtn = document.getElementById('apply-custom-color-btn');
 
     const applyGradientBtn = document.getElementById('apply-gradient-btn');
     const gradientToggleBtn = document.getElementById('custom-gradient-toggle');
@@ -21,11 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const gradientPreviewBar = document.getElementById('gradient-preview-bar');
     const gradientColor1 = document.getElementById('gradient-color-1');
     const gradientColor2 = document.getElementById('gradient-color-2');
-
-    const hiddenColorPicker = document.createElement('input');
-    hiddenColorPicker.type = 'color';
-    hiddenColorPicker.style.display = 'none';
-    document.body.appendChild(hiddenColorPicker);
 
     const generatorTabBtn = document.querySelector('.generator-tab-btn[data-tab="generator"]');
     const templatesTabBtn = document.querySelector('.generator-tab-btn[data-tab="templates"]');
@@ -48,13 +46,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const magnifiedImage = document.getElementById('magnified-image');
     const magnifiedPlaceholder = document.getElementById('magnified-placeholder');
     const magnifiedTitle = document.getElementById('magnified-title');
+    
+    const customConfirmModal = document.getElementById('custom-confirm-modal');
+    const confirmActionBtn = document.getElementById('confirm-action-btn');
+    const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+
+    // New custom size modal elements
+    const customSizeModal = document.getElementById('custom-size-modal');
+    const customSizeInput = document.getElementById('custom-size-input');
+    const customSizeApplyBtn = document.getElementById('custom-size-apply-btn');
+    const customSizeCancelBtn = document.getElementById('custom-size-cancel-btn');
 
     let templates = [];
     let selectedTemplate = null;
     let hoveredTemplate = null;
     let isGalleryPopulated = false;
+
     let isLivePreviewingGradient = false;
     let gradientSelection = { start: 0, end: 0 };
+    let isLivePreviewingColor = false;
+    let colorSelection = { start: 0, end: 0 };
 
     let historyStack = [];
     let historyIndex = -1;
@@ -66,25 +77,49 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function saveState() {
-        if (historyIndex < historyStack.length - 1) {
-            historyStack = historyStack.slice(0, historyIndex + 1);
+    function saveState(replace = false) {
+        const currentState = {
+            value: mailInput.value,
+            start: mailInput.selectionStart,
+            end: mailInput.selectionEnd,
+        };
+
+        if (replace) {
+            historyStack[historyIndex] = currentState;
+        } else {
+            if (historyIndex < historyStack.length - 1) {
+                historyStack = historyStack.slice(0, historyIndex + 1);
+            }
+            historyStack.push(currentState);
+            historyIndex++;
         }
-        historyStack.push(mailInput.value);
-        historyIndex++;
-        updateUndoButton();
+        updateUndoRedoButtons();
+    }
+
+    function changeState(newIndex) {
+        if (newIndex >= 0 && newIndex < historyStack.length) {
+            historyIndex = newIndex;
+            const state = historyStack[historyIndex];
+            mailInput.value = state.value;
+            mailInput.setSelectionRange(state.start, state.end);
+            updatePreview();
+            updateUndoRedoButtons();
+        }
     }
 
     function undo() {
         if (historyIndex > 0) {
-            historyIndex--;
-            mailInput.value = historyStack[historyIndex];
-            updatePreview();
-            updateUndoButton();
+            changeState(historyIndex - 1);
         }
     }
 
-    function updateUndoButton() {
+    function redo() {
+        if (historyIndex < historyStack.length - 1) {
+            changeState(historyIndex + 1);
+        }
+    }
+
+    function updateUndoRedoButtons() {
         undoBtn.disabled = historyIndex <= 0;
     }
 
@@ -94,54 +129,82 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function applyTag(tag, value = null) {
+        const start = mailInput.selectionStart;
+        const end = mailInput.selectionEnd;
+        let selectedText = mailInput.value.substring(start, end);
+        if (!selectedText && value === null) return;
+    
         saveState();
+    
+        let replacement;
+    
+        if (value !== null) {
+            const openingTag = `<${tag}=${value}>`;
+            const closingTag = `</${tag}>`;
+            const exactTagRegex = new RegExp(`^\\s*${openingTag.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}([\\s\\S]*?)${closingTag}\\s*$`, 'i');
+    
+            if (selectedText.trim().match(exactTagRegex)) {
+                replacement = selectedText.replace(exactTagRegex, '$1');
+            } else {
+                const anyOpeningTagRegex = new RegExp(`<${tag}=[^>]+>`, 'gi');
+                const anyClosingTagRegex = new RegExp(`</${tag}>`, 'gi');
+                
+                const textToWrap = selectedText.replace(anyOpeningTagRegex, '').replace(anyClosingTagRegex, '');
+                replacement = `${openingTag}${textToWrap}${closingTag}`;
+            }
+        } else {
+            const openTag = `<${tag}>`;
+            const closeTag = `</${tag}>`;
+            const fullTagRegex = new RegExp(`^\\s*${openTag.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}([\\s\\S]*?)${closeTag}\\s*$`, 'i');
+            const openTagRegex = new RegExp(openTag, 'gi');
+            const closeTagRegex = new RegExp(closeTag, 'gi');
+    
+            if (selectedText.trim().startsWith(`<${tag}`) && selectedText.trim().endsWith(closeTag)) {
+                 replacement = selectedText.replace(fullTagRegex, '$1');
+            } else if (selectedText.includes(`<${tag}`)) {
+                replacement = selectedText.replace(openTagRegex, '').replace(closeTagRegex, '');
+            } else {
+                replacement = `${openTag}${selectedText}${closeTag}`;
+            }
+        }
+    
+        mailInput.setRangeText(replacement, start, end, 'select');
+        updatePreview();
+        saveState(true);
+    }
+    
+    function applyDoubleTag(tag1, tag2) {
         const start = mailInput.selectionStart;
         const end = mailInput.selectionEnd;
         let selectedText = mailInput.value.substring(start, end);
         if (!selectedText) return;
-
-        let replacement = '';
-        const simpleTagRegex = new RegExp(`^<${tag}>([\\s\\S]*?)<\\/${tag}>$`);
-        const valueTagRegex = new RegExp(`^<${tag}=[^>]+>([\\s\\S]*?)<\\/${tag}>$`);
-
-        if (value) {
-            if (valueTagRegex.test(selectedText)) {
-                replacement = selectedText.replace(new RegExp(`^<${tag}=[^>]+>`), `<${tag}=${value}>`);
-            } else {
-                replacement = `<${tag}=${value}>${selectedText}</${tag}>`;
-            }
-        } else {
-            if (simpleTagRegex.test(selectedText)) {
-                replacement = selectedText.match(simpleTagRegex)[1];
-            } else {
-                replacement = `<${tag}>${selectedText}</${tag}>`;
-            }
-        }
-
-        mailInput.value = mailInput.value.substring(0, start) + replacement + mailInput.value.substring(end);
-        updatePreview();
-        saveState();
-    }
     
-    function applyDoubleTag(tag1, tag2) {
         saveState();
-        const start = mailInput.selectionStart;
-        const end = mailInput.selectionEnd;
-        const selectedText = mailInput.value.substring(start, end);
-        if (!selectedText) return;
-
-        const doubleTagRegex = new RegExp(`^<${tag1}><${tag2}>([\\s\\S]*?)<\\/${tag2}><\\/${tag1}>$`);
-        let replacement = '';
-
-        if(doubleTagRegex.test(selectedText)) {
-            replacement = selectedText.match(doubleTagRegex)[1];
-        } else {
-            replacement = `<${tag1}><${tag2}>${selectedText}</${tag2}></${tag1}>`;
+    
+        const tag1Open = `<${tag1}>`;
+        const tag1Close = `</${tag1}>`;
+        const tag2Open = `<${tag2}>`;
+        const tag2Close = `</${tag2}>`;
+    
+        const hasTag1 = selectedText.includes(tag1Open) && selectedText.includes(tag1Close);
+        const hasTag2 = selectedText.includes(tag2Open) && selectedText.includes(tag2Close);
+    
+        let processedText = selectedText;
+    
+        if (hasTag1) {
+            processedText = processedText.replace(new RegExp(tag1Open, 'g'), '').replace(new RegExp(tag1Close, 'g'), '');
+        }
+        if (hasTag2) {
+            processedText = processedText.replace(new RegExp(tag2Open, 'g'), '').replace(new RegExp(tag2Close, 'g'), '');
+        }
+    
+        if (!hasTag1 || !hasTag2) {
+            processedText = `${tag1Open}${tag2Open}${processedText}${tag2Close}${tag1Close}`;
         }
         
-        mailInput.value = mailInput.value.substring(0, start) + replacement + mailInput.value.substring(end);
+        mailInput.setRangeText(processedText, start, end, 'select');
         updatePreview();
-        saveState();
+        saveState(true);
     }
 
     function updatePreview(overrideText = null) {
@@ -172,56 +235,82 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function closeAllDropdowns() {
-        if (isLivePreviewingGradient) {
+        if (isLivePreviewingGradient || isLivePreviewingColor) {
             isLivePreviewingGradient = false;
+            isLivePreviewingColor = false;
             updatePreview();
         }
         document.querySelectorAll('.custom-dropdown-options.visible').forEach(d => d.classList.remove('visible'));
+        customColorPickerContainer.style.display = 'none';
     }
     
     document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
         const toggle = dropdown.querySelector('.toolbar-btn');
         const options = dropdown.querySelector('.custom-dropdown-options');
         if (toggle && options) {
-            toggle.addEventListener('click', (e) => {
-                e.stopPropagation();
+            toggle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
                 const isVisible = options.classList.contains('visible');
                 closeAllDropdowns();
                 if (!isVisible) {
                     options.classList.add('visible');
+                    const selectionStart = mailInput.selectionStart;
+                    const selectionEnd = mailInput.selectionEnd;
+                    const hasSelection = selectionStart !== selectionEnd;
+
                     if (dropdown.id === 'custom-gradient-dropdown') {
-                        gradientSelection.start = mailInput.selectionStart;
-                        gradientSelection.end = mailInput.selectionEnd;
-                        isLivePreviewingGradient = (gradientSelection.start !== gradientSelection.end);
+                        gradientSelection = { start: selectionStart, end: selectionEnd };
+                        isLivePreviewingGradient = hasSelection;
                         updateGradientUI();
+                    }
+                    if (dropdown.id === 'custom-color-dropdown') {
+                        colorSelection = { start: selectionStart, end: selectionEnd };
+                        isLivePreviewingColor = hasSelection;
                     }
                 }
             });
-            options.addEventListener('click', (e) => e.stopPropagation());
         }
     });
 
-    customColorOptions.addEventListener('click', (e) => {
+    customColorOptions.addEventListener('mousedown', (e) => {
+        e.preventDefault();
         const target = e.target.closest('.custom-option');
         if (!target) return;
+        
         const value = target.dataset.value;
-        if (value === 'custom') {
-            hiddenColorPicker.click();
+        
+        if (value === 'custom-toggle') {
+            customColorPickerContainer.style.display = customColorPickerContainer.style.display === 'flex' ? 'none' : 'flex';
         } else {
             applyTag('color', value);
             closeAllDropdowns();
         }
     });
 
-    hiddenColorPicker.addEventListener('change', (e) => {
-        applyTag('color', e.target.value);
+    function livePreviewColor(color) {
+        if (!isLivePreviewingColor) return;
+        
+        const fullText = mailInput.value;
+        const preSelection = fullText.substring(0, colorSelection.start);
+        const postSelection = fullText.substring(colorSelection.end);
+        
+        let selectedText = fullText.substring(colorSelection.start, colorSelection.end);
+        const anyOpeningTagRegex = /<color=[^>]+>/gi;
+        const anyClosingTagRegex = /<\/color>/gi;
+        selectedText = selectedText.replace(anyOpeningTagRegex, '').replace(anyClosingTagRegex, '');
+
+        const coloredText = `<color=${color}>${selectedText}</color>`;
+        updatePreview(preSelection + coloredText + postSelection);
+    }
+    
+    customColorInput.addEventListener('input', () => livePreviewColor(customColorInput.value));
+    
+    applyCustomColorBtn.addEventListener('click', () => {
+        applyTag('color', customColorInput.value);
         closeAllDropdowns();
     });
 
-    document.addEventListener('click', () => closeAllDropdowns());
-
     function applyGradient() {
-        saveState();
         const startColor = gradientColor1.value;
         const endColor = gradientColor2.value;
         const bias = parseFloat(gradientBiasSlider.value);
@@ -238,11 +327,12 @@ document.addEventListener('DOMContentLoaded', function() {
             closeAllDropdowns();
             return;
         }
+        saveState();
         const gradientTags = generateGradientTags(selectedText, startColor, endColor, bias, grouping);
-        mailInput.value = mailInput.value.substring(0, startPos) + gradientTags + mailInput.value.substring(endPos);
+        mailInput.setRangeText(gradientTags, startPos, endPos, 'select');
         isLivePreviewingGradient = false;
         updatePreview();
-        saveState();
+        saveState(true);
         closeAllDropdowns();
     }
 
@@ -264,9 +354,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const linearRatio = len > 1 ? midpointIndex / (len - 1) : 0;
             const biasedRatio = Math.pow(linearRatio, bias);
     
-            const r = Math.round(start.r + biasedRatio * (end.r - start.r));
-            const g = Math.round(start.g + biasedRatio * (end.g - start.g));
-            const b = Math.round(start.b + biasedRatio * (end.b - start.b));
+            let r = Math.round(start.r + biasedRatio * (end.r - start.r));
+            let g = Math.round(start.g + biasedRatio * (end.g - start.g));
+            let b = Math.round(start.b + biasedRatio * (end.b - start.b));
+            
+            r = Math.max(0, Math.min(255, r));
+            g = Math.max(0, Math.min(255, g));
+            b = Math.max(0, Math.min(255, b));
             
             output += `<color=${rgbToHex(r, g, b)}>${chunk}</color>`;
         }
@@ -468,18 +562,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     undoBtn.addEventListener('click', undo);
+    
     clearBtn.addEventListener('click', () => {
-        if (confirm('Are you sure you want to clear the editor?')) {
-            saveState();
-            mailInput.value = '';
-            updatePreview();
-            saveState();
+        customConfirmModal.style.display = 'flex';
+    });
+
+    confirmActionBtn.addEventListener('click', () => {
+        saveState();
+        mailInput.value = '';
+        updatePreview();
+        saveState();
+        customConfirmModal.style.display = 'none';
+    });
+    
+    confirmCancelBtn.addEventListener('click', () => {
+        customConfirmModal.style.display = 'none';
+    });
+    
+    mailInput.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'z') {
+            e.preventDefault();
+            undo();
+        } else if (e.ctrlKey && e.key === 'y') {
+            e.preventDefault();
+            redo();
         }
     });
     
     mailInput.addEventListener('input', () => {
         clearTimeout(inputTimeout);
-        inputTimeout = setTimeout(saveState, 500);
+        inputTimeout = setTimeout(() => saveState(true), 500);
         updatePreview();
     });
 
@@ -497,26 +609,63 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    boldBtn.addEventListener('click', () => applyTag('b'));
-    italicBtn.addEventListener('click', () => applyTag('i'));
-    boldItalicBtn.addEventListener('click', () => applyDoubleTag('b', 'i'));
+    function addFormattingListener(button, callback) {
+        button.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            callback();
+        });
+    }
 
-    customSizeOptions.addEventListener('click', (e) => {
+    addFormattingListener(boldBtn, () => applyTag('b'));
+    addFormattingListener(italicBtn, () => applyTag('i'));
+    addFormattingListener(boldItalicBtn, () => applyDoubleTag('b', 'i'));
+
+
+    customSizeOptions.addEventListener('mousedown', (e) => {
+        e.preventDefault();
         const target = e.target.closest('.custom-option');
         if (!target) return;
+        
         const value = target.dataset.value;
         if (value === 'custom') {
-            const customSize = prompt("Enter a custom font size (e.g., 22):");
-            if (customSize && !isNaN(customSize)) {
-                applyTag('size', customSize);
-            }
+            customSizeModal.style.display = 'flex';
+            customSizeInput.focus();
+            customSizeInput.value = '';
         } else {
             applyTag('size', value);
         }
         closeAllDropdowns();
     });
 
-    applyGradientBtn.addEventListener('click', applyGradient);
+    // Custom size modal logic
+    function applyCustomSize() {
+        const customSize = customSizeInput.value;
+        if (customSize && !isNaN(customSize) && customSize > 0) {
+            applyTag('size', customSize);
+        }
+        customSizeModal.style.display = 'none';
+    }
+
+    customSizeApplyBtn.addEventListener('click', applyCustomSize);
+    customSizeCancelBtn.addEventListener('click', () => {
+        customSizeModal.style.display = 'none';
+    });
+    customSizeModal.addEventListener('click', (e) => {
+        if (e.target === customSizeModal) {
+            customSizeModal.style.display = 'none';
+        }
+    });
+    customSizeInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            applyCustomSize();
+        } else if (e.key === 'Escape') {
+            customSizeModal.style.display = 'none';
+        }
+    });
+
+    addFormattingListener(applyGradientBtn, applyGradient);
+    
     gradientColor1.addEventListener('input', updateGradientUI);
     gradientColor2.addEventListener('input', updateGradientUI);
     gradientBiasSlider.addEventListener('input', updateGradientUI);
@@ -570,6 +719,12 @@ document.addEventListener('DOMContentLoaded', function() {
         updateMagnifiedPreview();
     });
 
+    document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('.custom-dropdown')) {
+            closeAllDropdowns();
+        }
+    });
+
     document.addEventListener('click', (e) => {
         if (!filterPanel.contains(e.target) && !filterToggleBtn.contains(e.target)) {
             filterPanel.classList.remove('visible');
@@ -579,6 +734,6 @@ document.addEventListener('DOMContentLoaded', function() {
     updatePreview();
     setupTemplatesAndFilters();
     saveState();
-    updateUndoButton();
+    updateUndoRedoButtons();
     updateGradientUI();
-})
+});

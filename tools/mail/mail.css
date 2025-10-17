@@ -4,6 +4,14 @@ html {
     text-rendering: optimizeLegibility;
   }
 
+.nav-brand-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
 @font-face {
     font-family: 'NotoSansHans DemiLight';
     src: url('NotoSansHans-DemiLight.otf') format('opentype');
@@ -362,6 +370,55 @@ nav.navbar {
     text-align: center;
 }
 
+#custom-color-picker-container {
+    display: none;
+    padding: var(--spacing-2) var(--spacing-3);
+    border-top: 1px solid var(--border-color);
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+}
+
+#custom-color-picker-container .color-input-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+#custom-color-picker-container .color-input-group label {
+    display: inline;
+    margin-bottom: 0;
+    margin-right: 8px;
+}
+
+#custom-color-picker-container input[type="color"] {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    padding: 0;
+}
+
+#custom-color-picker-container input[type="color"]::-webkit-color-swatch {
+    border-radius: 50%;
+    border: none;
+}
+
+.btn-primary-small {
+    padding: var(--spacing-1) var(--spacing-2) !important;
+    font-size: var(--font-size-xs) !important;
+    font-weight: 500 !important;
+    line-height: 1;
+    height: auto;
+    min-height: 0;
+}
+
+
 .preview-header {
     display: flex;
     justify-content: space-between;
@@ -424,10 +481,9 @@ nav.navbar {
     overflow-y: auto;
     white-space: pre-wrap;
     padding: 10px 20px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     transform: scaleY(0.95);
     transform-origin: top;
+    text-rendering: geometricPrecision;
 }
 
 .mail-bg #mail-preview {
@@ -444,6 +500,10 @@ nav.navbar {
 #custom-gradient-options {
     width: 240px;
     padding: var(--spacing-4);
+}
+
+#custom-gradient-options .btn-primary-small {
+    padding: var(--spacing-1) var(--spacing-3) !important;
 }
 
 .gradient-picker-dropdown {
@@ -613,21 +673,6 @@ input[type="range"]::-moz-range-thumb {
     color: var(--text-secondary);
     flex-grow: 1;
     text-align: left;
-}
-
-.btn-primary-small {
-    padding: var(--spacing-1) var(--spacing-3);
-    font-size: var(--font-size-xs);
-    border-radius: var(--radius-sm);
-    background: var(--accent-blue);
-    color: var(--text-primary);
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.btn-primary-small:hover {
-    background: var(--accent-blue-hover);
 }
 
 .char-counter {
@@ -953,6 +998,74 @@ input[type="range"]::-moz-range-thumb {
 .btn-danger:hover {
     background: #dc2626;
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.simple-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: fadeIn 0.2s ease;
+}
+
+.simple-modal-content {
+    background: var(--bg-secondary);
+    padding: var(--spacing-5);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 280px;
+    animation: zoomIn 0.2s ease-out forwards;
+}
+
+.simple-modal-content h3 {
+    margin-top: 0;
+    margin-bottom: var(--spacing-4);
+    font-size: var(--font-size-md);
+    text-align: center;
+}
+
+.simple-modal-content input[type="number"] {
+    width: 100%;
+    padding: var(--spacing-2);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-4);
+    text-align: center;
+    font-size: var(--font-size-base);
+}
+
+.simple-modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+}
+.simple-modal-actions button {
+    flex: 1;
+}
+
+.template-credits .secondary-thanks {
+    margin-top: var(--spacing-6);
+    margin-bottom: var(--spacing-3);
+    font-size: calc(var(--font-size-sm) * 0.95);
+}
+
+.contributors-secondary {
+    gap: var(--spacing-4) !important;
+}
+
+.contributors-secondary li {
+    font-size: var(--font-size-sm);
+    font-weight: 400;
+    color: var(--text-primary);
 }
 
 @media (max-width: 1200px) {

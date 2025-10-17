@@ -36,7 +36,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
-                <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--spacing-2);">
+                <a href="/" class="nav-brand-link">
                     <img src="/images/global/logo-new.webp" alt="Codex Helper Logo" class="logo-image">
                     <span>Codex Helper</span>
                 </a>
@@ -83,7 +83,7 @@
     
                 <div class="generator-tabs">
                     <button class="generator-tab-btn active" data-tab="generator">Mail Generator</button>
-                    <button class="generator-tab-btn" data-tab="templates">Load Template</button>
+                    <button class="generator-tab-btn" data-tab="templates">Template Gallery</button>
                 </div>
     
                 <div id="generator-view" class="generator-view active">
@@ -123,7 +123,7 @@
                                         </div>
                                         <div class="toolbar-item">
                                             <div id="custom-color-dropdown" class="custom-dropdown">
-                                                <button id="custom-color-toggle" class="toolbar-btn"><i class="fas fa-palette"></i></button>
+                                                <button id="custom-color-toggle" class="toolbar-btn" title="Color"><i class="fas fa-palette"></i></button>
                                                 <div id="custom-color-options" class="custom-dropdown-options">
                                                     <div class="custom-option" data-value="red"><span class="color-swatch" style="background:red;"></span>Red</div>
                                                     <div class="custom-option" data-value="green"><span class="color-swatch" style="background:green;"></span>Green</div>
@@ -131,7 +131,14 @@
                                                     <div class="custom-option" data-value="yellow"><span class="color-swatch" style="background:yellow;"></span>Yellow</div>
                                                     <div class="custom-option" data-value="orange"><span class="color-swatch" style="background:orange;"></span>Orange</div>
                                                     <div class="custom-option" data-value="purple"><span class="color-swatch" style="background:purple;"></span>Purple</div>
-                                                    <div class="custom-option" data-value="custom"><img src="/images/mail/colourwheel.webp" alt="Custom Color" class="color-wheel-icon">Custom...</div>
+                                                    <div class="custom-option" data-value="custom-toggle"><img src="/images/mail/colourwheel.webp" alt="Custom Color" class="color-wheel-icon">Custom...</div>
+                                                    <div id="custom-color-picker-container">
+                                                        <div class="color-input-group">
+                                                            <label for="custom-color-input">Pick</label>
+                                                            <input type="color" id="custom-color-input" value="#3b82f6">
+                                                        </div>
+                                                        <button id="apply-custom-color-btn" class="btn-primary btn-primary-small">Apply</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <label>Color</label>
@@ -172,7 +179,7 @@
 
                                                     <div class="dropdown-actions">
                                                         <span id="gradient-char-counter" class="gradient-char-counter">+0 chars</span>
-                                                        <button id="apply-gradient-btn" class="btn-primary-small">Apply</button>
+                                                        <button id="apply-gradient-btn" class="btn-primary btn-primary-small">Apply</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -233,11 +240,16 @@
 
                             <div class="template-credits">
                                 <h4>Community Contributions</h4>
-                                <p>A special thank you to the governors who helped gather, build & consolidate this collection of templates:</p>
+                                <p>A special thank you to the governors who helped build & consolidate this collection of templates:</p>
                                 <ul>
                                     <li>[1049] SECHSkies</li>
                                     <li>[1215] Kat</li>
                                     <li>[3542] Daysii</li>
+                                </ul>
+                                <p class="secondary-thanks">Another thank you to the governors who helped contribute templates to our gallery:</p>
+                                <ul class="contributors-secondary">
+                                    <li>[2308] Nemo</li>
+                                    <li>[3104] Eldest</li>
                                 </ul>
                             </div>
 
@@ -299,6 +311,17 @@
             <div class="modal-actions">
                 <button id="confirm-cancel-btn" class="btn-secondary">Cancel</button>
                 <button id="confirm-action-btn" class="btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-size-modal" class="simple-modal-overlay" style="display: none;">
+        <div class="simple-modal-content">
+            <h3>Enter Custom Size</h3>
+            <input type="number" id="custom-size-input" placeholder="e.g., 22" min="1">
+            <div class="simple-modal-actions">
+                <button id="custom-size-cancel-btn" class="btn-secondary">Cancel</button>
+                <button id="custom-size-apply-btn" class="btn-primary">Apply</button>
             </div>
         </div>
     </div>
