@@ -520,8 +520,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .calendar-icon-label img {
-    width: 42px;
-    height: 42px;
+    width: 46px;
+    height: 46px;
     object-fit: contain;
     opacity: 0.9;
     transition: all 0.2s ease;
