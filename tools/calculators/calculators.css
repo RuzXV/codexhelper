@@ -237,6 +237,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     vertical-align: text-bottom;
 }
 
+.hoh-link-group .hoh-link-label-top,
+.hoh-link-group .hoh-link-anchor {
+    position: relative;
+    top: -2px;
+}
+
 .rarity-selector, .building-selector { display: grid; gap: var(--spacing-3); }
 .rarity-selector { grid-template-columns: 1fr 1fr; }
 .building-selector { grid-template-columns: repeat(3, 1fr); }
@@ -520,8 +526,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .calendar-icon-label img {
-    width: 46px;
-    height: 46px;
+    width: 48px;
+    height: 48px;
     object-fit: contain;
     opacity: 0.9;
     transition: all 0.2s ease;
@@ -556,6 +562,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .input-wrapper:has(input:focus) {
     border-color: var(--accent-blue);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.hoh-link-group .toggle-switch {
+    width: 40px;
+    height: 22px;
+}
+
+.hoh-link-group .toggle-switch .toggle-slider:before {
+    height: 16px;
+    width: 16px;
+    bottom: 2px;
+}
+
+.hoh-link-group .toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(18px);
 }
 
 .custom-select-container { position: relative; }
