@@ -208,7 +208,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     flex-direction: row;
     align-items: baseline;
-    gap: 4px;
+    gap: 5px;
     margin-bottom: 0;
 }
 
@@ -507,6 +507,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     align-items: center;
     gap: var(--spacing-3);
+    height: 46px;
 }
 
 .calendar-icon-label {
@@ -515,9 +516,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     justify-content: center;
     cursor: pointer;
     border-radius: var(--radius-sm);
-    color: var(--text-secondary);
     transition: all 0.2s ease;
     flex-shrink: 0;
+    height: 46px;
+    width: 46px;
+    padding: 0;
+    margin: 0;
 }
 
 .calendar-icon-label img {
@@ -528,6 +532,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     transition: all 0.2s ease;
     border-radius: 50%;
     filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.7));
+    display: block;
 }
 
 .calendar-icon-label:hover img {
@@ -538,8 +543,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #migration-date {
     flex-grow: 1;
     min-width: 0;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    height: 46px;
+    padding: 0 var(--spacing-3);
+    margin: 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
 }
 
 .custom-select-container { position: relative; }
