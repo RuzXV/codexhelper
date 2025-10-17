@@ -160,9 +160,10 @@
                                         <label for="current-vip-points">Current VIP Points</label>
                                         <input type="text" id="current-vip-points" placeholder="Example: 1,500,000">
                                     </div>
+                                     <p class="disclaimer">You can leave VIP points blank to only calculate VIP from tokens.</p>
                                     <div class="form-group-toggle">
                                         <label class="toggle-switch"><input type="checkbox" id="vip-token-toggle"><span class="toggle-slider"></span></label>
-                                        <label for="vip-token-toggle" class="toggle-label">Calculate with VIP Tokens</label>
+                                        <label for="vip-token-toggle" class="toggle-label">Calculate VIP Tokens</label>
                                     </div>
                                     <div id="vip-token-grid-container" class="vip-token-grid-container">
                                         <div class="vip-token-grid">
@@ -265,8 +266,9 @@
                                         <label for="same-kvk-checkbox" class="toggle-label">Same KvK / Vacation Mode</label>
                                     </div>
                                     <button id="calculate-passport-btn" class="btn-primary">Calculate</button>
-                                    <div id="passport-result" class="calc-result"></div>
+                                    <div id="passport-needed-result" class="calc-result"></div>
                                     <div id="cost-result" class="calc-result"></div>
+                                    <div id="passport-power-breakdown" class="calc-result"></div>
                                 </div>
                             </div>
                         </div>

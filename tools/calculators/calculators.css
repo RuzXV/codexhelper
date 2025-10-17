@@ -1,4 +1,4 @@
-.navbar {
+nav.navbar {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
@@ -328,6 +328,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
 
+#hospital-tier-toggle + .toggle-slider {
+    background-image: radial-gradient(circle, #ca62e6 0%, #8113a7 100%);
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+#hospital-tier-toggle + .toggle-slider::after {
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+#hospital-tier-toggle:checked + .toggle-slider {
+    background-image: radial-gradient(circle, #f28d00 0%, #d55800 100%);
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
 
 .calc-result {
     margin-top: var(--spacing-4); padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-md);
@@ -365,6 +382,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     align-items: center;
     justify-content: center;
 }
+#passport-power-breakdown {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-2);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+}
+#passport-needed-result {
+    margin-top: var(--spacing-3);
+}
+
 .cost-line { display: flex; align-items: center; justify-content: center; gap: var(--spacing-2); }
 .cost-line img { height: 28px; width: auto; }
 .calc-result span, .calc-result strong { transition: filter 0.4s ease-out, opacity 0.4s ease-out; }

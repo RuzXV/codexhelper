@@ -312,7 +312,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const powerInput = document.getElementById('power-input');
         const sameKvkCheckbox = document.getElementById('same-kvk-checkbox');
-        const passportResultDiv = document.getElementById('passport-result');
+        const powerBreakdownDiv = document.getElementById('passport-power-breakdown');
+        const passportNeededDiv = document.getElementById('passport-needed-result');
         const currentPassportsInput = document.getElementById('current-passports-input');
         const costResultDiv = document.getElementById('cost-result');
         const migrationDateInput = document.getElementById('migration-date');
@@ -378,41 +379,65 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const performCalculation = () => {
-            passportResultDiv.innerHTML = ''; costResultDiv.innerHTML = ''; passportResultDiv.classList.remove('error'); costResultDiv.classList.remove('error');
+            powerBreakdownDiv.innerHTML = ''; passportNeededDiv.innerHTML = ''; costResultDiv.innerHTML = ''; 
+            powerBreakdownDiv.classList.remove('error'); passportNeededDiv.classList.remove('error'); costResultDiv.classList.remove('error');
+            
             const power = parseInt(powerInput.value.replace(/,/g, ''), 10);
             if (isNaN(power) || power <= 0) { 
                 if (powerInput.value) {
-                    passportResultDiv.textContent = 'Please enter a valid, positive power.'; passportResultDiv.classList.add('error');
+                    powerBreakdownDiv.textContent = 'Please enter a valid, positive power.'; 
+                    powerBreakdownDiv.classList.add('error');
                 }
                 return; 
             }
             
+            let breakdownLines = [];
             let effectivePower = power;
+            breakdownLines.push(`Starting Power: <strong>${power.toLocaleString()}</strong>`);
+            
             const hospitalCapacity = parseInt(hospitalCapacityInput.value.replace(/,/g, ''), 10) || 0;
             if (hospitalCapacity > 0 && !hospitalTierToggle.disabled) {
                 const isT5 = hospitalTierToggle.checked;
                 const troopPower = isT5 ? 10 : 4;
                 const powerReduction = hospitalCapacity * troopPower;
                 effectivePower -= powerReduction;
+                breakdownLines.push(`Delta w/ Full Hospital: <strong style="color: #ef4444;">-${powerReduction.toLocaleString()}</strong>`);
             }
             
-            if(hohLinkToggle.checked) {
+            if(hohLinkToggle.checked && hohReturnedPower > 0) {
                 effectivePower += hohReturnedPower;
+                breakdownLines.push(`Delta w/ HoH Return: <strong style="color: #4ade80;">+${hohReturnedPower.toLocaleString()}</strong>`);
             }
+
+            breakdownLines.push(`Final Migrating Power: <strong>${effectivePower.toLocaleString()}</strong>`);
 
             const isDiscounted = sameKvkCheckbox.checked;
             const bracket = passportBrackets.find(b => effectivePower <= b.maxPower);
-            if(!bracket) { passportResultDiv.textContent = 'Could not determine passport bracket.'; passportResultDiv.classList.add('error'); return; }
+            if(!bracket) { powerBreakdownDiv.textContent = 'Could not determine passport bracket.'; powerBreakdownDiv.classList.add('error'); return; }
 
             const requiredPassports = isDiscounted ? bracket.discount : bracket.normal;
+            breakdownLines.push(`Required Passports: <strong>${requiredPassports}</strong>`);
+
+            const currentBracketIndex = passportBrackets.findIndex(b => effectivePower <= b.maxPower);
+            if (currentBracketIndex > 0) {
+                const previousBracket = passportBrackets[currentBracketIndex - 1];
+                const powerToDrop = effectivePower - previousBracket.maxPower;
+                const passportsSaved = requiredPassports - (isDiscounted ? previousBracket.discount : previousBracket.normal);
+                if (powerToDrop > 0 && passportsSaved > 0) {
+                     breakdownLines.push(`<span style="font-size: var(--font-size-sm); color: var(--text-secondary);">Drop <strong>${powerToDrop.toLocaleString()}</strong> more power to save <strong>${passportsSaved}</strong> passports.</span>`);
+                }
+            }
+
+            powerBreakdownDiv.innerHTML = breakdownLines.map(line => `<span>${line}</span>`).join('');
+
             const currentPassports = parseInt(currentPassportsInput.value.replace(/,/g, ''), 10) || 0;
             if (isNaN(currentPassports) || currentPassports < 0) { costResultDiv.textContent = 'Current passports must be a positive number.'; costResultDiv.classList.add('error'); return; }
             const passportsNeeded = requiredPassports - currentPassports;
 
             if (passportsNeeded <= 0) { 
-                passportResultDiv.innerHTML = `<i class="fas fa-check-circle"></i><span>You have enough passports!</span>`; 
+                passportNeededDiv.innerHTML = `<i class="fas fa-check-circle"></i><span>You have enough passports!</span>`; 
             } else { 
-                passportResultDiv.innerHTML = `<img src="/images/calculators/passport.webp" alt="Passport"><span>Requires <strong id="passport-value">0</strong> Passports</span>`; 
+                passportNeededDiv.innerHTML = `<img src="/images/calculators/passport.webp" alt="Passport"><span>Requires <strong id="passport-value">0</strong> more Passports</span>`; 
                 animateCounter(document.getElementById('passport-value'), passportsNeeded, 700); 
             }
 
@@ -436,7 +461,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 monthsAvailable = 1;
             }
 
-
             if (passportsNeeded <= 0) { 
                 costResultDiv.innerHTML = `<span>No additional cost required.</span>`; 
             } else {
@@ -450,7 +474,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 animateCounter(document.getElementById('usd-cost-value'), bundleResult.cost, 700, '$');
                 triggerSuccessAnimation(costResultDiv);
             }
-            triggerSuccessAnimation(passportResultDiv);
+            triggerSuccessAnimation(powerBreakdownDiv);
+            triggerSuccessAnimation(passportNeededDiv);
         };
 
         calculatePassportBtn.addEventListener('click', () => {
@@ -482,28 +507,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const performCalculation = () => {
             vipResultDiv.classList.remove('error');
-            let totalPoints = parseInt(currentVipPointsInput.value.replace(/,/g, ''), 10) || 0;
+            const isTokenOnlyMode = !currentVipPointsInput.value && vipTokenToggle.checked;
             
-            if(vipTokenToggle.checked) {
+            let totalTokenPoints = 0;
+            if (vipTokenToggle.checked) {
                 vipTokenInputs.forEach(input => {
                     const count = parseInt(input.value.replace(/,/g, ''), 10) || 0;
                     const value = parseInt(input.dataset.value, 10);
-                    totalPoints += count * value;
+                    totalTokenPoints += count * value;
                 });
             }
 
+            if (isTokenOnlyMode) {
+                vipResultDiv.innerHTML = `<img src="/images/calculators/vip/vip_icon.webp" alt="VIP Icon"><span>You have <strong>${totalTokenPoints.toLocaleString()}</strong> total VIP points in tokens.</span>`;
+                triggerSuccessAnimation(vipResultDiv);
+                return;
+            }
+
+            let totalPoints = (parseInt(currentVipPointsInput.value.replace(/,/g, ''), 10) || 0) + totalTokenPoints;
+            
             const targetPoints = parseInt(desiredVipLevelSelect.value, 10);
             if (isNaN(targetPoints)) { vipResultDiv.textContent = 'Please select a desired VIP level.'; vipResultDiv.classList.add('error'); return; }
 
             const pointsNeeded = targetPoints - totalPoints;
+            const selectedOption = desiredVipLevelSelect.options[desiredVipLevelSelect.selectedIndex];
+            const levelName = selectedOption.dataset.level;
+            const levelImage = `/images/calculators/vip/${levelName.toLowerCase() === 'svip' ? 'svip' : 'vip' + levelName}.webp`;
+            const levelText = levelName === 'SVIP' ? 'SVIP' : `VIP ${levelName}`;
 
             if(pointsNeeded <= 0) {
-                vipResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have reached or surpassed this level!</span>`;
+                const overflow = -pointsNeeded;
+                vipResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have enough points for ${levelText}, with <strong>${overflow.toLocaleString()}</strong> points left over!</span>`;
             } else {
-                const selectedOption = desiredVipLevelSelect.options[desiredVipLevelSelect.selectedIndex];
-                const levelName = selectedOption.dataset.level;
-                const levelImage = `/images/calculators/vip/${levelName.toLowerCase() === 'svip' ? 'svip' : 'vip' + levelName}.webp`;
-                const levelText = levelName === 'SVIP' ? 'SVIP' : `VIP ${levelName}`;
                 vipResultDiv.innerHTML = `<img src="${levelImage}" alt="${levelText}"><span>Needs <strong id="vip-points-needed">0</strong> more points for ${levelText}</span>`;
                 animateCounter(document.getElementById('vip-points-needed'), pointsNeeded, 700);
             }
