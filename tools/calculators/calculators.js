@@ -14,14 +14,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const migrationDateInputJs = document.getElementById('migration-date');
 
     if (calendarIconLabel && migrationDateInputJs) {
-        calendarIconLabel.addEventListener('click', (e) => {
+        const openDatePicker = () => {
             try {
                 migrationDateInputJs.showPicker();
             } catch (error) {
                 console.error("showPicker() is not supported by this browser.", error);
                 migrationDateInputJs.focus();
             }
-        });
+        };
+
+        calendarIconLabel.addEventListener('click', openDatePicker);
+        migrationDateInputJs.addEventListener('click', openDatePicker);
     }
 
     let currentIndex = 0;
