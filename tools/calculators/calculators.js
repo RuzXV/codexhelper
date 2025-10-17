@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (calendarIconLabel && migrationDateInputJs) {
         calendarIconLabel.addEventListener('click', (e) => {
-            e.preventDefault();
             try {
                 migrationDateInputJs.showPicker();
             } catch (error) {
