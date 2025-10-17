@@ -1,3 +1,9 @@
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
 nav.navbar {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
