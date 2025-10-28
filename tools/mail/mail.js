@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmActionBtn = document.getElementById('confirm-action-btn');
     const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
 
-    // New custom size modal elements
     const customSizeModal = document.getElementById('custom-size-modal');
     const customSizeInput = document.getElementById('custom-size-input');
     const customSizeApplyBtn = document.getElementById('custom-size-apply-btn');
@@ -104,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mailInput.setSelectionRange(state.start, state.end);
             updatePreview();
             updateUndoRedoButtons();
+            mailInput.focus();
         }
     }
 
@@ -637,7 +637,6 @@ document.addEventListener('DOMContentLoaded', function() {
         closeAllDropdowns();
     });
 
-    // Custom size modal logic
     function applyCustomSize() {
         const customSize = customSizeInput.value;
         if (customSize && !isNaN(customSize) && customSize > 0) {
