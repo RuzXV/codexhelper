@@ -1130,17 +1130,22 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
 @media (min-width: 1025px) and (max-width: 1440px) {
     .hero::before,
     .hero::after {
-        width: 50vw;
-        max-width: 750px;
-        max-height: 800px;
+        width: 45vw;
+        max-width: 650px;
+        max-height: 700px;
+
+        mask-image: linear-gradient(to top, transparent 5%, black 35%);
+        -webkit-mask-image: linear-gradient(to top, transparent 5%, black 35%);
     }
 
     .hero::before {
-        left: -10vw;
+        left: -12vw;
+        background-position: bottom 1rem left;
     }
 
     .hero::after {
-        right: -8vw;
+        right: -10vw;
+        background-position: bottom 1rem right;
     }
 }
 
