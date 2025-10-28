@@ -74,14 +74,188 @@
             <div class="tool-hero-container">
                 <div class="section-badge">Community Tools</div>
                 <h1>Material Calculator</h1>
-                <p>This page is under construction. Please check back later for updates.</p>
+                <p>Plan your equipment crafting by selecting a loadout and calculating your material needs.</p>
             </div>
         </section>
     
         <section class="tool-content">
-            <!-- Placeholder for future content -->
+            <div class="calculator-container">
+                <div class="main-layout">
+                    <div class="material-inputs-column">
+                        <div class="calculator-grid">
+                            <div class="material-island" id="iron-island">
+                                <h3 class="island-header"><img src="/images/materials/ore_legendary.webp" alt="Iron Ore"> Iron Ore</h3>
+                                <div class="island-content">
+                                    <div class="rarity-input-group">
+                                        <label for="iron-common"><img src="/images/materials/ore_common.webp" alt="Common Iron Ore"> Common</label>
+                                        <input type="text" id="iron-common" class="material-input" data-material="iron" data-rarity="common" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="iron-advanced"><img src="/images/materials/ore_advanced.webp" alt="Advanced Iron Ore"> Advanced</label>
+                                        <input type="text" id="iron-advanced" class="material-input" data-material="iron" data-rarity="advanced" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="iron-elite"><img src="/images/materials/ore_elite.webp" alt="Elite Iron Ore"> Elite</label>
+                                        <input type="text" id="iron-elite" class="material-input" data-material="iron" data-rarity="elite" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="iron-epic"><img src="/images/materials/ore_epic.webp" alt="Epic Iron Ore"> Epic</label>
+                                        <input type="text" id="iron-epic" class="material-input" data-material="iron" data-rarity="epic" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="iron-legendary"><img src="/images/materials/ore_legendary.webp" alt="Legendary Iron Ore"> Legendary</label>
+                                        <input type="text" id="iron-legendary" class="material-input" data-material="iron" data-rarity="legendary" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="material-island" id="leather-island">
+                                <h3 class="island-header"><img src="/images/materials/leather_legendary.webp" alt="Leather"> Leather</h3>
+                                <div class="island-content">
+                                    <div class="rarity-input-group">
+                                        <label for="leather-common"><img src="/images/materials/leather_common.webp" alt="Common Leather"> Common</label>
+                                        <input type="text" id="leather-common" class="material-input" data-material="leather" data-rarity="common" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="leather-advanced"><img src="/images/materials/leather_advanced.webp" alt="Advanced Leather"> Advanced</label>
+                                        <input type="text" id="leather-advanced" class="material-input" data-material="leather" data-rarity="advanced" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="leather-elite"><img src="/images/materials/leather_elite.webp" alt="Elite Leather"> Elite</label>
+                                        <input type="text" id="leather-elite" class="material-input" data-material="leather" data-rarity="elite" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="leather-epic"><img src="/images/materials/leather_epic.webp" alt="Epic Leather"> Epic</label>
+                                        <input type="text" id="leather-epic" class="material-input" data-material="leather" data-rarity="epic" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="leather-legendary"><img src="/images/materials/leather_legendary.webp" alt="Legendary Leather"> Legendary</label>
+                                        <input type="text" id="leather-legendary" class="material-input" data-material="leather" data-rarity="legendary" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="material-island" id="ebony-island">
+                                <h3 class="island-header"><img src="/images/materials/ebony_legendary.webp" alt="Ebony"> Ebony</h3>
+                                <div class="island-content">
+                                    <div class="rarity-input-group">
+                                        <label for="ebony-common"><img src="/images/materials/ebony_common.webp" alt="Common Ebony"> Common</label>
+                                        <input type="text" id="ebony-common" class="material-input" data-material="ebony" data-rarity="common" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="ebony-advanced"><img src="/images/materials/ebony_advanced.webp" alt="Advanced Ebony"> Advanced</label>
+                                        <input type="text" id="ebony-advanced" class="material-input" data-material="ebony" data-rarity="advanced" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="ebony-elite"><img src="/images/materials/ebony_elite.webp" alt="Elite Ebony"> Elite</label>
+                                        <input type="text" id="ebony-elite" class="material-input" data-material="ebony" data-rarity="elite" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="ebony-epic"><img src="/images/materials/ebony_epic.webp" alt="Epic Ebony"> Epic</label>
+                                        <input type="text" id="ebony-epic" class="material-input" data-material="ebony" data-rarity="epic" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="ebony-legendary"><img src="/images/materials/ebony_legendary.webp" alt="Legendary Ebony"> Legendary</label>
+                                        <input type="text" id="ebony-legendary" class="material-input" data-material="ebony" data-rarity="legendary" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div class="material-island" id="bone-island">
+                                <h3 class="island-header"><img src="/images/materials/bone_legendary.webp" alt="Animal Bone"> Animal Bone</h3>
+                                <div class="island-content">
+                                    <div class="rarity-input-group">
+                                        <label for="bone-common"><img src="/images/materials/bone_common.webp" alt="Common Animal Bone"> Common</label>
+                                        <input type="text" id="bone-common" class="material-input" data-material="bone" data-rarity="common" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="bone-advanced"><img src="/images/materials/bone_advanced.webp" alt="Advanced Animal Bone"> Advanced</label>
+                                        <input type="text" id="bone-advanced" class="material-input" data-material="bone" data-rarity="advanced" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="bone-elite"><img src="/images/materials/bone_elite.webp" alt="Elite Animal Bone"> Elite</label>
+                                        <input type="text" id="bone-elite" class="material-input" data-material="bone" data-rarity="elite" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="bone-epic"><img src="/images/materials/bone_epic.webp" alt="Epic Animal Bone"> Epic</label>
+                                        <input type="text" id="bone-epic" class="material-input" data-material="bone" data-rarity="epic" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="bone-legendary"><img src="/images/materials/bone_legendary.webp" alt="Legendary Animal Bone"> Legendary</label>
+                                        <input type="text" id="bone-legendary" class="material-input" data-material="bone" data-rarity="legendary" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="chest-grid">
+                            <div class="material-island" id="chest-island">
+                                <h3 class="island-header"><img src="/images/materials/chest_legendary.webp" alt="Choice Chest"> Material Choice Chests</h3>
+                                <div class="island-content chest-content">
+                                    <div class="rarity-input-group">
+                                        <label for="chest-common"><img src="/images/materials/chest_common.webp" alt="Common Choice Chest"> Common</label>
+                                        <input type="text" id="chest-common" class="material-input" data-material="chest" data-rarity="common" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="chest-advanced"><img src="/images/materials/chest_advanced.webp" alt="Advanced Choice Chest"> Advanced</label>
+                                        <input type="text" id="chest-advanced" class="material-input" data-material="chest" data-rarity="advanced" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="chest-elite"><img src="/images/materials/chest_elite.webp" alt="Elite Choice Chest"> Elite</label>
+                                        <input type="text" id="chest-elite" class="material-input" data-material="chest" data-rarity="elite" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="chest-epic"><img src="/images/materials/chest_epic.webp" alt="Epic Choice Chest"> Epic</label>
+                                        <input type="text" id="chest-epic" class="material-input" data-material="chest" data-rarity="epic" placeholder="0">
+                                    </div>
+                                    <div class="rarity-input-group">
+                                        <label for="chest-legendary"><img src="/images/materials/chest_legendary.webp" alt="Legendary Choice Chest"> Legendary</label>
+                                        <input type="text" id="chest-legendary" class="material-input" data-material="chest" data-rarity="legendary" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="equipment-loadout-column">
+                        <div class="loadout-container">
+                            <h3 class="island-header">Equipment Loadout</h3>
+                            <div class="loadout-grid">
+                                <button class="loadout-slot" id="slot-helmet" data-slot="helmet"><img src="/images/materials/helmet_slot.webp" alt="Helmet Slot"></button>
+                                <button class="loadout-slot" id="slot-weapon" data-slot="weapon"><img src="/images/materials/weapon_slot.webp" alt="Weapon Slot"></button>
+                                <button class="loadout-slot" id="slot-chest" data-slot="chest"><img src="/images/materials/chest_slot.webp" alt="Chest Slot"></button>
+                                <button class="loadout-slot" id="slot-gloves" data-slot="gloves"><img src="/images/materials/glove_slot.webp" alt="Gloves Slot"></button>
+                                <button class="loadout-slot" id="slot-legs" data-slot="legs"><img src="/images/materials/leggings_slot.webp" alt="Legs Slot"></button>
+                                <button class="loadout-slot" id="slot-boots" data-slot="boots"><img src="/images/materials/boots_slot.webp" alt="Boots Slot"></button>
+                                <button class="loadout-slot" id="slot-accessory1" data-slot="accessory"><img src="/images/materials/accessory1_slot.webp" alt="Accessory 1 Slot"></button>
+                                <button class="loadout-slot" id="slot-accessory2" data-slot="accessory"><img src="/images/materials/accessory2_slot.webp" alt="Accessory 2 Slot"></button>
+                            </div>
+                            <div id="selected-items-list" class="selected-items-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-container">
+                    <button id="calculate-btn" class="btn-primary">Calculate</button>
+                    <div id="materials-result" class="calc-result" style="display: none;"></div>
+                </div>
+            </div>
         </section>
     </main>
+    
+    <div id="equipment-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Select Equipment</h3>
+                <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="modal-search" class="modal-search" placeholder="Search for an item...">
+                <div id="modal-grid" class="modal-grid">
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <footer class="footer">
         <div class="footer-container">
