@@ -39,7 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const RARITY_MULTIPLIERS = { common: 1, advanced: 4, elite: 16, epic: 64, legendary: 256 };
     const LEGENDARY_DIVISOR = 256;
 
-    let selectedEquipment = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
+    let craftingList = {};
+    let selectedLoadoutSlots = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
     let activeSlotId = null;
 
     const getMaterialIconPath = (mat) => {
@@ -54,17 +55,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const totalCost = { iron: 0, leather: 0, ebony: 0, bone: 0 };
         let equipmentIsSelected = false;
-        Object.values(selectedEquipment).forEach(itemId => {
-            if (itemId) {
+        for (const itemId in craftingList) {
+            const quantity = craftingList[itemId];
+            if (quantity > 0) {
                 equipmentIsSelected = true;
                 const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
                 if (itemData && itemData.cost) {
                     for (const mat in itemData.cost) {
-                        totalCost[mat] += itemData.cost[mat];
+                        totalCost[mat] += itemData.cost[mat] * quantity;
                     }
                 }
             }
-        });
+        }
 
         let materialsAreInput = Object.values(playerMaterials).some(val => val > 0) || playerChests > 0;
 
@@ -159,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
         resultDiv.style.display = 'block';
         let html = canCraft 
             ? `<h3 class="result-status craftable"><i class="fas fa-check-circle"></i> Loadout is Craftable</h3>`
-            : `<h3 class="result-status not-craftable">Insufficient Materials</h3>`;
+            : `<h3 class="result-status not-craftable"><i class="fas fa-times-circle"></i> Insufficient Materials</h3>`;
     
         let materialItemsHtml = '';
         MATERIALS.forEach(mat => {
@@ -195,23 +197,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
         let summaryHtml = `
-            <div class="result-item">
-                <img src="/images/materials/materials_icon.webp" alt="Total Materials">
-                <div class="label">Total Mats Needed:</div>
-                <span class="value">${totalMaterialCost.toLocaleString()}</span>
-            </div>
-            <div class="result-item">
-                <img src="/images/materials/materials_icon.webp" alt="Total Materials">
-                <div class="label">Total Mats Owned:</div>
-                <span class="value">${totalMaterialOwned.toLocaleString()}</span>
+            <div class="summary-items">
+                <div class="result-item">
+                    <img src="/images/materials/materials_icon.webp" alt="Total Materials">
+                    <div class="label">Total Mats Needed:</div>
+                    <span class="value">${totalMaterialCost.toLocaleString()}</span>
+                </div>
+                <div class="result-item">
+                    <img src="/images/materials/materials_icon.webp" alt="Total Materials">
+                    <div class="label">Total Mats Owned:</div>
+                    <span class="value">${(totalMaterialOwned - playerChests + Math.max(0, playerChests - neededFromChests) ).toLocaleString()}</span>
+                </div>
             </div>
         `;
 
-        html += `<div class="result-grid">${materialItemsHtml}<div class="result-separator"></div>${summaryHtml}</div>`;
+        html += `<div class="result-layout">
+                    <div class="material-items-grid">${materialItemsHtml}</div>
+                    <div class="result-separator"></div>
+                    ${summaryHtml}
+                 </div>`;
         resultDiv.innerHTML = html;
         triggerSuccessAnimation(resultDiv);
     }
-
 
     function openModalForSlot(slotElement) {
         activeSlotId = slotElement.id;
@@ -249,7 +256,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!slotElement) return;
     
         const slotKey = activeSlotId.replace('slot-', '');
-        selectedEquipment[slotKey] = itemId;
+        
+        const oldItemId = selectedLoadoutSlots[slotKey];
+        if (oldItemId) {
+            craftingList[oldItemId] = (craftingList[oldItemId] || 1) - 1;
+            if (craftingList[oldItemId] <= 0) {
+                delete craftingList[oldItemId];
+            }
+        }
+
+        craftingList[itemId] = (craftingList[itemId] || 0) + 1;
+        selectedLoadoutSlots[slotKey] = itemId;
         
         slotElement.innerHTML = `<img src="${itemData.image}" alt="${itemData.name}">`;
         
@@ -258,56 +275,81 @@ document.addEventListener('DOMContentLoaded', function() {
         if (calculateBtn.style.display === 'none') performCalculation();
     }
 
-    function removeItem(slotKey) {
-        selectedEquipment[slotKey] = null;
-        const slotElement = document.getElementById(`slot-${slotKey}`);
-        if(slotElement) {
-            slotElement.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${slotKey} Slot">`;
+    function addItemFromSelector(itemId) {
+        craftingList[itemId] = (craftingList[itemId] || 0) + 1;
+        updateSelectedItemsDisplay();
+        if (calculateBtn.style.display === 'none') performCalculation();
+    }
+
+    function removeItem(itemId) {
+        if (!craftingList[itemId]) return;
+        craftingList[itemId]--;
+        if (craftingList[itemId] <= 0) {
+            delete craftingList[itemId];
         }
+
+        for (const slotKey in selectedLoadoutSlots) {
+            if (selectedLoadoutSlots[slotKey] === itemId) {
+                if (!craftingList[itemId]) {
+                    selectedLoadoutSlots[slotKey] = null;
+                    const slotElement = document.getElementById(`slot-${slotKey}`);
+                    if (slotElement) {
+                        slotElement.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${slotKey} Slot">`;
+                    }
+                }
+            }
+        }
+
         updateSelectedItemsDisplay();
         if (calculateBtn.style.display === 'none') performCalculation();
     }
     
     function updateSelectedItemsDisplay() {
         selectedItemsList.innerHTML = '';
-        let hasSelection = false;
-        for (const slotKey in selectedEquipment) {
-            const itemId = selectedEquipment[slotKey];
-            if (itemId) {
-                hasSelection = true;
-                const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
-                if (itemData) {
-                    let costHtml = '<div class="selected-item-cost">';
-                    if(itemData.cost) {
-                        for(const mat in itemData.cost) {
-                            costHtml += `
-                                <div class="cost-pair">
-                                    <img src="${getMaterialIconPath(mat)}" alt="${mat}">
-                                    <span>${itemData.cost[mat]}</span>
-                                </div>
-                            `;
-                        }
-                    }
-                    costHtml += '</div>';
+        const hasSelection = Object.values(craftingList).some(qty => qty > 0);
 
-                    const itemEl = document.createElement('div');
-                    itemEl.className = 'selected-item';
-                    itemEl.innerHTML = `
-                        <img src="${itemData.image}" alt="${itemData.name}" class="selected-item-icon">
-                        <div class="selected-item-details">
-                            <span class="selected-item-name">${itemData.name}</span>
-                            ${costHtml}
-                        </div>
-                        <button class="remove-item-btn" data-slot-key="${slotKey}">&times;</button>
-                    `;
-                    selectedItemsList.appendChild(itemEl);
+        if (!hasSelection) {
+            selectedItemsList.innerHTML = '<p class="no-items-placeholder">No items selected.</p>';
+            return;
+        }
+
+        for (const itemId in craftingList) {
+            const quantity = craftingList[itemId];
+            if (quantity <= 0) continue;
+
+            const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+            if (itemData) {
+                let costHtml = '<div class="selected-item-cost">';
+                if (itemData.cost) {
+                    const costs = Object.entries(itemData.cost)
+                                      .map(([mat, amount]) => ({ mat, amount }))
+                                      .sort((a, b) => b.amount - a.amount);
+                    
+                    for (const cost of costs) {
+                        costHtml += `
+                            <div class="cost-pair">
+                                <img src="${getMaterialIconPath(cost.mat)}" alt="${cost.mat}">
+                                <span>${cost.amount}</span>
+                            </div>`;
+                    }
                 }
+                costHtml += '</div>';
+
+                const itemEl = document.createElement('div');
+                itemEl.className = 'selected-item';
+                itemEl.innerHTML = `
+                    <img src="${itemData.image}" alt="${itemData.name}" class="selected-item-icon">
+                    <div class="selected-item-details">
+                        <span class="selected-item-name">${itemData.name} ${quantity > 1 ? `<span class="item-quantity">x${quantity}</span>` : ''}</span>
+                        ${costHtml}
+                    </div>
+                    <button class="remove-item-btn" data-item-id="${itemId}">&times;</button>`;
+                selectedItemsList.appendChild(itemEl);
             }
         }
-        selectedItemsList.style.display = hasSelection ? 'flex' : 'none';
         
         document.querySelectorAll('.remove-item-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => removeItem(e.currentTarget.dataset.slotKey));
+            btn.addEventListener('click', (e) => removeItem(e.currentTarget.dataset.itemId));
         });
     }
 
@@ -318,6 +360,62 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemName = item.querySelector('span').textContent.toLowerCase();
             item.classList.toggle('hidden', !itemName.includes(searchTerm));
         });
+    }
+
+    function filterSelectorItems() {
+        const selectorSearch = document.getElementById('selector-search');
+        if (!selectorSearch) return;
+
+        const searchTerm = selectorSearch.value.toLowerCase();
+        const items = document.querySelectorAll('#equipment-selector-grid .selector-item');
+        
+        items.forEach(item => {
+            const itemName = item.querySelector('span').textContent.toLowerCase();
+            const shouldBeVisible = itemName.includes(searchTerm);
+            const isFadingOut = item.dataset.isFadingOut === 'true';
+
+            if (shouldBeVisible) {
+                item.style.display = 'flex';
+                delete item.dataset.isFadingOut;
+                setTimeout(() => {
+                    item.classList.remove('hidden');
+                }, 10);
+            } else {
+                if (!item.classList.contains('hidden')) {
+                    item.dataset.isFadingOut = 'true';
+                    item.classList.add('hidden');
+                    setTimeout(() => {
+                        if (item.dataset.isFadingOut === 'true') {
+                            item.style.display = 'none';
+                        }
+                    }, 300);
+                }
+            }
+        });
+    }
+
+    function initializeEquipmentSelector() {
+        const equipmentSelectorGrid = document.getElementById('equipment-selector-grid');
+        if (!equipmentSelectorGrid) return;
+        
+        let html = '';
+        EQUIPMENT_DATA.forEach(item => {
+            html += `
+                <div class="selector-item" data-item-id="${item.id}" title="Add ${item.name}">
+                    <img src="${item.image}" alt="${item.name}">
+                    <span>${item.name}</span>
+                </div>`;
+        });
+        equipmentSelectorGrid.innerHTML = html;
+
+        equipmentSelectorGrid.querySelectorAll('.selector-item').forEach(el => {
+            el.addEventListener('click', () => addItemFromSelector(el.dataset.itemId));
+        });
+
+        const selectorSearch = document.getElementById('selector-search');
+        if (selectorSearch) {
+            selectorSearch.addEventListener('input', filterSelectorItems);
+        }
     }
     
     allInputs.forEach(input => {
@@ -346,4 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
         void element.offsetWidth;
         element.classList.add('result-success');
     }
+
+    initializeEquipmentSelector();
+    updateSelectedItemsDisplay();
 });
