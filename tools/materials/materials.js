@@ -10,16 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalSearch = document.getElementById('modal-search');
     const selectedItemsList = document.getElementById('selected-items-list');
 
-    const EQUIPMENT_DATA = [
-        { id: 'pride_of_the_khan', name: "Pride of the Khan", slot: 'helmet', image: '/images/materials/equipment/pride_of_the_khan.webp', cost: { leather: 50, ebony: 10 } },
-        { id: 'frost_treads', name: "Frost Treads", slot: 'boots', image: '/images/materials/equipment/frost_treads.webp', cost: { iron: 30, bone: 30 } },
-        { id: 'set_glove', name: "Dragon's Breath", slot: 'gloves', image: '/images/materials/equipment/set_glove.webp', cost: { leather: 20, bone: 40 } },
-        { id: 'set_weapon', name: "Dragon's Fang", slot: 'weapon', image: '/images/materials/equipment/set_weapon.webp', cost: { iron: 50, bone: 10 } },
-        { id: 'set_chest', name: "Dragon's Hide", slot: 'chest', image: '/images/materials/equipment/set_chest.webp', cost: { ebony: 20, leather: 40 } },
-        { id: 'set_leg', name: "Dragon's Scales", slot: 'legs', image: '/images/materials/equipment/set_leg.webp', cost: { iron: 20, leather: 40 } },
-        { id: 'ring_of_doom', name: "Ring of Doom", slot: 'accessory', image: '/images/materials/equipment/ring_of_doom.webp', cost: { bone: 30, ebony: 30 } },
-        { id: 'horn_of_fury', name: "Horn of Fury", slot: 'accessory', image: '/images/materials/equipment/horn_of_fury.webp', cost: { iron: 30, ebony: 30 } },
-    ];
+    let EQUIPMENT_DATA = [];
 
     const MATERIALS = ['iron', 'leather', 'ebony', 'bone'];
     const CHEST_MATERIAL = 'chest';
@@ -46,6 +37,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const getMaterialIconPath = (mat) => {
         const iconName = mat === 'iron' ? 'ore' : mat;
         return `/images/materials/${iconName}_legendary.webp`;
+    };
+    
+    const formatStatName = (key) => {
+        return key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
 
     function performCalculation() {
@@ -224,16 +219,18 @@ document.addEventListener('DOMContentLoaded', function() {
         activeSlotId = slotElement.id;
         const slotType = slotElement.dataset.slot;
         
+        const itemSlotType = (slotType === 'accessory1' || slotType === 'accessory2') ? 'accessory' : slotType;
+
         modalTitle.textContent = `Select ${slotType.charAt(0).toUpperCase() + slotType.slice(1)}`;
         
-        const relevantItems = EQUIPMENT_DATA.filter(item => item.slot === slotType);
+        const relevantItems = EQUIPMENT_DATA.filter(item => item.slot === itemSlotType);
         modalGrid.innerHTML = '';
         
         relevantItems.forEach(item => {
             const itemEl = document.createElement('div');
             itemEl.className = 'modal-item';
             itemEl.dataset.itemId = item.id;
-            itemEl.innerHTML = `<img src="${item.image}" alt="${item.name}"><span>${item.name}</span>`;
+            itemEl.innerHTML = `<img src="/images/materials/equipment/${item.image}" alt="${item.name}"><span>${item.name}</span>`;
             itemEl.addEventListener('click', () => selectItem(item.id));
             modalGrid.appendChild(itemEl);
         });
@@ -268,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         craftingList[itemId] = (craftingList[itemId] || 0) + 1;
         selectedLoadoutSlots[slotKey] = itemId;
         
-        slotElement.innerHTML = `<img src="${itemData.image}" alt="${itemData.name}">`;
+        slotElement.innerHTML = `<img src="/images/materials/equipment/${itemData.image}" alt="${itemData.name}">`;
         
         closeModal();
         updateSelectedItemsDisplay();
@@ -290,13 +287,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         for (const slotKey in selectedLoadoutSlots) {
             if (selectedLoadoutSlots[slotKey] === itemId) {
-                if (!craftingList[itemId]) {
-                    selectedLoadoutSlots[slotKey] = null;
-                    const slotElement = document.getElementById(`slot-${slotKey}`);
-                    if (slotElement) {
-                        slotElement.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${slotKey} Slot">`;
-                    }
+                selectedLoadoutSlots[slotKey] = null;
+                const slotElement = document.getElementById(`slot-${slotKey}`);
+                if (slotElement) {
+                    slotElement.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${slotKey} Slot">`;
                 }
+                break; 
             }
         }
 
@@ -321,26 +317,45 @@ document.addEventListener('DOMContentLoaded', function() {
             if (itemData) {
                 let costHtml = '<div class="selected-item-cost">';
                 if (itemData.cost) {
-                    const costs = Object.entries(itemData.cost)
-                                      .map(([mat, amount]) => ({ mat, amount }))
-                                      .sort((a, b) => b.amount - a.amount);
-                    
+                    const costs = Object.entries(itemData.cost).map(([mat, amount]) => ({ mat, amount }));
                     for (const cost of costs) {
-                        costHtml += `
-                            <div class="cost-pair">
-                                <img src="${getMaterialIconPath(cost.mat)}" alt="${cost.mat}">
-                                <span>${cost.amount}</span>
-                            </div>`;
+                        if(cost.amount > 0) {
+                            costHtml += `
+                                <div class="cost-pair">
+                                    <img src="${getMaterialIconPath(cost.mat)}" alt="${cost.mat}">
+                                    <span>${cost.amount}</span>
+                                </div>`;
+                        }
                     }
                 }
                 costHtml += '</div>';
 
+                let statsHtml = '<div class="selected-item-stats">';
+                if (itemData.stats) {
+                    Object.entries(itemData.stats).forEach(([statKey, statValue]) => {
+                        if (statValue > 0) {
+                            statsHtml += `<div class="stat-pair">${formatStatName(statKey)} <span>+${statValue}%</span></div>`;
+                        }
+                    });
+                }
+                if (itemData.special_stats && itemData.special_stats.length > 0) {
+                     itemData.special_stats.forEach(stat => {
+                        statsHtml += `<div class="special-stat">${stat}</div>`;
+                    });
+                }
+                statsHtml += '</div>';
+
+
                 const itemEl = document.createElement('div');
                 itemEl.className = 'selected-item';
                 itemEl.innerHTML = `
-                    <img src="${itemData.image}" alt="${itemData.name}" class="selected-item-icon">
+                    <img src="/images/materials/equipment/${itemData.image}" alt="${itemData.name}" class="selected-item-icon">
                     <div class="selected-item-details">
-                        <span class="selected-item-name">${itemData.name} ${quantity > 1 ? `<span class="item-quantity">x${quantity}</span>` : ''}</span>
+                        <div class="selected-item-header">
+                           <span class="selected-item-name">${itemData.name}</span>
+                           ${quantity > 1 ? `<span class="item-quantity">x${quantity}</span>` : ''}
+                        </div>
+                        ${statsHtml}
                         ${costHtml}
                     </div>
                     <button class="remove-item-btn" data-item-id="${itemId}">&times;</button>`;
@@ -396,13 +411,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function initializeEquipmentSelector() {
         const equipmentSelectorGrid = document.getElementById('equipment-selector-grid');
-        if (!equipmentSelectorGrid) return;
+        if (!equipmentSelectorGrid || EQUIPMENT_DATA.length === 0) {
+            console.log("Equipment grid not found or no data to populate it.");
+            return;
+        };
         
         let html = '';
         EQUIPMENT_DATA.forEach(item => {
             html += `
                 <div class="selector-item" data-item-id="${item.id}" title="Add ${item.name}">
-                    <img src="${item.image}" alt="${item.name}">
+                    <img src="/images/materials/equipment/${item.image}" alt="${item.name}">
                     <span>${item.name}</span>
                 </div>`;
         });
@@ -433,10 +451,20 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateBtn.style.display = 'none';
     });
 
+    function debounce(func, delay = 250) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    }
+
     loadoutSlots.forEach(slot => slot.addEventListener('click', () => openModalForSlot(slot)));
     modalCloseBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-    modalSearch.addEventListener('input', filterModalItems);
+    modalSearch.addEventListener('input', debounce(filterModalItems, 200));
 
     function triggerSuccessAnimation(element) {
         if (!element) return;
@@ -445,6 +473,25 @@ document.addEventListener('DOMContentLoaded', function() {
         element.classList.add('result-success');
     }
 
-    initializeEquipmentSelector();
+    async function initializeCalculator() {
+        try {
+            const response = await fetch('equipment.json');
+            if (!response.ok) {
+                throw new Error(`Failed to load equipment data. Status: ${response.status}`);
+            }
+            EQUIPMENT_DATA = await response.json();
+            
+            initializeEquipmentSelector();
+
+        } catch (error) {
+            console.error("Could not initialize calculator:", error);
+            const equipmentSelectorGrid = document.getElementById('equipment-selector-grid');
+            if(equipmentSelectorGrid) {
+                equipmentSelectorGrid.innerHTML = `<p style="color: var(--text-secondary);">Error: Could not load equipment data.</p>`;
+            }
+        }
+    }
+
+    initializeCalculator();
     updateSelectedItemsDisplay();
 });

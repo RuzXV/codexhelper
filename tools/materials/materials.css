@@ -67,6 +67,9 @@ nav.navbar {
 
 #equipment-selector-wrapper {
     margin-top: var(--spacing-6);
+    height: 400px;
+    display: flex;
+    flex-direction: column;
 }
 
 .island-header {
@@ -90,12 +93,23 @@ nav.navbar {
     gap: var(--spacing-4);
 }
 
-.rarity-input-group { display: flex; align-items: center; gap: var(--spacing-3); }
-.rarity-input-group .rarity-label { display: flex; align-items: center; gap: var(--spacing-2); font-weight: 500; color: var(--text-secondary); flex-shrink: 0; }
+.rarity-input-group { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+}
+.rarity-input-group .rarity-label { 
+    display: flex; 
+    align-items: center; 
+    gap: var(--spacing-2); 
+    font-weight: 500; 
+    color: var(--text-secondary); 
+    flex-shrink: 0; 
+}
 .material-icon-wrapper {
     position: relative;
-    width: 24px;
-    height: 24px;
+    width: 40px;
+    height: 40px;
     background-size: cover;
     flex-shrink: 0;
 }
@@ -104,6 +118,7 @@ nav.navbar {
 .rarity-label.elite .material-icon-wrapper { background-image: url('/images/materials/elite_background.webp'); }
 .rarity-label.epic .material-icon-wrapper { background-image: url('/images/materials/epic_background.webp'); }
 .rarity-label.legendary .material-icon-wrapper { background-image: url('/images/materials/legendary_background.webp'); }
+
 .material-icon-wrapper img {
     position: absolute;
     top: 50%;
@@ -113,9 +128,24 @@ nav.navbar {
     height: 24px;
 }
 
+#chest-island .material-icon-wrapper {
+    background-image: none;
+}
+
+#chest-island .material-icon-wrapper img {
+    position: static;
+    transform: none;
+    width: 30px;
+    height: 30px;
+}
+
+#chest-island .rarity-label {
+    gap: var(--spacing-1);
+}
+
 .rarity-input-group input { 
-    margin-left: auto;
-    width: 60%;
+    width: 100px;
+    flex-shrink: 0;
     background: var(--bg-primary); 
     border: 1px solid var(--border-hover); 
     border-radius: var(--radius-sm); 
@@ -143,10 +173,8 @@ nav.navbar {
 .loadout-grid {
     position: relative;
     width: 210px;
-    height: 315px;
+    height: 400px; 
     margin: 0 auto;
-    transform: scale(0.7);
-    transform-origin: top center;
 }
 .loadout-slot {
     background: transparent;
@@ -180,16 +208,17 @@ nav.navbar {
 #slot-legs { top: 195px; left: 60px; }
 #slot-boots { top: 295px; left: 60px; }
 #slot-weapon { top: 145px; left: 10px; }
-#slot-gloves { top: 145px; left: 110x; }
+#slot-gloves { top: 145px; left: 110px; }
 #slot-accessory1 { top: 245px; left: 10px; }
 #slot-accessory2 { top: 245px; left: 110px; }
+
 
 .loadout-instructions {
     font-style: italic;
     color: var(--text-secondary);
     text-align: center;
     font-size: var(--font-size-sm);
-    margin-top: -50px;
+    margin-top: var(--spacing-4);
     padding: 0 var(--spacing-4);
 }
 
@@ -323,9 +352,12 @@ nav.navbar {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-2);
-    max-height: 280px;
     overflow-y: auto;
-    padding-right: var(--spacing-2);
+    margin-top: var(--spacing-3);
+    align-content: start;
+    padding: var(--spacing-1) var(--spacing-2) 0 var(--spacing-2);
+    flex-grow: 1;
+    min-height: 0;
 }
 .selector-grid::-webkit-scrollbar { width: 8px; }
 .selector-grid::-webkit-scrollbar-track { background: var(--bg-primary); border-radius: 10px; }
@@ -345,6 +377,7 @@ nav.navbar {
     justify-content: center;
     gap: var(--spacing-1);
     transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.2s ease, background 0.2s ease;
+    aspect-ratio: 1 / 1;
 }
 .selector-item:hover {
     border-color: var(--accent-blue);
@@ -366,7 +399,12 @@ nav.navbar {
 .modal-close-btn { background: none; border: none; font-size: 2rem; color: var(--text-secondary); cursor: pointer; }
 .modal-body { padding: var(--spacing-4); overflow-y: auto; }
 .modal-search { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-hover); border-radius: var(--radius-sm); padding: var(--spacing-2); color: var(--text-primary); }
-.modal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: var(--spacing-3); }
+.modal-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-4);
+}
 .modal-item { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--spacing-2); text-align: center; cursor: pointer; transition: all 0.2s ease; }
 .modal-item:hover { border-color: var(--accent-blue); transform: translateY(-2px); }
 .modal-item img { width: 56px; height: 56px; margin-bottom: var(--spacing-2); }
