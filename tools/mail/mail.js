@@ -103,7 +103,10 @@ document.addEventListener('DOMContentLoaded', function() {
             mailInput.setSelectionRange(state.start, state.end);
             updatePreview();
             updateUndoRedoButtons();
-            mailInput.focus();
+            
+            if (document.activeElement !== mailInput) {
+                mailInput.focus();
+            }
         }
     }
 
@@ -716,7 +719,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         mailInput.addEventListener('input', () => {
             clearTimeout(inputTimeout);
-            inputTimeout = setTimeout(() => saveState(true), 500);
+            inputTimeout = setTimeout(() => saveState(), 500);
             updatePreview();
         });
     }
