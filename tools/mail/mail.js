@@ -512,6 +512,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch('templates.json');
             if (!response.ok) throw new Error('Network response was not ok');
             templates = await response.json();
+            
+            templates.sort((a, b) => a.title.localeCompare(b.title));
+    
             populateFilters();
             renderTemplates();
         } catch (error) {
