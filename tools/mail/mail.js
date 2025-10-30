@@ -236,9 +236,21 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function parseGameTagsToHtml(text) {
         let html = '';
+        const stack = [];
         let i = 0;
+    
+        const escapeHtml = (unsafe) => {
+            if (typeof unsafe !== 'string') return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
+    
         while (i < text.length) {
-            let openTagIndex = text.indexOf('<', i);
+            const openTagIndex = text.indexOf('<', i);
             if (openTagIndex === -1) {
                 html += escapeHtml(text.substring(i));
                 break;
@@ -246,102 +258,79 @@ document.addEventListener('DOMContentLoaded', function() {
     
             html += escapeHtml(text.substring(i, openTagIndex));
     
-            let closeTagIndex = text.indexOf('>', openTagIndex);
+            const closeTagIndex = text.indexOf('>', openTagIndex);
             if (closeTagIndex === -1) {
                 html += escapeHtml(text.substring(openTagIndex));
                 break;
             }
     
             const tagStr = text.substring(openTagIndex + 1, closeTagIndex);
-    
-            if (tagStr.startsWith('/')) {
-                 html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
-                 i = closeTagIndex + 1;
-                 continue;
-            }
-    
-            const parts = tagStr.match(/([a-zA-Z]+)(?:[=\s](?:"([^"]*)"|([^> ]*)))?/);
-            if (!parts) {
-                html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
-                i = closeTagIndex + 1;
-                continue;
-            }
-    
-            const tagName = parts[1].toLowerCase();
-            const tagValue = parts[2] || parts[3] || null;
-    
-            const endTag = `</${tagName}>`;
-            const openTagPattern = new RegExp(`<${tagName}(?:[=\\s>]|$)`, 'i');
-            let balance = 1;
-            let searchIndex = closeTagIndex + 1;
-            let endTagPosition = -1;
-
-            while (searchIndex < text.length) {
-                const nextEndTag = text.indexOf(endTag, searchIndex);
+            const isClosingTag = tagStr.startsWith('/');
+            
+            if (isClosingTag) {
+                const tagName = tagStr.substring(1).toLowerCase();
+                if (stack.length === 0 || stack[stack.length - 1].name !== tagName) {
+                    return html + escapeHtml(text.substring(openTagIndex));
+                }
+                const closedTag = stack.pop();
+                switch (closedTag.name) {
+                    case 'b': html += '</strong>'; break;
+                    case 'i': html += '</em>'; break;
+                    case 'size':
+                    case 'color': html += '</span>'; break;
+                }
+            } else {
+                const parts = tagStr.match(/([a-zA-Z]+)(?:[=\s](?:"([^"]*)"|([^> ]*)))?/);
+                if (!parts) {
+                    html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
+                    i = closeTagIndex + 1;
+                    continue;
+                }
                 
-                const substringForMatch = text.substring(searchIndex);
-                const nextOpenTagMatch = substringForMatch.match(openTagPattern);
-                const nextOpenTag = nextOpenTagMatch ? searchIndex + nextOpenTagMatch.index : -1;
-
-                if (nextEndTag === -1) {
-                    break;
-                }
-
-                if (nextOpenTag !== -1 && nextOpenTag < nextEndTag) {
-                    balance++;
-                    searchIndex = nextOpenTag + 1;
-                } else {
-                    balance--;
-                    if (balance === 0) {
-                        endTagPosition = nextEndTag;
-                        break;
-                    }
-                    searchIndex = nextEndTag + 1;
-                }
-            }
+                const tagName = parts[1].toLowerCase();
+                const tagValue = parts[2] || parts[3] || null;
     
-            if (endTagPosition !== -1) {
-                const content = text.substring(closeTagIndex + 1, endTagPosition);
-                const innerHtml = parseGameTagsToHtml(content);
+                stack.push({ name: tagName, value: tagValue });
     
-                switch(tagName) {
+                switch (tagName) {
                     case 'b':
-                        html += `<strong>${innerHtml}</strong>`;
+                        html += '<strong>';
                         break;
                     case 'i':
-                        html += `<em>${innerHtml}</em>`;
+                        html += '<em>';
                         break;
                     case 'size':
                         if (tagValue) {
-                             const scaledSize = Math.max(parseFloat(tagValue) * 0.55, 1);
-                             html += `<span style="font-size: ${scaledSize}px;">${innerHtml}</span>`;
+                            const scaledSize = Math.max(parseFloat(tagValue) * 0.55, 1);
+                            html += `<span style="font-size: ${scaledSize}px;">`;
                         } else {
-                             html += innerHtml;
+                            html += '<span>';
                         }
                         break;
                     case 'color':
                         if (tagValue) {
-                            let finalColor = tagValue;
-                            if (finalColor.startsWith('"') && finalColor.endsWith('"')) {
-                                finalColor = finalColor.slice(1, -1);
-                            }
+                            let finalColor = tagValue.replace(/"/g, '');
                             if (!finalColor.startsWith('#') && /^[a-fA-F0-9]{6}$/.test(finalColor)) {
                                 finalColor = '#' + finalColor;
                             }
-                            html += `<span style="color: ${finalColor};">${innerHtml}</span>`;
+                            html += `<span style="color: ${finalColor};">`;
                         } else {
-                            html += innerHtml;
+                            html += '<span>';
                         }
                         break;
                     default:
-                        html += escapeHtml(text.substring(openTagIndex, endTagPosition + endTag.length));
+                        stack.pop();
+                        html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
                 }
-                i = endTagPosition + endTag.length;
-            } else {
-                html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
-                i = closeTagIndex + 1;
             }
+            
+            i = closeTagIndex + 1;
         }
+    
+        if (stack.length > 0) {
+            return escapeHtml(text);
+        }
+    
         return html;
     }
 
