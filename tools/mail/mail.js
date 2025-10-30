@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (stack.length > 0) {
             return escapeHtml(text);
         }
-    
+
         return html;
     }
 
