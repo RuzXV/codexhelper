@@ -41,6 +41,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedLoadoutSlots = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
     let activeSlotId = null;
 
+    let currentVirtualScrollItems = [];
+    let virtualScrollListener = null;
+
     const debounce = (callback, wait) => {
         let timeoutId = null;
         return (...args) => {
@@ -54,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const getMaterialIconPath = (mat, rarity = 'legendary') => {
         const iconName = mat === 'iron' ? 'ore' : mat;
         let rarityName = (rarity || 'legendary').toLowerCase();
+        if (rarityName === 'normal') rarityName = 'common';
         if (!RARITIES.includes(rarityName)) {
             rarityName = 'legendary';
         }
@@ -89,7 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function performCalculation() {
-        // All calculations are done in "common" equivalents
         const playerMaterialsCommon = {};
         MATERIALS.forEach(mat => playerMaterialsCommon[mat] = calculateTotalForMaterial(mat));
         const playerChestsCommon = calculateTotalForMaterial(CHEST_MATERIAL);
@@ -103,22 +106,28 @@ document.addEventListener('DOMContentLoaded', function() {
             if (quantity > 0) {
                 const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
                 if (itemData && itemData.cost) {
-                    const multiplier = RARITY_MULTIPLIERS[(itemData.quality || 'Normal').toLowerCase()];
-                    for (const mat in itemData.cost) {
-                        totalCostCommon[mat] += itemData.cost[mat] * quantity * multiplier;
+                    
+                    let qualityKey = (itemData.quality || 'Normal').toLowerCase();
+                    if (qualityKey === 'normal') {
+                        qualityKey = 'common';
+                    }
+                    const multiplier = RARITY_MULTIPLIERS[qualityKey];
+
+                    if (multiplier) {
+                        for (const mat in itemData.cost) {
+                            totalCostCommon[mat] += itemData.cost[mat] * quantity * multiplier;
+                        }
                     }
                     totalGoldCost += (itemData.gold_cost || 0) * quantity;
                 }
             }
         }
 
-        // Determine the rarity to display results in
         let displayRarity = 'Legendary';
         const highestRarity = getHighestSelectedRarity();
         if (highestRarity) {
             displayRarity = highestRarity;
         } else {
-            // Special case: no equipment selected, default to Legendary unless amounts are fractional
             const legendaryDivisor = RARITY_MULTIPLIERS.legendary;
             const hasFractionalLegendary = MATERIALS.some(mat => (playerMaterialsCommon[mat] > 0 && playerMaterialsCommon[mat] < legendaryDivisor));
             if (hasFractionalLegendary) {
@@ -312,25 +321,65 @@ document.addEventListener('DOMContentLoaded', function() {
         resultDiv.innerHTML = html;
         triggerSuccessAnimation(resultDiv);
     }
-
+    
     function populateModalGrid(slotType, searchTerm = '') {
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
-        
+
         const filteredItems = EQUIPMENT_DATA.filter(item => {
             const slotMatch = item.slot === slotType;
             const nameMatch = !searchTerm || item.name.toLowerCase().includes(lowerCaseSearchTerm);
             return slotMatch && nameMatch;
         });
+        currentVirtualScrollItems = filteredItems;
 
-        const html = filteredItems.map(item => `
-            <div class="modal-item" data-item-id="${item.id}">
-                <img src="/images/materials/equipment/${item.image}" alt="${item.name}">
-                <span class="item-name ${item.quality}">${item.name}</span>
-            </div>`
-        ).join('');
+        if (virtualScrollListener) {
+            modalGrid.removeEventListener('scroll', virtualScrollListener);
+        }
+        modalGrid.scrollTop = 0;
         
-        modalGrid.innerHTML = html;
+        const itemHeight = 130;
+        const getColumnCount = () => {
+            const itemAndGapWidth = 112;
+            return Math.max(1, Math.floor(modalGrid.clientWidth / itemAndGapWidth));
+        };
+        
+        const totalHeight = Math.ceil(filteredItems.length / getColumnCount()) * itemHeight;
+
+        modalGrid.innerHTML = `<div id="virtual-spacer" style="position: relative; height: ${totalHeight}px;"></div>`;
+        const virtualSpacer = document.getElementById('virtual-spacer');
+
+        const renderVisibleItems = () => {
+            const scrollTop = modalGrid.scrollTop;
+            const visibleHeight = modalGrid.clientHeight;
+            const columns = getColumnCount();
+            
+            const buffer = itemHeight * 2; 
+
+            const startIndex = Math.max(0, Math.floor((scrollTop - buffer) / itemHeight) * columns);
+            const endIndex = Math.min(filteredItems.length, Math.ceil((scrollTop + visibleHeight + buffer) / itemHeight) * columns);
+            
+            const offsetY = Math.floor(startIndex / columns) * itemHeight;
+            
+            const visibleItems = currentVirtualScrollItems.slice(startIndex, endIndex);
+
+            const html = visibleItems.map(item => `
+                <div class="modal-item" data-item-id="${item.id}">
+                    <img src="/images/materials/equipment/${item.image}" alt="${item.name}">
+                    <span class="item-name ${item.quality}">${item.name}</span>
+                </div>`
+            ).join('');
+
+            const itemsContainer = `<div class="modal-grid" style="position: absolute; top: 0; left: 0; right: 0; transform: translateY(${offsetY}px);">${html}</div>`;
+            
+            virtualSpacer.innerHTML = itemsContainer;
+        };
+        
+        virtualScrollListener = () => requestAnimationFrame(renderVisibleItems);
+        modalGrid.addEventListener('scroll', virtualScrollListener);
+        
+        requestAnimationFrame(renderVisibleItems);
     }
+
 
     function openModalForSlot(slotElement) {
         activeSlotId = slotElement.id;
@@ -349,7 +398,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeModal() {
         modal.style.display = 'none';
         activeSlotId = null;
+        
+        if (virtualScrollListener) {
+            modalGrid.removeEventListener('scroll', virtualScrollListener);
+            virtualScrollListener = null;
+        }
         modalGrid.innerHTML = '';
+        currentVirtualScrollItems = [];
     }
 
     function selectItem(itemId) {
@@ -375,13 +430,22 @@ document.addEventListener('DOMContentLoaded', function() {
         slotElement.innerHTML = `<img src="/images/materials/equipment/${itemData.image}" alt="${itemData.name}">`;
         
         closeModal();
-        updateUIDisplays();
+        updateUIDisplays(itemId);
         if (calculateBtn.style.display === 'none') performCalculation();
     }
 
     function addItemFromSelector(itemId) {
         craftingList[itemId] = (craftingList[itemId] || 0) + 1;
-        updateUIDisplays();
+
+        const itemElement = equipmentSelectorGrid.querySelector(`.selector-item[data-item-id="${itemId}"]`);
+        if (itemElement) {
+            itemElement.classList.add('item-added-glow');
+            setTimeout(() => {
+                itemElement.classList.remove('item-added-glow');
+            }, 1200);
+        }
+
+        updateUIDisplays(itemId);
         if (calculateBtn.style.display === 'none') performCalculation();
     }
 
@@ -425,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function updateSelectedItemsDisplay() {
+    function updateSelectedItemsDisplay(newItemId = null) {
         selectedItemsList.innerHTML = '';
         const hasSelection = Object.values(craftingList).some(qty => qty > 0);
 
@@ -481,6 +545,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const itemEl = document.createElement('div');
                 itemEl.className = 'selected-item';
+                if (itemId === newItemId) {
+                    itemEl.classList.add('item-just-added');
+                }
                 itemEl.innerHTML = `
                     <img src="/images/materials/equipment/${itemData.image}" alt="${itemData.name}" class="selected-item-icon">
                     <div class="selected-item-details">
@@ -574,8 +641,8 @@ document.addEventListener('DOMContentLoaded', function() {
         container.innerHTML = html;
     }
     
-    function updateUIDisplays() {
-        updateSelectedItemsDisplay();
+    function updateUIDisplays(newItemId = null) {
+        updateSelectedItemsDisplay(newItemId);
         calculateAndDisplayTotalStats();
     }
     
@@ -592,24 +659,36 @@ document.addEventListener('DOMContentLoaded', function() {
     function filterItems(grid, filterPanel, searchTerm) {
         const activeFilters = getActiveFilters(filterPanel);
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
-        
+        const transitionDuration = 300; 
+
         grid.querySelectorAll('.selector-item').forEach(item => {
             const itemData = EQUIPMENT_DATA.find(d => d.id === item.dataset.itemId);
-            if (!itemData) {
-                item.classList.add('hidden');
-                return;
-            }
+            if (!itemData) return;
 
             const nameMatch = itemData.name.toLowerCase().includes(lowerCaseSearchTerm);
             const slotMatch = !activeFilters.slot || activeFilters.slot.length === 0 || activeFilters.slot.includes(itemData.slot);
             const qualityMatch = !activeFilters.quality || activeFilters.quality.length === 0 || activeFilters.quality.includes(itemData.quality);
+            
             const statsMatch = !activeFilters.stats || activeFilters.stats.length === 0 || 
                 activeFilters.stats.some(statFilter =>
-                    itemData.stats && Object.keys(itemData.stats).some(statKey => getTroopTypeFromStat(statKey) === statFilter && itemData.stats[statKey] > 0)
+                    itemData.stats && itemData.stats[statFilter] > 0
                 );
             
-            const isVisible = nameMatch && slotMatch && qualityMatch && statsMatch;
-            item.classList.toggle('hidden', !isVisible);
+            const shouldBeVisible = nameMatch && slotMatch && qualityMatch && statsMatch;
+
+            if (shouldBeVisible) {
+                item.style.display = 'flex';
+                setTimeout(() => {
+                    item.classList.remove('hidden');
+                }, 10);
+            } else {
+                item.classList.add('hidden');
+                setTimeout(() => {
+                    if (item.classList.contains('hidden')) {
+                        item.style.display = 'none';
+                    }
+                }, transitionDuration);
+            }
         });
     }
 
@@ -625,7 +704,14 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             'Troop Type Stats': {
                 type: 'stats',
-                options: ['infantry', 'cavalry', 'archer', 'siege']
+                options: [
+                    'infantry_attack', 'cavalry_attack',
+                    'infantry_defense', 'cavalry_defense',
+                    'infantry_health', 'cavalry_health',
+                    'archer_attack', 'siege_attack',
+                    'archer_defense', 'siege_defense',
+                    'archer_health', 'siege_health'
+                ]
             }
         };
 
@@ -641,7 +727,11 @@ document.addEventListener('DOMContentLoaded', function() {
             html += `<div class="filter-category"><h5>${title}</h5>`;
             html += '<div class="filter-category-grid">';
             category.options.forEach(opt => {
-                const className = category.type === 'stats' ? `stat-${opt}` : '';
+                let className = '';
+                if (category.type === 'stats') {
+                    const troopType = getTroopTypeFromStat(opt);
+                    className = `stat-${troopType}`;
+                }
                 html += `<label class="filter-option ${className}">
                            <input type="checkbox" data-category="${category.type}" value="${opt}"> ${formatStatName(opt)}
                          </label>`;
@@ -800,34 +890,51 @@ document.addEventListener('DOMContentLoaded', function() {
     function adjustLayoutHeights() {
         const loadoutContainer = document.querySelector('.loadout-container');
         const shoppingListIsland = document.getElementById('shopping-list-island');
+        const selectorWrapper = document.getElementById('equipment-selector-wrapper');
+        const totalStatsIsland = document.getElementById('total-stats-island');
 
-        if (loadoutContainer && shoppingListIsland) {
-            if (window.innerWidth > 1200) {
-                const loadoutHeight = loadoutContainer.offsetHeight;
-                shoppingListIsland.style.height = `${loadoutHeight}px`;
-            } else {
-                shoppingListIsland.style.height = 'auto';
-            }
+        if (window.innerWidth > 1200 && loadoutContainer && shoppingListIsland && selectorWrapper && totalStatsIsland) {
+            const loadoutHeight = loadoutContainer.offsetHeight;
+            shoppingListIsland.style.height = `${loadoutHeight}px`;
+
+            const selectorHeight = selectorWrapper.offsetHeight;
+            totalStatsIsland.style.height = selectorHeight > 0 ? `${selectorHeight}px` : 'auto';
+
+        } else if (shoppingListIsland && totalStatsIsland) {
+            shoppingListIsland.style.height = 'auto';
+            totalStatsIsland.style.height = 'auto';
         }
     }
     
     window.addEventListener('resize', debounce(() => {
-        adjustLayoutHeights();
         adjustSelectorHeight();
+        adjustLayoutHeights();
     }, 150));
+
+    window.addEventListener('load', () => {
+        adjustSelectorHeight();
+        adjustLayoutHeights();
+    });
 
     async function initializeCalculator() {
         try {
             const response = await fetch('equipment.json');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            EQUIPMENT_DATA = await response.json();
+            const data = await response.json();
+            
+            const rarityOrder = { 'Legendary': 5, 'Epic': 4, 'Elite': 3, 'Advanced': 2, 'Normal': 1 };
+            EQUIPMENT_DATA = data.sort((a, b) => {
+                const orderA = rarityOrder[a.quality] || 0;
+                const orderB = rarityOrder[b.quality] || 0;
+                return orderB - orderA;
+            });
             
             initializeEquipmentSelector();
 
-            setTimeout(() => {
-                adjustLayoutHeights();
+             requestAnimationFrame(() => {
                 adjustSelectorHeight();
-            }, 150);
+                adjustLayoutHeights();
+            });
 
         } catch (error) {
             console.error("Could not initialize calculator:", error);
