@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>`
             ).join('');
 
-            const itemsContainer = `<div class="modal-grid" style="position: absolute; top: 0; left: 0; right: 0; transform: translateY(${offsetY}px);">${html}</div>`;
+            const itemsContainer = `<div style="position: absolute; top: 0; left: 0; right: 0; transform: translateY(${offsetY}px); display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: var(--spacing-3);">${html}</div>`;
             
             virtualSpacer.innerHTML = itemsContainer;
         };

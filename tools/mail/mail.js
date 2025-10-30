@@ -120,11 +120,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateUndoRedoButtons() {
-        undoBtn.disabled = historyIndex <= 0;
+        if(undoBtn) undoBtn.disabled = historyIndex <= 0;
     }
 
     const cachedContent = localStorage.getItem(CACHE_KEY);
-    if (cachedContent) {
+    if (mailInput && cachedContent) {
         mailInput.value = cachedContent;
     }
     
@@ -208,30 +208,141 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePreview(overrideText = null) {
+        if (!mailInput || !mailPreview || !charCounter) return;
+
         const text = overrideText !== null ? overrideText : mailInput.value;
         if (overrideText === null) {
             localStorage.setItem(CACHE_KEY, text);
         }
-
+    
         const newlines = (text.match(/\n/g) || []).length;
         const charCount = text.length + newlines;
-
+    
         charCounter.textContent = `${charCount}/${currentCharLimit}`;
         charCounter.style.color = charCount > currentCharLimit ? '#ff4d4d' : 'var(--text-secondary)';
         
-        let previewText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        previewText = previewText.replace(/&lt;b&gt;(.*?)&lt;\/b&gt;/gis, '<strong>$1</strong>');
-        previewText = previewText.replace(/&lt;i&gt;(.*?)&lt;\/i&gt;/gis, '<em>$1</em>');
-        
-        previewText = previewText.replace(/&lt;size=(\d+)&gt;(.*?)&lt;\/size&gt;/gis, (match, size, content) => {
-            const scaledSize = parseFloat(size) * 0.55;
-            return `<span style="font-size: ${scaledSize}px;">${content}</span>`;
-        });
+        const parsedHtml = parseGameTagsToHtml(text);
+        mailPreview.innerHTML = parsedHtml.replace(/\n/g, '<br>');
+    }
+    
+    function escapeHtml(text) {
+      return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+    }
+    
+    function parseGameTagsToHtml(text) {
+        let html = '';
+        let i = 0;
+        while (i < text.length) {
+            let openTagIndex = text.indexOf('<', i);
+            if (openTagIndex === -1) {
+                html += escapeHtml(text.substring(i));
+                break;
+            }
+    
+            html += escapeHtml(text.substring(i, openTagIndex));
+    
+            let closeTagIndex = text.indexOf('>', openTagIndex);
+            if (closeTagIndex === -1) {
+                html += escapeHtml(text.substring(openTagIndex));
+                break;
+            }
+    
+            const tagStr = text.substring(openTagIndex + 1, closeTagIndex);
+    
+            if (tagStr.startsWith('/')) {
+                 html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
+                 i = closeTagIndex + 1;
+                 continue;
+            }
+    
+            const parts = tagStr.match(/([a-zA-Z]+)(?:[=\s](?:"([^"]*)"|([^> ]*)))?/);
+            if (!parts) {
+                html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
+                i = closeTagIndex + 1;
+                continue;
+            }
+    
+            const tagName = parts[1].toLowerCase();
+            const tagValue = parts[2] || parts[3] || null;
+    
+            const endTag = `</${tagName}>`;
+            const openTagPattern = new RegExp(`<${tagName}(?:[=\\s>]|$)`, 'i');
+            let balance = 1;
+            let searchIndex = closeTagIndex + 1;
+            let endTagPosition = -1;
 
-        previewText = previewText.replace(/&lt;color=([a-zA-Z0-9#]+)&gt;(.*?)&lt;\/color&gt;/gis, (match, colorValue, content) => {
-            return `<span style="color: ${colorValue};">${content}</span>`;
-        });
-        mailPreview.innerHTML = previewText.replace(/\n/g, '<br>');
+            while (searchIndex < text.length) {
+                const nextEndTag = text.indexOf(endTag, searchIndex);
+                
+                const substringForMatch = text.substring(searchIndex);
+                const nextOpenTagMatch = substringForMatch.match(openTagPattern);
+                const nextOpenTag = nextOpenTagMatch ? searchIndex + nextOpenTagMatch.index : -1;
+
+                if (nextEndTag === -1) {
+                    break;
+                }
+
+                if (nextOpenTag !== -1 && nextOpenTag < nextEndTag) {
+                    balance++;
+                    searchIndex = nextOpenTag + 1;
+                } else {
+                    balance--;
+                    if (balance === 0) {
+                        endTagPosition = nextEndTag;
+                        break;
+                    }
+                    searchIndex = nextEndTag + 1;
+                }
+            }
+    
+            if (endTagPosition !== -1) {
+                const content = text.substring(closeTagIndex + 1, endTagPosition);
+                const innerHtml = parseGameTagsToHtml(content);
+    
+                switch(tagName) {
+                    case 'b':
+                        html += `<strong>${innerHtml}</strong>`;
+                        break;
+                    case 'i':
+                        html += `<em>${innerHtml}</em>`;
+                        break;
+                    case 'size':
+                        if (tagValue) {
+                             const scaledSize = Math.max(parseFloat(tagValue) * 0.55, 1);
+                             html += `<span style="font-size: ${scaledSize}px;">${innerHtml}</span>`;
+                        } else {
+                             html += innerHtml;
+                        }
+                        break;
+                    case 'color':
+                        if (tagValue) {
+                            let finalColor = tagValue;
+                            if (finalColor.startsWith('"') && finalColor.endsWith('"')) {
+                                finalColor = finalColor.slice(1, -1);
+                            }
+                            if (!finalColor.startsWith('#') && /^[a-fA-F0-9]{6}$/.test(finalColor)) {
+                                finalColor = '#' + finalColor;
+                            }
+                            html += `<span style="color: ${finalColor};">${innerHtml}</span>`;
+                        } else {
+                            html += innerHtml;
+                        }
+                        break;
+                    default:
+                        html += escapeHtml(text.substring(openTagIndex, endTagPosition + endTag.length));
+                }
+                i = endTagPosition + endTag.length;
+            } else {
+                html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
+                i = closeTagIndex + 1;
+            }
+        }
+        return html;
     }
 
     function closeAllDropdowns() {
@@ -241,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updatePreview();
         }
         document.querySelectorAll('.custom-dropdown-options.visible').forEach(d => d.classList.remove('visible'));
-        customColorPickerContainer.style.display = 'none';
+        if(customColorPickerContainer) customColorPickerContainer.style.display = 'none';
     }
     
     document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
@@ -272,20 +383,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    customColorOptions.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        const target = e.target.closest('.custom-option');
-        if (!target) return;
-        
-        const value = target.dataset.value;
-        
-        if (value === 'custom-toggle') {
-            customColorPickerContainer.style.display = customColorPickerContainer.style.display === 'flex' ? 'none' : 'flex';
-        } else {
-            applyTag('color', value);
-            closeAllDropdowns();
-        }
-    });
+    if(customColorOptions) {
+        customColorOptions.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('.custom-option');
+            if (!target) return;
+            
+            const value = target.dataset.value;
+            
+            if (value === 'custom-toggle') {
+                customColorPickerContainer.style.display = customColorPickerContainer.style.display === 'flex' ? 'none' : 'flex';
+            } else {
+                applyTag('color', value);
+                closeAllDropdowns();
+            }
+        });
+    }
 
     function livePreviewColor(color) {
         if (!isLivePreviewingColor) return;
@@ -303,14 +416,18 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePreview(preSelection + coloredText + postSelection);
     }
     
-    customColorInput.addEventListener('input', () => livePreviewColor(customColorInput.value));
+    if(customColorInput) customColorInput.addEventListener('input', () => livePreviewColor(customColorInput.value));
     
-    applyCustomColorBtn.addEventListener('click', () => {
-        applyTag('color', customColorInput.value);
-        closeAllDropdowns();
-    });
+    if(applyCustomColorBtn) {
+        applyCustomColorBtn.addEventListener('click', () => {
+            applyTag('color', customColorInput.value);
+            closeAllDropdowns();
+        });
+    }
 
     function applyGradient() {
+        if (!mailInput || !gradientColor1 || !gradientColor2 || !gradientBiasSlider || !gradientStrengthSlider) return;
+
         const startColor = gradientColor1.value;
         const endColor = gradientColor2.value;
         const bias = parseFloat(gradientBiasSlider.value);
@@ -368,6 +485,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateGradientUI() {
+        if (!gradientPreviewBar || !mailInput || !gradientCharCounter) return;
+
         const startColor = gradientColor1.value;
         const endColor = gradientColor2.value;
         const bias = parseFloat(gradientBiasSlider.value);
@@ -399,6 +518,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function setupTemplatesAndFilters() {
+        if (!templateGallery) return;
         try {
             const response = await fetch('templates.json');
             if (!response.ok) throw new Error('Network response was not ok');
@@ -411,6 +531,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function populateFilters() {
+        if (!filterOptionsContainer) return;
+
         const filters = templates.reduce((acc, t) => {
             (t.tags || []).forEach(tag => {
                 const [category, value] = tag.split(':');
@@ -448,6 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderTemplates() {
+        if (!templateGallery) return;
         const activeFilters = getActiveFilters();
     
         if (!isGalleryPopulated) {
@@ -466,11 +589,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (isAlreadySelected) {
                         selectedTemplate = null;
                         hoveredTemplate = null;
-                        loadTemplateBtn.disabled = true;
+                        if(loadTemplateBtn) loadTemplateBtn.disabled = true;
                     } else {
                         item.classList.add('selected');
                         selectedTemplate = templates[index];
-                        loadTemplateBtn.disabled = false;
+                        if(loadTemplateBtn) loadTemplateBtn.disabled = false;
                     }
                     updateMagnifiedPreview();
                 });
@@ -508,6 +631,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getActiveFilters() {
+        if (!filterOptionsContainer) return {};
         const active = {};
         filterOptionsContainer.querySelectorAll('input:checked').forEach(input => {
             const category = input.dataset.category;
@@ -542,6 +666,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function switchView(tabName) {
+        if (!generatorView || !templatesView || !generatorTabBtn || !templatesTabBtn) return;
         generatorView.classList.toggle('active', tabName === 'generator');
         templatesView.classList.toggle('active', tabName === 'templates');
         generatorTabBtn.classList.toggle('active', tabName === 'generator');
@@ -549,6 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateMagnifiedPreview() {
+        if(!magnifiedImage || !magnifiedTitle || !magnifiedPreviewContainer) return;
         const templateToShow = hoveredTemplate || selectedTemplate;
         if (templateToShow) {
             magnifiedImage.src = templateToShow.image;
@@ -561,162 +687,196 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    undoBtn.addEventListener('click', undo);
+    if(undoBtn) undoBtn.addEventListener('click', undo);
     
-    clearBtn.addEventListener('click', () => {
-        customConfirmModal.style.display = 'flex';
-    });
+    if(clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            if(customConfirmModal) customConfirmModal.style.display = 'flex';
+        });
+    }
+    
+    if(confirmActionBtn) {
+        confirmActionBtn.addEventListener('click', () => {
+            saveState();
+            mailInput.value = '';
+            updatePreview();
+            saveState();
+            if(customConfirmModal) customConfirmModal.style.display = 'none';
+        });
+    }
+    
+    if(confirmCancelBtn) {
+        confirmCancelBtn.addEventListener('click', () => {
+            if(customConfirmModal) customConfirmModal.style.display = 'none';
+        });
+    }
 
-    confirmActionBtn.addEventListener('click', () => {
-        saveState();
-        mailInput.value = '';
-        updatePreview();
-        saveState();
-        customConfirmModal.style.display = 'none';
-    });
-    
-    confirmCancelBtn.addEventListener('click', () => {
-        customConfirmModal.style.display = 'none';
-    });
-    
-    mailInput.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === 'z') {
-            e.preventDefault();
-            undo();
-        } else if (e.ctrlKey && e.key === 'y') {
-            e.preventDefault();
-            redo();
-        }
-    });
-    
-    mailInput.addEventListener('input', () => {
-        clearTimeout(inputTimeout);
-        inputTimeout = setTimeout(() => saveState(true), 500);
-        updatePreview();
-    });
-
-    generatorTabBtn.addEventListener('click', () => switchView('generator'));
-    templatesTabBtn.addEventListener('click', () => switchView('templates'));
-
-    previewTabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            previewTabBtns.forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-            previewContainer.className = 'mail-preview-container';
-            previewContainer.classList.add(btn.dataset.bg === 'mail' ? 'mail-bg' : 'board-bg');
-            currentCharLimit = (btn.dataset.bg === 'mail') ? 2000 : 1000;
+    if(mailInput) {
+        mailInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'z') {
+                e.preventDefault();
+                undo();
+            } else if (e.ctrlKey && e.key === 'y') {
+                e.preventDefault();
+                redo();
+            }
+        });
+        
+        mailInput.addEventListener('input', () => {
+            clearTimeout(inputTimeout);
+            inputTimeout = setTimeout(() => saveState(true), 500);
             updatePreview();
         });
-    });
+    }
+
+    if(generatorTabBtn) generatorTabBtn.addEventListener('click', () => switchView('generator'));
+    if(templatesTabBtn) templatesTabBtn.addEventListener('click', () => switchView('templates'));
+
+    if(previewTabBtns) {
+        previewTabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                previewTabBtns.forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                if(previewContainer) {
+                    previewContainer.className = 'mail-preview-container';
+                    previewContainer.classList.add(btn.dataset.bg === 'mail' ? 'mail-bg' : 'board-bg');
+                }
+                currentCharLimit = (btn.dataset.bg === 'mail') ? 2000 : 1000;
+                updatePreview();
+            });
+        });
+    }
 
     function addFormattingListener(button, callback) {
-        button.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            callback();
-        });
+        if(button) {
+            button.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                callback();
+            });
+        }
     }
 
     addFormattingListener(boldBtn, () => applyTag('b'));
     addFormattingListener(italicBtn, () => applyTag('i'));
     addFormattingListener(boldItalicBtn, () => applyDoubleTag('b', 'i'));
 
-
-    customSizeOptions.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        const target = e.target.closest('.custom-option');
-        if (!target) return;
-        
-        const value = target.dataset.value;
-        if (value === 'custom') {
-            customSizeModal.style.display = 'flex';
-            customSizeInput.focus();
-            customSizeInput.value = '';
-        } else {
-            applyTag('size', value);
-        }
-        closeAllDropdowns();
-    });
+    if (customSizeOptions) {
+        customSizeOptions.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('.custom-option');
+            if (!target) return;
+            
+            const value = target.dataset.value;
+            if (value === 'custom') {
+                if(customSizeModal) customSizeModal.style.display = 'flex';
+                if(customSizeInput) customSizeInput.focus();
+                if(customSizeInput) customSizeInput.value = '';
+            } else {
+                applyTag('size', value);
+            }
+            closeAllDropdowns();
+        });
+    }
 
     function applyCustomSize() {
+        if(!customSizeInput) return;
         const customSize = customSizeInput.value;
         if (customSize && !isNaN(customSize) && customSize > 0) {
             applyTag('size', customSize);
         }
-        customSizeModal.style.display = 'none';
+        if(customSizeModal) customSizeModal.style.display = 'none';
     }
 
-    customSizeApplyBtn.addEventListener('click', applyCustomSize);
-    customSizeCancelBtn.addEventListener('click', () => {
-        customSizeModal.style.display = 'none';
-    });
-    customSizeModal.addEventListener('click', (e) => {
-        if (e.target === customSizeModal) {
-            customSizeModal.style.display = 'none';
-        }
-    });
-    customSizeInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            applyCustomSize();
-        } else if (e.key === 'Escape') {
-            customSizeModal.style.display = 'none';
-        }
-    });
+    if(customSizeApplyBtn) customSizeApplyBtn.addEventListener('click', applyCustomSize);
+    if(customSizeCancelBtn) {
+        customSizeCancelBtn.addEventListener('click', () => {
+            if(customSizeModal) customSizeModal.style.display = 'none';
+        });
+    }
+    if(customSizeModal) {
+        customSizeModal.addEventListener('click', (e) => {
+            if (e.target === customSizeModal) {
+                customSizeModal.style.display = 'none';
+            }
+        });
+    }
+    if(customSizeInput) {
+        customSizeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyCustomSize();
+            } else if (e.key === 'Escape') {
+                if(customSizeModal) customSizeModal.style.display = 'none';
+            }
+        });
+    }
 
     addFormattingListener(applyGradientBtn, applyGradient);
     
-    gradientColor1.addEventListener('input', updateGradientUI);
-    gradientColor2.addEventListener('input', updateGradientUI);
-    gradientBiasSlider.addEventListener('input', updateGradientUI);
-    gradientStrengthSlider.addEventListener('input', updateGradientUI);
+    if(gradientColor1) gradientColor1.addEventListener('input', updateGradientUI);
+    if(gradientColor2) gradientColor2.addEventListener('input', updateGradientUI);
+    if(gradientBiasSlider) gradientBiasSlider.addEventListener('input', updateGradientUI);
+    if(gradientStrengthSlider) gradientStrengthSlider.addEventListener('input', updateGradientUI);
 
-    copyBtn.addEventListener('click', () => {
-        const copyBtnText = copyBtn.querySelector('span');
-        if (!copyBtnText) return;
-    
-        navigator.clipboard.writeText(mailInput.value).then(() => {
-            const originalText = copyBtnText.textContent;
-            copyBtnText.textContent = 'Copied!';
-            setTimeout(() => { 
-                copyBtnText.textContent = originalText; 
-            }, 2000);
+    if(copyBtn) {
+        copyBtn.addEventListener('click', () => {
+            const copyBtnText = copyBtn.querySelector('span');
+            if (!copyBtnText || !mailInput) return;
+        
+            navigator.clipboard.writeText(mailInput.value).then(() => {
+                const originalText = copyBtnText.textContent;
+                copyBtnText.textContent = 'Copied!';
+                setTimeout(() => { 
+                    copyBtnText.textContent = originalText; 
+                }, 2000);
+            });
         });
-    });
-
-    loadTemplateBtn.addEventListener('click', () => {
-        if (selectedTemplate) {
-            mailInput.value = selectedTemplate.content;
-            historyStack = [];
-            historyIndex = -1;
-            saveState();
-            updatePreview();
-            switchView('generator');
-        }
-    });
-
-    filterToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        filterPanel.classList.toggle('visible');
-    });
-
-    filterResetBtn.addEventListener('click', () => {
-        filterOptionsContainer.querySelectorAll('input:checked').forEach(i => i.checked = false);
-        renderTemplates();
-    });
-
-    templateGallery.addEventListener('mouseover', (e) => {
-        const item = e.target.closest('.template-item');
-        if (item) {
-            const index = parseInt(item.dataset.index, 10);
-            hoveredTemplate = templates[index];
-            updateMagnifiedPreview();
-        }
-    });
+    }
     
-    templateGallery.addEventListener('mouseleave', () => {
-        hoveredTemplate = null;
-        updateMagnifiedPreview();
-    });
+    if(loadTemplateBtn) {
+        loadTemplateBtn.addEventListener('click', () => {
+            if (selectedTemplate) {
+                mailInput.value = selectedTemplate.content;
+                historyStack = [];
+                historyIndex = -1;
+                saveState();
+                updatePreview();
+                switchView('generator');
+            }
+        });
+    }
+
+    if(filterToggleBtn) {
+        filterToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(filterPanel) filterPanel.classList.toggle('visible');
+        });
+    }
+
+    if(filterResetBtn) {
+        filterResetBtn.addEventListener('click', () => {
+            if(filterOptionsContainer) {
+                filterOptionsContainer.querySelectorAll('input:checked').forEach(i => i.checked = false);
+            }
+            renderTemplates();
+        });
+    }
+
+    if (templateGallery) {
+        templateGallery.addEventListener('mouseover', (e) => {
+            const item = e.target.closest('.template-item');
+            if (item) {
+                const index = parseInt(item.dataset.index, 10);
+                hoveredTemplate = templates[index];
+                updateMagnifiedPreview();
+            }
+        });
+        
+        templateGallery.addEventListener('mouseleave', () => {
+            hoveredTemplate = null;
+            updateMagnifiedPreview();
+        });
+    }
 
     document.addEventListener('mousedown', (e) => {
         if (!e.target.closest('.custom-dropdown')) {
@@ -725,14 +885,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.addEventListener('click', (e) => {
-        if (!filterPanel.contains(e.target) && !filterToggleBtn.contains(e.target)) {
+        if (filterPanel && filterToggleBtn && !filterPanel.contains(e.target) && !filterToggleBtn.contains(e.target)) {
             filterPanel.classList.remove('visible');
         }
     });
 
     updatePreview();
     setupTemplatesAndFilters();
-    saveState();
+    if(mailInput) {
+        saveState();
+    }
     updateUndoRedoButtons();
     updateGradientUI();
 });
