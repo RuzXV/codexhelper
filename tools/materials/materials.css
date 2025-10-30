@@ -319,7 +319,7 @@ nav.navbar {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-4);
-    overflow-y: auto;
+    overflow: hidden;
     flex-grow: 1;
 }
 .stats-group {
@@ -327,7 +327,7 @@ nav.navbar {
     padding-left: var(--spacing-3);
 }
 .stats-group h5 {
-    font-size: var(--font-size-base);
+    font-size: 1.1em;
     font-weight: 600;
     margin-bottom: var(--spacing-2);
 }
@@ -335,7 +335,7 @@ nav.navbar {
     justify-content: space-between;
 }
 #total-stats-container .special-stat {
-    font-size: var(--font-size-sm);
+    font-size: 0.9em;
 }
 h5.stat-cavalry { color: #57f287; }
 h5.stat-infantry { color: #5aa0ff; }
