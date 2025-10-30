@@ -241,7 +241,7 @@
     },
     {
         "title": "From the Ground Up",
-        "image": "/images/mail/template_previews/From_the_Ground_Up_Simple.webp",
+        "image": "/images/mail/template_previews/From_The_Ground_Up_Simple.webp",
         "content": "Greetings! At 0.00 UTC today, an event called \"From the Ground Up\" began, where you gain points by using speedups to upgrade buildings. This event will be fixed for players that <b>DO NOT </b>meet the current requirements. these are the requirements: \n\n<size=24><color=#ff6900><b>Event Rules</b></color></size>\n♦Governors below 1,000,000,000 KP - <b>15,000 Points MAXIMUM</b>\n\nIf anyone below 1b kp exceeds the point limit, the leadership council will determine their punishment based on the severity of the situation.\n\nWe fix these events to reward our active fighters that give a lot of time, troops, and resources for our kingdom's future. Please respect the effort these players go through, and don't push these events.\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
         "tags": ["format:Simple", "type:Event"]
     },
