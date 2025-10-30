@@ -124,10 +124,10 @@ nav.navbar {
     gap: var(--spacing-6);
 }
 .generator-panel {
-    flex: 1 1 55.6%;
+    flex: 1 1 56%;
 }
 .preview-panel {
-    flex: 1 1 44.4%;
+    flex: 1 1 44%;
     display: flex;
     flex-direction: column;
 }
@@ -481,8 +481,6 @@ nav.navbar {
     overflow-y: auto;
     white-space: pre-wrap;
     padding: 10px 20px;
-    transform: scaleY(0.95);
-    transform-origin: top;
     text-rendering: geometricPrecision;
 }
 
