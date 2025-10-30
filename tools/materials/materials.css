@@ -628,6 +628,13 @@ h5.legendary-text { background: linear-gradient(90deg, #ffb833, #fcd38b); -webki
     justify-content: center;
     height: 130px;
 }
+
+.modal-virtual-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--spacing-3);
+}
+
 .modal-item:hover { border-color: var(--accent-blue); transform: translateY(-2px); }
 .modal-item img { width: 48px; height: 48px; margin-bottom: var(--spacing-2); align-self: center; }
 .modal-item .item-name { 
