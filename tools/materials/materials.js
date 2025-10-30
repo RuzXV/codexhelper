@@ -324,60 +324,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function populateModalGrid(slotType, searchTerm = '') {
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
-
+    
         const filteredItems = EQUIPMENT_DATA.filter(item => {
             const slotMatch = item.slot === slotType;
             const nameMatch = !searchTerm || item.name.toLowerCase().includes(lowerCaseSearchTerm);
             return slotMatch && nameMatch;
         });
-        currentVirtualScrollItems = filteredItems;
-
+    
         if (virtualScrollListener) {
             modalGrid.removeEventListener('scroll', virtualScrollListener);
+            virtualScrollListener = null;
         }
+    
+        const html = filteredItems.map(item => `
+            <div class="modal-item" data-item-id="${item.id}">
+                <img src="/images/materials/equipment/${item.image}" alt="${item.name}">
+                <span class="item-name ${item.quality}">${item.name}</span>
+            </div>`
+        ).join('');
+    
+        modalGrid.innerHTML = html;
         modalGrid.scrollTop = 0;
-        
-        const itemHeight = 130;
-        const getColumnCount = () => {
-            const itemAndGapWidth = 112;
-            return Math.max(1, Math.floor(modalGrid.clientWidth / itemAndGapWidth));
-        };
-        
-        const totalHeight = Math.ceil(filteredItems.length / getColumnCount()) * itemHeight;
-
-        modalGrid.innerHTML = `<div id="virtual-spacer" style="position: relative; height: ${totalHeight}px;"></div>`;
-        const virtualSpacer = document.getElementById('virtual-spacer');
-
-        const renderVisibleItems = () => {
-            const scrollTop = modalGrid.scrollTop;
-            const visibleHeight = modalGrid.clientHeight;
-            const columns = getColumnCount();
-            
-            const buffer = itemHeight * 2; 
-
-            const startIndex = Math.max(0, Math.floor((scrollTop - buffer) / itemHeight) * columns);
-            const endIndex = Math.min(filteredItems.length, Math.ceil((scrollTop + visibleHeight + buffer) / itemHeight) * columns);
-            
-            const offsetY = Math.floor(startIndex / columns) * itemHeight;
-            
-            const visibleItems = currentVirtualScrollItems.slice(startIndex, endIndex);
-
-            const html = visibleItems.map(item => `
-                <div class="modal-item" data-item-id="${item.id}">
-                    <img src="/images/materials/equipment/${item.image}" alt="${item.name}">
-                    <span class="item-name ${item.quality}">${item.name}</span>
-                </div>`
-            ).join('');
-
-            const itemsContainer = `<div class="modal-virtual-grid" style="position: absolute; top: 0; left: 0; right: 0; transform: translateY(${offsetY}px);">${html}</div>`;
-            
-            virtualSpacer.innerHTML = itemsContainer;
-        };
-        
-        virtualScrollListener = () => requestAnimationFrame(renderVisibleItems);
-        modalGrid.addEventListener('scroll', virtualScrollListener);
-        
-        requestAnimationFrame(renderVisibleItems);
     }
 
 
