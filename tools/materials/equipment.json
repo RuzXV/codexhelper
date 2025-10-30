@@ -318,9 +318,9 @@
     },
     "special_stats": [],
     "cost": {
-      "leather": 0,
-      "iron": 0,
-      "ebony": 0,
+      "leather": 70,
+      "iron": 15,
+      "ebony": 15,
       "bone": 0
     },
     "gold_cost": 5000000,
@@ -347,9 +347,9 @@
     },
     "special_stats": [],
     "cost": {
-      "leather": 0,
-      "iron": 0,
-      "ebony": 0,
+      "leather": 15,
+      "iron": 15,
+      "ebony": 70,
       "bone": 0
     },
     "gold_cost": 5000000,
@@ -376,9 +376,9 @@
     },
     "special_stats": [],
     "cost": {
-      "leather": 0,
-      "iron": 0,
-      "ebony": 0,
+      "leather": 15,
+      "iron": 70,
+      "ebony": 15,
       "bone": 0
     },
     "gold_cost": 5000000,
@@ -410,7 +410,7 @@
       "leather": 0,
       "iron": 0,
       "ebony": 0,
-      "bone": 0
+      "bone": 35
     },
     "gold_cost": 6000000,
     "image": "scepter_of_the_forest_guardian.webp"
@@ -467,9 +467,9 @@
     },
     "special_stats": [],
     "cost": {
-      "leather": 0,
-      "iron": 0,
-      "ebony": 0,
+      "leather": 50,
+      "iron": 20,
+      "ebony": 20,
       "bone": 0
     },
     "gold_cost": 2000000,
@@ -498,9 +498,9 @@
       "Commander EXP Gain 3%"
     ],
     "cost": {
-      "leather": 0,
-      "iron": 0,
-      "ebony": 0,
+      "leather": 20,
+      "iron": 50,
+      "ebony": 20,
       "bone": 0
     },
     "gold_cost": 2000000,
@@ -527,9 +527,9 @@
     },
     "special_stats": [],
     "cost": {
-      "leather": 0,
-      "iron": 0,
-      "ebony": 0,
+      "leather": 20,
+      "iron": 20,
+      "ebony": 50,
       "bone": 0
     },
     "gold_cost": 2000000,
@@ -559,8 +559,8 @@
     ],
     "cost": {
       "leather": 0,
-      "iron": 0,
-      "ebony": 0,
+      "iron": 60,
+      "ebony": 20,
       "bone": 0
     },
     "gold_cost": 500000,
@@ -587,7 +587,7 @@
     },
     "special_stats": [],
     "cost": {
-      "leather": 0,
+      "leather": 110,
       "iron": 0,
       "ebony": 0,
       "bone": 0
@@ -618,7 +618,7 @@
       "Gathering Speed 2%"
     ],
     "cost": {
-      "leather": 0,
+      "leather": 100,
       "iron": 0,
       "ebony": 0,
       "bone": 0
@@ -2031,9 +2031,9 @@
       "Siege March Speed 3%"
     ],
     "cost": {
-      "leather": 0,
-      "iron": 0,
-      "ebony": 0,
+      "leather": 10,
+      "iron": 15,
+      "ebony": 15,
       "bone": 0
     },
     "gold_cost": 30000000,
@@ -2998,8 +2998,8 @@
     ],
     "cost": {
       "leather": 0,
-      "iron": 0,
-      "ebony": 0,
+      "iron": 40,
+      "ebony": 10,
       "bone": 0
     },
     "gold_cost": 500000,
@@ -3235,9 +3235,9 @@
       "Siege March Speed 3%"
     ],
     "cost": {
-      "leather": 0,
-      "iron": 0,
-      "ebony": 0,
+      "leather": 15,
+      "iron": 10,
+      "ebony": 15,
       "bone": 0
     },
     "gold_cost": 30000000,
@@ -3664,7 +3664,7 @@
       "siege_health": 0
     },
     "special_stats": [
-      "10% chance to grant 50 Extra Rage for itself & up to 2 allies."
+      "10% Chance to grant 50 Extra Rage for itself & up to 2 allies."
     ],
     "cost": {
       "leather": 30,
@@ -3788,7 +3788,7 @@
       "siege_health": 0
     },
     "special_stats": [
-      "30% chance to gain 50 Extra Rage"
+      "30% Chance to gain 50 Extra Rage"
     ],
     "cost": {
       "leather": 40,
@@ -3912,7 +3912,7 @@
       "siege_health": 0
     },
     "special_stats": [
-      "10% chance to grant 10% Attack Bonus"
+      "10% Chance to grant 10% Attack Bonus"
     ],
     "cost": {
       "leather": 30,
@@ -3974,7 +3974,7 @@
       "siege_health": 0
     },
     "special_stats": [
-      "50% chance 3% Combo Attack"
+      "50% Chance 3% Combo Attack"
     ],
     "cost": {
       "leather": 40,

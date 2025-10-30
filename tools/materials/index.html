@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Material Calculator - Codex Helper</title>
+    <title>Crafting Calculator - Codex Helper</title>
     <meta name="description" content="A collection of community tools made to make players lives easier.">
     
     <meta property="og:title" content="Tools - Codex Helper">
@@ -64,7 +64,7 @@
             <div class="sub-nav-container">
                 <a href="/tools/mail/" class="sub-nav-link">Alliance Mail Generator</a>
                 <a href="/tools/calculators/" class="sub-nav-link">General Calculators</a>
-                <a href="/tools/materials/" class="sub-nav-link active">Material Calculator</a>
+                <a href="/tools/materials/" class="sub-nav-link active">Crafting Calculator</a>
             </div>
         </div>
     </nav>
@@ -73,7 +73,7 @@
         <section class="tool-hero">
             <div class="tool-hero-container">
                 <div class="section-badge">Community Tools</div>
-                <h1>Material Calculator</h1>
+                <h1>Crafting Calculator</h1>
                 <p>Plan your equipment crafting by selecting a loadout and calculating your material needs.</p>
             </div>
         </section>
@@ -301,23 +301,33 @@
                                 <button class="loadout-slot" id="slot-gloves" data-slot="gloves"><img src="/images/materials/glove_slot.webp" alt="Gloves Slot"></button>
                                 <button class="loadout-slot" id="slot-legs" data-slot="legs"><img src="/images/materials/leggings_slot.webp" alt="Legs Slot"></button>
                                 <button class="loadout-slot" id="slot-boots" data-slot="boots"><img src="/images/materials/boots_slot.webp" alt="Boots Slot"></button>
-                                <button class="loadout-slot" id="slot-accessory1" data-slot="accessory"><img src="/images/materials/accessory1_slot.webp" alt="Accessory 1 Slot"></button>
-                                <button class="loadout-slot" id="slot-accessory2" data-slot="accessory"><img src="/images/materials/accessory2_slot.webp" alt="Accessory 2 Slot"></button>
+                                <button class="loadout-slot" id="slot-accessory1" data-slot="accessory1"><img src="/images/materials/accessory1_slot.webp" alt="Accessory 1 Slot"></button>
+                                <button class="loadout-slot" id="slot-accessory2" data-slot="accessory2"><img src="/images/materials/accessory2_slot.webp" alt="Accessory 2 Slot"></button>
                             </div>
                             <p class="loadout-instructions">Select a slot or use the search box below to add equipment to your crafting list</p>
                         </div>
                         <div id="equipment-selector-wrapper" class="material-island">
                             <h3 class="island-header">Add to Crafting List</h3>
-                            <input type="text" id="selector-search" class="modal-search" placeholder="Search for an item...">
+                            <div class="search-filter-wrapper">
+                                <input type="text" id="selector-search" class="modal-search" placeholder="Search for an item...">
+                                <button id="selector-filter-toggle-btn" class="btn-secondary filter-toggle-btn"><i class="fas fa-filter"></i></button>
+                                <div id="selector-filter-panel" class="filter-panel"></div>
+                            </div>
                             <div id="equipment-selector-grid" class="selector-grid">
-                                <!-- This will be populated by JS -->
                             </div>
                         </div>
                     </div>
                     <div class="shopping-list-column">
-                        <div class="material-island">
-                            <h3 class="island-header">Shopping List</h3>
+                        <div class="material-island" id="shopping-list-island">
+                            <h3 class="island-header">
+                                <span>Shopping List</span>
+                                <button id="clear-shopping-list-btn" class="btn-clear-list" title="Clear All Items"><i class="fas fa-trash"></i></button>
+                            </h3>
                             <div id="selected-items-list" class="selected-items-list"></div>
+                        </div>
+                        <div class="material-island" id="total-stats-island">
+                            <h3 class="island-header">Loadout Stats</h3>
+                            <div id="total-stats-container"></div>
                         </div>
                     </div>
                 </div>
@@ -337,7 +347,9 @@
                 <button id="modal-close-btn" class="modal-close-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <input type="text" id="modal-search" class="modal-search" placeholder="Search for an item...">
+                <div class="search-filter-wrapper">
+                    <input type="text" id="modal-search" class="modal-search" placeholder="Search for an item...">
+                </div>
                 <div id="modal-grid" class="modal-grid">
                 </div>
             </div>
