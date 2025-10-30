@@ -124,10 +124,10 @@ nav.navbar {
     gap: var(--spacing-6);
 }
 .generator-panel {
-    flex: 1 1 56.6%;
+    flex: 1 1 55.6%;
 }
 .preview-panel {
-    flex: 1 1 43.4%;
+    flex: 1 1 44.4%;
     display: flex;
     flex-direction: column;
 }
