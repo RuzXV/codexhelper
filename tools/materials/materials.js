@@ -16,6 +16,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectorFilterPanel = document.getElementById('selector-filter-panel');
     const equipmentSelectorGrid = document.getElementById('equipment-selector-grid');
 
+    // Screenshot Mode Elements
+    const screenshotBtn = document.getElementById('screenshot-btn');
+    const screenshotModal = document.getElementById('screenshot-modal');
+    const screenshotModalCloseBtn = document.getElementById('screenshot-modal-close-btn');
+    const copyImageBtn = document.getElementById('copy-image-btn');
+    const screenshotCaptureArea = document.getElementById('screenshot-capture-area');
+    const screenshotLoadoutGrid = document.getElementById('screenshot-loadout-grid');
+    const screenshotShoppingList = document.getElementById('screenshot-shopping-list');
+    const screenshotTotalStats = document.getElementById('screenshot-total-stats');
+
     let EQUIPMENT_DATA = [];
 
     const MATERIALS = ['iron', 'leather', 'ebony', 'bone'];
@@ -910,6 +920,123 @@ document.addEventListener('DOMContentLoaded', function() {
         adjustSelectorHeight();
         adjustLayoutHeights();
     });
+
+    function populateScreenshotLoadout() {
+        let html = '';
+        Object.keys(SLOT_PLACEHOLDERS).forEach(slotKey => {
+            const slotId = `slot-${slotKey}`;
+            const itemId = selectedLoadoutSlots[slotKey];
+            const itemData = itemId ? EQUIPMENT_DATA.find(i => i.id === itemId) : null;
+            const imgSrc = itemData ? `/images/materials/equipment/${itemData.image}` : SLOT_PLACEHOLDERS[slotKey];
+            const altText = itemData ? itemData.name : `${slotKey} slot`;
+            
+            html += `<div class="loadout-slot" id="screenshot-${slotId}" data-slot="${slotKey}">
+                        <img src="${imgSrc}" alt="${altText}">
+                     </div>`;
+        });
+        screenshotLoadoutGrid.innerHTML = html;
+    }
+
+    function populateScreenshotShoppingList() {
+        let html = '';
+        const uniqueItems = new Set(Object.values(selectedLoadoutSlots).filter(id => id !== null));
+    
+        if (uniqueItems.size === 0) {
+            screenshotShoppingList.innerHTML = '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary);">No items in loadout.</p>';
+            return;
+        }
+
+        uniqueItems.forEach(itemId => {
+            const itemData = EQUIPMENT_DATA.find(i => i.id === itemId);
+            if (!itemData) return;
+    
+            let statsHtml = '';
+            if (itemData.stats) {
+                Object.entries(itemData.stats).forEach(([statKey, statValue]) => {
+                    if (statValue > 0) {
+                        const troopType = getTroopTypeFromStat(statKey);
+                        statsHtml += `<div class="stat-pair ${troopType}">${formatStatName(statKey)} <span>+${statValue}%</span></div>`;
+                    }
+                });
+            }
+            if (itemData.special_stats && itemData.special_stats.length > 0) {
+                 itemData.special_stats.forEach(stat => {
+                    statsHtml += `<div class="special-stat">${stat}</div>`;
+                });
+            }
+    
+            html += `<div class="screenshot-list-item">
+                        <img src="/images/materials/equipment/${itemData.image}" alt="${itemData.name}">
+                        <div class="screenshot-item-details">
+                            <span class="item-name ${itemData.quality}">${itemData.name}</span>
+                            <div class="screenshot-item-stats">${statsHtml}</div>
+                        </div>
+                     </div>`;
+        });
+        screenshotShoppingList.innerHTML = html;
+    }
+
+    function populateScreenshotTotalStats() {
+        screenshotTotalStats.innerHTML = document.getElementById('total-stats-container').innerHTML;
+    }
+    
+    function openScreenshotModal() {
+        const hasLoadoutItems = Object.values(selectedLoadoutSlots).some(id => id !== null);
+        if (!hasLoadoutItems) {
+            alert("Please add at least one item to your equipment loadout first.");
+            return;
+        }
+        populateScreenshotLoadout();
+        populateScreenshotShoppingList();
+        populateScreenshotTotalStats();
+        screenshotModal.style.display = 'flex';
+    }
+
+    function closeScreenshotModal() {
+        screenshotModal.style.display = 'none';
+    }
+
+    async function copyImageToClipboard() {
+        const originalButtonText = copyImageBtn.innerHTML;
+        copyImageBtn.innerHTML = 'Copying...';
+        copyImageBtn.disabled = true;
+
+        try {
+            const canvas = await html2canvas(screenshotCaptureArea, {
+                backgroundColor: 'var(--bg-primary)',
+                useCORS: true, 
+                logging: false,
+                scale: 2
+            });
+            
+            canvas.toBlob(async (blob) => {
+                if (navigator.clipboard && navigator.clipboard.write) {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    copyImageBtn.innerHTML = 'Copied!';
+                } else {
+                    throw new Error('Clipboard API not available.');
+                }
+            }, 'image/png');
+        } catch (err) {
+            console.error('Failed to copy image: ', err);
+            copyImageBtn.innerHTML = 'Failed!';
+            alert('Could not copy image. Your browser might not support this feature, or there was an error.');
+        } finally {
+            setTimeout(() => {
+                copyImageBtn.innerHTML = originalButtonText;
+                copyImageBtn.disabled = false;
+            }, 2000);
+        }
+    }
+    
+    screenshotBtn.addEventListener('click', openScreenshotModal);
+    screenshotModalCloseBtn.addEventListener('click', closeScreenshotModal);
+    screenshotModal.addEventListener('click', (e) => {
+        if (e.target === screenshotModal) closeScreenshotModal();
+    });
+    copyImageBtn.addEventListener('click', copyImageToClipboard);
 
     async function initializeCalculator() {
         try {
