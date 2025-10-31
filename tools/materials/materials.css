@@ -276,7 +276,7 @@ nav.navbar {
 
 .result-layout { 
     display: flex; 
-    align-items: stretch; 
+    align-items: center;
     gap: var(--spacing-4); 
 }
 
@@ -285,8 +285,8 @@ nav.navbar {
 .summary-items { 
     display: flex; 
     flex-direction: column; 
-    gap: var(--spacing-6); 
-    flex: 1;
+    gap: var(--spacing-6);
+    flex: 0 1 340px;
     align-items: center;
     justify-content: center;
 }
@@ -571,7 +571,7 @@ h5.legendary-text { background: linear-gradient(90deg, #ffb833, #fcd38b); -webki
     justify-content: center;
     gap: var(--spacing-1);
     transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.2s ease, background 0.2s ease;
-    height: 120px;
+    height: 105px;
 }
 .selector-item:hover {
     border-color: var(--accent-blue);
