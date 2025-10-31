@@ -345,7 +345,7 @@ h5.stat-cavalry { color: #57f287; }
 h5.stat-infantry { color: #5aa0ff; }
 h5.stat-archer { color: #ef4444; }
 h5.stat-siege { color: #a855f7; }
-h5.legendary-text { background: linear-gradient(90deg, #ffb833, #fcd38b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+h5.legendary-text { background: linear-gradient(90deg, #ffffff, #a1a7b7); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
 .selected-item {
     display: flex;
@@ -667,6 +667,12 @@ h5.legendary-text { background: linear-gradient(90deg, #ffb833, #fcd38b); -webki
 .stat-pair.infantry span { color: #5aa0ff; }
 .stat-pair.archer span { color: #ef4444; }
 .stat-pair.siege span { color: #a855f7; }
+.stat-pair.troop span {
+    background: linear-gradient(90deg, #ffb833, #fcd38b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
 
 
 .special-stat {

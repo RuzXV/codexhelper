@@ -627,6 +627,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     
+        const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
+        const statTypes = ['attack', 'defense', 'health', 'march_speed'];
+    
+        statTypes.forEach(statType => {
+            const universalStatKey = `troop_${statType}`;
+            const universalValue = totalStats[universalStatKey] || 0;
+    
+            if (universalValue > 0) {
+                troopTypes.forEach(troopType => {
+                    const specificStatKey = `${troopType}_${statType}`;
+                    totalStats[specificStatKey] = (totalStats[specificStatKey] || 0) + universalValue;
+                });
+            }
+        });
+    
         const groupedStats = {
             infantry: { total: 0, stats: {} },
             cavalry: { total: 0, stats: {} },
@@ -635,7 +650,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     
         for (const stat in totalStats) {
-            if (totalStats[stat] > 0) {
+            if (totalStats[stat] > 0 && !stat.startsWith('troop_')) {
                 const troopType = getTroopTypeFromStat(stat);
                 if (groupedStats[troopType]) {
                     groupedStats[troopType].stats[stat] = totalStats[stat];
@@ -652,6 +667,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (groupedStats[troopType].total > 0) {
                 html += `<div class="stats-group">`;
                 html += `<h5 class="stat-${troopType}"><img src="/images/materials/${troopType}_icon.webp" alt="${troopType} icon"> ${formatStatName(troopType)}</h5>`;
+                
                 for (const stat in groupedStats[troopType].stats) {
                     html += `<div class="stat-pair ${troopType}">
                                 ${formatStatName(stat)} <span>+${totalStats[stat].toFixed(1).replace('.0', '')}%</span>
