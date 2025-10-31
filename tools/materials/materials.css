@@ -332,8 +332,9 @@ nav.navbar {
     margin-bottom: var(--spacing-2);
 }
 .stats-group h5 img {
-    width: 20px;
-    height: 20px;
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: middle;
 }
 .stats-group .stat-pair {
     justify-content: space-between;
@@ -660,6 +661,17 @@ h5.legendary-text { background: linear-gradient(90deg, #ffffff, #a1a7b7); -webki
     gap: var(--spacing-1);
 }
 
+.stat-pair img {
+    height: 1em;
+    width: 1em;
+    margin-right: 0.5em;
+}
+
+.stat-name-wrapper {
+    display: flex;
+    align-items: center;
+}
+
 .stat-pair span {
     font-weight: 600;
 }
@@ -885,8 +897,8 @@ h5.legendary-text { background: linear-gradient(90deg, #ffffff, #a1a7b7); -webki
 }
 
 #screenshot-total-stats .stats-group h5 img {
-    width: 16px;
-    height: 16px;
+    width: 1.2em;
+    height: 1.2em;
 }
 
 #screenshot-total-stats .stat-pair {

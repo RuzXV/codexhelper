@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tools - Codex Helper</title>
+    <title>Davor's Toolkit - Codex Helper</title>
     <meta name="description" content="A collection of community tools made to make players lives easier.">
     
     <meta property="og:title" content="Tools - Codex Helper">
     <meta property="og:description" content="A collection of community tools made to make players lives easier.">
     <meta property="og:image" content="https://codexhelper.com/images/global/logo_meta.webp">
-    <meta property="og:url" content="https://codexhelper.com/tools">
+    <meta property="og:url" content="https://codexhelper.com/tools/davor_toolkit">
     <meta property="og:type" content="website">
     <meta name="theme-color" content="#3b82f6">
 
     <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/tools/tools.css">
+    <link rel="stylesheet" href="toolkit.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
@@ -64,7 +65,7 @@
                 <a href="/tools/mail/" class="sub-nav-link">Alliance Mail Generator</a>
                 <a href="/tools/calculators/" class="sub-nav-link">General Calculators</a>
                 <a href="/tools/materials/" class="sub-nav-link">Crafting Calculator</a>
-                <a href="/tools/davor_toolkit/" class="sub-nav-link">Davor's Toolkit</a>
+                <a href="/tools/davor_toolkit/" class="sub-nav-link active">Davor's Toolkit</a>
             </div>
         </div>
     </nav>
@@ -73,40 +74,43 @@
         <section class="tool-hero">
             <div class="tool-hero-container">
                 <div class="section-badge">Community Tools</div>
-                <h1>Codex Helper Tools</h1>
-                <p>A collection of community tools designed to make your Rise of Kingdoms life easier.</p>
+                <h1 class="tool-title">
+                    <img src="/images/davor_toolkit/davor_icon.webp" alt="Davor Icon" class="title-icon">
+                    Davor's Toolkit
+                </h1>
+                <div class="coming-soon-content">
+                    <i class="fas fa-tools"></i>
+                    <h2>Coming Soon</h2>
+                    <p>This new and exciting feature is currently under construction. Please check back later!</p>
+                </div>
             </div>
         </section>
-    
-        <section class="tool-content">
-            <div class="tool-grid">
-                <a href="/tools/mail/" class="tool-card">
-                    <div class="tool-card-icon-wrapper">
-                        <i class="fas fa-envelope-open-text tool-card-icon"></i>
+
+        <section class="contributor-section">
+            <div class="contributor-container">
+                <div class="contributor-box">
+                    <div class="contributor-content">
+                        <h3>About Davor</h3>
+                        <p>Davor is a long-time mathematical ROK player who excels at understanding the true nature of the numbers behind the game we all play. He is one of our <span class="wizard-gradient">Codex Wizards</span> consistently answering questions related to the game and continues to create tools for the community to help optimize their gameplay and get the most of our their accounts.</p>
                     </div>
-                    <div class="tool-card-content">
-                        <h3>Alliance Mail Generator</h3>
-                        <p>Create formatted in-game mails for your alliance with ease.</p>
+                    <div class="contributor-actions">
+                        <p class="contributor-connect">Contact Davor or find more of his tools and support his work here:</p>
+                        <div class="action-item">
+                            <span class="action-label">Discord:</span>
+                            <div class="action-btn discord-btn">
+                                <i class="fa-brands fa-discord"></i>
+                                <span>@davor5647</span>
+                            </div>
+                        </div>
+                        <div class="action-item">
+                            <span class="action-label">Support Him:</span>
+                            <a href="https://buymeacoffee.com/davorrok/davor-s-rok-tools-box" target="_blank" class="action-btn support-btn">
+                                <img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="Buy me a coffee">
+                                <span>Support Davor</span>
+                            </a>
+                        </div>
                     </div>
-                </a>
-                <a href="/tools/calculators/" class="tool-card">
-                    <div class="tool-card-icon-wrapper">
-                        <i class="fas fa-calculator tool-card-icon"></i>
-                    </div>
-                    <div class="tool-card-content">
-                        <h3>General Calculators</h3>
-                        <p>Calculate skill upgrade costs, passport requirements, and more.</p>
-                    </div>
-                </a>
-                <a href="/tools/materials/" class="tool-card">
-                    <div class="tool-card-icon-wrapper">
-                        <i class="fas fa-hammer tool-card-icon"></i>
-                    </div>
-                    <div class="tool-card-content">
-                        <h3>Crafting Calculator</h3>
-                        <p>Plan your equipment crafting and calculate your material needs.</p>
-                    </div>
-                </a>
+                </div>
             </div>
         </section>
     </main>
@@ -148,5 +152,6 @@
     </footer>
 
     <script src="/script.js" defer></script>
+    <script src="toolkit.js" defer></script>
 </body>
 </html>

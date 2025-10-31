@@ -88,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (statKey.startsWith('infantry')) return 'infantry';
         if (statKey.startsWith('archer')) return 'archer';
         if (statKey.startsWith('siege')) return 'siege';
+        if (statKey.startsWith('troop')) return 'troop';
         return 'general';
     }
 
@@ -666,11 +667,13 @@ document.addEventListener('DOMContentLoaded', function() {
         sortedTroopTypes.forEach(troopType => {
             if (groupedStats[troopType].total > 0) {
                 html += `<div class="stats-group">`;
-                html += `<h5 class="stat-${troopType}"><img src="/images/materials/${troopType}_icon.webp" alt="${troopType} icon"> ${formatStatName(troopType)}</h5>`;
+                html += `<h5 class="stat-${troopType}">${formatStatName(troopType)}</h5>`;
                 
                 for (const stat in groupedStats[troopType].stats) {
+                    const iconHtml = `<img src="/images/materials/${troopType}_icon_mini.webp" alt="${troopType} icon">`;
                     html += `<div class="stat-pair ${troopType}">
-                                ${formatStatName(stat)} <span>+${totalStats[stat].toFixed(1).replace('.0', '')}%</span>
+                                <div class="stat-name-wrapper">${iconHtml}${formatStatName(stat)}</div>
+                                <span>+${totalStats[stat].toFixed(1).replace('.0', '')}%</span>
                              </div>`;
                 }
                 html += `</div>`;
