@@ -16,15 +16,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectorFilterPanel = document.getElementById('selector-filter-panel');
     const equipmentSelectorGrid = document.getElementById('equipment-selector-grid');
 
-    // Screenshot Mode Elements
     const screenshotBtn = document.getElementById('screenshot-btn');
     const screenshotModal = document.getElementById('screenshot-modal');
     const screenshotModalCloseBtn = document.getElementById('screenshot-modal-close-btn');
     const copyImageBtn = document.getElementById('copy-image-btn');
+    const downloadImageBtn = document.getElementById('download-image-btn');
     const screenshotCaptureArea = document.getElementById('screenshot-capture-area');
     const screenshotLoadoutGrid = document.getElementById('screenshot-loadout-grid');
     const screenshotShoppingList = document.getElementById('screenshot-shopping-list');
     const screenshotTotalStats = document.getElementById('screenshot-total-stats');
+
+    const customAlertModal = document.getElementById('custom-alert-modal');
+    const customAlertCloseBtn = document.getElementById('custom-alert-close-btn');
+    const customAlertOkBtn = document.getElementById('custom-alert-ok-btn');
+    const customAlertMessage = document.getElementById('custom-alert-message');
 
     let EQUIPMENT_DATA = [];
 
@@ -84,6 +89,33 @@ document.addEventListener('DOMContentLoaded', function() {
         if (statKey.startsWith('archer')) return 'archer';
         if (statKey.startsWith('siege')) return 'siege';
         return 'general';
+    }
+
+    function showCustomAlert(message) {
+        if (customAlertModal && customAlertMessage) {
+            customAlertMessage.textContent = message;
+            customAlertModal.style.display = 'flex';
+        }
+    }
+
+    function closeCustomAlert() {
+        if (customAlertModal) {
+            customAlertModal.style.display = 'none';
+        }
+    }
+    
+    if (customAlertModal) {
+        customAlertModal.addEventListener('click', (e) => {
+            if (e.target === customAlertModal) {
+                closeCustomAlert();
+            }
+        });
+    }
+    if (customAlertCloseBtn) {
+        customAlertCloseBtn.addEventListener('click', closeCustomAlert);
+    }
+    if (customAlertOkBtn) {
+        customAlertOkBtn.addEventListener('click', closeCustomAlert);
     }
 
     function getHighestSelectedRarity() {
@@ -619,10 +651,10 @@ document.addEventListener('DOMContentLoaded', function() {
         sortedTroopTypes.forEach(troopType => {
             if (groupedStats[troopType].total > 0) {
                 html += `<div class="stats-group">`;
-                html += `<h5 class="stat-${troopType}">${formatStatName(troopType)}</h5>`;
+                html += `<h5 class="stat-${troopType}"><img src="/images/materials/${troopType}_icon.webp" alt="${troopType} icon"> ${formatStatName(troopType)}</h5>`;
                 for (const stat in groupedStats[troopType].stats) {
                     html += `<div class="stat-pair ${troopType}">
-                                ${formatStatName(stat)} <span>+${groupedStats[troopType].stats[stat].toFixed(1).replace('.0', '')}%</span>
+                                ${formatStatName(stat)} <span>+${totalStats[stat].toFixed(1).replace('.0', '')}%</span>
                              </div>`;
                 }
                 html += `</div>`;
@@ -892,21 +924,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function adjustLayoutHeights() {
-        const loadoutContainer = document.querySelector('.loadout-container');
-        const shoppingListIsland = document.getElementById('shopping-list-island');
-        const selectorWrapper = document.getElementById('equipment-selector-wrapper');
-        const totalStatsIsland = document.getElementById('total-stats-island');
-
-        if (window.innerWidth > 1200 && loadoutContainer && shoppingListIsland && selectorWrapper && totalStatsIsland) {
-            const loadoutHeight = loadoutContainer.offsetHeight;
-            shoppingListIsland.style.height = `${loadoutHeight}px`;
-
-            const selectorHeight = selectorWrapper.offsetHeight;
-            totalStatsIsland.style.height = selectorHeight > 0 ? `${selectorHeight}px` : 'auto';
-
-        } else if (shoppingListIsland && totalStatsIsland) {
-            shoppingListIsland.style.height = 'auto';
-            totalStatsIsland.style.height = 'auto';
+        const loadoutColumn = document.querySelector('.equipment-loadout-column');
+        const shoppingListColumn = document.querySelector('.shopping-list-column');
+    
+        if (window.innerWidth > 1200 && loadoutColumn && shoppingListColumn) {
+            requestAnimationFrame(() => {
+                const loadoutHeight = loadoutColumn.offsetHeight;
+                shoppingListColumn.style.height = `${loadoutHeight}px`;
+            });
+        } else if (shoppingListColumn) {
+            shoppingListColumn.style.height = 'auto';
         }
     }
     
@@ -927,12 +954,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const slotId = `slot-${slotKey}`;
             const itemId = selectedLoadoutSlots[slotKey];
             const itemData = itemId ? EQUIPMENT_DATA.find(i => i.id === itemId) : null;
-            const imgSrc = itemData ? `/images/materials/equipment/${itemData.image}` : SLOT_PLACEHOLDERS[slotKey];
+            const imgSrc = itemData ? `/images/materials/equipment/${itemData.image}` : '';
             const altText = itemData ? itemData.name : `${slotKey} slot`;
             
             html += `<div class="loadout-slot" id="screenshot-${slotId}" data-slot="${slotKey}">
-                        <img src="${imgSrc}" alt="${altText}">
-                     </div>`;
+                        ${itemData ? `<img src="/images/materials/equipment/${itemData.image}" alt="${itemData.name}">` : ''}
+                    </div>`;
         });
         screenshotLoadoutGrid.innerHTML = html;
     }
@@ -983,7 +1010,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function openScreenshotModal() {
         const hasLoadoutItems = Object.values(selectedLoadoutSlots).some(id => id !== null);
         if (!hasLoadoutItems) {
-            alert("Please add at least one item to your equipment loadout first.");
+            showCustomAlert("Please add at least one item to your equipment loadout first.");
             return;
         }
         populateScreenshotLoadout();
@@ -996,38 +1023,123 @@ document.addEventListener('DOMContentLoaded', function() {
         screenshotModal.style.display = 'none';
     }
 
-    async function copyImageToClipboard() {
-        const originalButtonText = copyImageBtn.innerHTML;
-        copyImageBtn.innerHTML = 'Copying...';
-        copyImageBtn.disabled = true;
+    function waitForImagesToLoad(containerElement) {
+        const images = Array.from(containerElement.getElementsByTagName('img'));
+        const promises = images.map(img => {
+            return new Promise((resolve, reject) => {
+                if (img.complete && img.naturalHeight !== 0) {
+                    resolve();
+                } else {
+                    img.onload = () => resolve();
+                    img.onerror = () => reject(new Error(`Could not load image: ${img.src}`));
+                }
+            });
+        });
+        return Promise.all(promises);
+    }
 
+    async function generateImageBlob() {
+        const node = screenshotCaptureArea;
+        const watermark = document.querySelector('.screenshot-watermark');
+        if (watermark) watermark.classList.add('visible');
+    
         try {
-            const canvas = await html2canvas(screenshotCaptureArea, {
-                backgroundColor: 'var(--bg-primary)',
-                useCORS: true, 
-                logging: false,
-                scale: 2
+            await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 50)));
+            await waitForImagesToLoad(node);
+    
+            const scale = 2;
+            const dataUrl = await domtoimage.toPng(node, {
+                width: node.clientWidth * scale,
+                height: node.clientHeight * scale,
+                style: {
+                    transform: `scale(${scale})`,
+                    transformOrigin: 'top left'
+                },
+                bgcolor: window.getComputedStyle(node).backgroundColor || 'transparent'
             });
             
-            canvas.toBlob(async (blob) => {
-                if (navigator.clipboard && navigator.clipboard.write) {
-                    await navigator.clipboard.write([
-                        new ClipboardItem({ 'image/png': blob })
-                    ]);
-                    copyImageBtn.innerHTML = 'Copied!';
-                } else {
+            const blob = await (await fetch(dataUrl)).blob();
+            if (!blob) {
+                throw new Error('Data URL to Blob conversion failed.');
+            }
+            return blob;
+        } finally {
+            if (watermark) watermark.classList.remove('visible');
+        }
+    }
+
+    async function handleDownloadImage(e) {
+        e.stopPropagation();
+        const originalButtonText = downloadImageBtn.innerHTML;
+        downloadImageBtn.disabled = true;
+    
+        try {
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Image generation timed out')), 10000)
+            );
+            const blob = await Promise.race([generateImageBlob(), timeoutPromise]);
+
+            const link = document.createElement('a');
+            link.download = 'rok-loadout-summary.png';
+            link.href = URL.createObjectURL(blob);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            downloadImageBtn.innerHTML = '<i class="fas fa-check"></i> Downloaded!';
+        } catch (err) {
+            console.error('Failed to generate or download image: ', err);
+            downloadImageBtn.innerHTML = '<i class="fas fa-times"></i> Failed!';
+            showCustomAlert('Could not generate the image for download. Please try again.');
+        } finally {
+            setTimeout(() => {
+                downloadImageBtn.innerHTML = originalButtonText;
+                downloadImageBtn.disabled = false;
+            }, 3000);
+        }
+    }
+
+    async function handleCopyImage(e) {
+        e.stopPropagation();
+        const originalButtonText = copyImageBtn.innerHTML;
+        copyImageBtn.disabled = true;
+    
+        try {
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Image generation timed out')), 10000)
+            );
+            const blob = await Promise.race([generateImageBlob(), timeoutPromise]);
+    
+            try {
+                if (!navigator.clipboard || !navigator.clipboard.write) {
                     throw new Error('Clipboard API not available.');
                 }
-            }, 'image/png');
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                copyImageBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    
+            } catch (clipboardError) {
+                console.warn('Clipboard API failed, falling back to download:', clipboardError);
+                const link = document.createElement('a');
+                link.download = 'rok-loadout-summary.png';
+                link.href = URL.createObjectURL(blob);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+                copyImageBtn.innerHTML = '<i class="fas fa-download"></i> Downloaded!';
+            }
+    
         } catch (err) {
-            console.error('Failed to copy image: ', err);
-            copyImageBtn.innerHTML = 'Failed!';
-            alert('Could not copy image. Your browser might not support this feature, or there was an error.');
+            console.error('Failed to generate or copy image: ', err);
+            copyImageBtn.innerHTML = '<i class="fas fa-times"></i> Failed!';
+            showCustomAlert('Could not generate the image. Please try again.');
         } finally {
             setTimeout(() => {
                 copyImageBtn.innerHTML = originalButtonText;
                 copyImageBtn.disabled = false;
-            }, 2000);
+            }, 3000);
         }
     }
     
@@ -1036,7 +1148,11 @@ document.addEventListener('DOMContentLoaded', function() {
     screenshotModal.addEventListener('click', (e) => {
         if (e.target === screenshotModal) closeScreenshotModal();
     });
-    copyImageBtn.addEventListener('click', copyImageToClipboard);
+    copyImageBtn.addEventListener('click', handleCopyImage);
+    if (downloadImageBtn) {
+        downloadImageBtn.addEventListener('click', handleDownloadImage);
+    }
+
 
     async function initializeCalculator() {
         try {

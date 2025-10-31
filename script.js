@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.querySelectorAll('.btn-primary:not(#copy-btn), .btn-secondary:not(#filter-toggle-btn)').forEach(button => {
+    document.querySelectorAll('.btn-primary:not(#copy-btn):not(#copy-image-btn), .btn-secondary:not(#filter-toggle-btn):not(#download-image-btn)').forEach(button => {
         button.addEventListener('click', function(e) {
             if (this.getAttribute('href') && this.getAttribute('href').startsWith('http')) {
                 return;
