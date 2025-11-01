@@ -866,7 +866,7 @@ body.home .navbar {
 }
 
 .faq-answer a:not(.btn-primary):not(.btn-secondary),
-.faq-content a:not(.btn-primary):not(.btn-secondary) {
+.faq-content a:not(.btn-primary):not(.btn-secondary), .feature-content p a {
     display: inline;
     min-height: auto;
     min-width: auto;
