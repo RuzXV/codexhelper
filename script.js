@@ -979,6 +979,11 @@ function login(event) {
         <span>Logging in...</span>
     `;
 
+    const mailInput = document.getElementById('mail-input');
+    if (mailInput && mailInput.value) {
+        sessionStorage.setItem('preLoginMailContent', mailInput.value);
+    }
+
     const scope = 'identify';
     const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
     

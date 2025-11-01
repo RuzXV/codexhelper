@@ -1168,7 +1168,6 @@ input[type="range"]::-moz-range-thumb {
     position: relative;
     background: rgba(20, 21, 24, 0.8);
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
@@ -1231,8 +1230,14 @@ input[type="range"]::-moz-range-thumb {
 .template-actions {
     display: flex;
     gap: var(--spacing-3);
-    justify-content: flex-end;
+    justify-content: center;
+    width: 100%;
 }
+
+.template-actions .btn-secondary {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
 .template-actions .btn-secondary,
 .template-actions .btn-danger,
 .template-actions .btn-primary {

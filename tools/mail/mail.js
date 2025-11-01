@@ -730,8 +730,8 @@ document.addEventListener('DOMContentLoaded', function() {
             tableHtml += `
                 <div class="grid-row" data-template-id="${t.template_id}">
                     <div class="template-name">${escapeHtml(t.template_name)}</div>
-                    <div class="template-date grid-date-saved">${new Date(t.date_saved * 1000).toLocaleDateString()}</div>
-                    <div class="template-date grid-last-loaded">${t.last_loaded ? new Date(t.last_loaded * 1000).toLocaleString() : 'Never'}</div>
+                    <div class="template-date grid-date-saved">${new Date(t.date_saved * 1000).toLocaleDateString('en-GB')}</div>
+                    <div class="template-date grid-last-loaded">${t.last_loaded ? new Date(t.last_loaded * 1000).toLocaleString('en-GB') : 'Never'}</div>
                     <div class="template-actions">
                         <button class="btn-secondary copy-saved-btn" title="Copy Code"><i class="fas fa-copy"></i></button>
                         <button class="btn-primary load-saved-btn" title="Load into Editor"><i class="fas fa-edit"></i></button>
@@ -840,17 +840,46 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    const cachedData = window.loadUserData(CACHE_KEY);
-    if (mailInput && cachedData && cachedData.mailContent) {
-        mailInput.value = cachedData.mailContent;
+    const preLoginContent = sessionStorage.getItem('preLoginMailContent');
+    if (mailInput && preLoginContent) {
+        mailInput.value = preLoginContent;
+        sessionStorage.removeItem('preLoginMailContent');
+    } else {
+        const cachedData = window.loadUserData(CACHE_KEY);
+        if (mailInput && cachedData && cachedData.mailContent) {
+            mailInput.value = cachedData.mailContent;
+        }
     }
 
     if(undoBtn) undoBtn.addEventListener('click', undo);
+    let confirmCallback = null;
+
+    function showCustomConfirm(message, title, onConfirm) {
+        const modalTitle = document.getElementById('custom-confirm-title');
+        const modalMessage = document.getElementById('custom-confirm-message');
+        
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        confirmCallback = onConfirm;
+        
+        customConfirmModal.style.display = 'flex';
+    }
+
     if(clearBtn) {
         clearBtn.addEventListener('click', () => {
-            if(customConfirmModal) customConfirmModal.style.display = 'flex';
+            showCustomConfirm(
+                'Are you sure you want to clear the editor?',
+                'Confirm Clear',
+                () => {
+                    saveState();
+                    mailInput.value = '';
+                    updatePreview();
+                    saveState();
+                }
+            );
         });
     }
+
     if(mailInput) {
         mailInput.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); } 
@@ -865,17 +894,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if(confirmActionBtn) {
         confirmActionBtn.addEventListener('click', () => {
-            saveState();
-            mailInput.value = '';
-            updatePreview();
-            saveState();
-            if(customConfirmModal) customConfirmModal.style.display = 'none';
+            if (typeof confirmCallback === 'function') {
+                confirmCallback();
+            }
+            customConfirmModal.style.display = 'none';
+            confirmCallback = null;
         });
     }
+
     if(confirmCancelBtn) {
         confirmCancelBtn.addEventListener('click', () => {
-            if(customConfirmModal) customConfirmModal.style.display = 'none';
+            customConfirmModal.style.display = 'none';
+            confirmCallback = null;
         });
+    }
+
+    async function handleDeleteSavedTemplate(e) {
+        const row = e.target.closest('.grid-row');
+        const templateId = row.dataset.templateId;
+        const templateName = row.querySelector('.template-name').textContent;
+    
+        showCustomConfirm(
+            `Are you sure you want to delete the template "${templateName}"? This cannot be undone.`,
+            'Confirm Deletion',
+            async () => {
+                try {
+                    await fetchWithAuth(`/api/templates/${templateId}`, { method: 'DELETE' });
+                    renderSavedTemplatesView();
+                } catch (error) {
+                    console.error('Failed to delete template:', error);
+                    showCustomAlert('Could not delete the template.', "Delete Error");
+                }
+            }
+        );
     }
     
     if(generatorTabBtn) generatorTabBtn.addEventListener('click', () => switchView('generator'));
