@@ -29,6 +29,62 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentIndex = 0;
     let hohReturnedPower = 0;
+    
+    const CALCULATORS_CACHE_KEY = 'generalCalculatorsState';
+
+    const debounce = (callback, wait) => {
+        let timeoutId = null;
+        return (...args) => {
+            window.clearTimeout(timeoutId);
+            timeoutId = window.setTimeout(() => {
+                callback.apply(null, args);
+            }, wait);
+        };
+    };
+
+    const saveAllCalculatorsState = debounce(() => {
+        const state = {};
+        const allInputs = document.querySelectorAll('.calculator-island input, .calculator-island select');
+        
+        allInputs.forEach(input => {
+            if (input.type === 'radio') {
+                if (input.checked) {
+                    state[input.name] = input.value;
+                }
+            } else if (input.type === 'checkbox') {
+                state[input.id] = input.checked;
+            } else {
+                state[input.id] = input.value;
+            }
+        });
+
+        window.saveUserData(CALCULATORS_CACHE_KEY, state);
+    }, 500);
+
+    function loadAllCalculatorsState() {
+        const savedState = window.loadUserData(CALCULATORS_CACHE_KEY);
+        if (!savedState) return;
+
+        const allInputs = document.querySelectorAll('.calculator-island input, .calculator-island select');
+        
+        allInputs.forEach(input => {
+            if (input.type === 'radio') {
+                if (savedState[input.name] === input.value) {
+                    input.checked = true;
+                }
+            } else if (input.type === 'checkbox') {
+                if (typeof savedState[input.id] !== 'undefined') {
+                    input.checked = savedState[input.id];
+                }
+            } else {
+                 if (typeof savedState[input.id] !== 'undefined') {
+                    input.value = savedState[input.id];
+                }
+            }
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+    }
 
     const moveToSlide = (targetIndex, animate = true) => {
         if (!slides.length || !slides[targetIndex]) return;
@@ -121,7 +177,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             let rawValue = value.replace(/,/g, '');
             if (isNaN(rawValue) || rawValue.trim() === '') {
-                input.value = '';
+                // Don't clear if it was an invalid char, just remove it
+                input.value = rawValue.replace(/\D/g, '');
                 return;
             }
 
@@ -545,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
             triggerSuccessAnimation(vipResultDiv);
         };
         
-        const customSelectContainer = document.querySelector('.carousel-slide.is-active .custom-select-container');
+        const customSelectContainer = document.querySelector('.carousel-slide[data-title="VIP Level"] .custom-select-container');
         if (customSelectContainer && !customSelectContainer.querySelector('.select-selected')) {
             const selectEl = customSelectContainer.querySelector('select');
             const selectedDiv = document.createElement("DIV");
@@ -571,7 +628,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     Array.from(optionsDiv.getElementsByClassName("same-as-selected")).forEach(el => el.classList.remove("same-as-selected"));
                     this.classList.add("same-as-selected");
                     closeAllSelect();
-                    // Manually trigger calculation for custom select
                     if (calculateVipBtn.style.display === 'none') performCalculation();
                 });
                 optionsDiv.appendChild(itemDiv);
@@ -604,7 +660,7 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateVipBtn.addEventListener('click', () => {
             performCalculation();
             calculateVipBtn.style.display = 'none';
-            const formElements = [currentVipPointsInput, vipTokenToggle, ...vipTokenInputs];
+            const formElements = [currentVipPointsInput, vipTokenToggle, ...vipTokenInputs, desiredVipLevelSelect];
             setupAutoCalculation(formElements, performCalculation);
         });
     }
@@ -792,6 +848,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.requestAnimationFrame(() => {
         initAndResize();
+        loadAllCalculatorsState();
+        document.querySelectorAll('.calculator-island input, .calculator-island select').forEach(input => {
+            const eventType = (input.type === 'radio' || input.type === 'checkbox' || input.tagName === 'SELECT') ? 'change' : 'input';
+            input.addEventListener(eventType, saveAllCalculatorsState);
+        });
     });
 
     let resizeTimer;

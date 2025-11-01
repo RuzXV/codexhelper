@@ -1086,8 +1086,92 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     color: transparent;
     
     animation: gradient-flow 3s linear infinite;
-  }
-  
+}
+
+  #auth-container {
+    display: flex;
+    align-items: center;
+}
+
+.discord-login-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-1) var(--spacing-3);
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    text-decoration: none;
+    color: #FFFFFF !important;
+    background: rgba(88, 101, 242, 0.35);
+    border: 1px solid rgba(88, 101, 242, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    height: 46px;
+}
+
+.discord-login-btn:hover {
+    background: rgba(88, 101, 242, 0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(88, 101, 242, 0.4);
+}
+
+.discord-login-btn i {
+    font-size: 1.2em;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-1) var(--spacing-2);
+    height: 46px;
+}
+
+.user-profile .profile-pic {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-profile .username {
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.user-profile .logout-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: var(--spacing-2);
+    margin-left: var(--spacing-1);
+    border-radius: var(--radius-sm);
+    transition: color 0.2s ease, background-color 0.2s ease;
+    min-height: auto;
+    min-width: auto;
+}
+
+.user-profile .logout-btn:hover {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.2);
+}
+
 @keyframes gradient-flow {
     0% {
       background-position: 200% center;

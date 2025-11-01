@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const charCounter = document.getElementById('char-counter');
     let currentCharLimit = 2000;
-    const CACHE_KEY = 'mailGeneratorCache';
+    const CACHE_KEY = 'mailGeneratorContent';
 
     const magnifiedPreviewContainer = document.getElementById('magnified-preview-container');
     const magnifiedImage = document.getElementById('magnified-image');
@@ -126,9 +126,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if(undoBtn) undoBtn.disabled = historyIndex <= 0;
     }
 
-    const cachedContent = localStorage.getItem(CACHE_KEY);
-    if (mailInput && cachedContent) {
-        mailInput.value = cachedContent;
+    const cachedData = window.loadUserData(CACHE_KEY);
+    if (mailInput && cachedData && cachedData.mailContent) {
+        mailInput.value = cachedData.mailContent;
     }
     
     function applyTag(tag, value = null) {
@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const text = overrideText !== null ? overrideText : mailInput.value;
         if (overrideText === null) {
-            localStorage.setItem(CACHE_KEY, text);
+            window.saveUserData(CACHE_KEY, { mailContent: text });
         }
     
         const newlines = (text.match(/\n/g) || []).length;
@@ -252,6 +252,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .replace(/'/g, "&#039;");
         };
     
+        const knownTags = ['b', 'i', 'size', 'color'];
+    
         while (i < text.length) {
             const openTagIndex = text.indexOf('<', i);
             if (openTagIndex === -1) {
@@ -261,10 +263,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
             html += escapeHtml(text.substring(i, openTagIndex));
     
+            const nextChar = text[openTagIndex + 1];
+            if (nextChar === undefined || (nextChar !== '/' && !/[a-zA-Z]/.test(nextChar))) {
+                html += escapeHtml(text.substring(openTagIndex, openTagIndex + 1));
+                i = openTagIndex + 1;
+                continue;
+            }
+    
             const closeTagIndex = text.indexOf('>', openTagIndex);
             if (closeTagIndex === -1) {
-                html += escapeHtml(text.substring(openTagIndex));
-                break;
+                return escapeHtml(text);
             }
     
             const tagStr = text.substring(openTagIndex + 1, closeTagIndex);
@@ -272,18 +280,36 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (isClosingTag) {
                 const tagName = tagStr.substring(1).toLowerCase();
-                if (stack.length === 0 || stack[stack.length - 1].name !== tagName) {
-                    return html + escapeHtml(text.substring(openTagIndex));
+    
+                if (!knownTags.includes(tagName)) {
+                    html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
+                    i = closeTagIndex + 1;
+                    continue;
                 }
-                const closedTag = stack.pop();
-                switch (closedTag.name) {
-                    case 'b': html += '</strong>'; break;
-                    case 'i': html += '</em>'; break;
-                    case 'size':
-                    case 'color': html += '</span>'; break;
+    
+                let tagPositionInStack = -1;
+                for (let j = stack.length - 1; j >= 0; j--) {
+                    if (stack[j].name === tagName) {
+                        tagPositionInStack = j;
+                        break;
+                    }
+                }
+    
+                if (tagPositionInStack === -1) {
+                    return escapeHtml(text);
+                }
+    
+                for (let j = stack.length - 1; j >= tagPositionInStack; j--) {
+                    const tagToClose = stack.pop();
+                    switch (tagToClose.name) {
+                        case 'b': html += '</strong>'; break;
+                        case 'i': html += '</em>'; break;
+                        case 'size': case 'color': html += '</span>'; break;
+                    }
                 }
             } else {
                 const parts = tagStr.match(/([a-zA-Z]+)(?:[=\s](?:"([^"]*)"|([^> ]*)))?/);
+                
                 if (!parts) {
                     html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
                     i = closeTagIndex + 1;
@@ -293,22 +319,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 const tagName = parts[1].toLowerCase();
                 const tagValue = parts[2] || parts[3] || null;
     
+                if (!knownTags.includes(tagName)) {
+                    html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
+                    i = closeTagIndex + 1;
+                    continue;
+                }
+    
                 stack.push({ name: tagName, value: tagValue });
     
                 switch (tagName) {
-                    case 'b':
-                        html += '<strong>';
-                        break;
-                    case 'i':
-                        html += '<em>';
-                        break;
+                    case 'b': html += '<strong>'; break;
+                    case 'i': html += '<em>'; break;
                     case 'size':
                         if (tagValue) {
                             const scaledSize = Math.max(parseFloat(tagValue) * 0.55, 1);
                             html += `<span style="font-size: ${scaledSize}px;">`;
-                        } else {
-                            html += '<span>';
-                        }
+                        } else { html += '<span>'; }
                         break;
                     case 'color':
                         if (tagValue) {
@@ -317,13 +343,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 finalColor = '#' + finalColor;
                             }
                             html += `<span style="color: ${finalColor};">`;
-                        } else {
-                            html += '<span>';
-                        }
+                        } else { html += '<span>'; }
                         break;
-                    default:
-                        stack.pop();
-                        html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
                 }
             }
             
@@ -333,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (stack.length > 0) {
             return escapeHtml(text);
         }
-
+    
         return html;
     }
 

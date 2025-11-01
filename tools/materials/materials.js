@@ -25,6 +25,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const screenshotLoadoutGrid = document.getElementById('screenshot-loadout-grid');
     const screenshotShoppingList = document.getElementById('screenshot-shopping-list');
     const screenshotTotalStats = document.getElementById('screenshot-total-stats');
+    const screenshotTotalCost = document.getElementById('screenshot-total-cost');
+    const screenshotViewToggle = document.getElementById('screenshot-view-toggle');
+    const screenshotToggleLabel = document.getElementById('screenshot-toggle-label');
+    const screenshotTotalStatsWrapper = document.querySelector('.screenshot-total-stats-wrapper');
+    const screenshotTotalCostWrapper = document.querySelector('.screenshot-total-cost-wrapper');
 
     const customAlertModal = document.getElementById('custom-alert-modal');
     const customAlertCloseBtn = document.getElementById('custom-alert-close-btn');
@@ -68,6 +73,51 @@ document.addEventListener('DOMContentLoaded', function() {
             }, wait);
         };
     };
+
+    const MATERIALS_CACHE_KEY = 'materialsCalculatorState';
+
+    const saveCalculatorState = debounce(() => {
+        const state = {};
+        document.querySelectorAll('.material-input').forEach(input => {
+            state[input.id] = input.value;
+        });
+        
+        state.craftingList = craftingList;
+        state.selectedLoadoutSlots = selectedLoadoutSlots;
+    
+        window.saveUserData(MATERIALS_CACHE_KEY, state);
+    }, 500);
+    
+    function loadCalculatorState() {
+        const savedState = window.loadUserData(MATERIALS_CACHE_KEY);
+        if (!savedState) return;
+    
+        document.querySelectorAll('.material-input').forEach(input => {
+            if (savedState[input.id]) {
+                input.value = savedState[input.id];
+            }
+        });
+        
+        if (savedState.craftingList) {
+            craftingList = savedState.craftingList;
+        }
+        
+        if (savedState.selectedLoadoutSlots) {
+            selectedLoadoutSlots = savedState.selectedLoadoutSlots;
+            Object.keys(selectedLoadoutSlots).forEach(slotKey => {
+                const itemId = selectedLoadoutSlots[slotKey];
+                if (itemId) {
+                    const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+                    const slotElement = document.getElementById(`slot-${slotKey}`);
+                    if (itemData && slotElement) {
+                        slotElement.innerHTML = `<img src="/images/materials/equipment/${itemData.image}" alt="${itemData.name}">`;
+                    }
+                }
+            });
+        }
+        
+        updateUIDisplays();
+    }
 
     const getMaterialIconPath = (mat, rarity = 'legendary') => {
         const iconName = mat === 'iron' ? 'ore' : mat;
@@ -441,6 +491,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         closeModal();
         updateUIDisplays(itemId);
+        saveCalculatorState();
         if (calculateBtn.style.display === 'none') performCalculation();
     }
 
@@ -456,6 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         updateUIDisplays(itemId);
+        saveCalculatorState();
         if (calculateBtn.style.display === 'none') performCalculation();
     }
 
@@ -478,6 +530,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         updateUIDisplays();
+        saveCalculatorState();
         if (calculateBtn.style.display === 'none') performCalculation();
     }
 
@@ -493,6 +546,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         updateUIDisplays();
+        saveCalculatorState();
         
         if (calculateBtn.style.display === 'none') {
             performCalculation();
@@ -853,6 +907,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isNaN(value) && value.length > 0) {
                 e.target.value = parseInt(value, 10).toLocaleString('en-US');
             }
+            saveCalculatorState();
         });
     });
 
@@ -881,6 +936,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         updateUIDisplays();
+        saveCalculatorState();
         if (calculateBtn.style.display === 'none') performCalculation();
     }
 
@@ -1010,12 +1066,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     statsHtml += `<div class="special-stat">${stat}</div>`;
                 });
             }
+
+            let costHtml = '';
+            if (itemData.cost) {
+                const costs = Object.entries(itemData.cost).filter(([, amount]) => amount > 0);
+                if (costs.length > 0) {
+                    costs.forEach(([mat, amount]) => {
+                        let qualityClass = `text-${(itemData.quality || 'Normal').toLowerCase()}`;
+                        costHtml += `
+                            <div class="cost-pair">
+                                <img src="${getMaterialIconPath(mat, itemData.quality)}" alt="${mat}">
+                                <span class="${qualityClass}">${amount}</span>
+                            </div>`;
+                    });
+                }
+            }
     
             html += `<div class="screenshot-list-item">
                         <img src="/images/materials/equipment/${itemData.image}" alt="${itemData.name}">
                         <div class="screenshot-item-details">
                             <span class="item-name ${itemData.quality}">${itemData.name}</span>
                             <div class="screenshot-item-stats">${statsHtml}</div>
+                            <div class="screenshot-item-cost">${costHtml}</div>
                         </div>
                      </div>`;
         });
@@ -1025,6 +1097,54 @@ document.addEventListener('DOMContentLoaded', function() {
     function populateScreenshotTotalStats() {
         screenshotTotalStats.innerHTML = document.getElementById('total-stats-container').innerHTML;
     }
+
+    function populateScreenshotTotalCost() {
+        const totalCost = { iron: 0, leather: 0, ebony: 0, bone: 0 };
+        let totalGoldCost = 0;
+        const materialNames = {
+            iron: "Iron Ore",
+            leather: "Leather",
+            ebony: "Ebony",
+            bone: "Animal Bone"
+        };
+    
+        const uniqueItems = new Set(Object.values(selectedLoadoutSlots).filter(id => id !== null));
+    
+        uniqueItems.forEach(itemId => {
+            const itemData = EQUIPMENT_DATA.find(i => i.id === itemId);
+            if (itemData && itemData.cost) {
+                for (const mat in itemData.cost) {
+                    totalCost[mat] += itemData.cost[mat];
+                }
+                totalGoldCost += itemData.gold_cost || 0;
+            }
+        });
+    
+        let html = '';
+        Object.entries(totalCost).forEach(([mat, amount]) => {
+            if (amount > 0) {
+                html += `
+                    <div class="screenshot-cost-item">
+                        <img src="${getMaterialIconPath(mat, 'legendary')}" alt="${materialNames[mat]}">
+                        <span class="value text-legendary">${materialNames[mat]}: ${amount.toLocaleString()}</span>
+                    </div>`;
+            }
+        });
+    
+        if (totalGoldCost > 0) {
+            html += `
+                <div class="screenshot-cost-item">
+                    <img src="/images/materials/gold_icon.webp" alt="Gold">
+                    <span class="value">Gold: ${totalGoldCost.toLocaleString()}</span>
+                </div>`;
+        }
+    
+        if (!html) {
+            html = '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary);">No materials required.</p>';
+        }
+    
+        screenshotTotalCost.innerHTML = html;
+    }
     
     function openScreenshotModal() {
         const hasLoadoutItems = Object.values(selectedLoadoutSlots).some(id => id !== null);
@@ -1032,9 +1152,20 @@ document.addEventListener('DOMContentLoaded', function() {
             showCustomAlert("Please add at least one item to your equipment loadout first.");
             return;
         }
+
+        screenshotViewToggle.checked = false;
+        screenshotCaptureArea.classList.remove('view-materials');
+        screenshotToggleLabel.textContent = "Stats Overview";
+        screenshotTotalStatsWrapper.style.display = 'flex';
+        screenshotTotalCostWrapper.style.display = 'none';
+        screenshotTotalStatsWrapper.classList.remove('fade-out-down', 'fade-in-up');
+        screenshotTotalCostWrapper.classList.remove('fade-out-down', 'fade-in-up');
+
+
         populateScreenshotLoadout();
         populateScreenshotShoppingList();
         populateScreenshotTotalStats();
+        populateScreenshotTotalCost();
         screenshotModal.style.display = 'flex';
     }
 
@@ -1171,6 +1302,41 @@ document.addEventListener('DOMContentLoaded', function() {
     if (downloadImageBtn) {
         downloadImageBtn.addEventListener('click', handleDownloadImage);
     }
+    
+    screenshotViewToggle.addEventListener('change', () => {
+        const isCostView = screenshotViewToggle.checked;
+        screenshotTotalStatsWrapper.classList.remove('fade-in-up', 'fade-out-down');
+        screenshotTotalCostWrapper.classList.remove('fade-in-up', 'fade-out-down');
+
+        if (isCostView) {
+            screenshotCaptureArea.classList.add('view-materials');
+            screenshotToggleLabel.textContent = "Material Cost";
+            
+            screenshotTotalStatsWrapper.classList.add('fade-out-down');
+            screenshotTotalCostWrapper.style.display = 'flex';
+            screenshotTotalCostWrapper.classList.add('fade-in-up');
+            
+            setTimeout(() => {
+                if(screenshotViewToggle.checked) {
+                    screenshotTotalStatsWrapper.style.display = 'none';
+                }
+            }, 400);
+
+        } else {
+            screenshotCaptureArea.classList.remove('view-materials');
+            screenshotToggleLabel.textContent = "Stats Overview";
+            
+            screenshotTotalCostWrapper.classList.add('fade-out-down');
+            screenshotTotalStatsWrapper.style.display = 'flex';
+            screenshotTotalStatsWrapper.classList.add('fade-in-up');
+
+            setTimeout(() => {
+                if(!screenshotViewToggle.checked) {
+                    screenshotTotalCostWrapper.style.display = 'none';
+                }
+            }, 400);
+        }
+    });
 
 
     async function initializeCalculator() {
@@ -1187,6 +1353,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             initializeEquipmentSelector();
+            
+            loadCalculatorState();
 
              requestAnimationFrame(() => {
                 adjustSelectorHeight();

@@ -185,6 +185,14 @@ document.addEventListener('DOMContentLoaded', function() {
             list.style.animationPlayState = isPaused;
         });
     });
+
+    const isToolsPage = window.location.pathname.startsWith('/tools');
+    if (isToolsPage) {
+        const authContainer = document.getElementById('auth-container');
+        if (authContainer) {
+            initAuth(authContainer);
+        }
+    }
 });
 
 const style = document.createElement('style');
@@ -869,3 +877,120 @@ window.addEventListener('scroll', () => {
         ticking = true;
     }
 }, { passive: true });
+
+function getLoggedInUser() {
+    try {
+        const user = localStorage.getItem('codexUser');
+        return user ? JSON.parse(user) : null;
+    } catch (e) {
+        console.error("Failed to parse user data from localStorage", e);
+        return null;
+    }
+}
+
+function getStorageKey(key) {
+    const user = getLoggedInUser();
+    if (user && user.id) {
+        return `codex-user-${user.id}-${key}`;
+    }
+    return `codex-guest-${key}`;
+}
+
+window.saveUserData = (key, data) => {
+    try {
+        localStorage.setItem(getStorageKey(key), JSON.stringify(data));
+    } catch (e) {
+        console.error("Failed to save user data to localStorage", e);
+    }
+};
+
+window.loadUserData = (key) => {
+    try {
+        const data = localStorage.getItem(getStorageKey(key));
+        return data ? JSON.parse(data) : null;
+    } catch (e) {
+        console.error("Failed to load user data from localStorage", e);
+        return null;
+    }
+};
+
+const DISCORD_CLIENT_ID = '1434105087722258573';
+const REDIRECT_URI = 'https://codexhelper.com/auth/callback';
+
+function initAuth(container) {
+    const user = getLoggedInUser();
+    if (user) {
+        renderLoggedInState(container, user);
+    } else {
+        renderLoggedOutState(container);
+        handleAuthCallback(); 
+    }
+}
+
+function renderLoggedOutState(container) {
+    container.innerHTML = `
+        <button class="discord-login-btn">
+            <i class="fa-brands fa-discord"></i>
+            <span>Login with Discord</span>
+        </button>
+    `;
+    container.querySelector('.discord-login-btn').addEventListener('click', login);
+}
+
+function renderLoggedInState(container, user) {
+    const avatarUrl = user.avatar 
+        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+        : `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
+
+    container.innerHTML = `
+        <div class="user-profile">
+            <img src="${avatarUrl}" alt="Profile Picture" class="profile-pic">
+            <span class="username">@${user.username}</span>
+            <button class="logout-btn" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    `;
+    container.querySelector('.logout-btn').addEventListener('click', logout);
+}
+
+function login() {
+    localStorage.setItem('loginRedirect', window.location.pathname + window.location.search);
+    
+    const scope = 'identify';
+    const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
+    
+    window.location.href = authUrl;
+}
+
+function logout() {
+    localStorage.removeItem('codexUser');
+    const authContainer = document.getElementById('auth-container');
+    if (authContainer) {
+        renderLoggedOutState(authContainer);
+    }
+    window.location.reload();
+}
+
+async function handleAuthCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+
+    if (code) {
+        console.log("Simulating token exchange with code:", code);
+        
+        const mockUserData = {
+            id: '123456789012345678',
+            username: 'ruzxv',
+            avatar: 'a_abcdef1234567890abcdef1234567890',
+            discriminator: '0' 
+        };
+
+        localStorage.setItem('codexUser', JSON.stringify(mockUserData));
+
+        const redirectPath = localStorage.getItem('loginRedirect') || '/tools/';
+        localStorage.removeItem('loginRedirect');
+        window.history.replaceState({}, document.title, redirectPath);
+        window.location.reload();
+    }
+}

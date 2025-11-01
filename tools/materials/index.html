@@ -372,6 +372,13 @@
             <div class="screenshot-header">
                 <h3>Loadout Summary</h3>
                 <div class="screenshot-actions">
+                    <div class="screenshot-toggle-wrapper">
+                        <label for="screenshot-view-toggle" class="toggle-switch">
+                            <input type="checkbox" id="screenshot-view-toggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span id="screenshot-toggle-label">Stats Overview</span>
+                    </div>
                     <button id="copy-image-btn" class="btn-primary"><i class="fas fa-copy"></i> Copy Image</button>
                     <button id="download-image-btn" class="btn-secondary"><i class="fas fa-download"></i> Download Image</button>
                     <button id="screenshot-modal-close-btn" class="modal-close-btn">&times;</button>
@@ -387,9 +394,15 @@
                         <h4 class="screenshot-title">Loadout Details</h4>
                         <div id="screenshot-shopping-list"></div>
                     </div>
-                    <div class="screenshot-total-stats-wrapper">
-                        <h4 class="screenshot-title">Total Loadout Stats</h4>
-                        <div id="screenshot-total-stats"></div>
+                    <div class="screenshot-summary-fader">
+                        <div class="screenshot-total-stats-wrapper">
+                            <h4 class="screenshot-title">Total Loadout Stats</h4>
+                            <div id="screenshot-total-stats"></div>
+                        </div>
+                        <div class="screenshot-total-cost-wrapper" style="display: none;">
+                            <h4 class="screenshot-title">Total Material Cost</h4>
+                            <div id="screenshot-total-cost"></div>
+                        </div>
                     </div>
                 </div>
                 
