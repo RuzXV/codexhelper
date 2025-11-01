@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderSavedTemplatesView() {
-        if (window.currentUser) {
+        if (window.currentUser && window.userAuthToken) {
             savedTemplatesLoginPrompt.style.display = 'none';
             savedTemplatesContent.style.display = 'block';
             fetchAndDisplaySavedTemplates();
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (saveTemplateBtn) {
         saveTemplateBtn.addEventListener('click', () => {
-            if (!window.currentUser) {
+            if (!window.currentUser || !window.userAuthToken) {
                 alert("Please log in with Discord to save templates.");
                 return;
             }
@@ -205,7 +205,6 @@ document.addEventListener('DOMContentLoaded', function() {
             saveTemplateNameInput.focus();
         });
     }
-
     if (saveTemplateConfirmBtn) {
         saveTemplateConfirmBtn.addEventListener('click', async () => {
             const templateName = saveTemplateNameInput.value.trim();
