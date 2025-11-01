@@ -979,9 +979,12 @@ function login(event) {
         <span>Logging in...</span>
     `;
 
-    const mailInput = document.getElementById('mail-input');
-    if (mailInput && mailInput.value) {
-        sessionStorage.setItem('preLoginMailContent', mailInput.value);
+    if (typeof window.getPreLoginState === 'function') {
+        const state = window.getPreLoginState();
+        if (state) {
+            sessionStorage.setItem('preLoginState', JSON.stringify(state));
+            sessionStorage.setItem('preLoginToolPath', window.location.pathname);
+        }
     }
 
     const scope = 'identify';

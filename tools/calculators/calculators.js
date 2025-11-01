@@ -27,6 +27,29 @@ document.addEventListener('DOMContentLoaded', function() {
         migrationDateInputJs.addEventListener('click', openDatePicker);
     }
 
+    window.getPreLoginState = function() {
+        const state = {};
+        const allInputs = document.querySelectorAll('.calculator-island input, .calculator-island select');
+        let hasInput = false;
+        
+        allInputs.forEach(input => {
+            if (input.type === 'radio') {
+                if (input.checked) {
+                    state[input.name] = input.value;
+                    if (input.value) hasInput = true;
+                }
+            } else if (input.type === 'checkbox') {
+                state[input.id] = input.checked;
+                if (input.checked) hasInput = true;
+            } else {
+                state[input.id] = input.value;
+                if (input.value) hasInput = true;
+            }
+        });
+    
+        return hasInput ? state : null;
+    };
+
     let currentIndex = 0;
     let hohReturnedPower = 0;
     
@@ -61,8 +84,8 @@ document.addEventListener('DOMContentLoaded', function() {
         window.saveUserData(CALCULATORS_CACHE_KEY, state);
     }, 500);
 
-    function loadAllCalculatorsState() {
-        const savedState = window.loadUserData(CALCULATORS_CACHE_KEY);
+    function loadAllCalculatorsState(stateToLoad = null) {
+        const savedState = stateToLoad || window.loadUserData(CALCULATORS_CACHE_KEY);
         if (!savedState) return;
 
         const allInputs = document.querySelectorAll('.calculator-island input, .calculator-island select');
@@ -848,7 +871,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.requestAnimationFrame(() => {
         initAndResize();
-        loadAllCalculatorsState();
+
+        const preLoginPath = sessionStorage.getItem('preLoginToolPath');
+        if (preLoginPath === window.location.pathname) {
+            const preLoginState = JSON.parse(sessionStorage.getItem('preLoginState'));
+            if (preLoginState) {
+                loadAllCalculatorsState(preLoginState);
+            }
+            sessionStorage.removeItem('preLoginState');
+            sessionStorage.removeItem('preLoginToolPath');
+        } else {
+            loadAllCalculatorsState();
+        }
+
         document.querySelectorAll('.calculator-island input, .calculator-island select').forEach(input => {
             const eventType = (input.type === 'radio' || input.type === 'checkbox' || input.tagName === 'SELECT') ? 'change' : 'input';
             input.addEventListener(eventType, saveAllCalculatorsState);

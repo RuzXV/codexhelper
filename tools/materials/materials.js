@@ -73,6 +73,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }, wait);
         };
     };
+    
+    window.getPreLoginState = function() {
+        const state = {};
+        let hasInput = false;
+    
+        document.querySelectorAll('.material-input').forEach(input => {
+            state[input.id] = input.value;
+            if (input.value) hasInput = true;
+        });
+        
+        state.craftingList = craftingList;
+        state.selectedLoadoutSlots = selectedLoadoutSlots;
+    
+        if (Object.keys(craftingList).length > 0) hasInput = true;
+    
+        return hasInput ? state : null;
+    };
 
     const MATERIALS_CACHE_KEY = 'materialsCalculatorState';
 
@@ -88,8 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
         window.saveUserData(MATERIALS_CACHE_KEY, state);
     }, 500);
     
-    function loadCalculatorState() {
-        const savedState = window.loadUserData(MATERIALS_CACHE_KEY);
+    function loadCalculatorState(stateToLoad = null) {
+        const savedState = stateToLoad || window.loadUserData(MATERIALS_CACHE_KEY);
         if (!savedState) return;
     
         document.querySelectorAll('.material-input').forEach(input => {
@@ -1351,12 +1368,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 const orderB = rarityOrder[b.quality] || 0;
                 return orderB - orderA;
             });
-            
+
             initializeEquipmentSelector();
             
-            loadCalculatorState();
+            const preLoginPath = sessionStorage.getItem('preLoginToolPath');
+            if (preLoginPath === window.location.pathname) {
+                const preLoginState = JSON.parse(sessionStorage.getItem('preLoginState'));
+                if (preLoginState) {
+                    loadCalculatorState(preLoginState);
+                }
+                sessionStorage.removeItem('preLoginState');
+                sessionStorage.removeItem('preLoginToolPath');
+            } else {
+                loadCalculatorState();
+            }
 
-             requestAnimationFrame(() => {
+            updateUIDisplays();
+
+            requestAnimationFrame(() => {
                 adjustSelectorHeight();
                 adjustLayoutHeights();
             });
@@ -1370,5 +1399,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     initializeCalculator();
-    updateUIDisplays();
 });

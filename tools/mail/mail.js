@@ -127,6 +127,14 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUndoRedoButtons();
     }
 
+    window.getPreLoginState = function() {
+        const mailInput = document.getElementById('mail-input');
+        if (mailInput && mailInput.value) {
+            return { mailContent: mailInput.value };
+        }
+        return null;
+    };
+
     function changeState(newIndex) {
         if (newIndex >= 0 && newIndex < historyStack.length) {
             historyIndex = newIndex;
@@ -840,10 +848,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    const preLoginContent = sessionStorage.getItem('preLoginMailContent');
-    if (mailInput && preLoginContent) {
-        mailInput.value = preLoginContent;
-        sessionStorage.removeItem('preLoginMailContent');
+    const preLoginPath = sessionStorage.getItem('preLoginToolPath');
+    if (preLoginPath === window.location.pathname) {
+        const preLoginState = JSON.parse(sessionStorage.getItem('preLoginState'));
+        if (mailInput && preLoginState && preLoginState.mailContent) {
+            mailInput.value = preLoginState.mailContent;
+        }
+        sessionStorage.removeItem('preLoginState');
+        sessionStorage.removeItem('preLoginToolPath');
     } else {
         const cachedData = window.loadUserData(CACHE_KEY);
         if (mailInput && cachedData && cachedData.mailContent) {
