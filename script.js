@@ -1002,13 +1002,22 @@ function logout() {
 
 function getAuthToken() {
     try {
-        const user = localStorage.getItem('codexUser');
-        if (!user) return null;
+        const userString = localStorage.getItem('codexUser');
+        if (!userString) {
+            return null;
+        }
         
-        const userData = JSON.parse(user);
-        return userData.accessToken ? `Bearer ${userData.accessToken}` : null;
+        const userData = JSON.parse(userString);
+        
+        if (userData && userData.accessToken) {
+            return `Bearer ${userData.accessToken}`;
+        } else {
+            console.warn("User data found in localStorage but is missing accessToken. User needs to re-authenticate.");
+            return null;
+        }
     } catch (e) {
         console.error("Failed to parse user data or get auth token from localStorage", e);
+        localStorage.removeItem('codexUser');
         return null;
     }
 }

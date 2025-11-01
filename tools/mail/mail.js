@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const customSizeInput = document.getElementById('custom-size-input');
     const customSizeApplyBtn = document.getElementById('custom-size-apply-btn');
     const customSizeCancelBtn = document.getElementById('custom-size-cancel-btn');
+    const customAlertModal = document.getElementById('custom-alert-modal');
+    const customAlertTitle = document.getElementById('custom-alert-title');
+    const customAlertMessage = document.getElementById('custom-alert-message');
+    const customAlertOkBtn = document.getElementById('custom-alert-ok-btn');
 
     const generatorTabBtn = document.querySelector('.generator-tab-btn[data-tab="generator"]');
     const templatesTabBtn = document.querySelector('.generator-tab-btn[data-tab="templates"]');
@@ -71,6 +75,22 @@ document.addEventListener('DOMContentLoaded', function() {
     let historyIndex = -1;
     let inputTimeout = null;
     const API_BASE_URL = 'https://api.codexhelper.com';
+
+    function showCustomAlert(message, title = "Notice") {
+        if (customAlertModal && customAlertMessage && customAlertTitle) {
+            customAlertTitle.textContent = title;
+            customAlertMessage.textContent = message;
+            customAlertModal.style.display = 'flex';
+        } else {
+            alert(message);
+        }
+    }
+
+    if (customAlertOkBtn) {
+        customAlertOkBtn.addEventListener('click', () => {
+            if (customAlertModal) customAlertModal.style.display = 'none';
+        });
+    }
 
     function escapeHtml(text) {
         if (typeof text !== 'string') return '';
@@ -781,7 +801,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 renderSavedTemplatesView();
             } catch (error) {
                 console.error('Failed to delete template:', error);
-                alert('Could not delete the template.');
+                showCustomAlert('Could not delete the template.', "Delete Error");
             }
         }
     }
@@ -813,7 +833,7 @@ document.addEventListener('DOMContentLoaded', function() {
             switchView('saved');
         } catch (error) {
             console.error('Failed to save template:', error);
-            alert(`Could not save template: ${error.message}`);
+            showCustomAlert(`Could not save template: ${error.message}`, "Save Error");
         } finally {
             button.disabled = false;
             button.textContent = 'Save';
