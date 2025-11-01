@@ -73,76 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let historyIndex = -1;
     let inputTimeout = null;
     
-    let currentUser = null;
-    let userAuthToken = null;
-
-    function getLoggedInUser() {
-        try {
-            const user = localStorage.getItem('codexUser');
-            return user ? JSON.parse(user) : null;
-        } catch (e) {
-            console.error("Failed to parse user data from localStorage", e);
-            return null;
-        }
-    }
-
-    function initAuth() {
-        const user = getLoggedInUser();
-        if (user && user.access_token && user.data) {
-            currentUser = user.data;
-            userAuthToken = user.access_token;
-            renderLoggedInState(document.getElementById('auth-container'), currentUser);
-        } else {
-            renderLoggedOutState(document.getElementById('auth-container'));
-            renderLoggedOutState(savedTemplatesAuthContainer);
-        }
-    }
-    
-    window.addEventListener('message', (event) => {
-        if (event.origin !== window.location.origin) return;
-        const { type, user, error } = event.data;
-        if (type === 'auth-success') {
-            localStorage.setItem('codexUser', JSON.stringify(user));
-            window.location.reload();
-        } else if (type === 'auth-error') {
-            console.error('Authentication error received from popup:', error);
-            renderLoggedOutState(document.getElementById('auth-container'));
-            renderLoggedOutState(savedTemplatesAuthContainer);
-        }
-    });
-
-    function renderLoggedOutState(container) {
-        if (!container) return;
-        container.innerHTML = `<button class="discord-login-btn"><i class="fa-brands fa-discord"></i><span>Login with Discord</span></button>`;
-        container.querySelector('.discord-login-btn').addEventListener('click', login);
-    }
-    
-    function renderLoggedInState(container, user) {
-        if (!container) return;
-        const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
-        container.innerHTML = `
-            <div class="user-profile">
-                <img src="${avatarUrl}" alt="Profile Picture" class="profile-pic">
-                <span class="username">@${user.username}</span>
-                <button class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
-            </div>`;
-        container.querySelector('.logout-btn').addEventListener('click', logout);
-    }
-    
-    function login() {
-        if (window.codexLogin) {
-            window.codexLogin();
-        } else {
-            console.error("Login function not found. Please ensure it's available from your main script.js");
-            alert("Login functionality is currently unavailable.");
-        }
-    }
-
-    function logout() {
-        localStorage.removeItem('codexUser');
-        window.location.reload();
-    }
-    
     async function fetchAndDisplaySavedTemplates() {
         if (!window.userAuthToken) {
             renderSavedTemplatesView();
@@ -335,7 +265,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-
     if (gradientToggleBtn) {
         gradientToggleBtn.addEventListener('mousedown', function(e) {
             e.preventDefault();
@@ -391,12 +320,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateUndoRedoButtons() {
         if(undoBtn) undoBtn.disabled = historyIndex <= 0;
     }
-
-    // Modified this to use the new auth-aware local storage functions
+    
     function getCacheKey(baseKey) {
-        const user = getLoggedInUser();
-        if (user && user.data) {
-            return `codex-user-${user.data.id}-${baseKey}`;
+        if (window.getLoggedInUser) {
+            const user = window.getLoggedInUser();
+            if (user && user.data) {
+                return `codex-user-${user.data.id}-${baseKey}`;
+            }
         }
         return `codex-guest-${baseKey}`;
     }
@@ -1014,6 +944,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if(generatorTabBtn) generatorTabBtn.addEventListener('click', () => switchView('generator'));
     if(templatesTabBtn) templatesTabBtn.addEventListener('click', () => switchView('templates'));
+    if(savedTemplatesTabBtn) savedTemplatesTabBtn.addEventListener('click', () => switchView('saved'));
+
 
     if(previewTabBtns) {
         previewTabBtns.forEach(btn => {
@@ -1173,7 +1105,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    initAuth();
     updatePreview();
     setupTemplatesAndFilters();
     if(mailInput) {
@@ -1182,22 +1113,3 @@ document.addEventListener('DOMContentLoaded', function() {
     updateUndoRedoButtons();
     updateGradientUI();
 });
-
-const DISCORD_CLIENT_ID = '1434105087722258573';
-const REDIRECT_URI = 'https://codexhelper.com/auth/callback';
-let authPopup = null;
-
-window.codexLogin = function() {
-    const scope = 'identify';
-    const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
-    
-    const width = 500, height = 700;
-    const left = (window.innerWidth / 2) - (width / 2);
-    const top = (window.innerHeight / 2) - (height / 2);
-    
-    authPopup = window.open(authUrl, 'DiscordAuth', `width=${width},height=${height},top=${top},left=${left}`);
-
-    if (!authPopup || authPopup.closed || typeof authPopup.closed === 'undefined') {
-        alert("Popup was blocked! Please allow popups for this site and try again.");
-    }
-}
