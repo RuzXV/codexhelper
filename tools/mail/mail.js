@@ -508,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const tagToClose = stack.pop();
                     switch (tagToClose.name) {
                         case 'b': html += '</strong>'; break;
-                        case 'i': html += '</em>'; break;
+                        case 'i': html += '<em>'; break;
                         case 'size': case 'color': html += '</span>'; break;
                     }
                 }

@@ -13,8 +13,8 @@ html {
 }
 
 @font-face {
-    font-family: 'NotoSansHans DemiLight';
-    src: url('NotoSansHans-DemiLight.otf') format('opentype');
+    font-family: 'NotoSansHans Regular';
+    src: url('NotoSansHans-Regular.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
 }
