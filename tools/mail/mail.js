@@ -723,7 +723,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="grid-header">Template Name</div>
                 <div class="grid-header">Date Saved</div>
                 <div class="grid-header">Last Loaded</div>
-                <div class="grid-header"></div>
+                <div class="grid-header">Actions</div>
         `;
 
         templates.forEach(t => {
@@ -1021,7 +1021,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
             if (!getLoggedInUser()) {
-                alert('You must be logged in with Discord to save templates.');
+                showCustomAlert('You must be logged in with Discord to save templates.');
                 return;
             }
             saveTemplateNameInput.value = '';

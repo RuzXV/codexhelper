@@ -1016,7 +1016,6 @@ input[type="range"]::-moz-range-thumb {
     padding: var(--spacing-5);
     border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
-    box-shadow: 0 5px 25px rgba(0,0,0,0.3);
     width: 90%;
     max-width: 280px;
     animation: zoomIn 0.2s ease-out forwards;
@@ -1167,7 +1166,9 @@ input[type="range"]::-moz-range-thumb {
 
 #saved-templates-view {
     position: relative;
-    background: var(--bg-secondary);
+    background: rgba(20, 21, 24, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
@@ -1190,7 +1191,7 @@ input[type="range"]::-moz-range-thumb {
 
 .saved-templates-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr auto;
+    grid-template-columns: 1.5fr 1fr 1fr 180px;
     gap: var(--spacing-4);
     align-items: center;
 }
@@ -1232,12 +1233,15 @@ input[type="range"]::-moz-range-thumb {
     gap: var(--spacing-3);
     justify-content: flex-end;
 }
-.template-actions .btn-secondary, .template-actions .btn-danger {
-    padding: var(--spacing-1) var(--spacing-3);
-    min-width: auto;
-    min-height: auto;
-    height: auto;
-    font-size: var(--font-size-sm);
+.template-actions .btn-secondary,
+.template-actions .btn-danger,
+.template-actions .btn-primary {
+    padding: 0;
+    width: 44px;
+    height: 44px;
+    min-width: 0;
+    min-height: 0;
+    font-size: var(--font-size-base);
 }
 .btn-danger {
      background-color: rgba(239, 68, 68, 0.2);
@@ -1267,6 +1271,13 @@ input[type="range"]::-moz-range-thumb {
     margin-bottom: var(--spacing-6);
     font-size: var(--font-size-lg);
     color: var(--text-secondary);
+}
+
+#custom-alert-message {
+    margin-bottom: var(--spacing-4);
+    padding: 0 var(--spacing-4);
+    color: var(--text-secondary);
+    text-align: center;
 }
 
 @media (max-width: 768px) {
