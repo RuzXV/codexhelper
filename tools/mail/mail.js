@@ -1,21 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const API_BASE_URL = 'https://api.codexhelper.com';
+
     const mailInput = document.getElementById('mail-input');
     const mailPreview = document.getElementById('mail-preview');
     const copyBtn = document.getElementById('copy-btn');
     const previewContainer = document.getElementById('mail-preview-container');
-
     const undoBtn = document.getElementById('undo-btn');
     const clearBtn = document.getElementById('clear-btn');
     const boldBtn = document.getElementById('bold-btn');
     const italicBtn = document.getElementById('italic-btn');
     const boldItalicBtn = document.getElementById('bold-italic-btn');
-    
     const customSizeOptions = document.getElementById('custom-size-options');
     const customColorOptions = document.getElementById('custom-color-options');
     const customColorPickerContainer = document.getElementById('custom-color-picker-container');
     const customColorInput = document.getElementById('custom-color-input');
     const applyCustomColorBtn = document.getElementById('apply-custom-color-btn');
-
     const applyGradientBtn = document.getElementById('apply-gradient-btn');
     const gradientToggleBtn = document.getElementById('custom-gradient-toggle');
     const gradientBiasSlider = document.getElementById('gradient-bias-slider');
@@ -24,51 +23,318 @@ document.addEventListener('DOMContentLoaded', function() {
     const gradientPreviewBar = document.getElementById('gradient-preview-bar');
     const gradientColor1 = document.getElementById('gradient-color-1');
     const gradientColor2 = document.getElementById('gradient-color-2');
-
     const generatorTabBtn = document.querySelector('.generator-tab-btn[data-tab="generator"]');
     const templatesTabBtn = document.querySelector('.generator-tab-btn[data-tab="templates"]');
     const generatorView = document.getElementById('generator-view');
     const templatesView = document.getElementById('templates-view');
     const previewTabBtns = document.querySelectorAll('.preview-tab-btn');
-
     const templateGallery = document.getElementById('template-gallery');
     const loadTemplateBtn = document.getElementById('load-template-btn');
     const filterToggleBtn = document.getElementById('filter-toggle-btn');
     const filterPanel = document.getElementById('filter-panel');
     const filterOptionsContainer = document.getElementById('filter-options');
     const filterResetBtn = document.getElementById('filter-reset-btn');
-
     const charCounter = document.getElementById('char-counter');
-    let currentCharLimit = 2000;
-    const CACHE_KEY = 'mailGeneratorContent';
-
     const magnifiedPreviewContainer = document.getElementById('magnified-preview-container');
     const magnifiedImage = document.getElementById('magnified-image');
     const magnifiedPlaceholder = document.getElementById('magnified-placeholder');
     const magnifiedTitle = document.getElementById('magnified-title');
-    
     const customConfirmModal = document.getElementById('custom-confirm-modal');
     const confirmActionBtn = document.getElementById('confirm-action-btn');
     const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
-
     const customSizeModal = document.getElementById('custom-size-modal');
     const customSizeInput = document.getElementById('custom-size-input');
     const customSizeApplyBtn = document.getElementById('custom-size-apply-btn');
     const customSizeCancelBtn = document.getElementById('custom-size-cancel-btn');
 
+    const savedTemplatesTabBtn = document.querySelector('.generator-tab-btn[data-tab="saved"]');
+    const savedTemplatesView = document.getElementById('saved-templates-view');
+    const saveTemplateBtn = document.getElementById('save-template-btn');
+    const saveTemplateModal = document.getElementById('save-template-modal');
+    const saveTemplateNameInput = document.getElementById('save-template-name-input');
+    const saveTemplateConfirmBtn = document.getElementById('save-template-confirm-btn');
+    const saveTemplateCancelBtn = document.getElementById('save-template-cancel-btn');
+    const savedTemplatesLoginPrompt = document.getElementById('saved-templates-login-prompt');
+    const savedTemplatesContent = document.getElementById('saved-templates-content');
+    const savedTemplatesList = document.getElementById('saved-templates-list');
+    const savedTemplatesAuthContainer = document.getElementById('saved-templates-auth-container');
+
+    let currentCharLimit = 2000;
+    const CACHE_KEY = 'mailGeneratorContent';
     let templates = [];
     let selectedTemplate = null;
     let hoveredTemplate = null;
     let isGalleryPopulated = false;
-
     let isLivePreviewingGradient = false;
     let gradientSelection = { start: 0, end: 0 };
     let isLivePreviewingColor = false;
     let colorSelection = { start: 0, end: 0 };
-
     let historyStack = [];
     let historyIndex = -1;
     let inputTimeout = null;
+    
+    let currentUser = null;
+    let userAuthToken = null;
+
+    function getLoggedInUser() {
+        try {
+            const user = localStorage.getItem('codexUser');
+            return user ? JSON.parse(user) : null;
+        } catch (e) {
+            console.error("Failed to parse user data from localStorage", e);
+            return null;
+        }
+    }
+
+    function initAuth() {
+        const user = getLoggedInUser();
+        if (user && user.access_token && user.data) {
+            currentUser = user.data;
+            userAuthToken = user.access_token;
+            renderLoggedInState(document.getElementById('auth-container'), currentUser);
+        } else {
+            renderLoggedOutState(document.getElementById('auth-container'));
+            renderLoggedOutState(savedTemplatesAuthContainer);
+        }
+    }
+    
+    window.addEventListener('message', (event) => {
+        if (event.origin !== window.location.origin) return;
+        const { type, user, error } = event.data;
+        if (type === 'auth-success') {
+            localStorage.setItem('codexUser', JSON.stringify(user));
+            window.location.reload();
+        } else if (type === 'auth-error') {
+            console.error('Authentication error received from popup:', error);
+            renderLoggedOutState(document.getElementById('auth-container'));
+            renderLoggedOutState(savedTemplatesAuthContainer);
+        }
+    });
+
+    function renderLoggedOutState(container) {
+        if (!container) return;
+        container.innerHTML = `<button class="discord-login-btn"><i class="fa-brands fa-discord"></i><span>Login with Discord</span></button>`;
+        container.querySelector('.discord-login-btn').addEventListener('click', login);
+    }
+    
+    function renderLoggedInState(container, user) {
+        if (!container) return;
+        const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
+        container.innerHTML = `
+            <div class="user-profile">
+                <img src="${avatarUrl}" alt="Profile Picture" class="profile-pic">
+                <span class="username">@${user.username}</span>
+                <button class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>`;
+        container.querySelector('.logout-btn').addEventListener('click', logout);
+    }
+    
+    function login() {
+        if (window.codexLogin) {
+            window.codexLogin();
+        } else {
+            console.error("Login function not found. Please ensure it's available from your main script.js");
+            alert("Login functionality is currently unavailable.");
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('codexUser');
+        window.location.reload();
+    }
+    
+    async function fetchAndDisplaySavedTemplates() {
+        if (!window.userAuthToken) {
+            renderSavedTemplatesView();
+            return;
+        }
+
+        savedTemplatesList.innerHTML = '<tr><td colspan="4" style="text-align: center;">Loading your templates...</td></tr>';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/templates`, {
+                headers: { 'Authorization': `Bearer ${window.userAuthToken}` }
+            });
+
+            if (!response.ok) {
+                if(response.status === 401) {
+                    alert("Your session has expired. Please log in again.");
+                    if (window.logout) window.logout();
+                    return;
+                }
+                throw new Error(`Failed to fetch templates: ${response.statusText}`);
+            }
+
+            const templates = await response.json();
+            savedTemplatesList.innerHTML = '';
+
+            if (templates.length === 0) {
+                savedTemplatesList.innerHTML = '<tr><td colspan="4" style="text-align: center;">You haven\'t saved any templates yet.</td></tr>';
+                return;
+            }
+
+            templates.forEach(template => {
+                const tr = document.createElement('tr');
+                const dateSaved = new Date(template.date_saved * 1000).toLocaleDateString();
+                const lastLoaded = template.last_loaded ? new Date(template.last_loaded * 1000).toLocaleString() : 'Never';
+
+                tr.innerHTML = `
+                    <td>${escapeHtml(template.template_name)}</td>
+                    <td>${dateSaved}</td>
+                    <td>${lastLoaded}</td>
+                    <td>
+                        <button class="btn-primary btn-primary-small btn-load-template">Load</button>
+                        <button class="btn-danger-small btn-delete-template">Delete</button>
+                    </td>
+                `;
+                
+                const loadBtn = tr.querySelector('.btn-load-template');
+                loadBtn.dataset.content = template.content;
+                loadBtn.dataset.id = template.template_id;
+                loadBtn.addEventListener('click', handleLoadSavedTemplate);
+
+                const deleteBtn = tr.querySelector('.btn-delete-template');
+                deleteBtn.dataset.id = template.template_id;
+                deleteBtn.dataset.name = template.template_name;
+                deleteBtn.addEventListener('click', handleDeleteSavedTemplate);
+
+                savedTemplatesList.appendChild(tr);
+            });
+
+        } catch (error) {
+            console.error("Error fetching saved templates:", error);
+            savedTemplatesList.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ff4d4d;">Could not load your templates. Please try again later.</td></tr>';
+        }
+    }
+
+    function renderSavedTemplatesView() {
+        if (window.currentUser) {
+            savedTemplatesLoginPrompt.style.display = 'none';
+            savedTemplatesContent.style.display = 'block';
+            fetchAndDisplaySavedTemplates();
+        } else {
+            savedTemplatesLoginPrompt.style.display = 'block';
+            savedTemplatesContent.style.display = 'none';
+            if (savedTemplatesAuthContainer && !savedTemplatesAuthContainer.hasChildNodes()) {
+                if (window.renderLoggedOutState) {
+                    window.renderLoggedOutState(savedTemplatesAuthContainer);
+                }
+            }
+        }
+    }
+
+    async function handleLoadSavedTemplate(event) {
+        const { content, id } = event.target.dataset;
+        
+        mailInput.value = content;
+        updatePreview();
+        saveState();
+        switchView('generator');
+
+        if (window.userAuthToken) {
+            fetch(`${API_BASE_URL}/api/templates/${id}/load`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${window.userAuthToken}` }
+            }).catch(err => console.error("Failed to update last_loaded timestamp:", err));
+        }
+    }
+
+    async function handleDeleteSavedTemplate(event) {
+        const { id, name } = event.target.dataset;
+        if (confirm(`Are you sure you want to delete the template "${name}"? This cannot be undone.`)) {
+            if (!window.userAuthToken) {
+                alert("You are not logged in.");
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/templates/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${window.userAuthToken}` }
+                });
+                if (!response.ok) throw new Error("Failed to delete template.");
+                event.target.closest('tr').remove();
+            } catch (error) {
+                console.error("Error deleting template:", error);
+                alert("Could not delete the template. Please try again.");
+            }
+        }
+    }
+
+    if (saveTemplateBtn) {
+        saveTemplateBtn.addEventListener('click', () => {
+            if (!window.currentUser) {
+                alert("Please log in with Discord to save templates.");
+                return;
+            }
+            if (!mailInput.value.trim()) {
+                alert("Cannot save an empty template.");
+                return;
+            }
+            saveTemplateNameInput.value = '';
+            saveTemplateModal.style.display = 'flex';
+            saveTemplateNameInput.focus();
+        });
+    }
+
+    if (saveTemplateConfirmBtn) {
+        saveTemplateConfirmBtn.addEventListener('click', async () => {
+            const templateName = saveTemplateNameInput.value.trim();
+            if (!templateName) {
+                alert("Please enter a name for your template.");
+                return;
+            }
+            
+            const content = mailInput.value;
+            const charCount = (content.length + (content.match(/\n/g) || []).length);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/templates`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${window.userAuthToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        template_name: templateName,
+                        content: content,
+                        char_count: charCount
+                    })
+                });
+                
+                if (!response.ok) throw new Error("Failed to save template.");
+
+                saveTemplateModal.style.display = 'none';
+                alert("Template saved successfully!");
+
+                if (savedTemplatesView.classList.contains('active')) {
+                    fetchAndDisplaySavedTemplates();
+                }
+            } catch (error) {
+                console.error("Error saving template:", error);
+                alert("Could not save the template. Please try again later.");
+            }
+        });
+    }
+    
+    if (saveTemplateCancelBtn) {
+        saveTemplateCancelBtn.addEventListener('click', () => saveTemplateModal.style.display = 'none');
+    }
+
+    function switchView(tabName) {
+        document.querySelectorAll('.generator-view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.generator-tab-btn').forEach(b => b.classList.remove('active'));
+    
+        const view = document.getElementById(`${tabName}-view`) || document.getElementById(`${tabName}s-view`);
+        const tabBtn = document.querySelector(`.generator-tab-btn[data-tab="${tabName}"]`);
+    
+        if (view) view.classList.add('active');
+        if (tabBtn) tabBtn.classList.add('active');
+        
+        if (tabName === 'saved') {
+            renderSavedTemplatesView();
+        }
+    }
+
 
     if (gradientToggleBtn) {
         gradientToggleBtn.addEventListener('mousedown', function(e) {
@@ -126,7 +392,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if(undoBtn) undoBtn.disabled = historyIndex <= 0;
     }
 
-    const cachedData = window.loadUserData(CACHE_KEY);
+    // Modified this to use the new auth-aware local storage functions
+    function getCacheKey(baseKey) {
+        const user = getLoggedInUser();
+        if (user && user.data) {
+            return `codex-user-${user.data.id}-${baseKey}`;
+        }
+        return `codex-guest-${baseKey}`;
+    }
+
+    const cachedData = JSON.parse(localStorage.getItem(getCacheKey('mailGeneratorContent')));
     if (mailInput && cachedData && cachedData.mailContent) {
         mailInput.value = cachedData.mailContent;
     }
@@ -215,7 +490,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const text = overrideText !== null ? overrideText : mailInput.value;
         if (overrideText === null) {
-            window.saveUserData(CACHE_KEY, { mailContent: text });
+            localStorage.setItem(getCacheKey(CACHE_KEY), JSON.stringify({ mailContent: text }));
         }
     
         const newlines = (text.match(/\n/g) || []).length;
@@ -680,14 +955,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function rgbToHex(r, g, b) {
         return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
     }
-
-    function switchView(tabName) {
-        if (!generatorView || !templatesView || !generatorTabBtn || !templatesTabBtn) return;
-        generatorView.classList.toggle('active', tabName === 'generator');
-        templatesView.classList.toggle('active', tabName === 'templates');
-        generatorTabBtn.classList.toggle('active', tabName === 'generator');
-        templatesTabBtn.classList.toggle('active', tabName === 'templates');
-    }
     
     function updateMagnifiedPreview() {
         if(!magnifiedImage || !magnifiedTitle || !magnifiedPreviewContainer) return;
@@ -906,6 +1173,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    initAuth();
     updatePreview();
     setupTemplatesAndFilters();
     if(mailInput) {
@@ -914,3 +1182,22 @@ document.addEventListener('DOMContentLoaded', function() {
     updateUndoRedoButtons();
     updateGradientUI();
 });
+
+const DISCORD_CLIENT_ID = '1434105087722258573';
+const REDIRECT_URI = 'https://codexhelper.com/auth/callback';
+let authPopup = null;
+
+window.codexLogin = function() {
+    const scope = 'identify';
+    const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
+    
+    const width = 500, height = 700;
+    const left = (window.innerWidth / 2) - (width / 2);
+    const top = (window.innerHeight / 2) - (height / 2);
+    
+    authPopup = window.open(authUrl, 'DiscordAuth', `width=${width},height=${height},top=${top},left=${left}`);
+
+    if (!authPopup || authPopup.closed || typeof authPopup.closed === 'undefined') {
+        alert("Popup was blocked! Please allow popups for this site and try again.");
+    }
+}

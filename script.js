@@ -1,3 +1,6 @@
+window.currentUser = null;
+window.userAuthToken = null;
+
 function toggleFAQ(button) {
     const faqItem = button.parentElement;
     const isActive = faqItem.classList.contains('active');
@@ -920,8 +923,17 @@ let authPopup = null;
 
 function initAuth(container) {
     const user = getLoggedInUser();
+
+    if (user && user.data && user.access_token) {
+        window.currentUser = user.data;
+        window.userAuthToken = user.access_token;
+    } else {
+        window.currentUser = null;
+        window.userAuthToken = null;
+    }
+
     if (user) {
-        renderLoggedInState(container, user);
+        renderLoggedInState(container, user.data);
     } else {
         renderLoggedOutState(container);
     }
