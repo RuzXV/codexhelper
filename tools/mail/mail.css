@@ -1243,11 +1243,11 @@ input[type="range"]::-moz-range-thumb {
 .template-actions .btn-danger,
 .template-actions .btn-primary {
     padding: 0;
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
     min-width: 0;
     min-height: 0;
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
 }
 .btn-danger {
      background-color: rgba(239, 68, 68, 0.2);
