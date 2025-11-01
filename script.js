@@ -1,6 +1,3 @@
-window.currentUser = null;
-window.userAuthToken = null;
-
 function toggleFAQ(button) {
     const faqItem = button.parentElement;
     const isActive = faqItem.classList.contains('active');
@@ -922,24 +919,13 @@ const REDIRECT_URI = 'https://codexhelper.com/auth/callback';
 let authPopup = null;
 
 function initAuth(container) {
-    const userObject = getLoggedInUser();
-
-    if (userObject && userObject.data && userObject.access_token) {
-        window.currentUser = userObject.data;
-        window.userAuthToken = userObject.access_token;
-        renderLoggedInState(container, userObject.data);
-    } 
-    else if (userObject && userObject.id) { 
-        window.currentUser = userObject;
-        window.userAuthToken = null; 
-        renderLoggedInState(container, userObject);
-    } 
-    else {
-        window.currentUser = null;
-        window.userAuthToken = null;
+    const user = getLoggedInUser();
+    if (user) {
+        renderLoggedInState(container, user);
+    } else {
         renderLoggedOutState(container);
     }
-
+    
     window.addEventListener('message', (event) => {
         if (event.origin !== window.location.origin) {
             return;

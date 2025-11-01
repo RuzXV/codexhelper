@@ -13,8 +13,8 @@ html {
 }
 
 @font-face {
-    font-family: 'NotoSansHans Regular';
-    src: url('NotoSansHans-Regular.otf') format('opentype');
+    font-family: 'NotoSansHans DemiLight';
+    src: url('NotoSansHans-DemiLight.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
 }
@@ -1064,92 +1064,6 @@ input[type="range"]::-moz-range-thumb {
     font-size: var(--font-size-sm);
     font-weight: 400;
     color: var(--text-primary);
-}
-
-.preview-actions {
-    display: flex;
-    gap: var(--spacing-2);
-}
-#copy-btn, #save-template-btn {
-    gap: var(--spacing-2);
-    padding: var(--spacing-2) var(--spacing-3);
-}
-#copy-btn {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-}
-#copy-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: var(--border-hover);
-}
-#copy-btn img {
-    height: 1em;
-}
-
-#saved-templates-login-prompt h3 {
-    margin-bottom: var(--spacing-2);
-}
-.saved-templates-table-container {
-    max-height: 600px;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    background: var(--bg-secondary);
-}
-.saved-templates-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-}
-.saved-templates-table th, .saved-templates-table td {
-    padding: var(--spacing-3) var(--spacing-4);
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
-}
-.saved-templates-table th {
-    background: var(--bg-tertiary);
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-.saved-templates-table tr:last-child td {
-    border-bottom: none;
-}
-.saved-templates-table tr:hover {
-    background-color: var(--bg-tertiary);
-}
-.saved-templates-table td:last-child {
-    display: flex;
-    gap: var(--spacing-2);
-}
-
-.btn-danger-small {
-    background: #ef4444;
-    color: white;
-    padding: var(--spacing-1) var(--spacing-2) !important;
-    border-radius: var(--radius-sm);
-    border: 1px solid transparent;
-    font-weight: 500 !important;
-    font-size: var(--font-size-xs) !important;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    height: auto;
-    min-height: 0;
-}
-.btn-danger-small:hover {
-    background: #dc2626;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
-}
-#save-template-name-input {
-    width: 100%;
-    padding: var(--spacing-2);
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-4);
-    text-align: center;
-    font-size: var(--font-size-base);
 }
 
 @media (max-width: 1200px) {

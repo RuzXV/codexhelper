@@ -60,7 +60,7 @@
         
         <div class="sub-navbar">
             <div class="sub-nav-container">
-                <a href="/tools/mail/" class="sub-nav-link active">Alliance Mail Generator</a>
+                <a href="/tools/mail/" class="sub-nav-link">Alliance Mail Generator</a>
                 <a href="/tools/calculators/" class="sub-nav-link">General Calculators</a>
                 <a href="/tools/materials/" class="sub-nav-link">Crafting Calculator</a>
                 <a href="/tools/davor_toolkit/" class="sub-nav-link">Davor's Toolkit</a>
@@ -83,7 +83,6 @@
                 <div class="generator-tabs">
                     <button class="generator-tab-btn active" data-tab="generator">Mail Generator</button>
                     <button class="generator-tab-btn" data-tab="templates">Template Gallery</button>
-                    <button class="generator-tab-btn" data-tab="saved">Saved Templates</button>
                 </div>
     
                 <div id="generator-view" class="generator-view active">
@@ -207,16 +206,10 @@
                                     <button class="preview-tab-btn active" data-bg="mail">Mail Preview</button>
                                     <button class="preview-tab-btn" data-bg="board">Board Preview</button>
                                 </div>
-                                <div class="preview-actions">
-                                    <button id="copy-btn" class="btn-secondary">
-                                        <img src="/images/mail/tools_copy_icon.webp" alt="Copy Icon">
-                                        <span>Copy</span>
-                                    </button>
-                                    <button id="save-template-btn" class="btn-primary">
-                                        <i class="fas fa-save"></i>
-                                        <span>Save Template</span>
-                                    </button>
-                                </div>
+                                <button id="copy-btn" class="btn-primary">
+                                    <img src="/images/mail/tools_copy_icon.webp" alt="Copy Icon">
+                                    <span>Copy Code</span>
+                                </button>
                             </div>
                             <div id="mail-preview-container" class="mail-preview-container mail-bg">
                                 <div id="mail-preview"></div>
@@ -270,30 +263,6 @@
                     </div>
                 </div>
 
-                <div id="saved-templates-view" class="generator-view">
-                    <div id="saved-templates-login-prompt" style="display: none; text-align: center; padding: 50px 0;">
-                        <h3>Login to View Saved Templates</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 20px;">You must be logged in with Discord to save and load your personal templates.</p>
-                        <div id="saved-templates-auth-container"></div>
-                    </div>
-                    <div id="saved-templates-content" style="display: none;">
-                        <h3>Your Saved Templates</h3>
-                        <div class="saved-templates-table-container">
-                            <table class="saved-templates-table">
-                                <thead>
-                                    <tr>
-                                        <th>Template Name</th>
-                                        <th>Date Saved</th>
-                                        <th>Last Loaded</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="saved-templates-list">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
     </main>
@@ -352,17 +321,6 @@
             <div class="simple-modal-actions">
                 <button id="custom-size-cancel-btn" class="btn-secondary">Cancel</button>
                 <button id="custom-size-apply-btn" class="btn-primary">Apply</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="save-template-modal" class="simple-modal-overlay" style="display: none;">
-        <div class="simple-modal-content">
-            <h3>Save Template</h3>
-            <input type="text" id="save-template-name-input" placeholder="Enter a name for your template" maxlength="50">
-            <div class="simple-modal-actions">
-                <button id="save-template-cancel-btn" class="btn-secondary">Cancel</button>
-                <button id="save-template-confirm-btn" class="btn-primary">Save</button>
             </div>
         </div>
     </div>
