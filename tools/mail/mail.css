@@ -1191,7 +1191,7 @@ input[type="range"]::-moz-range-thumb {
 .saved-templates-grid {
     display: grid;
     grid-template-columns: 1.5fr 1fr 1fr 180px;
-    gap: var(--spacing-4);
+    column-gap: var(--spacing-4);
     align-items: center;
 }
 
