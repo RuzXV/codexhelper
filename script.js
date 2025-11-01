@@ -916,6 +916,7 @@ window.loadUserData = (key) => {
 
 const DISCORD_CLIENT_ID = '1434105087722258573';
 const REDIRECT_URI = 'https://codexhelper.com/auth/callback';
+let authPopup = null;
 
 function initAuth(container) {
     const user = getLoggedInUser();
@@ -923,8 +924,23 @@ function initAuth(container) {
         renderLoggedInState(container, user);
     } else {
         renderLoggedOutState(container);
-        handleAuthCallback(); 
     }
+    
+    window.addEventListener('message', (event) => {
+        if (event.origin !== window.location.origin) {
+            return;
+        }
+
+        const { type, user, error } = event.data;
+        if (type === 'auth-success') {
+            localStorage.setItem('codexUser', JSON.stringify(user));
+            window.location.reload();
+        } else if (type === 'auth-error') {
+            console.error('Authentication error received from popup:', error);
+            const authContainer = document.getElementById('auth-container');
+            if(authContainer) renderLoggedOutState(authContainer);
+        }
+    });
 }
 
 function renderLoggedOutState(container) {
@@ -954,43 +970,32 @@ function renderLoggedInState(container, user) {
     container.querySelector('.logout-btn').addEventListener('click', logout);
 }
 
-function login() {
-    localStorage.setItem('loginRedirect', window.location.pathname + window.location.search);
-    
+function login(event) {
+    const loginButton = event.currentTarget;
+    loginButton.disabled = true;
+    loginButton.classList.add('is-loading');
+    loginButton.innerHTML = `
+        <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+        <span>Logging in...</span>
+    `;
+
     const scope = 'identify';
     const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
     
-    window.location.href = authUrl;
+    const width = 500, height = 700;
+    const left = (window.innerWidth / 2) - (width / 2);
+    const top = (window.innerHeight / 2) - (height / 2);
+    
+    authPopup = window.open(authUrl, 'DiscordAuth', `width=${width},height=${height},top=${top},left=${left}`);
+
+    if (!authPopup || authPopup.closed || typeof authPopup.closed === 'undefined') {
+        alert("Popup was blocked! Please allow popups for this site and try again.");
+        const authContainer = document.getElementById('auth-container');
+        if (authContainer) renderLoggedOutState(authContainer);
+    }
 }
 
 function logout() {
     localStorage.removeItem('codexUser');
-    const authContainer = document.getElementById('auth-container');
-    if (authContainer) {
-        renderLoggedOutState(authContainer);
-    }
     window.location.reload();
-}
-
-async function handleAuthCallback() {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-
-    if (code) {
-        console.log("Simulating token exchange with code:", code);
-        
-        const mockUserData = {
-            id: '123456789012345678',
-            username: 'ruzxv',
-            avatar: 'a_abcdef1234567890abcdef1234567890',
-            discriminator: '0' 
-        };
-
-        localStorage.setItem('codexUser', JSON.stringify(mockUserData));
-
-        const redirectPath = localStorage.getItem('loginRedirect') || '/tools/';
-        localStorage.removeItem('loginRedirect');
-        window.history.replaceState({}, document.title, redirectPath);
-        window.location.reload();
-    }
 }

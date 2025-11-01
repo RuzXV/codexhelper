@@ -1,10 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Authenticating...</title>
-    <script src="/script.js" defer></script>
+    <style>
+        body { background-color: #0c0c0f; color: #a1a7b7; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    </style>
 </head>
 <body>
     <p>Please wait while we log you in...</p>
+
+    <script>
+        window.onload = async () => {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            
+            const workerUrl = 'https://codex-discord-auth.ruzzxv.workers.dev';
+
+            if (code) {
+                try {
+                    const response = await fetch(workerUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code: code }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status: ${response.status}`);
+                    }
+                    
+                    const userData = await response.json();
+
+                    if (window.opener) {
+                        window.opener.postMessage({ type: 'auth-success', user: userData }, window.location.origin);
+                    }
+                } catch (error) {
+                    console.error('Error during authentication:', error);
+                    if (window.opener) {
+                        window.opener.postMessage({ type: 'auth-error', error: error.message }, window.location.origin);
+                    }
+                }
+            } else {
+                if (window.opener) {
+                    window.opener.postMessage({ type: 'auth-error', error: 'No code received from Discord.' }, window.location.origin);
+                }
+            }
+            window.close();
+        };
+    </script>
 </body>
 </html>
