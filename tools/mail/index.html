@@ -83,6 +83,7 @@
                 <div class="generator-tabs">
                     <button class="generator-tab-btn active" data-tab="generator">Mail Generator</button>
                     <button class="generator-tab-btn" data-tab="templates">Template Gallery</button>
+                    <button class="generator-tab-btn" data-tab="saved">Saved Templates</button>
                 </div>
     
                 <div id="generator-view" class="generator-view active">
@@ -206,10 +207,16 @@
                                     <button class="preview-tab-btn active" data-bg="mail">Mail Preview</button>
                                     <button class="preview-tab-btn" data-bg="board">Board Preview</button>
                                 </div>
-                                <button id="copy-btn" class="btn-primary">
-                                    <img src="/images/mail/tools_copy_icon.webp" alt="Copy Icon">
-                                    <span>Copy Code</span>
-                                </button>
+                                <div class="preview-actions">
+                                    <button id="save-btn" class="btn-secondary" title="Save Template">
+                                        <i class="fas fa-save"></i>
+                                        <span>Save</span>
+                                    </button>
+                                    <button id="copy-btn" class="btn-primary">
+                                        <img src="/images/mail/tools_copy_icon.webp" alt="Copy Icon">
+                                        <span>Copy Code</span>
+                                    </button>
+                                </div>
                             </div>
                             <div id="mail-preview-container" class="mail-preview-container mail-bg">
                                 <div id="mail-preview"></div>
@@ -259,6 +266,17 @@
                                 <img id="magnified-image" src="" alt="Magnified Template Preview">
                             </div>
                             <h4 id="magnified-title"></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="saved-templates-view" class="generator-view">
+                    <div id="saved-templates-content">
+                    </div>
+                    <div id="logged-out-overlay" style="display: none;">
+                        <div class="logged-out-message">
+                            <h3>You must be logged in to view and save templates.</h3>
+                            <div id="saved-templates-auth-container"></div>
                         </div>
                     </div>
                 </div>
@@ -321,6 +339,17 @@
             <div class="simple-modal-actions">
                 <button id="custom-size-cancel-btn" class="btn-secondary">Cancel</button>
                 <button id="custom-size-apply-btn" class="btn-primary">Apply</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="save-template-modal" class="simple-modal-overlay" style="display: none;">
+        <div class="simple-modal-content">
+            <h3>Save Template</h3>
+            <input type="text" id="save-template-name-input" placeholder="Enter a name for your template">
+            <div class="simple-modal-actions">
+                <button id="save-template-cancel-btn" class="btn-secondary">Cancel</button>
+                <button id="save-template-confirm-btn" class="btn-primary">Save</button>
             </div>
         </div>
     </div>

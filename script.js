@@ -999,3 +999,16 @@ function logout() {
     localStorage.removeItem('codexUser');
     window.location.reload();
 }
+
+function getAuthToken() {
+    try {
+        const user = localStorage.getItem('codexUser');
+        if (!user) return null;
+        
+        const userData = JSON.parse(user);
+        return userData.accessToken ? `Bearer ${userData.accessToken}` : null;
+    } catch (e) {
+        console.error("Failed to parse user data or get auth token from localStorage", e);
+        return null;
+    }
+}

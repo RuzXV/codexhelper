@@ -3,19 +3,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const mailPreview = document.getElementById('mail-preview');
     const copyBtn = document.getElementById('copy-btn');
     const previewContainer = document.getElementById('mail-preview-container');
-
     const undoBtn = document.getElementById('undo-btn');
     const clearBtn = document.getElementById('clear-btn');
     const boldBtn = document.getElementById('bold-btn');
     const italicBtn = document.getElementById('italic-btn');
     const boldItalicBtn = document.getElementById('bold-italic-btn');
-    
     const customSizeOptions = document.getElementById('custom-size-options');
     const customColorOptions = document.getElementById('custom-color-options');
     const customColorPickerContainer = document.getElementById('custom-color-picker-container');
     const customColorInput = document.getElementById('custom-color-input');
     const applyCustomColorBtn = document.getElementById('apply-custom-color-btn');
-
     const applyGradientBtn = document.getElementById('apply-gradient-btn');
     const gradientToggleBtn = document.getElementById('custom-gradient-toggle');
     const gradientBiasSlider = document.getElementById('gradient-bias-slider');
@@ -24,11 +21,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const gradientPreviewBar = document.getElementById('gradient-preview-bar');
     const gradientColor1 = document.getElementById('gradient-color-1');
     const gradientColor2 = document.getElementById('gradient-color-2');
+    const charCounter = document.getElementById('char-counter');
+    const customConfirmModal = document.getElementById('custom-confirm-modal');
+    const confirmActionBtn = document.getElementById('confirm-action-btn');
+    const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+    const customSizeModal = document.getElementById('custom-size-modal');
+    const customSizeInput = document.getElementById('custom-size-input');
+    const customSizeApplyBtn = document.getElementById('custom-size-apply-btn');
+    const customSizeCancelBtn = document.getElementById('custom-size-cancel-btn');
 
     const generatorTabBtn = document.querySelector('.generator-tab-btn[data-tab="generator"]');
     const templatesTabBtn = document.querySelector('.generator-tab-btn[data-tab="templates"]');
+    const savedTemplatesTabBtn = document.querySelector('.generator-tab-btn[data-tab="saved"]');
     const generatorView = document.getElementById('generator-view');
     const templatesView = document.getElementById('templates-view');
+    const savedTemplatesView = document.getElementById('saved-templates-view');
     const previewTabBtns = document.querySelectorAll('.preview-tab-btn');
 
     const templateGallery = document.getElementById('template-gallery');
@@ -37,39 +44,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterPanel = document.getElementById('filter-panel');
     const filterOptionsContainer = document.getElementById('filter-options');
     const filterResetBtn = document.getElementById('filter-reset-btn');
-
-    const charCounter = document.getElementById('char-counter');
-    let currentCharLimit = 2000;
-    const CACHE_KEY = 'mailGeneratorContent';
-
-    const magnifiedPreviewContainer = document.getElementById('magnified-preview-container');
     const magnifiedImage = document.getElementById('magnified-image');
-    const magnifiedPlaceholder = document.getElementById('magnified-placeholder');
     const magnifiedTitle = document.getElementById('magnified-title');
-    
-    const customConfirmModal = document.getElementById('custom-confirm-modal');
-    const confirmActionBtn = document.getElementById('confirm-action-btn');
-    const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+    const magnifiedPreviewContainer = document.getElementById('magnified-preview-container');
 
-    const customSizeModal = document.getElementById('custom-size-modal');
-    const customSizeInput = document.getElementById('custom-size-input');
-    const customSizeApplyBtn = document.getElementById('custom-size-apply-btn');
-    const customSizeCancelBtn = document.getElementById('custom-size-cancel-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const saveTemplateModal = document.getElementById('save-template-modal');
+    const saveTemplateNameInput = document.getElementById('save-template-name-input');
+    const saveTemplateConfirmBtn = document.getElementById('save-template-confirm-btn');
+    const saveTemplateCancelBtn = document.getElementById('save-template-cancel-btn');
+    const savedTemplatesContent = document.getElementById('saved-templates-content');
+    const loggedOutOverlay = document.getElementById('logged-out-overlay');
+    const savedTemplatesAuthContainer = document.getElementById('saved-templates-auth-container');
 
     let templates = [];
     let selectedTemplate = null;
     let hoveredTemplate = null;
     let isGalleryPopulated = false;
-
+    let currentCharLimit = 2000;
+    const CACHE_KEY = 'mailGeneratorContent';
     let isLivePreviewingGradient = false;
     let gradientSelection = { start: 0, end: 0 };
     let isLivePreviewingColor = false;
     let colorSelection = { start: 0, end: 0 };
-
     let historyStack = [];
     let historyIndex = -1;
     let inputTimeout = null;
+    const API_BASE_URL = 'https://api.codexhelper.com';
 
+    function escapeHtml(text) {
+        if (typeof text !== 'string') return '';
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+    
     if (gradientToggleBtn) {
         gradientToggleBtn.addEventListener('mousedown', function(e) {
             e.preventDefault();
@@ -124,11 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateUndoRedoButtons() {
         if(undoBtn) undoBtn.disabled = historyIndex <= 0;
-    }
-
-    const cachedData = window.loadUserData(CACHE_KEY);
-    if (mailInput && cachedData && cachedData.mailContent) {
-        mailInput.value = cachedData.mailContent;
     }
     
     function applyTag(tag, value = null) {
@@ -228,29 +235,10 @@ document.addEventListener('DOMContentLoaded', function() {
         mailPreview.innerHTML = parsedHtml.replace(/\n/g, '<br>');
     }
     
-    function escapeHtml(text) {
-      return text
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-    }
-    
     function parseGameTagsToHtml(text) {
         let html = '';
         const stack = [];
         let i = 0;
-    
-        const escapeHtml = (unsafe) => {
-            if (typeof unsafe !== 'string') return '';
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        };
     
         const knownTags = ['b', 'i', 'size', 'color'];
     
@@ -357,7 +345,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         return html;
     }
-
+    
     function closeAllDropdowns() {
         if (isLivePreviewingGradient || isLivePreviewingColor) {
             isLivePreviewingGradient = false;
@@ -367,75 +355,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.custom-dropdown-options.visible').forEach(d => d.classList.remove('visible'));
         if(customColorPickerContainer) customColorPickerContainer.style.display = 'none';
     }
-    
-    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-        const toggle = dropdown.querySelector('.toolbar-btn');
-        const options = dropdown.querySelector('.custom-dropdown-options');
-        if (toggle && options) {
-            toggle.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                const isVisible = options.classList.contains('visible');
-                closeAllDropdowns();
-                if (!isVisible) {
-                    options.classList.add('visible');
-                    const selectionStart = mailInput.selectionStart;
-                    const selectionEnd = mailInput.selectionEnd;
-                    const hasSelection = selectionStart !== selectionEnd;
 
-                    if (dropdown.id === 'custom-gradient-dropdown') {
-                        gradientSelection = { start: selectionStart, end: selectionEnd };
-                        isLivePreviewingGradient = hasSelection;
-                        updateGradientUI();
-                    }
-                    if (dropdown.id === 'custom-color-dropdown') {
-                        colorSelection = { start: selectionStart, end: selectionEnd };
-                        isLivePreviewingColor = hasSelection;
-                    }
-                }
-            });
+    function applyCustomSize() {
+        if(!customSizeInput) return;
+        const customSize = customSizeInput.value;
+        if (customSize && !isNaN(customSize) && customSize > 0) {
+            applyTag('size', customSize);
         }
-    });
-
-    if(customColorOptions) {
-        customColorOptions.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            const target = e.target.closest('.custom-option');
-            if (!target) return;
-            
-            const value = target.dataset.value;
-            
-            if (value === 'custom-toggle') {
-                customColorPickerContainer.style.display = customColorPickerContainer.style.display === 'flex' ? 'none' : 'flex';
-            } else {
-                applyTag('color', value);
-                closeAllDropdowns();
-            }
-        });
-    }
-
-    function livePreviewColor(color) {
-        if (!isLivePreviewingColor) return;
-        
-        const fullText = mailInput.value;
-        const preSelection = fullText.substring(0, colorSelection.start);
-        const postSelection = fullText.substring(colorSelection.end);
-        
-        let selectedText = fullText.substring(colorSelection.start, colorSelection.end);
-        const anyOpeningTagRegex = /<color=[^>]+>/gi;
-        const anyClosingTagRegex = /<\/color>/gi;
-        selectedText = selectedText.replace(anyOpeningTagRegex, '').replace(anyClosingTagRegex, '');
-
-        const coloredText = `<color=${color}>${selectedText}</color>`;
-        updatePreview(preSelection + coloredText + postSelection);
-    }
-    
-    if(customColorInput) customColorInput.addEventListener('input', () => livePreviewColor(customColorInput.value));
-    
-    if(applyCustomColorBtn) {
-        applyCustomColorBtn.addEventListener('click', () => {
-            applyTag('color', customColorInput.value);
-            closeAllDropdowns();
-        });
+        if(customSizeModal) customSizeModal.style.display = 'none';
     }
 
     function applyGradient() {
@@ -527,6 +454,43 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             gradientCharCounter.textContent = `+0 chars`;
+        }
+    }
+
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : { r: 255, g: 255, b: 255 };
+    }
+
+    function componentToHex(c) {
+        const hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
+    }
+
+    function rgbToHex(r, g, b) {
+        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    }
+
+    function switchView(tabName) {
+        const views = {
+            generator: generatorView,
+            templates: templatesView,
+            saved: savedTemplatesView
+        };
+        const tabs = {
+            generator: generatorTabBtn,
+            templates: templatesTabBtn,
+            saved: savedTemplatesTabBtn
+        };
+
+        for (const key in views) {
+            const isActive = key === tabName;
+            if (views[key]) views[key].classList.toggle('active', isActive);
+            if (tabs[key]) tabs[key].classList.toggle('active', isActive);
+        }
+
+        if (tabName === 'saved') {
+            renderSavedTemplatesView();
         }
     }
 
@@ -667,28 +631,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : { r: 255, g: 255, b: 255 };
-    }
-
-    function componentToHex(c) {
-        const hex = c.toString(16);
-        return hex.length == 1 ? "0" + hex : hex;
-    }
-
-    function rgbToHex(r, g, b) {
-        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-    }
-
-    function switchView(tabName) {
-        if (!generatorView || !templatesView || !generatorTabBtn || !templatesTabBtn) return;
-        generatorView.classList.toggle('active', tabName === 'generator');
-        templatesView.classList.toggle('active', tabName === 'templates');
-        generatorTabBtn.classList.toggle('active', tabName === 'generator');
-        templatesTabBtn.classList.toggle('active', tabName === 'templates');
-    }
-    
     function updateMagnifiedPreview() {
         if(!magnifiedImage || !magnifiedTitle || !magnifiedPreviewContainer) return;
         const templateToShow = hoveredTemplate || selectedTemplate;
@@ -703,14 +645,204 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if(undoBtn) undoBtn.addEventListener('click', undo);
+    async function fetchWithAuth(endpoint, options = {}) {
+        const token = getAuthToken();
+        if (!token) {
+            throw new Error('User not authenticated');
+        }
+
+        const headers = {
+            ...options.headers,
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        };
+
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem('codexUser');
+                renderSavedTemplatesView(); 
+            }
+            const errorData = await response.json().catch(() => ({ message: 'An unknown API error occurred.' }));
+            throw new Error(errorData.message || `API request failed with status ${response.status}`);
+        }
+        return response.json();
+    }
+
+    async function renderSavedTemplatesView() {
+        const user = getLoggedInUser();
+
+        if (user && getAuthToken()) {
+            loggedOutOverlay.style.display = 'none';
+            savedTemplatesContent.innerHTML = `<p>Loading your templates...</p>`;
+            try {
+                const templates = await fetchWithAuth('/api/templates');
+                populateSavedTemplatesTable(templates);
+            } catch (error) {
+                console.error('Failed to fetch saved templates:', error);
+                savedTemplatesContent.innerHTML = `<p class="error-message">Could not load your templates. Please try logging in again.</p>`;
+            }
+        } else {
+            savedTemplatesContent.innerHTML = '';
+            loggedOutOverlay.style.display = 'flex';
+            if (savedTemplatesAuthContainer && !savedTemplatesAuthContainer.hasChildNodes()) {
+                initAuth(savedTemplatesAuthContainer);
+            }
+        }
+    }
+
+    function populateSavedTemplatesTable(templates) {
+        if (templates.length === 0) {
+            savedTemplatesContent.innerHTML = `<p>You have no saved templates. Use the "Save" button in the generator to add one!</p>`;
+            return;
+        }
+
+        let tableHtml = `
+            <div class="saved-templates-grid">
+                <div class="grid-header">Template Name</div>
+                <div class="grid-header">Date Saved</div>
+                <div class="grid-header">Last Loaded</div>
+                <div class="grid-header"></div>
+        `;
+
+        templates.forEach(t => {
+            tableHtml += `
+                <div class="grid-row" data-template-id="${t.template_id}">
+                    <div class="template-name">${escapeHtml(t.template_name)}</div>
+                    <div class="template-date grid-date-saved">${new Date(t.date_saved * 1000).toLocaleDateString()}</div>
+                    <div class="template-date grid-last-loaded">${t.last_loaded ? new Date(t.last_loaded * 1000).toLocaleString() : 'Never'}</div>
+                    <div class="template-actions">
+                        <button class="btn-secondary copy-saved-btn" title="Copy Code"><i class="fas fa-copy"></i></button>
+                        <button class="btn-primary load-saved-btn" title="Load into Editor"><i class="fas fa-edit"></i></button>
+                        <button class="btn-danger delete-saved-btn" title="Delete Template"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+
+        tableHtml += '</div>';
+        savedTemplatesContent.innerHTML = tableHtml;
+
+        document.querySelectorAll('.copy-saved-btn').forEach(btn => btn.addEventListener('click', handleCopySavedTemplate));
+        document.querySelectorAll('.load-saved-btn').forEach(btn => btn.addEventListener('click', handleLoadSavedTemplate));
+        document.querySelectorAll('.delete-saved-btn').forEach(btn => btn.addEventListener('click', handleDeleteSavedTemplate));
+    }
     
+    async function handleCopySavedTemplate(e) {
+        const row = e.target.closest('.grid-row');
+        const templateId = row.dataset.templateId;
+        const button = e.target.closest('button');
+        const originalIcon = button.innerHTML;
+
+        try {
+            const templates = await fetchWithAuth('/api/templates');
+            const template = templates.find(t => t.template_id == templateId);
+            if (template) {
+                await navigator.clipboard.writeText(template.content);
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => button.innerHTML = originalIcon, 2000);
+            }
+        } catch (error) {
+            console.error('Failed to copy template:', error);
+            button.innerHTML = '<i class="fas fa-times"></i>';
+            setTimeout(() => button.innerHTML = originalIcon, 2000);
+        }
+    }
+
+    async function handleLoadSavedTemplate(e) {
+        const row = e.target.closest('.grid-row');
+        const templateId = row.dataset.templateId;
+
+        try {
+            const templates = await fetchWithAuth('/api/templates');
+            const template = templates.find(t => t.template_id == templateId);
+            if (template) {
+                mailInput.value = template.content;
+                updatePreview();
+                saveState();
+                switchView('generator');
+                await fetchWithAuth(`/api/templates/${templateId}/load`, { method: 'PUT' });
+            }
+        } catch (error) {
+            console.error('Failed to load template:', error);
+            alert('Could not load the template.');
+        }
+    }
+
+    async function handleDeleteSavedTemplate(e) {
+        const row = e.target.closest('.grid-row');
+        const templateId = row.dataset.templateId;
+        const templateName = row.querySelector('.template-name').textContent;
+
+        if (confirm(`Are you sure you want to delete the template "${templateName}"? This cannot be undone.`)) {
+            try {
+                await fetchWithAuth(`/api/templates/${templateId}`, { method: 'DELETE' });
+                renderSavedTemplatesView();
+            } catch (error) {
+                console.error('Failed to delete template:', error);
+                alert('Could not delete the template.');
+            }
+        }
+    }
+    
+    async function handleSaveTemplate() {
+        const name = saveTemplateNameInput.value.trim();
+        const content = mailInput.value;
+        const charCount = content.length + (content.match(/\n/g) || []).length;
+
+        if (!name) {
+            alert('Please enter a name for your template.');
+            return;
+        }
+
+        const button = saveTemplateConfirmBtn;
+        button.disabled = true;
+        button.textContent = 'Saving...';
+
+        try {
+            await fetchWithAuth('/api/templates', {
+                method: 'POST',
+                body: JSON.stringify({
+                    template_name: name,
+                    content: content,
+                    char_count: charCount
+                })
+            });
+            saveTemplateModal.style.display = 'none';
+            switchView('saved');
+        } catch (error) {
+            console.error('Failed to save template:', error);
+            alert(`Could not save template: ${error.message}`);
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Save';
+        }
+    }
+
+    const cachedData = window.loadUserData(CACHE_KEY);
+    if (mailInput && cachedData && cachedData.mailContent) {
+        mailInput.value = cachedData.mailContent;
+    }
+
+    if(undoBtn) undoBtn.addEventListener('click', undo);
     if(clearBtn) {
         clearBtn.addEventListener('click', () => {
             if(customConfirmModal) customConfirmModal.style.display = 'flex';
         });
     }
-    
+    if(mailInput) {
+        mailInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); } 
+            else if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
+        });
+        mailInput.addEventListener('input', () => {
+            clearTimeout(inputTimeout);
+            inputTimeout = setTimeout(() => saveState(), 500);
+            updatePreview();
+        });
+    }
+
     if(confirmActionBtn) {
         confirmActionBtn.addEventListener('click', () => {
             saveState();
@@ -720,33 +852,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if(customConfirmModal) customConfirmModal.style.display = 'none';
         });
     }
-    
     if(confirmCancelBtn) {
         confirmCancelBtn.addEventListener('click', () => {
             if(customConfirmModal) customConfirmModal.style.display = 'none';
         });
     }
-
-    if(mailInput) {
-        mailInput.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'z') {
-                e.preventDefault();
-                undo();
-            } else if (e.ctrlKey && e.key === 'y') {
-                e.preventDefault();
-                redo();
-            }
-        });
-        
-        mailInput.addEventListener('input', () => {
-            clearTimeout(inputTimeout);
-            inputTimeout = setTimeout(() => saveState(), 500);
-            updatePreview();
-        });
-    }
-
+    
     if(generatorTabBtn) generatorTabBtn.addEventListener('click', () => switchView('generator'));
     if(templatesTabBtn) templatesTabBtn.addEventListener('click', () => switchView('templates'));
+    if(savedTemplatesTabBtn) savedTemplatesTabBtn.addEventListener('click', () => switchView('saved'));
 
     if(previewTabBtns) {
         previewTabBtns.forEach(btn => {
@@ -762,7 +876,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-
+    
     function addFormattingListener(button, callback) {
         if(button) {
             button.addEventListener('mousedown', (e) => {
@@ -775,60 +889,87 @@ document.addEventListener('DOMContentLoaded', function() {
     addFormattingListener(boldBtn, () => applyTag('b'));
     addFormattingListener(italicBtn, () => applyTag('i'));
     addFormattingListener(boldItalicBtn, () => applyDoubleTag('b', 'i'));
+    addFormattingListener(applyGradientBtn, applyGradient);
+
+    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+        const toggle = dropdown.querySelector('.toolbar-btn');
+        const options = dropdown.querySelector('.custom-dropdown-options');
+        if (toggle && options) {
+            toggle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                const isVisible = options.classList.contains('visible');
+                closeAllDropdowns();
+                if (!isVisible) {
+                    options.classList.add('visible');
+                    const selectionStart = mailInput.selectionStart;
+                    const selectionEnd = mailInput.selectionEnd;
+                    const hasSelection = selectionStart !== selectionEnd;
+
+                    if (dropdown.id === 'custom-gradient-dropdown') {
+                        gradientSelection = { start: selectionStart, end: selectionEnd };
+                        isLivePreviewingGradient = hasSelection;
+                        updateGradientUI();
+                    }
+                    if (dropdown.id === 'custom-color-dropdown') {
+                        colorSelection = { start: selectionStart, end: selectionEnd };
+                        isLivePreviewingColor = hasSelection;
+                    }
+                }
+            });
+        }
+    });
 
     if (customSizeOptions) {
         customSizeOptions.addEventListener('mousedown', (e) => {
             e.preventDefault();
             const target = e.target.closest('.custom-option');
             if (!target) return;
-            
             const value = target.dataset.value;
             if (value === 'custom') {
                 if(customSizeModal) customSizeModal.style.display = 'flex';
-                if(customSizeInput) customSizeInput.focus();
-                if(customSizeInput) customSizeInput.value = '';
+                if(customSizeInput) { customSizeInput.focus(); customSizeInput.value = ''; }
             } else {
                 applyTag('size', value);
             }
             closeAllDropdowns();
         });
     }
-
-    function applyCustomSize() {
-        if(!customSizeInput) return;
-        const customSize = customSizeInput.value;
-        if (customSize && !isNaN(customSize) && customSize > 0) {
-            applyTag('size', customSize);
-        }
-        if(customSizeModal) customSizeModal.style.display = 'none';
-    }
-
     if(customSizeApplyBtn) customSizeApplyBtn.addEventListener('click', applyCustomSize);
-    if(customSizeCancelBtn) {
-        customSizeCancelBtn.addEventListener('click', () => {
-            if(customSizeModal) customSizeModal.style.display = 'none';
-        });
-    }
-    if(customSizeModal) {
-        customSizeModal.addEventListener('click', (e) => {
-            if (e.target === customSizeModal) {
-                customSizeModal.style.display = 'none';
-            }
-        });
-    }
+    if(customSizeCancelBtn) customSizeCancelBtn.addEventListener('click', () => { if(customSizeModal) customSizeModal.style.display = 'none'; });
+    if(customSizeModal) customSizeModal.addEventListener('click', (e) => { if (e.target === customSizeModal) customSizeModal.style.display = 'none'; });
     if(customSizeInput) {
         customSizeInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                applyCustomSize();
-            } else if (e.key === 'Escape') {
-                if(customSizeModal) customSizeModal.style.display = 'none';
-            }
+            if (e.key === 'Enter') { e.preventDefault(); applyCustomSize(); } 
+            else if (e.key === 'Escape') { if(customSizeModal) customSizeModal.style.display = 'none'; }
         });
     }
 
-    addFormattingListener(applyGradientBtn, applyGradient);
-    
+    if(customColorOptions) {
+        customColorOptions.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('.custom-option');
+            if (!target) return;
+            const value = target.dataset.value;
+            if (value === 'custom-toggle') {
+                customColorPickerContainer.style.display = customColorPickerContainer.style.display === 'flex' ? 'none' : 'flex';
+            } else {
+                applyTag('color', value);
+                closeAllDropdowns();
+            }
+        });
+    }
+    function livePreviewColor(color) {
+        if (!isLivePreviewingColor) return;
+        const fullText = mailInput.value;
+        const preSelection = fullText.substring(0, colorSelection.start);
+        const postSelection = fullText.substring(colorSelection.end);
+        let selectedText = fullText.substring(colorSelection.start, colorSelection.end).replace(/<color=[^>]+>/gi, '').replace(/<\/color>/gi, '');
+        const coloredText = `<color=${color}>${selectedText}</color>`;
+        updatePreview(preSelection + coloredText + postSelection);
+    }
+    if(customColorInput) customColorInput.addEventListener('input', () => livePreviewColor(customColorInput.value));
+    if(applyCustomColorBtn) applyCustomColorBtn.addEventListener('click', () => { applyTag('color', customColorInput.value); closeAllDropdowns(); });
+
     if(gradientColor1) gradientColor1.addEventListener('input', updateGradientUI);
     if(gradientColor2) gradientColor2.addEventListener('input', updateGradientUI);
     if(gradientBiasSlider) gradientBiasSlider.addEventListener('input', updateGradientUI);
@@ -838,17 +979,13 @@ document.addEventListener('DOMContentLoaded', function() {
         copyBtn.addEventListener('click', () => {
             const copyBtnText = copyBtn.querySelector('span');
             if (!copyBtnText || !mailInput) return;
-        
             navigator.clipboard.writeText(mailInput.value).then(() => {
                 const originalText = copyBtnText.textContent;
                 copyBtnText.textContent = 'Copied!';
-                setTimeout(() => { 
-                    copyBtnText.textContent = originalText; 
-                }, 2000);
+                setTimeout(() => { copyBtnText.textContent = originalText; }, 2000);
             });
         });
     }
-    
     if(loadTemplateBtn) {
         loadTemplateBtn.addEventListener('click', () => {
             if (selectedTemplate) {
@@ -861,6 +998,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            if (!getLoggedInUser()) {
+                alert('You must be logged in with Discord to save templates.');
+                return;
+            }
+            saveTemplateNameInput.value = '';
+            saveTemplateModal.style.display = 'flex';
+            saveTemplateNameInput.focus();
+        });
+    }
+    if (saveTemplateConfirmBtn) saveTemplateConfirmBtn.addEventListener('click', handleSaveTemplate);
+    if (saveTemplateCancelBtn) saveTemplateCancelBtn.addEventListener('click', () => saveTemplateModal.style.display = 'none');
+
 
     if(filterToggleBtn) {
         filterToggleBtn.addEventListener('click', (e) => {
@@ -868,16 +1019,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if(filterPanel) filterPanel.classList.toggle('visible');
         });
     }
-
     if(filterResetBtn) {
         filterResetBtn.addEventListener('click', () => {
-            if(filterOptionsContainer) {
-                filterOptionsContainer.querySelectorAll('input:checked').forEach(i => i.checked = false);
-            }
+            if(filterOptionsContainer) filterOptionsContainer.querySelectorAll('input:checked').forEach(i => i.checked = false);
             renderTemplates();
         });
     }
-
     if (templateGallery) {
         templateGallery.addEventListener('mouseover', (e) => {
             const item = e.target.closest('.template-item');
@@ -887,7 +1034,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateMagnifiedPreview();
             }
         });
-        
         templateGallery.addEventListener('mouseleave', () => {
             hoveredTemplate = null;
             updateMagnifiedPreview();
@@ -899,7 +1045,6 @@ document.addEventListener('DOMContentLoaded', function() {
             closeAllDropdowns();
         }
     });
-
     document.addEventListener('click', (e) => {
         if (filterPanel && filterToggleBtn && !filterPanel.contains(e.target) && !filterToggleBtn.contains(e.target)) {
             filterPanel.classList.remove('visible');
@@ -908,9 +1053,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updatePreview();
     setupTemplatesAndFilters();
-    if(mailInput) {
-        saveState();
-    }
+    if(mailInput) saveState();
     updateUndoRedoButtons();
     updateGradientUI();
 });
