@@ -1232,6 +1232,7 @@ input[type="range"]::-moz-range-thumb {
     gap: var(--spacing-3);
     justify-content: center;
     width: 100%;
+    align-items: center;
 }
 
 .template-actions .btn-secondary {
