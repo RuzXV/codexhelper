@@ -1,0 +1,62 @@
+---
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+import '../styles/styles.css';
+
+import metaImage from '../assets/images/global/logo_meta.webp';
+import appleTouchIcon from '../assets/images/favicon/apple-touch-icon.png';
+import favicon32 from '../assets/images/favicon/favicon-32x32.png';
+import favicon16 from '../assets/images/favicon/favicon-16x16.png';
+import manifest from '../assets/images/favicon/site.webmanifest';
+
+const { 
+    title, 
+    description = "ROK information done right. Enhance your Rise of Kingdoms experience on Discord today.", 
+    bodyClass = "" 
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{title} - Codex Helper</title>
+    <meta name="description" content={description}>
+
+    <meta property="og:title" content={`${title} - Codex Helper`}>
+    <meta property="og:description" content={description}>
+    <meta property="og:image" content={new URL(metaImage.src, Astro.url)}>
+    <meta property="og:url" content={Astro.url.href}>
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#3b82f6">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src}>
+    <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src}>
+    <link rel="icon" type="image/png" sizes="16x16" href={favicon16.src}>
+    <link rel="manifest" href={manifest}>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-156DRH9ZB0"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-156DRH9ZB0');
+    </script>
+    
+    <slot name="head-scripts" />
+</head>
+<body class={bodyClass}>
+    <Navbar />
+
+    <slot />
+
+    <Footer />
+    
+    <script>import "../scripts/script.js";</script>
+    <slot name="body-scripts" />
+</body>
+</html>

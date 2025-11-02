@@ -1,0 +1,674 @@
+[
+    {
+        "title": "Alliance Mobilization v2",
+        "image": "/images/mail/template_previews/Alliance_Mobilization_v2_simple.webp",
+        "content": "<b><size=50>- ALLIANCE MOBILIZATION -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b>Alliance Mobilization is here!</b>\nWe're currently in the <b>registration phase</b> and need <b>everyone registered</b> to secure top rewards.\n\n<b><color=#1E90FF>POINT REQUIREMENTS</color></b>\n◆ <b>1600 points minimum</b> for all accounts\n◆ <b>Failure to reach the minimum</b> will result in removal during the reward phase\n\n<b><color=#1E90FF>Pro Tips</color></b>\n◆ Many <b>AM quests overlap</b> with <b>Bastion quests</b> plan ahead to double your progress.\n◆ Combine AM with ongoing events like <b>MTG</b> to maximize rewards efficiently.\n◆ Knock out quick, achievable quests first to keep momentum strong.\n\n<b><color=#1E90FF>Reminder</color></b>\nKvK is ending soon! If you're outside ALLIANCE, you'll <b>miss KvK rewards</b>.\n\nStay inside, stay active, and get your AM points done, it's free progress for you and the team.\n\n<b>Let's finish strong, stay coordinated, and show what XXXX is made of.</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Alliance Mobilization",
+        "image": "/images/mail/template_previews/Alliance_Mobilization_Simple.webp",
+        "content": "<b><size=50>- ALLIANCE MOBILIZATION -</size></b>\n\n<b>Hi Warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\n<b>Time to shine!</b>\nLet's make this Alliance Mobilization one of our strongest yet. Here's what's expected of everyone:\n\n<color=#1E90FF><b>Requirements</b></color>\n◆ Every member must score a minimum of <b>1100 points</b>.\n◆ Aim for <b>1500+</b> to help boost alliance rewards and personal gains.\n◆ Quests will be rotated frequently — <b>stay active and grab them fast!</b>\n\n<color=#1E90FF><b>Pro Tips</b></color>\n◆ <b>Focus on gold quests:</b> Highest points for less effort.\n◆ <b>Choose smart:</b> Complete quick and achievable quests first.\n◆ <b>Combine progress:</b> Work on overlapping goals like training, gathering, or building.\n\nThe faster we clear tasks, the better rewards for all. Stay alert and coordinate with your teammates to keep quests flowing.\n\n<b>Push hard, finish strong, and let's keep XXXX at the top!</b>\n",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Anti-Cheating DKP",
+        "image": "/images/mail/template_previews/Anti-Cheating-DKP_Simple.webp",
+        "content": "<b><size=65>- NO DKP CHEATING -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b><size=35>ZERO TOLERANCE POLICY</size></b>\n\nAt this stage of the game, <b>no one should have to be told this</b>.\n<b>DKP cheating</b> is not only dishonorable, it's shameful. It disrespects your teammates, wastes leadership time, and undermines the integrity of everything we've built.\n\n<color=#1E90FF><b>What Counts as Cheating</b></color>\n◆ <b>Feeding yourself with farms or alts</b> to inflate dead counts\n◆ <b>Pushing fake deaths</b> not tied to real war participation\n◆ <b>Feeding outside of MGE</b> without being an officially ranked and approved player\n<b>Feeding is ONLY allowed during MGE</b> and ONLY if you are listed and verified by Council. Anything outside of that is considered <b>cheating, plain and simple.</b>\n\n<color=#1E90FF><b>Accountability</b></color>\nEvery <b>kill, death, and stat change</b> is tracked through DKP and kill logs.\n<b>You will be caught.</b> The data doesn't lie.\n\n<color=#1E90FF><b>Consequences if Caught</b></color>\n◆ <b>Immediate DKP reset</b> and loss of all earned credit\n◆ <b>Eviction or zeroing</b> at Council discretion\n◆ <b>Permanent ban</b> from all future MGE rankings or events\n\nIf you're inflating stats instead of fighting real battles, you're not part of the team effort.\n\nWe don't cheat our way to victory — <b>we earn it.</b> Every Warrior in XXXX is expected to uphold that standard with pride.",
+        "tags": ["format:Simple", "type:Kingdom Management", "type:Event"]
+    },
+    {
+        "title": "Armament Guide",
+        "image": "/images/mail/template_previews/Armament_Guide_Simple.webp",
+        "content": "<b><size=65>- ARMAMENTS GUIDE -</size></b>\n\n<b>Hi Warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\n<color=#1E90FF><b>What Are Armaments?</b></color>\nArmaments are formation-specific gear for your <b>primary commander</b>. Each march can equip <b>4 pieces</b> that match the formation type. They add stats like <b>%Attack, %Defense,</b> and <b>%Health</b>.\n\n<color=#1E90FF><b>Attributes & Tiers</b></color>\nArmaments come in 3 tiers: <b>Elite, Epic, Legendary.</b>\nHigher tiers roll stronger attributes.\nLegendary stats range roughly from <b>1.5%–3.5%</b> depending on type.\nEach piece has <b>3 unique attribute lines</b> — duplicate stat lines don't appear.\n\n<color=#1E90FF><b>Inscriptions</b></color>\nArmaments can include <b>inscriptions</b>, giving extra buffs.\n<b>Epic</b> armaments can have 1 inscription, <b>Legendary</b> up to 2.\nInscriptions can be <b>Common, Rare,</b> or <b>Special,</b> and their chances vary by tier.\n\n<color=#1E90FF><b>How to Obtain</b></color>  \nEarn armaments from <b>Travel & Dispatch</b>, <b>Recycling,</b> or bundles.\nYou can re-roll attributes using the <b>Transmutation</b> system.\n\n<color=#1E90FF><b>Tips</b></color>\n• Focus on stats for your main troop type (Infantry, Cavalry, Archers).\n• Fill all 4 slots first, then improve stats over time.\n• Rally and garrison players should aim for high rolls and inscriptions.\n• Don't worry about perfection early — build balance before optimization.\n\n<b>Stay patient, plan upgrades wisely, and your formations will grow stronger every day!</b>",
+        "tags": ["format:Simple", "type:Armaments", "type:Guide"]
+    },
+    {
+        "title": "Banner | Kingdom Fancy",
+        "image": "/images/mail/template_previews/Banner_Kingdom_Fancy.webp",
+        "content": "<b>╔─━━━━━━━━━━━━░<color=#f44336>★</color>░━━━━━━━━━━━━━━─╗\n\n\n                           <size=50px><color=#0d47a1>KINGDOM</color><color=#e60000>=͟͟͞♡</color><color=#388e3c>XXXX</color></size>\n\n\n╚─━━━━━━━━━━━━░<color=#673ab7>★</color>░━━━━━━━━━━━━━━─╝</b>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Barbarian Forts",
+        "image": "/images/mail/template_previews/Barbarian_Forts_Simple.webp",
+        "content": "<b><size=90>-BARB FORTS-</size></b>\n\n<b><size=40>Hey Warriors,</size></b>\n\nSuuuuper proud of yall! You guys are doing so good on the forts! Here is a reminder of why Barb Forts are your <b>bread and butter in offseason</b>. Don't sleep on them! they're one of the <b>highest ROI (Return on investment) activities</b> you can grind right now.\n\nHere's what you're gaining by doing forts consistently:\n• <b>Speedups</b> – Universals, and healing\n• <b>Books of Covenant</b> – Great for credit Exchange.\n• <b>XP Tomes</b> – Level up commanders faster\n• <b>Resources</b> – Food, wood, stone, and gold\n\n<b><size=30>The Biggest ROI is the Alliance Chests! We are aiming for 3/3 in one full day! </size></b> \n\n<b>REMEMBER our Offseason mission: it is NOT downtime</b>- it's your prep season. Do your part. Help your team. Get your rewards, and get ready for KVK!\n\n<b>EVERYONE MUST MEET THE 100 Forts/Week minimum! Top fort runner will get HUGE rewards! </b>",
+        "tags": ["format:Simple", "type:Barbarian Forts"]
+    },
+    {
+        "title": "City Hall Guide",
+        "image": "/images/mail/template_previews/City_Hall_Guide_Simple.webp",
+        "content": "<b><size=65>- CITY HALL GUIDE -</size></b>\n\n<b>Hi warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\n<b>Use this quick reference to plan your City Hall upgrades efficiently and reach CH25 as smoothly as possible.</b>\n\n<color=#1E90FF><b>Lv2</b></color>  Lumber mill, archery, scout camp\n<color=#1E90FF><b>Lv3</b></color>  Wall lv2*\n<color=#1E90FF><b>Lv4</b></color>  Wall lv3*\n<color=#1E90FF><b>Lv5</b></color>  Hospital lv4, wall*\n<color=#1E90FF><b>Lv6</b></color>  Quarry lv5, tavern lv5, wall, scout lv5*\n<color=#1E90FF><b>Lv7</b></color>  Quarry, tavern, wall, storehouse*\n<color=#1E90FF><b>Lv8</b></color>  Quarry, tavern, wall, farm lv7, barracks lv7*\n<color=#1E90FF><b>Lv9</b></color>  Quarry, tavern, wall, alliance center lv8*\n<color=#1E90FF><b>Lv10</b></color> Quarry, tavern, wall, academy lv9*\n<color=#1E90FF><b>Lv11</b></color> Quarry, tavern, wall, quarry lv10, stable lv10, hospital lv10*\n<color=#1E90FF><b>Lv12</b></color> Quarry, tavern, wall, storehouse lv11*\n<color=#1E90FF><b>Lv13</b></color> Quarry, tavern, wall, lumber mill lv12, archery lv12*\n<color=#1E90FF><b>Lv14</b></color> Quarry, tavern, wall, alliance center lv13, goldmine lv13, trading post*\n<color=#1E90FF><b>Lv15–25</b></color> Continue upgrading all prior buildings, focusing on academy, alliance center, and resource structures to meet CH requirements.\n\n<b>Stay consistent and plan your upgrades ahead to avoid delays in progression!</b>",
+        "tags": ["format:Simple", "type:Guide", "type:Early Game"]
+    },
+    {
+        "title": "Farming Rules",
+        "image": "/images/mail/template_previews/Farming_Rules_Simple.webp",
+        "content": "<b><size=50>-FARMING RULES REMINDER-</size></b>\n\n<b><size=35>Hey Warriors,</size></b>\n\n<b><color=#000000>◆ NODE ETIQUETTE ◆</color></b>\nIf you see someone heading toward a node, <b>DO NOT race them.</b> Find another one — it's that simple.\n\n<b><color=#000000>◆ FFA GEM CLARIFICATION ◆</color></b>\n<b>FFA Gems</b> means you can farm on any alliance territory, but <b>do not take a node someone is already heading to.</b> Respect movement, respect each other.\n\n<b><color=#000000>◆ WHY THESE RULES EXIST ◆</color></b>\nThese rules protect <b>you</b> and <b>your alliance</b>. Proper farming boosts resource flow and keeps our system balanced. Respect it, and we all win.\n\n<b><color=#000000>◆ REPORTING ISSUES ◆</color></b>\nIf someone repeatedly takes nodes you're already marching to, report it to <i>Internal Affairs</i>.\nWe'll handle it privately and properly before it escalates to <b>muting by Lilith.</b>\nWe have <b>zero tolerance</b> for disrespect — let's keep our kingdom fair and peaceful.\n\n<b><color=#000000>◆ GET PUMPED ◆</color></b>\nPre-KvK is right around the corner. <b>Stay focused, stay ready, and keep farming smart.</b>\n\n<b><color=#1E90FF>Happy farming, Warriors!</color></b>",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Guardian Schedule",
+        "image": "/images/mail/template_previews/Guardian_Schedule_Simple.webp",
+        "content": "<b><size=65>- GUARDIANS -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b>Guardian times and locations are listed below. Please use this updated schedule for accurate timing and participation.</b>\n\n<color=#1E90FF><b>Guardian Rotation</b></color>\n<b>LT Crusader (000 000)</b> — 00:15 / 12:15 UTC  \n<b>RCF (000 000)</b> — 00:45 / 12:45 UTC\n<b>LT Crusader (000 000)</b> — 01:15 / 13:15 UTC\n<b>Crusader (000 000)</b> — 01:45 / 13:45 UTC\n<b>Crusader (000 000)</b> — 02:15 / 14:15 UTC  ",
+        "tags": ["format:Simple", "type:Kingdom Management", "type:KVK"]
+    },
+    {
+        "title": "King of the Tribes",
+        "image": "/images/mail/template_previews/King_of_the_Tribes_Simple.webp",
+        "content": "<b><size=65>- KING OF THE TRIBES -</size></b>\n\n<b>Hi Warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\n<b>King of the Tribes has arrived, it's Fort time!</b>\nKeep those <b>rallies</b> running, calibrate your <b>AP</b>, and <b>grab a Rune</b> for extra power heading into Pre-KvK.\n\n<color=#1E90FF><b>How to Earn More Points</b></color>\nPoints come from both the <b>number of players in rallies</b> and the <b>level of the forts</b>.\n<b>More people in the rally + higher fort level = more points!</b>\n\n<b>Tips for Maximum Efficiency</b>\n• Use small marches (50k–80k troops)\n• Teleport near clusters of rally leaders\n• Do not use siege units\n• Join every fort rally you can\n\n<color=#1E90FF><b>Reminder</b></color>\nThe more active we are, the stronger we finish. Stay alert, keep rallies filled, and help secure that top spot for XXXX.\n\n<b>We're the leading alliance in the kingdom, let's keep our place and show what we're made of!</b>  \n\n<b>We got this, Warriors!</b>  ",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Kingdom Rules",
+        "image": "/images/mail/template_previews/Kingdom_Rules_Simple.webp",
+        "content": "<b><size=45>- WELCOME TO KINGDOM XXXX -</size></b>\n\n<b>Hi Warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\n<b>Welcome to Kingdom XXXX!</b>\nHere's everything you need to know to start strong and stay aligned.\n\n<color=#1E90FF><b>READ YOUR MAILS</b></color>\nAll updates, event info, and rules are posted through Council mails, don't skip them!\n\n<color=#1E90FF><b>Kingdom Titles</b></color>\nTo request a title, visit the <b>Lost Temple</b> and register for a time.\nTitles start with <b>1-minute use</b>. No “Done” message is needed after completion.\n\n<color=#1E90FF><b>Karuak Bosses & Silk Road</b></color>\n<b>Karuak:</b> 00:00 UTC\n<b>Silk Road:</b> 00:00 UTC & 00:00 UTC\nKaruak is done in <b>ALLIANCE</b> only. Silk Road is completed once in <b>Volcano</b> and once in <b>ALLIANCE.</b>\nIf you can't attend, <b>leave your alliance</b> before the event to keep your rewards.\n\n<color=#1E90FF><b>Alliance Mobilization (AM)</b></color>\nHeld in <b>ALLIANCE</b> only. Ready checks are required.\nFarms may join if there's space. To opt out, notify leadership beforehand.\n\n<color=#1E90FF><b>Ark of Osiris (AOO)</b></color>\nAOO is run in <b>ALLIANCE</b> only with <b>two teams.</b>\n\n<color=#1E90FF><b>Farming</b></color>\nFree farming is allowed across the kingdom.\nWhenever possible, farm on <b>alliance land</b> to maximize boost gains.\n\n<color=#1E90FF><b>Rallies</b></color>\nFollow the <b>1+1 rule:</b> host one, join one.\n\n<color=#1E90FF><b>Alliance Performance</b></color>\nPerformance is tracked by <b>kingdom activity and event participation.</b>\nInactive players or those not contributing to KvK or events will be removed.\n<b>Show up. Stay active. Help the kingdom win.</b>",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Kingdom Rules v2",
+        "image": "/images/mail/template_previews/Kingdom_Rules_v2_Simple.webp",
+        "content": "<b><size=65>- KINGDOM RULES -</size></b>\n\n<b>Hi Warriors,</b>\n\nWelcome to <b>Kingdom XXXX!</b> Here's what you need to know to stay aligned and thrive.\n\n<color=#1E90FF><b>◆ READ YOUR MAILS ◆</b></color>\nAll updates, events, and reminders are posted here.\n<b>Stay informed, stay ready.</b>\n\n<color=#1E90FF><b>◆ Fort Tracking ◆</b></color>\nAll fort activity is tracked. Each player must complete <b>100 forts per week.</b>\nTop hitters receive <b>weekly rewards</b>.\n<b>Rally Rule:</b> Host one, join one.\n\n<color=#1E90FF><b>◆ Alliance Mobilization (AM) ◆</b></color>\nAM participation is required — <b>1600 points minimum.</b>\nWe track progress for every player. <b>No exceptions.</b>\n\n<color=#1E90FF><b>◆ Kingdom Events ◆</b></color>\n<b>Karuak & Silk Road:</b> 00:00 UTC.\nIf you can't attend, leave your alliance before the event to keep rewards.\n\n<color=#1E90FF><b>◆ Ark of Osiris (AOO) ◆</b></color>\nRuns on scheduled weekends.\n<b>Applications must be submitted early.</b>\n\n<color=#1E90FF><b>◆ Titles ◆</b></color>\nTitles are assigned through the <b>Lost Temple.</b>\nRegister your time and wait for your title.\n\n<color=#1E90FF><b>◆ Farming ◆</b></color>\nFree farming is allowed kingdom-wide.\nPrioritize <b>alliance territory</b> for maximum yield and safety.\n\n<color=#1E90FF><b>◆ Accountability ◆</b></color>\nAll <b>KVK fights, AM, forts, and events</b> are tracked.\n<b>No effort or inactivity = removal, penalties, and lost rewards.</b>  \nIf you'll be away, communicate early — we don't bite… much.",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Alliance Mobilization v3",
+        "image": "/images/mail/template_previews/Alliance_Mobilization_v3_Simple.webp",
+        "content": "Greetings we will be registering for this event on [Date and Time Here]. if you wish to participate, we would ask the following things:\n\n1. All players who participate must complete */10 quests, with the optional requirement of the 11th quest.\n\n2. If a quest is accepted accidentally, <b>DO NOT</b> accept a new quest until the timer has run out, otherwise you will waste 1 quest chance.\n\n3. If [More Than Gems] aligns with this event, it is highly recommended to accept gem spending quests when you spend gems for MTG.\n\n4. If you cannot complete the required amount of quests, please do not click the green checkmark.\n\nAll players who register and cannot complete the required amount of quests will be exempt from all further Ali Mob Events.\n\nIf you have any questions, please contact your alliance leaders.\n\nSincerely,\n\n<b>xxxx Alliance Leadership</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "AOO | Registration",
+        "image": "/images/mail/template_previews/AOO_Registration_Simple.webp",
+        "content": "Greetings! This mail is a reminder that the Ark of Osiris Event is next week. [Date and Time Here].\n\nPlease message [Coordinator Name] if you wish to play ark of Osiris. There are only 30 spots so we will give priority to players who normally play in [Alliance Name]. \n\nThank you!\n\n<b>xxxx Ark Leadership</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "AOO | Registration v2",
+        "image": "/images/mail/template_previews/AOO_Registration_v2_Simple.webp",
+        "content": "Greetings! This mail is a reminder that the Ark of Osiris Event is next week. [Date and Time Here].\n\nPlease message [Coordinator Name] if you wish to play ark of Osiris. There are only 30 spots so we will give priority to players who normally play in [Alliance Name]. \n\nHere is the current list:\n\n*List players Here*\n\nIf you are on the list and can't make it, please let us know.\n\nThank you!\n\n<b>xxxx Ark Leadership</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "AOO | Team-Setup",
+        "image": "/images/mail/template_previews/AOO_Team-Setup_Simple.webp",
+        "content": "<size=24><color=#D60000><b>Red Team (Bottom Lane)</b></color></size>\n\n<b>Rally/Garrison Leads</b>\n[Player Name] <b>Priority TP</b> (Troop Type)\n[Player Name] <b>Priority TP</b> (Troop Type)\n[Player Name] <b>Priority TP</b> (Troop Type)\n[Player Name] <b>Priority TP</b> (Troop Type)\n\n<b>Players</b>\n[Player Name] <b>Priority TP</b>\n[Player Name] <b>Priority TP</b>\n[Player Name] <b>Priority TP</b>\n[Player Name] <b>Priority TP</b>\n[Player Name]\n[Player Name]\n[Player Name]\n[Player Name]\n[Player Name]\n[Player Name]\n[Player Name]\n\n-------------------------------------------------------------------\n\n<size=24><color=#0079FF><b>Blue Team (Top Lane)</b></color></size>\n\n<b>Rally/Garrison Leads</b>\n[Player Name] <b>Priority TP</b> (Troop Type)\n[Player Name] <b>Priority TP</b> (Troop Type)\n[Player Name] <b>Priority TP</b> (Troop Type)\n[Player Name] <b>Priority TP</b> (Troop Type)\n\n<b>Players</b>\n[Player Name] <b>Priority TP</b>\n[Player Name] <b>Priority TP</b>\n[Player Name] <b>Priority TP</b>[Player Name] <b>Priority TP</b>\n[Player Name]\n[Player Name]\n[Player Name]\n[Player Name]\n[Player Name]\n[Player Name]\n[Player Name]\n\nIf you are part of our team, please follow these simple rules:\n♦ Follow Markers and Instructions\n♦ Don't open field unless you are a strong player or instructed to\n♦ Be Online, On time, and ready to fight!\n♦ Applying troop expansions and Def/Atk boosts is recommended\n\nPlease Join our Discord Voice Chat @ [Time] UTC. We will use discord to communicate more effectively.\n\nCheers,\n\n<b>xxxx Ark Leadership Team</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Banner | Event",
+        "image": "/images/mail/template_previews/Banner_Event_Fancy.webp",
+        "content": "<size=40><color=#005577><b>═════════════════╗</b></color></size>\n<size=38><color=#005577><b>EVENT NAME</b></color></size>\n<size=22><color=#0693e3><i><b>Kingdom xxxx</b></i></color></size>\n<size=40><color=#005577><b>═════════════════╝</b></color></size>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Kingdom v2",
+        "image": "/images/mail/template_previews/Banner_Kingdom_v2_Fancy.webp",
+        "content": "<color=#1E90FF><size=38>══════════════★XXXX★</size></color>\n<color=#87CEFA><size=26>                                                                                 COUNCIL MAIL</size></color>\n",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Barbarian Forts v2",
+        "image": "/images/mail/template_previews/Barbarian_Forts_v2_Coloured.webp",
+        "content": "                       <b><size=25>GET THOSE CHESTS, SPEEDUPS, & FREE AP!</size></b>\n\n<b><size=25><color=purple>WHY 1+1 FORT RALLIES?</color></size></b>\nRead below to understand how 1+1 off-season forts grind benefits each member of the kingdom.\n\n<b><size=30>1+1 = more FREE AP!</size></b>\n<b>MORE FORTS = MORE ALLIANCE GIFTS</b>\nMORE ALLIANCE GIFTS = Bigger chance to get all 7K weekly free AP\n7K weekly free AP = 28K monthly free AP from gifts\n<b><color=green>28K free AP / 560 50AP monthly from gifts</color></b>\n\n<b>MORE FORTS = Up to 20 individual forts/day from 3K Daily AP</b>\n50AP from mail rewards x 20 barb forts/day = 1K free AP daily =\n<b><color=green>28K free AP / 560 50AP monthly from mail rewards</color></b>\n\n<b><size=30>1+1 = more ALLIANCE CHESTS!</size></b>\n<b>MORE ALLIANCE GIFTS = MORE ALLIANCE CHESTS</b>\n3K Free Daily AP = 20 individual forts/day\n<b>If 150 members will do 20 forts daily:</b>\n150 members / 2 players per rally = 75 forts\n\n75 forts x 20 rallies = <b><color=green>1.500 FORTS DAILY</color></b>\n60 alliance keys for each Lvl5 fort x 1.500 forts daily =\n90K alliance keys x 150 members claiming gifts = <b><color=green>13.5M KEY POINTS</color></b>\n\nEach alliance chest = 3.5M key points\n13.5M key points / 3M key points = <b><color=green>EASILY 4 ALLIANCE CHESTS PER DAY</color></b>\n\nEach chest = 16-18hrs of speeds\n18hrs x 4 chests = 72hrs daily free speeds = <b><color=green>494hrs WEEKLY / 2.160hrs (60 DAYS) MONTHLY</color></b>\n\nNow, how cool is that all for free?",
+        "tags": ["format:Coloured", "type:Barbarian Forts"]
+    },
+    {
+        "title": "Buff Activation | Research v3",
+        "image": "/images/mail/template_previews/Buff_Activation_Research_v3_Simple.webp",
+        "content": "<b><size=40>Hey Warriors,</size></b>  \n\n<b>It's research buff time — starting at 22:30 UTC!</b>\nIf you've been saving your tech upgrades, now's the time to power them out.\n\nBefore starting, don't forget to:\n• <b>Request the Scientist title</b> for a research speed bonus\n• <b>Grab the 15% research rune</b> located at <b>LT</b>\n\nStack your bonuses and make every second count.\n\n<b>Happy researching!</b>",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Banner | Event v2",
+        "image": "/images/mail/template_previews/Banner_Event_v2_Fancy.webp",
+        "content": "<color=#bd8e1d><size=40>═══════༺ ✿༻ ═══════ </size></color>  \n<size=40><b><color=#bd8e1d>             EVENT NAME</color></b></size>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Soluna Coins Strategy",
+        "image": "/images/mail/template_previews/Soluna_Coins_Strategy_Coloured.webp",
+        "content": "<size=40><b><color=#bd8e1d>             SOLUNA COINS STRATEGY</color></b></size>  \n\n<size=28><b><color=#1E90FF>Hi warriors!</color></b></size>\nFirst, a huge congratulations to everyone for your <b>amazing performance during Pre-KvK!</b> The effort, teamwork, and dedication shown have set us up for success in the next phase. Let's keep that momentum going!\n\nNow, as we prepare for what's ahead, <b>focus on gathering <i>(NOT STEALING)</i>resources and farming barbs</b>. <b>Chaining should be your top priority</b> so you can save as much AP as possible for the higher-level barbs in the next zone.\n\nA few important reminders:\n<b>• No farms are allowed in Lost Kingdom</b>\n<b>• Stay positive and respectful in all chats, camp, and kingdom threads</b>\n<b>• Read your mails carefully,important updates are coming soon</b>\n\nFor now, <b>favorite this mail</b> so you can refer back when donating your coins. This is kingdom technology that benefits everyone, so please follow the priority order below. The faster we clear our kingdom tech the better!\n\n<b><color=navy>☆ Priority 1 (Gathering Resources, Action Point Recovery) ☆</color></b>\n>> 01 Bumper Season, up to level 15\n>> 02 Rejuvenate, up to level 15\n\n<b><color=purple>☆ Priority 2 (Swift Stride, Attack & Defense) ☆</color></b>  \n>> 03 Swift Stride, up to level 15\n>> 04 Cavalry Defense, up to level 15\n>> 05 Cavalry Attack, up to level 15\n>> 06 Infantry Defense, up to level 15\n>> 07 Infantry Attack, up to level 15\n>> 08 Archer Defense, up to level 15\n>> 09 Archer Attack, up to level 15\n\n<b><color=navy>☆ Priority 3 (Troop Attack, Combustion, Harden) ☆</color></b>  \n>> 10 Troop Attack, as high as possible\n>> 11 Combustion, as high as possible\n>> 12 Harden, as high as possible\n\nIf you have any questions, please ask any of our amazing officers. And don't forget to <b>FAVORITE this mail!</b>\n\n<b>Keep crushing it, warriors!</b>",
+        "tags": ["format:Coloured", "type:Guide", "type:Early Game"]
+    },
+    {
+        "title": "KVK | Pass Opening v5",
+        "image": "/images/mail/template_previews/KVK_Pass_Opening_v5_Fancy.webp",
+        "content": "<size=40>═══════<color=#008080> ༺✿༻ </color>═══════</size>\n<size=38><b><color=#008080> UPDATE: WAR Begins DATE 00:00 UTC</color></b></size>\n<size=40>═══════<color=#008080> ༺✿༻ </color>═══════</size>\n\n<size=30><b><color=#000000>My Warriors,\n\nIT'S ALMOST TIME!! PLEASE BE READY at least 1 hour BEFORE!\nHere are some Battle Reminders:</color></b></size>\n<b>◇ <color=#008080>If you are offline, you will be kicked</color>, please TP to safety (zone 4) if AFK.\n◇ <color=#008080>No bubbling or AFK on the frontlines</color>, TP out and give other fighters your spot.\n◇ <color=#008080>Use expansions, boosts, runes, AND BASTION SKILLS</color>; check gear, presets, and talents.\n◇ <color=#008080>Reinforce from nearby (5s or less) PAY ATTENTION!</color>\n◇ <color=#008080>Stay on your alliance territory at all times</color> or risk rallies on your city.\n◇ <color=#008080>Mute Discord when not speaking</color>, we don't want to hear your background noise. DONT TALK OVER LEADERS!\n◇ <color=#008080>FOLLOW MARKERS</color> and fight together for buffs/debuffs.\n◇ <color=#008080>When flags are built</color>, wait for garrison/rally leads to TP in first.</b>\n\n<b><size=24><color=#008080>§ BONUS PRO War Tips §</color></size></b>\n<b>•— <color=#008080>Match troop types</color> in rallies/garrisons and AGAIN reinforce only from nearby.\n•— <color=#008080>Avoid unnecessary field battles, FIGHT IN A BALL</color> and stay on alliance territory, for BUFFS.\n•— <color=#008080>WATCH OUT for enemy AOE on FLAGS</color> and stay out of its range. <color=#008080>PAY ATTENTION</color>\n•— <color=#008080>Check hospitals regularly</color> and heal in batches.</b>\n\n<b><color=#000000>FIGHT SMART, WE ARE STRONGER TOGETHER, and LET'S HAVE FUN! This is it, this is the real thing, OUR FIRST FIGHT! Come prepared! NO EXCUSES! Win or lose we will fight till the end! </color></b>",
+        "tags": ["format:Fancy", "type:KVK"]
+    },
+    {
+        "title": "Banner | Border",
+        "image": "/images/mail/template_previews/Banner_Border_Fancy.webp",
+        "content": "<size=48><color=#165E60>══</color><color=#3EAAA0>══</color><color=#7ABFA8>══</color><color=#A3D7CC>═</color></size><size=52><color=#165E60>★</color></size><size=48><color=#A3D7CC>═</color><color=#7ABFA8>══</color><color=#3EAAA0>══</color><color=#165E60>══</color></size>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Border v2",
+        "image": "/images/mail/template_previews/Banner_Border_v2_Fancy.webp",
+        "content": "<size=40>═══════<color=#BB270D> ༺✿༻ </color>═══════</size>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Camp",
+        "image": "/images/mail/template_previews/Banner_Camp_Fancy.webp",
+        "content": "<color=#000000><size=44>══════ ༺✿༻ ══════</size></color>\n<size=38><b>                      <color=#008080>NAME CAMP</color></b></size>\n<color=#000000><size=44>══════ ༺✿༻ ══════</size></color>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Camp v2",
+        "image": "/images/mail/template_previews/Banner_Camp_v2_Fancy.webp",
+        "content": "<color=#8B0000><size=44>▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌</size></color>\n<size=38><b>                           NAME CAMP </b></size>\n<size=34><b>            Xx WAR CALL= NO MERCY xX</b></size>\n<color=#8B0000><size=44>▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌</size></color>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Diplo",
+        "image": "/images/mail/template_previews/Banner_Diplo_Fancy.webp",
+        "content": "                                     <size=25><b><color=#BB270D>亗</color> Diplomatic Planning Update <color=#BB270D>亗</color></b></size>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Event v3",
+        "image": "/images/mail/template_previews/Banner_Event_v3_Fancy.webp",
+        "content": "             <b><size=60><color=#3450B4>亗 Kingdom XXXX 亗</color></size></b>\n                                            <b><size=38><color=#3450B4> E V E N T </color></size></b>\n     <b><size=42><color=#3450B4>◈ ━━━━━↓ ↓ ↓━━━━━ ◈</color></size></b>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Kingdom v3",
+        "image": "/images/mail/template_previews/Banner_Kingdom_v3_Fancy.webp",
+        "content": "<color=#000080><size=44>══════ ༺✿༻ ══════</size></color>  \n<size=38><b>             KINGDOM XXXX | COUNCIL</b></size>  \n<color=#000080><size=44>══════ ༺✿༻ ══════</size></color>  ",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Kingdom v4",
+        "image": "/images/mail/template_previews/Banner_Kingdom_v4_Fancy.webp",
+        "content": "<color=#5A6CAB><size=45><b>╔═══════════╗</b></size>\n                                    « <size=75><b>XXXX</b></size> »\n                        <b>亗 .K I N G D O M  of  X X X X X X.亗</b>\n\n<size=45><b>╚════</b></size> •★★★★★• <size=45><b>════╝</b></size></color>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Kingdom v5",
+        "image": "/images/mail/template_previews/Banner_Kingdom_v5_Fancy.webp",
+        "content": "<color=#1E90FF><size=38>══════════════★XXXX★</size></color>\n<color=#4682B4><size=25>                                                                   •COUNCIL MAIL•</size></color>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Kingdom v6",
+        "image": "/images/mail/template_previews/Banner_Kingdom_v6_Fancy.webp",
+        "content": "                                                             <size=35><b><color=#BB270D>亗</color> XXXX <color=#BB270D>亗</color></b></size>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Kingdom v7",
+        "image": "/images/mail/template_previews/Banner_Kingdom_v7_Fancy.webp",
+        "content": "<size=40><color=#BB270D>★═══════ XXXX ═══════★</color></size>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Kingdom v8",
+        "image": "/images/mail/template_previews/Banner_Kingdom_v8_Fancy.webp",
+        "content": "<size=40><color=#BB270D>╔═══════ XXXX ═══════╗</color></size>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Banner | Pre-KVK",
+        "image": "/images/mail/template_previews/Banner_Pre-KVK_Fancy.webp",
+        "content": "<size=40>══<color=#FF0000><size=45><b><color=#8d00bb>E</color><color=#9400c3>v</color><color=#9c00ca>e</color> <color=#aa00d9>o</color><color=#b200e1>f</color> <color=#c000f0>T</color><color=#c800f7>h</color><color=#cf00ff>e</color> <color=#db00f8>C</color><color=#e100f5>r</color><color=#e700f1>u</color><color=#ed00ee>s</color><color=#f300ea>a</color><color=#f900e7>d</color><color=#ff00e3>e</color></b></size></color>══</size>",
+        "tags": ["format:Fancy", "type:Banner"]
+    },
+    {
+        "title": "Buff Activation | Research",
+        "image": "/images/mail/template_previews/Buff_Activation_Research_Simple.webp",
+        "content": "<b><size=65>- RESEARCH BUFF -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b>It's research buff time starting at 00:00 UTC!</b>\nIf you've been saving your tech upgrades, now is the moment to power them out.\n\n<color=#1E90FF><b>Before You Begin</b></color>\n◆ Request the <b>Scientist title</b> for extra research speed.\n◆ Grab the <b>15% Research Rune</b> located at <b>LT</b>.\n◆ Double-check that you've activated all other buffs and boosts.\n\nStack your bonuses, manage your timers wisely, and make every second count.\n\n<b>Happy researching and keep pushing that tech advantage!</b>",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Buff Activation | Research v2",
+        "image": "/images/mail/template_previews/Buff_Activation_Research_v2_Simple.webp",
+        "content": "Dear members,\n\nWe are going to activate a kingdom buff at <b>*Time Here*</b>\n\n<color=#eb144c><b>Industrial Revolution</b></color>\n<b>(Increase Research Speed by 10%)</b>\n\nRemember that Kingdom Buff is 4 hours long.\n\n<b>Remember to pick up a research speed rune from the holy sites.</b>\n\nKeep up the growth and the good work!\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Buff Activation | Training",
+        "image": "/images/mail/template_previews/Buff_Activation_Training_Simple.webp",
+        "content": "Dear members,\n\nWe are going to activate a kingdom buff at <b>*Time Here*</b>\n\n<color=#eb144c><b>Mobilize for War</b></color>\n<b>(Increase Training Speed by 10%)</b>\n\nRemember that Kingdom Buff is 4 hours long.\n\n<b>Remember to pick up a training speed rune from the holy sites.</b>\n\nKeep up the growth and the good work!\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Event Rules",
+        "image": "/images/mail/template_previews/Event_Rules_Simple.webp",
+        "content": "                  <size=30><b><color='#e60000'>MGE FINES SYSTEM & EVENTS RULES!</color></b></size>\n\nThe minimum fine is <color=#f44336><b>250 million </b></color>resources for one point up to one hundred thousand points (001-100,000) over MGE cap\n\nAny points above (100,000) will be calculated as <color=#f44336><b>one million resources per thousand points</b></color> ( 1K points = 1M rss )\n\nNormal fines are only applied if it is your first time breaking MGE\n\nIf your name is repeated for the second time, your fine will be doubled whether it is the minimum fine or any points above the minimum.\n\nExample: ( player with 5,200,000 points ) = 500M rss minimum fine doubled + 200M rss for those 200K points above the minimum. \n\nIf your name is repeated for the third time even for one point over cap, the punishment will be <color=#d81b60><b>zero</b></color> without any warning.\n\nNo excuses will be accepted from now on, whatever they may be.\n\nI didn't pay attention to my points\nI didn't see the Kingdom's mail \nI accidentally collected troops\nI was playing another event and didn't pay attention to MGE, etc.\n\nAnything like this is your fault and we will not accept it.\n\nAny player can apply for MGE spot even if it's just for unlock spot \n\n<b>20 GH's events update</b>\n\nAny 20 golden heads event is free for all to compete, Farms and alt accounts can only push for basic rewards points, any Farm/Alt account pushing over basic rewards points will have to pay fine to kingdom bank, Fines apply only the first and second time you break the rules, third time = zero.\n\nCheck kingdom's Discord <color=#004d40><b><color=#e91e63>important mail channel</color></b></color> to see anything related to the kingdom's rules.",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "From the Ground Up",
+        "image": "/images/mail/template_previews/From_The_Ground_Up_Simple.webp",
+        "content": "Greetings! At 0.00 UTC today, an event called \"From the Ground Up\" began, where you gain points by using speedups to upgrade buildings. This event will be fixed for players that <b>DO NOT </b>meet the current requirements. these are the requirements: \n\n<size=24><color=#ff6900><b>Event Rules</b></color></size>\n♦Governors below 1,000,000,000 KP - <b>15,000 Points MAXIMUM</b>\n\nIf anyone below 1b kp exceeds the point limit, the leadership council will determine their punishment based on the severity of the situation.\n\nWe fix these events to reward our active fighters that give a lot of time, troops, and resources for our kingdom's future. Please respect the effort these players go through, and don't push these events.\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Game of Power",
+        "image": "/images/mail/template_previews/Game_of_Power_Fancy.webp",
+        "content": "<color=#1D8BFE><b><size=30>☆ﾟ°˖* Legendary Commander Sculptures * ˖°ﾟ☆</size></b></color>\n\n<b><color=#066207>～··～··～··～··～··～··\n>Rank 1 → Player 1\n>Rank 2 → Player 2\n>Rank 3 → Player 3\n～··～··～··～··～··～··</color></b>\n\n<b>Which one is it?</b>\nGame of Power\nIncrease power by building, research & training\n\n<b>What's everyone else's maximum?</b>\n\n<b><color=red>340,000 power growth</color></b>\n\n<b>What happens if I go over?</b>\nIf you end up in the Top 10 and took less than 200k deads last KvK – fine is at least 1 billion resources. Everyone else will have credits used.",
+        "tags": ["format:Fancy", "type:Event"]
+    },
+    {
+        "title": "Game of Power v2",
+        "image": "/images/mail/template_previews/Game_of_Power_v2_Simple.webp",
+        "content": "Greetings! At 0.00 UTC today, an event called \"Game of Power\" began, where you gain points by increasing your power through training troops, researching, and building. This event will be fixed for players that <b>DO NOT </b>meet the current requirements. these are the requirements: \n\n<size=24><color=#ff6900><b>Event Rules</b></color></size>\n♦Governors below 1,000,000,000 KP - <b>450,000 Points MAXIMUM</b>\n\nIf anyone below 1bm kp exceeds the point limit, the leadership council will determine their punishment based on the severity of the situation.\n\nWe fix these events to reward our active fighters that give a lot of time, troops, and resources for our kingdom's future. Please respect the effort these players go through, and don't push these events.\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Gathering Commanders Guide",
+        "image": "/images/mail/template_previews/Gathering_Commanders_Guide_Simple.webp",
+        "content": "<color=#c2185b><size=30px><b>Gathering Commanders</b></size></color>\n\nBonjour tout le monde,\nAs we all spend 80% of our RoK time in gathering resources, there is always a little confusion on which commanders we should use for farming different types of resources (rss), so let's talk...\n\n<b>Cleopatra VII</b>\nFood = 20% Wood = 20% Stone = 30% Gold = 20%\nAdditional rss = 0%\nCleo gives extra rss packs (After expertise). Some people find it annoying, but we all can agree that she is cute and good at gathering stone.\n\n<b>Ishida Mitsunari</b>\nFood = 30% Wood = 20% Stone = 20% Gold = 0%\nAdditional rss = 0%\nHe is very good for gathering food, make sure he stays away from gold as he is already wearing a lot.\n\n<b>Seondoek</b>\nFood = 20% Wood = 20% Stone = 20% Gold = 30%\nAdditional rss = 10%\nHer Expertise Skill gives 10% additional rss. My personal favorite for Gold pits\n\n<b>Matilda of Flowers</b>\nFood = 20% Wood = 20% Stone = 25% Gold = 0%\nAdditional rss = 10%\nShe's like Poor man's Seondeok with her additional rss but she's best at farming stone\n\n<b>Joan of Arc</b>\nFood = 25% Wood = 25% Stone = 25% Gold = 25%\nAdditional rss = 0%\nShe is like YSG of farming commanders works good everywhere\n\n<b>Queen Tamar of Georgia</b>\nFood = 20% Wood = 25% Stone = 20% Gold = 0%\nAdditional rss = 0%\nOur queen works great at gathering wood\n\n<b>Sarka</b>\nFood = 18% Wood = 18% Stone = 18% Gold = 18%\nAdditional rss = 0%\nSarka is mini-Joan, works good everywhere\n\n<b>Gaius Marius</b>\nFood = 20% Wood = 15% Stone = 15% Gold = 0%\nAdditional rss = 0%\nMakes a good pair with Ishida for food.\n\n<b>Constance</b>\nFood = 15% Wood = 20% Stone = 15% Gold = 0%\nAdditional rss = 10%\nBest at gathering wood, makes a good secondary pair for food or stone\n\n<b>Centurion</b>\nFood = 10% Wood = 10% Stone = 10% Gold = 10%\nAdditional rss = 0%\nOnly green gathering commander in game. Let's not talk about him.",
+        "tags": ["format:Simple", "type:Guide"]
+    },
+    {
+        "title": "Hero Scrolls Onboarding",
+        "image": "/images/mail/template_previews/Hero_Scrolls_Onboarding_Simple.webp",
+        "content": "<b>══════ HERO SCROLLS - Commander Ranking  ══════</b>\n1/ Share a commander on Alliance or Kingdom Chat\n2/ !commanders and select the commander\nA ranking for that commander will be presented - Enjoy!\n\n<b>══════ HERO SCROLLS ONBOARDING - YOUR BIOS ══════\nFirst Step: Bind Your Account</b>\nThe first account you bind is your Primary. Subsequent ones are your Farms.\n\n<b>To Bind Your Account:</b>\n!bind 12345  (Replace 12345 with your governor ID)\nFor farms, repeat the bind command with their IDs.\n\n<b>Made a Mistake?</b>\n!bind clear 12345  (Clears a specific binding),\n!bind purge  (Wipes all your bindings),\n\n<b>After Binding, Configure Your Profile:</b>\n!setrole\n!setvip\n!setutc\n!setlanguage\n!title My Name Is Mafia  (Sets your title to \"My Name Is Mafia\"),\n\n<b>Pull Your Bio:</b>\n!bio  (Displays your profile),\n!bio @governor  (Shows a bound governor's bio),\n!bio 12345  (Fetches a governor's bio by ID),\n!bio XXXX12345  (Gets a governor's bio from server XXXX by ID)",
+        "tags": ["format:Simple", "type:Guide"]
+    },
+    {
+        "title": "Training Day v2",
+        "image": "/images/mail/template_previews/Training_Day_v2_Simple.webp",
+        "content": "Greetings! At 0.00 UTC today, an event called \"Training Day\" began, where you gain points by using speedups to train troops. This event will be fixed for players that <b>DO NOT </b>meet the current requirements. these are the requirements: \n\n<size=24><color=#ff6900><b>Event Rules</b></color></size>\n•Governors below 1,000,000,000 KP - <b>15k Points MAXIMUM</b>\n\nIf anyone below 1b kp exceeds the point limit, the leadership council will determine their punishment based on the severity of the situation.\n\nWe fix these events to reward our active fighters that give a lot of time, troops, and resources for our kingdom's future. Please respect the effort these players go through, and don't push these events.\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Training Day",
+        "image": "/images/mail/template_previews/Training_Day_Fancy.webp",
+        "content": "<color=#1D8BFE><b><size=30>✬✬°˖* Legendary Commander Sculptures * ˖°✬✬</size></b></color>\n\n<b><color=#066207>～··～··～··～··～··～··\n>Rank 1 → Player 1\n>Rank 2 → Player 2\n>Rank 3 → Player 3\n～··～··～··～··～··～··</color></b>\n\n<b>Which one is it?</b>\nTraining Day\nIncrease power by training\n\n<b>What's everyone else's maximum?</b>\n<b><color=red>Fighters – 10,000 minutes\nNon-fighters – 3,200 minutes</color></b>\n\n<b>What happens if I go over?</b>\nIf you end up in the Top 10 and took less than 200k deads last KvK – fine is at least 1 billion resources. Everyone else will have credits used.",
+        "tags": ["format:Fancy", "type:Event"]
+    },
+    {
+        "title": "Town Hall",
+        "image": "/images/mail/template_previews/Town_Hall_Simple.webp",
+        "content": "<b><size=45>- TOWN HALL ANNOUNCEMENT -</size></b>  \n\n<b>Hi warriors,</b>  \n\nOur next Town Hall will be held on <b>DATE TIME UTC</b>.  \n\nThis is the best place to learn what's coming up, hear important updates, and stay connected. It's also the opportunity for you to ask questions, share comments, and bring up any concerns. We are here to serve you all, and we want every voice in XXXX to be heard.  \n\nMake plans to attend and be part of shaping our path forward.  ",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Title Request",
+        "image": "/images/mail/template_previews/Title_Request_Coloured.webp",
+        "content": "                                           Hello, Kings and Queens\n\nKingdom titles can now be granted automatically by applying for them in the Lost Temple.\n\n<b>Here is a detailed explanation of how to request a title. </b>\n<b><color=#0d47a1>1- Go to the lost temple and click on the settings icon.</color></b>\n<b><color=#388e3c>2- Click on titles.</color></b>\n<b><color=#e64a19>3- Click on the lens icon for the title you want</color></b>\n<b><color=#e91e63>4- Choose the time you want to get the title</color></b>\n<b><color=#e60000>5- Click on apply and wait for your turn to get the title</color></b>\n\n<b><color=#263238>Best regards❤</color></b>",
+        "tags": ["format:Coloured", "type:Kingdom Management", "type:Guide"]
+    },
+    {
+        "title": "Silk Road v3",
+        "image": "/images/mail/template_previews/Silk_Road_v3_Simple.webp",
+        "content": "Greetings! We will be hosting the Silk Road event at [Date and Time Here].\n\n<size=20><color=#ff6900><i><b>Silk Road Tips & Tricks</b></i></color></size>\n♦Bring two full marches for the event.\n♦Keep one march close to the Caravan to receive extra points, attack with the other march.\n♦Silk road is attempted 3 times for max rewards, so follow markers at all times.\n♦Avoid Attacking Allied Kingdom Flags or Allied Kingdom marches (for KvK only)\n\nIf you have any questions about Silk Road, please message your alliance leaders.\n\nSincerely,\n\n<b>xxxx Leadership Team</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Silk Road v2",
+        "image": "/images/mail/template_previews/Silk_Road_v2_Simple.webp",
+        "content": "<b><size=65>- SILK ROAD EVENT -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b>Silk Road</b> kicks off on <b>00/00 @ 00:00 UTC</b>!\nBe ready to defend your caravans, coordinate with teammates, and keep your armies close.\n<b>Communication and timing</b> are key to securing maximum points and rewards.\n\n<color=#1E90FF><b>Event Reminders</b></color>\n◆ <b>Follow markers</b> for rally paths and defense points.\n◆ <b>Escort caravans</b> safely — do not wander off.\n◆ <b>Stay grouped</b> and reinforce fast if under attack.\n◆ <b>Rewards scale</b> with performance — finish strong.\n\n<b>Stay sharp, stay united, and let's dominate the route!</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Silk Road",
+        "image": "/images/mail/template_previews/Silk_Road_Fancy.webp",
+        "content": "<color=#1D8BFE><b><size=35>☆°˖* Silk Road* ˖°☆</size></b></color>\n\n<color=#066207><b>～··～··～··～··～··～··\n<b>Alliance 1</b> Day & time (contact)\n<b>Alliance 2</b> Day & time (contact)\n～··～··～··～··～··～··</b></color>\n\n<b>What is Silk Road again?</b>\nAn event where you can get gold heads easily! So, make sure you join at least once over the 3 sessions.\n\nYour main objective here is to <b>protect the Alliance Caravan</b>, transporting goods to a specific destination. We have a meeting point. Bring 2 full marches here.\n\nDuring the transporting process, there will be the <b>enemies randomly spawned</b> on the map and trying to raid the Caravan. Each alliance has three attempts – these will run consecutively. Each attempt takes a bit over 15 minutes. So, allow yourself an hour including time to chat.\n\n<b><color=maroon>Important\nFollow markers to know where to send your 2 marches</color></b>\n\n<color=red><b>When and Where</b></color>\nFor this event you can change alliances at the last minute, but you will only earn rewards once.\n\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:Event"]
+    },
+    {
+        "title": "Siege Deletion",
+        "image": "/images/mail/template_previews/Siege_Deletion_Coloured.webp",
+        "content": "<b><color=#0d47a1>Kingdom T5/T4 siege delete !</color></b>\n\nAs we wrap up our kingdom cleanup project, we have one major step remaining before we can jump into the next kvk.<b>KINGDOM T5 and T4 SIEGE DELETION.</b>\n\nEvery account in the kingdom, whether it's a main account or farm does not need T5/T4 siege. These unnecessary units add too much power to our accounts and increase our matchmaking for no purpose.\n\nStarting DATE through DATE <b><color=#f44336>(6 days)</color></b> all accounts must have their <b><color=#e53935>t5/t4 siege deleted</color></b>. We will be performing audits and scouting of troops to check that you have followed the kingdom rules.\n\nFeel free to make the siege delete fun! Find a friend and splash your siege units against their walls and vice-versa! or you can help Top 3 in MGE to get more points\n\nThe only exception we are making is to keep <b><color=#2e7d32>75,000</color></b> t4 or t5 siege for pit farming.",
+        "tags": ["format:Coloured", "type:Kingdom Management"]
+    },
+    {
+        "title": "Shadow Legion v3",
+        "image": "/images/mail/template_previews/Shadow_Legion_v3_Simple.webp",
+        "content": "<b><size=65> SHADOW LEGION -</size></b>\n\n<b>Hi Warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\n<b>Shadow Legion Challenge</b> at <b>00:00 UTC</b> on <b>00/00</b>.\n\n<color=#1E90FF><b>Quick Guide</b></color>\n<b>Strong Garrison:</b> Make sure your wall garrison is strong and well-defended.\n<b>Talents & Gear:</b> Adjust talents and equip proper gear for your best defense.\n<b>Follow Markers:</b> Watch leadership markers and teleport close to form small clusters.\n<b>Assist Teammates:</b> The more you <b>help others</b>, the more points you earn for yourself and the kingdom.\n\n<color=#1E90FF><b>Tips</b></color>\n◆ Defend early waves quickly to reduce downtime.\n◆ Reinforce allies under attack to earn assist points.\n◆ Keep healing after each wave, stay ready for the next.\n\n<b>We've got the teamwork and strength to crush it!</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Shadow Legion v2",
+        "image": "/images/mail/template_previews/Shadow_Legion_v2_Simple.webp",
+        "content": "Greetings! We will be starting the Shadow Legion Event on [Date and Time Here]\n\nTo prepare for this event (whether you are online or not), please do the following:\n\n♦ Setup your city with proper garrison commanders (Utilizing the full garrison talent tree is best)\n\n♦ Collect a War Rune (10% Atk/Def/Health), and open a 5% Atk/Def Boost from your inventory\n\n♦ If you don't have proper garrison commanders, use commanders that buff all troop types, or that don't require only one troop type for the buffs to work\n\n<b>If you are not online:</b>\n\n♦ Make sure all your troops are inside your city if you think you will need them.\n\nIf you have any other questions, please ask in alliance chat, or ask your alliance leadership.\n\nSincerely,\n\n<b>xxxx Leadership Team</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Shadow Legion",
+        "image": "/images/mail/template_previews/Shadow_Legion_Fancy.webp",
+        "content": "<color=#FE901D><b><size=35>☆°˖* Shadow Legion * ˖°☆</size></b></color>\n\n<color=#901DFE><b>～··～··～··～··～··～··\n<b>Alliance 1</b> Day & time (contact)\n<b>Alliance 2</b> Day & time (contact)\n～··～··～··～··～··～··</b></color>\n\n<b>Which event is Shadow Legion again?</b>\nAll our cities will be attacked by waves of elite Shadow Legion armies. There are <b>25 waves over about 1 hour</b> testing your garrison commanders. Make sure you leave most of your troops inside your city, but we help one another by reinforcing cities.\n\nThis Shadow Legion mop civilization is <b>CIVILIZATION</b> and Epic commander is COMMANDER. The skills the Shadow Legion have can be found in game. Not half bad, but I'm sure you'll all be fine.\n\nJust use your best garrison commanders!\n\n<color=orange><i><b>Before</b></i></color>\nGrab a <b>Rune</b>\nScout a nearby city to activate <b>War Effect</b>\nUse a <b>Defence Buff</b>\n\n<color=red><i><b>During</b></i></color>\n<b>Heal</b> between waves using the help button. Push help!\nScout again when “War Effect” wears off.\n\n<color=green><i><b>Afterwards</b></i></color>\nIf breached, your castle will burn until the event is over but this is temporary. You will have a small amount of healing, and your wall may require some repair.\n\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:Event"]
+    },
+    {
+        "title": "Karuak | Boss",
+        "image": "/images/mail/template_previews/Karuak_Boss_Fancy.webp",
+        "content": "           <color=#1D8BFE><b><size=35>☆°˖* Karuak Ceremony * ˖°☆\n              Time to Fight the Bosses</size></b></color>\n\n<color=#066207><b>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n<b>Alliance 1</b> Day & time (contact)\n<b>Alliance 2</b> Day & time (contact)\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</b></color>\n\n<b>Karuak Ceremony</b>\nKaruak Bosses is all about seeing who Lilith favours! Are you the Karaku's chosen one? You may march away with 3 day speedups, gold heads or Elite stars.\n\nOver the three day event, many governors will complete their Karuak challenges.\n\nEveryone should try to reach at least level 35 ideally in the alliance they wish to join for the Bosses to unlock them before your alliance's session. The type of march hitting you will be sent separately.\n\n<b><color=#066207>Important</color></b>\n<b>1. Select an alliance.</b> Bear in mind, once you begin attacking the first boss, you must complete all available bosses in that alliance.\n<b>2. Meet at the marker</b> at the set time with at least 2 marches – one of 50k troops and one full march\n<b>3. Follow the directions</b> of the r5/r4 leading the Ceremony!\n<b><color=red>IF YOU HIT EARLY, YOU WILL BE KICKED FROM THE ALLIANCE</color></b>\n\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:Event"]
+    },
+    {
+        "title": "Passports",
+        "image": "/images/mail/template_previews/Passports_Fancy.webp",
+        "content": "<color=red><b><size=35> <(｀^´)> You want Passports? <(｀^´)>\n                  You can stay, you know</size></b></color>\n\n<color=purple><i>Just like Aretha Franklin in the Blues Brothers\nall we want is a little RESPECT\n\nYou want our passports, then you want to run away and desert us.\nOnce you are gone, we are gonna play “Feeling Good” by Nina Simone so, whatever sis.</i></color>\n\n<color=#067eaa><b>I'm migrating – its locked in</b></color>\nIf you still think leaving is the best option, you can get Passports here (that is if you were too lazy to get the ones Lilith throw us each week):\n\n<b>1. Pony up the resources.</b> It's 100 million per passport to a maximum of 10 passports\n<b>2. Throw some Alliance Credits our way.</b> That's right, the gold coins. Each 100k of these will get on into an Alliance Shop. You'll still need to bye (yes, goodbye, not buy) that passport for 600k silver coins.\n<b>3.</b> Go to the shop and <b>lay down the cold hard cash</b> … or your sugar daddy's credit card for a <b>New World Bundle</b> – how is not my problem.\n\nSorry if you were hoping for an easy ride but baby, we grew a set.\n\n<color=#067eaa><b>One final word</b></color>\nJust to be clear. We don't want everyone to go. We've loved having you here and although our next Season of Conquest will be different, we will still have fun. Hopefully just a little less intense!\n\n<color=#070662><b><i>Leadership</i></b></color>",
+        "tags": ["format:Fancy", "type:Kingdom Management"]
+    },
+    {
+        "title": "Karuak | Boss v2",
+        "image": "/images/mail/template_previews/Karuak_Boss_v2_Simple.webp",
+        "content": "Greetings! For everyone who wants to defeat the Karuak bosses and receive rewards, we will be gathering on <i><b>*Time and Date Here*</b></i>\n\nBring 2 marches, one march with only <i><b>50k </b></i>troops, and a full march. The first 3 bosses are very weak, and with the amount of people that gather, it's better to not use full marches so that everyone can join in defeating it before it dies. We want everyone to receive rewards, because you can receive a good amount of gold heads from these bosses.\n\nSee you all then!\n\nSincerely,\n\n<b>xxxx Leadership Team</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Kingdom Bank",
+        "image": "/images/mail/template_previews/Kingdom_Bank_Coloured.webp",
+        "content": "<b><color=#0d47a1>BANK NAME is here to serve all your KvK banking needs!</color></b>\nFor those who are unfamiliar with KvK war banks, here's how it works:\nEvery player in the kingdom can donate <b><color=#e91e63>20 million resources every week by Sunday after 00:00 UTC</color></b> (it should be <b><color=#e91e63>5M of each type </color></b>of resource)\n\n<b>Bank donations are not obligatory, and all donations are recorded in the bank's Excel </b>file.\n\nAfter you send your resources, please go to <b><color=#1a237e>alliance rankings Resources Assistance</color></b> and take a screenshot of your RSS donations then go to kingdom discord <b><color=#e91e63>RESOURCES APPLICATION CATEGORY </color></b>apply channel then pick bank donate option or send the bank a PM in game with the details of your deposit.\n\nThe bank should receive all 20M resources (meaning you will pay the resource transfer tax).\n\n20 million might feel like a lot, but please remember that production from territory in alliance is over <b><color=#e91e63>100M a week</color></b>.\n\n<b><color=#1a237e>We ask a small part of that (20%) to be donated to the bank weekly</color></b>.\n\nThe bank will hold these resources, and release them to players who are fighting in KvK to heal during the war effort. The bank will be used during times of war ONLY, to allow XXXX to continue fighting for victory.\n\nCouncil will determine when and how it is appropriate to use the bank funds. XXXX is the bank manager, all requests should be forwarded to him or kingdom discord apply channel.\n\nIf everyone contributes regularly, there should be enough to go around. Any player who has been making the required contributions may request bank, and Council will determine whether the request can be fulfilled based on resource balances. Sometimes, priority will need to be given to T5 fighters who have higher hospital bills.\n\nIf you have any questions please inform us. Thank you.",
+        "tags": ["format:Coloured", "type:Kingdom Management"]
+    },
+    {
+        "title": "Kingdom Trophies",
+        "image": "/images/mail/template_previews/Kingdom_Trophies_Fancy.webp",
+        "content": "<color=#f14f00><size=30><b>  ⋘ ── ∗ ⋅◈ Kingdom Trophies ◈⋅ ∗ ── ⋙\n         ⋘ ─ ∗ ⋅◈ Heroic Helpers ◈⋅ ∗ ─ ⋙</b></size></color>\n\nThese people have a great tenacity to help our alliance members - thanks.\n\n<b><color=#F39C12>Legendary Trophy</color></b>\nPlayer 1\n\n<b><color=#9400D3>Epic Trophy</color></b>\nPlayer 2\nPlayer 3\n\n<b><color=#03A9F4>Elite Trophy</color></b>\nPlayer 4\nPlayer 5\nPlayer 6\nPlayer 7\nPlayer 8\n\n<b><color=#33FF00>Advance Trophy</color></b>\nPlayer 9\nPlayer 10\nPlayer 11\nPlayer 12\nPlayer 13\nPlayer 14\nPlayer 15\nPlayer 16\nPlayer 17\nPlayer 18",
+        "tags": ["format:Fancy", "type:Kingdom Management"]
+    },
+    {
+        "title": "Lord of War",
+        "image": "/images/mail/template_previews/Lord_of_War_Simple.webp",
+        "content": "Greetings! At 0.00 UTC today, an event called \"Lord of War\" began, where you gain points by increasing your troop power. This event will be fixed for players that <b>DO NOT </b>meet the current requirements. These are the requirements: \n\n<size=24><color=#ff6900><b>Event Rules</b></color></size>\n♦Governors below 1,000,000,000 KP - <b>150,000 Points MAXIMUM</b>\n\nIf anyone below 1b kp exceeds the point limit, the leadership council will determine their punishment based on the severity of the situation.\n\nWe fix these events to reward our active fighters that give a lot of time, troops, and resources for our kingdom's future. Please respect the effort these players go through, and don't push these events.\n\nSincerely,\n\n<b>XXXX Leadership & Council</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Off-season Activity v2",
+        "image": "/images/mail/template_previews/Off-season_Activity_v2_Simple.webp",
+        "content": "<b><size=65>- WEEKLY UPDATE -</size></b>\n\n<b>Hi Warriors,</b>\n\nStarting at <b>00:00 UTC every Sunday/Monday</b>, our weekly tracking resets.  \nHere's what kicks off this week:\n\n<color=#1E90FF><b>◆ Fort Tracking ◆</b></color>  \nMinimum: <b>100 forts per member per week</b>  \nTracking begins at <b>00:00 UTC every Monday</b>.  \nThe member with the <b>most forts completed</b> will receive a <b>special reward!</b>  \nKeep rallying — forts fuel our growth, alliance chests, and overall momentum.\n\n<color=#1E90FF><b>◆ Alliance Chest Tracking ◆</b></color>  \nWe must clear <b>3 alliance chests per day</b>.  \nThis requires <b>consistent fort participation and daily donations</b>.  \n<b>Everyone contributes. Everyone benefits.</b>\n\n<color=#1E90FF><b>◆ Offseason Focus ◆</b></color>  \nThe offseason is not downtime — it's preparation time.  \nStay active, build strong, and stay ready for what's next.  \n<b>Discipline now means dominance later.</b>\n\nLet's raise the standard, Warriors.  \nTogether, we rebuild stronger, faster, and sharper than ever.",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Off-season Activity",
+        "image": "/images/mail/template_previews/Off-season_Activity_Simple.webp",
+        "content": "<b><size=50>- OFFSEASON HAS BEGUN -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b><size=34>OFFSEASON IS NOT A VACATION — IT'S A MISSION.</size></b>\n\nWe're officially shifting gears. <b>Offseason begins now.</b> With it comes a new culture, new pace, and new expectations across Kingdom XXXX.\n\n<b>This is your wake-up call.</b>\nIf you're part of this community, you're expected to <b>grind, show up, and stay active.</b>  \nWe're done babysitting and done dragging dead weight. This next chapter is about <b>accountability, effort, and excellence.</b>\n\n<color=#1E90FF><b>What's Changing</b></color>\n◆ <b>FORTS, FORTS, FORTS!</b> Everyone will have minimum participation requirements. <i>Top performers will receive weekly rewards.</i>\n◆ <b>More forts = more AP, speedups, and alliance chests.</b> This is our #1 path to rebuild stronger for KvK NUMBER\n◆ <b>EVENT ATTENDANCE TRACKING</b> - Karuak, Silk Road, AOO, AM-every event matters.\n◆ <b>INACTIVITY = REMOVAL</b>-no exceptions. If you're not fighting or showing up, you're stepping out.\n\n<color=#1E90FF><b>Alliance Mobilization</b></color>\nWith the new AM minimums, there's <b>no excuse</b> not to hit level 18. Those rewards are <b>some of the best in the game,</b>make sure you're earning them.\n\nIf you're here for the <b>fun and the fight</b>, we're glad to have you.\nIf not, that's okay — reach out and we'll help you migrate when the gates open.\n\n<b>More details on fort and event requirements coming soon.</b>  \nLet's build a lean, mean, fighting machine — the kind of XXXX others envy.",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Now or Never v2",
+        "image": "/images/mail/template_previews/Now_or_Never_v2_Simple.webp",
+        "content": "Greetings! At 0.00 UTC today, an event called \"Now or Never\" began, where you gain points by using speed ups. This event will be fixed for players that <b>DO NOT </b>meet the current requirements. these are the requirements: \n\n<size=24><color=#ff6900><b>Event Rules</b></color></size>\n♦Governors below 1,000,000,000 KP - <b>25k Points MAXIMUM</b>\n\nIf anyone below 1b kp exceeds the point limit, the leadership council will determine their punishment based on the severity of the situation.\n\nWe fix these events to reward our active fighters that give a lot of time, troops, and resources for our kingdom's future. Please respect the effort these players go through, and don't push these events.\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:Event"]
+    },
+    {
+        "title": "Now or Never",
+        "image": "/images/mail/template_previews/Now_or_Never_Fancy.webp",
+        "content": "<color=#1D8BFE><b><size=30>☆ﾟ°˖* Legendary Commander Sculptures * ˖°ﾟ☆</size></b></color>\n\n<b><color=#066207>～··～··～··～··～··～··\n>Rank 1 → Player 1\n>Rank 2 → Player 2\n>Rank 3 → Player 3\n～··～··～··～··～··～··</color></b>\n\n<b>Which one is it?</b>\nNow or Never\nUse speedups\n\n<b>What's everyone else's maximum?</b>\n<b><color=red>10,000 minutes</color></b>\n\n<b>What happens if I go over?</b>\nIf you end up in the Top 10 and took less than 200k deads – starting fine is 1 billion resources. Everyone else will have credits used.\n\n<b>Why not have it open?</b>\nOur King was serious when he said KvK is over, it's been called. So, let's start preparing for our next KvK and saving those speedups.",
+        "tags": ["format:", "type:", "type:"]
+    },
+    {
+        "title": "New Leadership Announcement",
+        "image": "/images/mail/template_previews/New_Leadership_Announcement_Simple.webp",
+        "content": "<b><size=70>-LEADERSHIP ANNOUNCEMENT-</size></b>\n\n<b><size=40>Hey Warriors,</size></b>\n\nAs we continue building something strong and unified together, we want to thank <i>name</i> for the time, effort, and leadership poured into XXXX. Their consistency and commitment have helped carry this kingdom, and we're deeply grateful for the role they've played.\n\nWith that same spirit, we're proud to introduce our new leadership team.\n\n<b><size=32><color=#FF69B4>KING: <i>name</i></color></size></b>  \n<b><size=32><color=#1E90FF>CO-KINGS: <i>name</i>, <i>name</i>,\n<i>name</i></color></size></b>\n\n<b><size=30>COUNCIL & DEPARTMENTS:</size></b>\n<i>name</i> – Kingdom Management, Diplo\n<i>name</i> – Migration, MGE, War Lead\n<i>name</i> – Data, Member Management\n<i>name</i> – AOO, OL\n<i>name</i> – Events, RSS Seller, Territory\n<i>name</i> – Diplo\n<i>name</i> – War\n<i>name</i> – Diplo\n\n<b><size=30>ADVISORS:</size></b>\n<i>name</i>, <i>name</i>\n\n<i>Note: <i>name</i> will continue in current roles through KvK and step down after it ends.</i>\n\n<b><size=30>OUR MISSION:</size></b>\n◆ Become a competitive A seed.\n◆ Continue to grow into a fighting kingdom that shows up and gives it all. \n◆ With strategic migration, build a lean, mean, fighting machine.\n\nWe may be a young KD, but our team is built on experience. Every move we make is with strategy, purpose, and the future in mind. Thank you all for your continued support and trust.",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Purge Notice",
+        "image": "/images/mail/template_previews/Purge_Notice_v2_Simple.webp",
+        "content": "<b><size=80>-PURGE NOTICE-</size></b>  \n\n<b><size=40>Hey Warriors,</size></b>  \n\n<b>The purge begins on DATE at reset.</b>  \n\nIf you are NOT on the stay list, you must leave the kingdom before this day! This is your final warning. Anyone remaining who is not cleared to stay will be BURNED. No exceptions. (<i>TRIPLE CHECK YOUR MAILS FOR THE FULL STAY LIST</i>)\n\n<b>DATE AT 00:00: You must be out of the kingdom by reset if you are NOT on the stay list,</b><i> OR YOU WILL BE BURNED!!!</i>\n\n<b>Need a passport?</b> Go to <b>ALLIANCE</b> and request one NOW before it's too late.  \n\nIf you believe there's been a mistake, message <b>R4s</b> directly.",
+        "tags": ["format:Simple", "type:Kingdom Management"]
+    },
+    {
+        "title": "Purge Notice v2",
+        "image": "/images/mail/template_previews/Purge_Notice_Fancy.webp",
+        "content": "<b><color=#e60000>Important Notice - Further Kingdom Clean Up</color></b>\n\n<b>If you don't check this kingdom mail, you are responsible for everything. Read carefully.</b>\n\n<b><color=#1a237e>Leave list. Will be announced soon on Kingdom Discord</color></b>\n\n★ Don't try to avoid it. We noted all player ID's. ★\n\nCouncil has decided a kingdom clean up is needed to keep the kingdom healthy, this list has been created based on your account stats, KvK performance and activity, which is not what we are looking for in our Kingdom.\n\nIf your name is on this list, this means that you must leave within 10 days. Contact GOV NAME for passports.\n\nPassports will be given right before your migration.\n\nIf you don't migrate within an hour after receiving your passports, you will be zeroed.\n\nIf the period expires and you are still in the kingdom and did not inform any council members, you will be banned from all alliances and become a target that can always be zeroed.\n\nIf you have a farm account on this list, you must reduce your power below 30M power. Any account in the top 300 will be subject to review.\n\n<b>For kingdom and glory,\nRegards, XXXX council\n\n                                     ★☆★ Gloria Exercitus ★☆★</b>\n    <color=#D2B48C>@xxxx[{::::::::::::::::::::::::::::::::::> ★☆★ <::::::::::::::::::::::::::::::::::}]xxxx@</color>\n\n                                                       <color=#990000>  ̿  ̿' ̿'̵͇̿<color=#000000>з=(๏_๏)=*</color>/̵͇̿/'̿'̿ ̿ ̿ ̿</color>",
+        "tags": ["format:Fancy", "type:Kingdom Management"]
+    },
+    {
+        "title": "Karuak Guide | Hell",
+        "image": "/images/mail/template_previews/Karuak_Guide_Hell_Coloured.webp",
+        "content": "<b>Karuak Ceremony</b>\n\nThe following list is what will attack at each Hell level by troop type and number.\n\n<b>Remember</b> \n<color=blue><b>Cavalry</b> to beat Archers</color>\n<color=red><b>Archers</b> to beat Infantry</color>\n<color=purple><b>Infantry</b> to beat Cavalry</color>\n\n- - - - - - - - - - - - - - - - - - - \n\n<color=purple>1- Bringing <b>Cavalry</b>: 25,000 – Attack with <b>Infantry</b>\n2- Cavalry: 32,500</color>\n\n<color=blue>3- Archer: 37,500\n4- Archer: 42,500\n5- Archer: 75,000</color>\n\n<color=red>6- Infantry: 52,500\n7- Infantry: 57,500</color>\n\n<color=purple>8- Cavalry: 62,500\n9- Cavalry: 67,500\n10- Cavalry: 100,000</color>\n\n<color=blue>11- Archer: 85,000</color>\n\n<color=red>12- Infantry: 95,000</color>\n\n<color=purple>13- Cavalry: 115,000</color>\n\n<color=blue>14- Archer: 125,000\n15- Archer: 130,000</color>\n\n<color=red>16- Infantry: 150,000</color>\n\n<color=purple>17- Cavalry: 160,000</color>\n\n<color=blue>18- Archer: 210,000</color>\n\n<color=red>19- Infantry: 230,000\n20- Infantry: 340,000</color>\n\n<color=purple>21- Cavalry: 280,000</color>\n\n<color=blue>22- Archer: 300,000</color>\n\n<color=red>23- Infantry: 335,000</color>\n\n<color=purple>24- Cavalry: 355,000\n25- Cavalry: 365,000</color>\n\n<color=blue>26- Archer: 460,000</color>\n\n<color=red>27- Infantry: 520,000</color>\n\n<color=purple>28- Cavalry: 650,000</color>\n\n<color=blue>29- Archer: 750,000\n30- Archer: 1,250,000</color>",
+        "tags": ["format:Coloured", "type:Event", "type:Guide"]
+    },
+    {
+        "title": "Karuak Guide | Hell v2",
+        "image": "/images/mail/template_previews/Karuak_Guide_Hell_v2_Simple.webp",
+        "content": "<b><size=65>- KARUAK CEREMONY -</size></b>\n\n<b>Hi Warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\nEach level of the <b>Karuak Ceremony</b> features barbarians with specific troop types.  \nTo maximize efficiency, use counter troops for each level based on difficulty.\n\n<color=#1E90FF><b>Hell Difficulty</b></color>\n<b>Use Infantry →</b> 1–2, 8–10, 13, 17, 21, 24-25, 28\n<b>Use Cavalry →</b> 3–5, 11, 14-15, 18, 22, 26, 29-30\n<b>Use Archers →</b> 6–7, 12, 16, 19-20, 23, 27\n\nThese counters help reduce losses and finish stages faster.\nIt's not mandatory to follow, but it's strongly recommended for efficiency.\n\n<b>Stay consistent, support your teammates, and make every challenge count!</b>",
+        "tags": ["format:Simple", "type:Event", "type:Guide"]
+    },
+    {
+        "title": "KVK | Altar",
+        "image": "/images/mail/template_previews/KVK_Altar_Fancy.webp",
+        "content": "<color=#f14f00><size=30><b>⋘ ── ∗ ⋅◈ Let's get ready to rumble! ◈⋅ ∗ ── ⋙\n     ⋘ ── ∗ ⋅◈ Today's Altar Fight ◈⋅ ∗ ── ⋙</b></size></color>\n\n<color=#067eaa><b>Time to really start getting those Kills</b></color>\nBe ready to battle with a single march with some awesome AOE commanders. Polish off the gear, check the armaments, and finish off some crystal research. Then teleport your city in close and tight.\n\n<b>Battle commences TODAY from TIME\nAltar opens @ TIME</b>\nUK: TIME\nUSA EST: TIME\n[somewhere in the Asian timezone]\n\n<b><color=#00827f>Quick pointers</color></b>\n<b>|1| Follow all markers.</b> Move as one to make short work of Earth.\n<b>|2| Teleport like a pro. </b> Front lines are reserved for 2b + kps. Land neatly, and move if you're asked to.\n<b>|3| Bring your best Marches. </b> Wait near the pass to keep swap over quick. Ideally AOE, meta and fully kitted out with gear, armaments and crystal.\n<b>|4| Follow all markers. </b> I'm serious\n<b>|5| Kill Marked players first and then every Herman.</b>  Yes, it will hurt, but those behind will be juicy!\n<b>|6| Follow all markers. </b> You getting the vibe yet?\n\n<b><color=#00827f>Discord</color></b>\nMake sure you are in Discord to keep an eye on what's happening and to keep in touch whilst we're in different alliances.\n\n<b><color=#00827f>… and finally ‘cause I can</color></b>\nSongs to play about winning!\nTitanium (feat. Sia) by David Guetta\n\n<color=#070662><b><i>Leadership</i></b></color>\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:KVK"]
+    },
+    {
+        "title": "KVK | Altar Readycheck",
+        "image": "/images/mail/template_previews/KVK_Altar_Readycheck_Fancy.webp",
+        "content": "<color=#f14f00><size=30><b>⋘ ── ∗ ⋅◈ Let's get ready to rumble! ◈⋅ ∗ ── ⋙\n         ⋘ ── ∗ ⋅◈ Today's Altar Fight ◈⋅ ∗ ── ⋙</b></size></color>\n\n<color=#067eaa><b>Time to really start getting those Kills</b></color>\nBe ready to battle with a single march with some awesome AOE commanders. Polish off the gear, check the armaments, and finish off some crystal research. Then teleport your city in close and tight. You must stick with the ball and follow all markers. We have a chance if we run as a tight knit team.\n\n<b>Battle commences TODAY @ TIME\nAltar opens @ TIME</b>\nUK: TIME\nUSA EST: TIME\n[somewhere in the Asian timezone]\n\n<color=red><b>x x x --- Red Cross --- x x x</b></color>\nSoz, won't be there. I'm getting some beauty sleep or earning the money I'll spend here. At least I read what you sent me.\n\n<color=green><b>√ √ √ --- Green Tick --- √ √ √</b></color>\nLock it in. I'll be online as a high functioning fighter with catlike reflexes. Just wait till you see me. \n\n<color=grey><b>? ? ? --- No answer--- ? ? ?</b></color>\nI have commitment issues. Don't judge me.\n\nThis one is serious. We need to know, so reply honestly.\nSubtlety is my speciality\n\n<color=#070662><b><i>Leadership</i></b></color>\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:KVK"]
+    },
+    {
+        "title": "KVK | Autarch List",
+        "image": "/images/mail/template_previews/KVK_Autarch_List_Simple.webp",
+        "content": "<b><size=80>-AUTARCH LIST-</size></b>\n\n<b><size=35>Hey Warriors,</size></b>\n\n<b>We want to take a moment to say THANK YOU for your incredible work this KvK!</b>  \n<b>This is only the beginning.</b>\n\n<b><i>Below is our official Autarch list, recognizing those who went above and beyond, showing unmatched commitment and fighting till the end.</i></b>\n\n<b><size=30>AUTARCH LIST</size></b>\n\n<i>name</i>\n<i>name</i>\n<i>name</i>\n<i>name</i>\n<i>name</i>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Battle Guide",
+        "image": "/images/mail/template_previews/KVK_Battle_Guide_Simple.webp",
+        "content": "<b><size=65>-KVK BATTLE GUIDE-</size></b>\n\n<b>Hi Warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\n<b>Key tips and commands to help you fight effectively in KvK.</b>\n\n<color=#1E90FF><b>Battle Commands</b></color>\n<b>Ball:</b> Group tightly for offense or defense\n<b>Push:</b> Move as directed by markers\n<b>Burn:</b> Target enemy cities or flags\n<b>Full:</b> Fill rallies and structures\n<b>TP:</b> Teleport your city\n<b>Fix:</b> Repair gaps in the line\n<b>Inf / Cav / Arch:</b> Infantry, Cavalry, Archers  \n\n<color=#1E90FF><b>Fighting Tips</b></color>\n<b>1.</b> Collect Runes and use capacity buffs (+25% to +50%) before joining the Ball.\n<b>2.</b> Use correct troop types when attacking or defending. Reinforce flags from nearby cities.\n<b>3.</b> Always <b>follow markers</b> and leadership signals. Wrong movement weakens the formation.\n<b>4.</b> Watch pings, stay grouped, and fight smart — coordination wins wars.\n\n<b>Discipline, awareness, and teamwork lead to victory. Let's make every fight count!</b>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Important Dates",
+        "image": "/images/mail/template_previews/KVK_Important_Dates_Simple.webp",
+        "content": "<b><size=55>-KVK CARTEL CALENDAR-</size></b>\n\n<b><i>*All dates and times are subject to change depending on Chronicle achievements.</i></b>\n\n<b>Pass and Zone Openings</b>\n◆ DATE — Pass 5 Z6 opens, TIME UTC\n◆ DATE — Pass 6 Altars opens, TIME UTC\n◆ DATE — Pass 7 clash, TIME UTC\n◆ DATE — Pass 8 Kings Land opens, TIME UTC\n◆ DATE — Pass 5 FFA, TIME UTC\n◆ DATE — Pass 4 FFA, TIME UTC\n\n<b>Key Captures</b>\n◆ DATE — Circle capture, TIME UTC\n◆DATE — Ziggurat capture, TIME UTC\n\n<b>Altars of Darkness</b>\n◆ DATE — TIME UTC\n\n<b>Ancient Ruins</b>\n◆ DATES\n\n<b>MGE Cycles</b>\n◆ Inf — DATE\n◆ Arc — DATE\n◆ Lead — DATE\n\n<b>Ark of Osiris Windows</b>\n◆ Registration — DATE\n◆ Matches — DATES\n\n<b>Start and End</b>\n◆ LK ends — DATE",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Etiquette of Visiting Alliances",
+        "image": "/images/mail/template_previews/KVK_Etiquette_of_Visiting_Alliances_Fancy.webp",
+        "content": "<color=#0bc6a8><size=30>●▬๑† <b>Etiquette of Visiting Alliances</b> †๑▬●</size></color>\n\n\n<b>|1|</b> Leave your filthy mouths and bad attitudes at the door. At least until you've met the alliance!\n<b>|2|</b> Don't nick the silverware. Or anything from the alliance shop\n<b>|3|</b> Pull your weight. Participate with the alliance with battles, building, forts or resource assistance\n<b>|4|</b> Don't sit on the boss's seat. Or their territory. Particularly when its limited and/or disputed\n<b>|5|</b> Speak when spoken to. But never nag.\n\n\nFinally, know when your welcome has come to an end. You will be kicked at some point. It might not be rational. But know that we love(d) you...maybe\n\n\nFrom the mightiest to the smallest players, we are all here to get the most from this KvK and we all have a role to play. Follow these simple rules, and we'll all get along swimmingly. If not, expect a sudden and abrupt departure and potentially a rapid drop in power.\n\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:KVK"]
+    },
+    {
+        "title": "KVK | Kingsland",
+        "image": "/images/mail/template_previews/KVK_Kingsland_Simple.webp",
+        "content": "<b><size=65>- KINGSLAND BEGINS -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b>Kingsland begins on 00/00 at 00:00 UTC.</b>\nThis is it — the moment we've prepared for. Lock in, stay alert, and be ready to fight.\n\nIf you missed the Town Hall, here's what matters most:\n\n<color=#1E90FF><b>1. Teleport Correctly</b></color>\nIf you teleport wrong, you'll be asked to move.\n<color=#1E90FF><b>2. Alliance Overflow</b></color>\nIf one alliance is full, apply to another active alliance — fights are coordinated.\n<color=#1E90FF><b>3. Join VC</b></color>\nVoice comms save seconds, and seconds win wars.\n<color=#1E90FF><b>4. Stay in the Ball</b></color>\nWe're using a <b>defensive line strategy</b>. Hold your ground, rotate back if yellow, but don't flee.\n<color=#1E90FF><b>5. Follow Markers</b></color>\n<color=#FF0000><b>RED = Attack</b></color>\n<color=#32CD32><b>GREEN = Ball Up</b></color>\n\n<b>Remember:</b> we don't run from war, we stand together in it.\nOthers may avoid real fights — we thrive in them.\n<b>Our strength is unity, discipline, and heart.</b>\n\n<b>Kingsland is where everything counts.</b>\nShow up, stay calm, follow calls, and make this a battle they'll never forget.\n\n<b>More strategies and updates will follow — keep your favorites marked.</b>",
+        "tags": ["format:", "type:", "type:"]
+    },
+    {
+        "title": "KVK | Kingsland v2",
+        "image": "/images/mail/template_previews/KVK_Kingsland_v2_Simple.webp",
+        "content": "<b><size=65>- KINGSLAND WAR -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b>Kingsland begins on 00/00 at 00:00 UTC.</b>  \nBe online 1–2 hours early and ready to fight.\n\n<color=#1E90FF><b>Battle Reminders</b></color>\n◆ If you go offline, teleport to safety to make space for active fighters.\n◆ No bubbling or AFK on frontlines — clear space for reinforcements.\n◆ Use expansions, boosts, and runes — check your gear, presets, and talents.\n◆ Reinforce from nearby cities (10s or less) and only to garrisons or flags.\n◆ Pre-place reinforcements in cities around key objectives.\n◆ Stay on alliance territory — avoid unnecessary city rallies.\n◆ Join war voice chat — communication wins fights.\n◆ Do not sit in passes — keep them clear for entry movement.\n◆ Follow markers:\n<color=#FF0000><b>RED = Attack</b></color>\n<color=#32CD32><b>GREEN = Ball Up</b></color>\n◆ Let rally and garrison leads teleport first before flag fights.\n\n<color=#1E90FF><b>Pro War Tips</b></color>\n• Match troop types when reinforcing.\n• Fight in a Ball and hold your ground for maximum buffs.\n• Avoid enemy AOE near flags and reposition quickly.\n• Heal in batches and monitor hospital space.\n• Focus on objectives — DKP will follow.\n\n<b>Fight smart, stay united, and give it everything. This is our final push — no excuses. Win or lose, we fight together till the end.</b>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Registration",
+        "image": "/images/mail/template_previews/KVK_Registration_Fancy.webp",
+        "content": "<color=#0bc6a8><size=30>     ●▬▬▬๑† <b>KvK here we come</b> †๑▬▬▬●\n  ●▬๑† ӝ <b> Let's get ready to rumble </b> ӝ †๑▬●</size></color>\n\nMonday we will be registering for our Kingdom's number KvK. It's our fourth ‘pop' so if we get to choose, we'll go Nile\nI know, I said never again, but here we are!\n\n<b><color=#00827f>Quick pointers</color></b>\n<b>|1| Eve of the Crusade or Pre-KvK:</b> You'll have to participate! So, think about setting troops to land on Sunday.\nCheck out rok-calculator to work out when to set yours.\n<b>|2| DKPs:</b> Apply to all City Hall 25 regardless of power. Base power will be collected prior to pre-KvK training.\n\n<b><color=#00827f>Key Dates</color></b>\n<b>Already started!</b> Training T5 with 22k boost\n<b>DATE</b> Training T4 with 22k boost\n<b>DATE</b> Marauders\n<b>DATE</b> Lost Kingdom opens\n<b>DATE</b> Pass 6 (first field fighting) approx.\n\n<b><color=#00827f>Discord</color></b>\nMake sure you are in Discord to keep an eye on what's happening and to keep in touch whilst we're in different alliances.\n\n<b><color=#00827f>… and finally ‘cause I can</color></b>\nSongs to play about things repeating!\nClockwork by Phrase\n\n<color=#070662><b><i>Leadership</i></b></color>\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:KVK"]
+    },
+    {
+        "title": "KVK | Ruins Timetable",
+        "image": "/images/mail/template_previews/KVK_Ruins_Timetable_Fancy.webp",
+        "content": "NOTE: You can copy & paste dates from any of the TKC timetables, just make sure the dates are in a format that your camp understands. Which normally means the very odd mm/dd/yyyy format\n\n<b>Ancient Ruins Timetable!\n\n<color=#d81b60>The Ancient Ruins opens every: 39hrs for an hour</color></b>\n\n<color=#283593><i>1.  DATE TIME (Kill 3 stalkers – Hope you got that!)\n2.  DATE TIME\n3.  DATE TIME\n4.  DATE TIME\n5.  DATE TIME\n6.  DATE TIME\n7.  DATE TIME\n8.  DATE TIME\n9.  DATE TIME\n10.  DATE TIME\n11.  DATE TIME\n12.  DATE TIME\n13.  DATE TIME\n14.  DATE TIME\n15.  DATE TIME\n16.  DATE TIME\n17.  DATE TIME\n18.  DATE TIME\n19.  DATE TIME\n20.  DATE TIME\n21.  DATE TIME\n22.  DATE TIME\n23.  DATE TIME\n24.  DATE TIME\n25.  DATE TIME\n26.  DATE TIME\n27.  DATE TIME\n28. DATE TIME</i></color>\n\n<color=#d32f2f><i><b>Make sure you send 1 march to ruin before going to bed to generate your honor points as much as possible\n\nFavorite this mail so you won't miss the timetable. </b></i></color>\n\n<color=#070662><b><i>Leadership</i></b></color>\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:KVK"]
+    },
+    {
+        "title": "KVK | War Hype",
+        "image": "/images/mail/template_previews/KVK_War_Hype_Fancy.webp",
+        "content": "<color=#8B0000><size=44>▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌</size></color>  \n<size=38><b>                           XXXX CAMP </b></size>  \n<size=34><b>            Xx WAR CALL= NO MERCY xX</b></size>  \n<color=#8B0000><size=44>▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌</size></color>  \n\n<i><size=24>Motivational mail for Kingsland… ready for it? </size></i>  \n\n<size=45><color=#B22222><b>SHOW UP</b></color></size>\n<size=45><color=#8B0000><b>FIGHT TILL THE END</b></color></size>  \n<size=45><color=#4B0000><b>DOMINATE</b></color></size>  \n<size=45><color=#1A0000><b>WIN</b></color></size>  \n\n<b> *ALSO-This is KVK! Please teleport as close as possible, like canned sardines, so close you could smell the other city, so close that there are NO GAPS, so close that you dont need me to tell you this.. just do it!*</b>\n\n*ALSO BUBBLE IF YOU ARE AT PASS 8.*\n\n<i><b>\"It's not about how hard you hit, it's about how hard you can get hit and keep moving forward.\"</b></i>\n<i>– Guess the movie??</i>",
+        "tags": ["format:Fancy", "type:KVK"]
+    },
+    {
+        "title": "KVK | Pass Opening",
+        "image": "/images/mail/template_previews/KVK_Pass_Opening_Simple.webp",
+        "content": "<b><size=65>- PASS 4 OPENING -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b>At 00/00 @ 00:00 UTC</b>, <b>Pass Level 4</b> will open and our first major fight begins.  \nThis is where preparation meets execution — let's start strong.\n\n<color=#1E90FF><b>Before the Pass Opens</b></color>  \n◆ Save your <b>bastion quests</b> to unlock key skills faster.  \n◆ Join the <b>Allied Discord</b> and <b>get verified early.</b>  \nBeing in <b>voice call</b> is crucial for real-time coordination — don't miss important calls.\n\n<color=#1E90FF><b>When the Pass Opens</b></color>  \nWe'll <b>swarm it immediately</b> with our strongest players.  \n<b>Do NOT interfere</b> — only a limited number can hit the pass at once.  \nSpeed and discipline will determine victory.\n\nOnce the pass falls, we'll begin <b>building into Zone 5.</b>  \nWatch for markers and follow instructions in <b>voice chat.</b>  \n<b>Unity wins wars — follow calls without hesitation.</b>\n\n<color=#1E90FF><b>Teleport Rules</b></color>  \n◆ <b>Do NOT teleport in immediately.</b> Rally and Garrison leads go first.  \n◆ <b>Do NOT random TP</b> unless you can handle a full swarm and have strong gear and armaments.  \n◆ <b>Do NOT teleport on allied territory</b> — enemies can still target you there.  \n◆ If you random TP into Zone 5, <b>focus on forts</b> and fill as needed — every fort counts.\n\n<b>Final Prep:</b>  \n◆ Set your <b>marches and presets</b>  \n◆ Pop <b>troop expansions</b>  \n◆ Grab your <b>rune</b> and activate your <b>attack or defense buff</b>\n\n<b>Stay sharp. Stay united. Execute with precision.</b>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Pass Opening v2",
+        "image": "/images/mail/template_previews/KVK_Pass_Opening_v2_Simple.webp",
+        "content": "<b><size=65>- PASS 7 WAR PREP -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b><size=35>FINAL REMINDERS BEFORE WAR</size></b>\n\nThe fight at <b><color=#1E90FF>Pass 7 begins 00/00 @ 00:00 UTC</color></b> followed by <b><color=#1E90FF>Kingsland on 00/00 @ 00:00 UTC</color></b>.  \n<b>Every move matters. Coordination wins wars.</b>\n\n<color=#1E90FF><b>Frontline Teleports</b></color>  \nReserved ONLY for <b>rally leads, garrisons, and leadership.</b>  \n<b>Do NOT TP to front</b> unless filling or leading. Walk up if not killing troops.\n\n<color=#1E90FF><b>Fillers & Farms</b></color>  \nSend all 3 troop types and fill nearby flags or cities.  \n<b>Don't waste your main's troops,</b>save for Kingsland.\n\n<color=#1E90FF><b>Logging Off?</b></color>  \n<b>DO NOT bubble or AFK on frontlines.</b> TP out and free your spot for active players.\n\n<color=#1E90FF><b>Guardians</b></color>  \n<b>Do NOT hit before 00:00 UTC.</b>\n\n<color=#1E90FF><b>War Reminders</b></color>  \n◆ <b>If offline, you'll be kicked — TP to safety</b>  \n◆ <b>No bubbling or AFK on front</b>  \n◆ <b>Use boosts, runes, bastions, gear, presets</b>  \n◆ <b>Reinforce from nearby — pay attention</b>  \n◆ <b>Stay on alliance territory — avoid rallies</b>  \n◆ <b>Mute Discord unless leading</b>  \n◆ <b>FOLLOW MARKERS and wait for callouts</b>\n\n<color=#1E90FF><b>§ Pro Tips §</b></color>  \n• Match troop types in rallies and flags  \n• Fight in a ball for buffs and protection  \n• Avoid enemy AoE around flags  \n• Heal in batches between pushes\n\n<b>Fight smart. Be present. No excuses. Let's make it count.</b>  ",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Pass Opening v3",
+        "image": "/images/mail/template_previews/KVK_Pass_Opening_v3_Simple.webp",
+        "content": "<b><size=65>- WAR REMINDER -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b>It's almost time! War begins on 00/00 at 00:00 UTC.</b>  \nBe ready <b>1–2 hours before</b> to prepare and get fully buffed.\n\n<color=#1E90FF><b>Battle Reminders</b></color>  \n◆ If offline, teleport to safety zones before war starts.  \n◆ No bubbling or AFK on the frontlines — make space for active fighters.  \n◆ Use expansions, boosts, and runes; double-check your gear, presets, and talents.  \n◆ Reinforce from <b>nearby cities (10s or less)</b> only.  \n◆ Stay on <b>alliance territory</b> for buffs and protection.  \n◆ Mute Discord when not speaking — follow leader calls clearly.  \n◆ <b>Follow markers</b> and move as one unit for buffs and synergy.  \n◆ Wait for garrison and rally leads to teleport first before flag fights.\n\n<color=#1E90FF><b>Pro War Tips</b></color>  \n• Match troop types in rallies and garrisons.  \n• Avoid unnecessary field fights — <b>fight in a Ball</b> and stay grouped.  \n• Watch for <b>enemy AOE near flags</b> and move out of range fast.  \n• Check your hospital often and heal in small batches to stay battle-ready.\n\n<b>Fight smart, stay disciplined, and give it everything you've got. This is our final stand — no excuses, no holding back. Win or lose, we fight together till the end!</b>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Pass Opening v4",
+        "image": "/images/mail/template_previews/KVK_Pass_Opening_v4_Fancy.webp",
+        "content": "<color=#f14f00><size=30><b>⋘ ── ∗ ⋅◈ Time to Battle ◈⋅ ∗ ── ⋙\n⋘ ── ∗ ⋅◈ Pass opening [time] ◈⋅ ∗ ── ⋙</b></size></color>\n\n<color=#067eaa><b>Time for the fun to start</b></color>\n\nBring down your best marches with equipment to the marked area at [time]. We're sure by now you all know the drill. A quick reminder:\n\n<b><color=#066207><size=25>⋘ ── BIG TICKET ITEMS ── ⋙</size></color></b>\n1. Take stock and set a budget for resources and speedups.\n2. Empty your hospital.\n3. Finish off today's bastion quests.\n4. Use up your Kahar's Bone Whistles.\n5. Spend as much crystal as possible.\n\n<b><color=#066207><size=25>⋘ ── SETTING YOUR SET UP ── ⋙</size></color></b>\nCheck the following and make sure your slots are sorted.\n<b>City skin</b>\n<b>Commander pairs</b>\n<b>Equipment</b>\n<b>Formations & armaments</b>\n\n<b><color=#066207><size=25>⋘ ── TELEPORTING ── ⋙</size></color></b>\nJoin [alliances] and make sure you are on alliance territory.\n\n<b><color=#066207><size=25>⋘ ── OFFLINE ── ⋙</size></color></b>\n<b>Do not use a shield and steal a spot from someone</b> who can be online and fight. We don't care if you're a big/small player - If you weren't supposed to be somewhere shielded, teleport before going offline.\n\nPutting a shield on is like putting on Durex protection before you go out– it is not going to work at midnight.\n\n<b>Remove reinforcements in your city</b> before leaving the frontline. No one wants to run a marathon to get their troops back.\n\n<color=#070662><b><i>Leadership</i></b></color>\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:KVK"]
+    },
+    {
+        "title": "KVK | Important Dates v2",
+        "image": "/images/mail/template_previews/KVK_Important_Dates_v2_Coloured.webp",
+        "content": "Here is every important date you need to know, save this mail in your favorites to check it whenever you want.\n\n<b><color=#e91e63>●</color></b><b>Pre-KvK:</b>\n<color=#f44336><b>Stage 1:  \"The Lost Secret (DATE) \"</b></color> Kill Marauders to earn Satchels containing Parchments. Trade sets of Parchments for chests containing rewards.\n<b><color=#0d47a1>Stage 2: \"Clash of Civilizations (DATE)\"</color></b> Destroy Marauder Encampments (Forts) for rewards.\n<b><color=#e91e63>Stage 3: \"Prepare for Battle (DATE)\"</color></b> Train Troops.\nWe will have a training buff daily at TIME UTC . Warriors that want to start popping their 50/20K BOOST can start preparing for Pre-KvK Training\n\n<b><color=#f44336>●</color></b><b> KvK Important Dates:</b>\n<b><color=#388e3c>1st Ruins:  (DATE)</color></b>\n<b><color=#e60000>Pass 4 - Fighting:  (DATE)</color></b>\n<b><color=#0d47a1>Pass 5 - No Fighting:  (DATE)</color></b>\n<b><color=#673ab7>1st Altar: (DATE)</color></b>\n<b><color=#0d47a1>Pass 7 - Fighting: (DATE)</color></b>\n<b><color=#f44336>Pass 8 - KL Fight: (DATE)</color></b>\n\nPlease try to schedule time on the importance of those times to be online.",
+        "tags": ["format:Coloured", "type:KVK"]
+    },
+    {
+        "title": "KVK | Pre-KVK Marauders",
+        "image": "/images/mail/template_previews/KVK_Pre-KVK_Marauders_Simple.webp",
+        "content": "<b><size=65>- PRE-KVK REMINDER -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b>Marauder Phase</b> is officially here!  \nRemember to <b>calibrate your AP</b> every point matters. The true value lies with <b>Lost Kingdom barbarians,</b> who drop <b>crystals</b> used to upgrade your <b>Crystal Tech</b>. Stronger tech means stronger performance in war.\n\n<b>Save your AP now, push smart in LK,</b> and plan your resources for maximum impact.  \nOur <b>Kingdom-wide push</b> will take place during the <b>Training Phase</b> be ready!\n\nThis is the calm before the storm. Prepare wisely, fight strategically, and make every action count.",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Pre-KVK Stages",
+        "image": "/images/mail/template_previews/KVK_Pre-KVK_Stages_Simple.webp",
+        "content": "<b><size=60>- EVE OF THE CRUSADE -</size></b>\n\n<b>Hi Warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\n<b>The Eve of the Crusade event begins on 00/00!</b>  \nThis <b>Pre-KvK stage</b> determines our kingdom's <b>starting position</b> in Lost Kingdom, so <b>every point matters.</b>\n\n<color=#1E90FF><b>Stage 1: Marauders (00/00–00/00)</b></color>  \nDefeat <b>Marauders</b> to earn <b>Worn Leather Satchels</b> that drop <b>Scraps of Parchment.</b>  \nCollect all <b>7 Parchments</b> to exchange for <b>Kingdom Supply Chests</b> and gain both <b>Individual</b> and <b>Kingdom Crusade Points.</b>  \n<b>Use everything before reset</b> — unused items vanish after this stage.\n\n<color=#1E90FF><b>Stage 2: Marauder Encampments (00/00–00/00)</b></color>  \n<b>Rally Marauder Encampments</b> like forts to earn <b>Individual</b> and <b>Kingdom points.</b>\n\n<color=#1E90FF><b>Stage 3: Troop Training (00/00–00/00)</b></color>  \n<b>Train troops</b> to earn points. Upgrading units also counts by tier difference.  \n<b>Wait for buffs and Runes</b> before training for the <b>best advantage</b> and maximum point gain.  \n<b>Train smart</b> and get ready to push hard.\n\n<b>Lost Kingdom opens at 00:00 on 00/00.</b>  \n<b>XXXX</b> will be pushing for <b>top placement.</b>\n\n<b>Stay focused, plan smart, and let's make this our strongest start yet!</b>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Pre-KVK Stages v2",
+        "image": "/images/mail/template_previews/KVK_Pre-KVK_Stages_v2_Simple.webp",
+        "content": "<size=22><color=#ff6900><b>Day 1 & 2 ~ Barbarian Marauders</b></color></size>\n♦ Collect War Runes (10% Health, Defense, Attack) or Barbarian Runes (Bonus Damage to Barbarians)\n♦ Apply 5% or 10% Attack or Defense Boosts\n♦ Always travel in groups \n♦ Always use 4-5 marches \n♦ Open large amounts of satchels at the same time for best results.\n\n<size=22><color=#ff6900><b>Day 3 & 4 ~ Barbarian Marauder Forts</b></color></size>\n♦ Collect War Runes (10% Health, Defense, Attack)\n♦ Apply 5% or 10% Attack or Defense Boosts \n♦ Completely fill every rally\n♦ have 1 march rallying a fort, and 4 marches joining rallies for best results\n♦ Make sure you join rallies with the correct troop type\n♦ Spread out and join rallies closest to you.\n♦ If a rally is more than 5 minutes away, do not join.\n♦ If you're a strong player, join other alliances to help others do more forts\n\n<size=22><color=#ff6900><b>Day 5 & 6 ~ Troop Training</b></color></size>\n♦Collect 15% Training Rune before opening 10k, 20k, or 50k reserves.\n♦Train troops during 10% training kingdom buff\n♦Ask for duke title in kingdom chat before you train\n♦Go crazy training troops!\n\nLet's push hard during Pre-KvK and show the other kingdoms that we're active and ready to fight! If you're having trouble getting points in any of these events, please contact your alliance leaders so they can help you get as many points as possible.\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Pre-KVK Training Buff Schedule",
+        "image": "/images/mail/template_previews/KVK_Pre-KVK_Training_Buff_Schedule_Simple.webp",
+        "content": "<b><size=45>- PRE-KVK TRAINING PHASE -</size></b>\n\n<b>Hi Warriors,</b>\n\nThe <b>Training Phase</b> of Pre-KvK is officially here!  \nIf you plan to push power, reach out to leadership so we can help coordinate buffs and timing.\n\n<color=#1E90FF><b>Training Buff Times</b></color>  \n◆ <b>00:00 UTC</b>  \n◆ <b>16:00 UTC</b>  \n◆ <b>20:00 UTC</b>  \n\nUse these windows to maximize efficiency, stack runes, titles, and training buffs for best results.\n\n<color=#1E90FF><b>Guardian Kill Times</b></color>  \n<b>Friday:</b> <b>00:00 UTC</b>  \n<b>Saturday:</b> <b>00:00 UTC</b> • <b>00:00 UTC</b>  \n<b>Sunday:</b> <b>00:00 UTC</b> • <b>00:00 UTC</b>  \n\nMake sure to be on time and ready for rotations,guardians provide essential buffs for Pre-KvK preparation.\n\n<b><i>FOLLOW MARKERS AND WATCH MAILS FOR LIVE UPDATES</i></b>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Requirements",
+        "image": "/images/mail/template_previews/KVK_Requirements_Simple.webp",
+        "content": "                                           <size=30><b><color='#e60000'>KvK requirements!</color></b></size>\n\nWe registered for KvK! As usual we will have requirements for everyone next KvK, these apply to every player, no matter alliance, power or rank. We have based the requirements on previous 3 KvK's averages, these should be achievable for every player who shows up to fight and participate.\n\nAfter careful considerations we determined the requirements as follows: \n• 100M+ power: 550.000.000 killpoints and 3.000.000 dead troops\n• 90M-99 power: 400.000.000 killpoints and 2.500.000 dead troops\n• 80M-89M power: 300.000.000 killpoints and 2.000.000 dead troops\n• 70M-79M power: 200.000.000 killpoints and 1.500.000 dead troops\n• 60M-69M power: 100.000.000 killpoints and 1.000.000 dead troops\n• 50M-59M power: 55.000.000 killpoints and 800.000 dead troops \n• <50M power with city hall lvl 25: 25.000.000 killpoints and 500.000 dead troops\n\nBy being a part of our kingdom we assume you accept these requirements and help our kingdom during war. A data scan will be done tomorrow to determine which category is applicable for each player. If you want to delete some troops to fall into a lower requirement category do so before tomorrow 20 UTC.",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Requirements v2",
+        "image": "/images/mail/template_previews/KVK_Requirements_v2_Simple.webp",
+        "content": "<b><size=40>- SAMPLE KVK REQUIREMENTS -</size></b>\n\n<b>Hi Warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\nAs we prepare for the upcoming KvK, every fighter is expected to step up and contribute. To keep things fair and effective, the following <b>Kill Point (KP)</b> and <b>Dead Troop</b> minimums are based on your <b>power level before pre-KvK.</b>\n\n<color=#1E90FF><b>Power Brackets & Requirements</b></color>  \n40M–50M → <b>80M KP</b> | <b>350K Deads</b>  \n50M–60M → <b>100M KP</b> | <b>400K Deads</b>  \n60M–70M → <b>120M KP</b> | <b>500K Deads</b>  \n70M–80M → <b>140M KP</b> | <b>750K Deads</b>  \n80M–90M → <b>200M KP</b> | <b>900K Deads</b>  \n90M–100M → <b>300M KP</b> | <b>1.2M Deads</b>  \n100M–110M → <b>400M KP</b> | <b>1.5M Deads</b>  \n110M–120M → <b>500M KP</b> | <b>1.8M Deads</b>  \n120M–130M → <b>600M KP</b> | <b>2.2M Deads</b>\n\n<color=#1E90FF><b>Flag Fillers</b></color>  \nDeads from fillers count at a <b>0.3x rate</b> toward your main's total.  \nIf you plan to use a filler, <b>notify leadership in advance</b> for tracking.\n\n<color=#1E90FF><b>Tracking & Enforcement</b></color>  \nThese requirements are <b>mandatory</b> and will be monitored during KvK.  \nThe <b>DKP Sheet</b> will be updated regularly so you can track your progress.  \nAim for <b>100% completion</b> in your bracket to remain in good standing.\n\nIf you need guidance for prep, training, or combat strategy, <b>reach out to leadership early.</b>\n\n<b>Prepare well. Fight hard. Make this KvK one to remember.</b>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Requirements v3",
+        "image": "/images/mail/template_previews/KVK_Requirements_v3_Simple.webp",
+        "content": "<b>***PLEASE FAVORITE THIS MAIL***</b>\n\nWe as a leadership team desire to have expectations on contributions for KvK. The reason for this is two-fold: \n\n1. It helps you understand the goals you ought to achieve and doesn't leave you guessing if you contribute enough. \n\n2. It helps us as a leadership team know which players do not contribute enough to our kingdom's success.\n\nWe ask that all players take these requirements seriously, our kingdom's success depends on your efforts during KvK!\n\n<size=24><i><b>KvK Expectations</b></i></size>\n[100M+ Power]------------------[** Kills + ** deads]\n[99M - 90M Power]------------[** Kills + ** deads]\n[89M - 80M Power]----------------[** Kills + ** deads]\n[79M - 70M Power]--------------[** Kills + ** deads]\n[69M - 60M Power]---------------[** Kills + ** deads]\n[59M - 50M Power]-----------------[** Kills + ** deads]\n[49M - 40M Power]-------------------[** Kills + ** deads]\n[39M - 30M Power]-------------------[** Kills + ** deads]\n[29M - 10M Power]---------------------------[** Kills + ** Deads]\n[(<b>FOR FARMS ONLY</b>) ~ ** Deads]\n\nIf you have any questions about these expectations, please contact your alliance leadership.\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Teleporting 101",
+        "image": "/images/mail/template_previews/KVK_Teleporting_101_Simple.webp",
+        "content": "<b><size=65>- TELEPORTING 101 -</size></b>\n\n<b>Hi Warriors,</b>\n\n<b><size=35>Fight Smart, Teleport Smarter</size></b>\n\nFrontline teleports are <b>reserved for heavy hitters, leadership, and war leads</b> with the power and tech to hold the line.  \n<i>FOLLOW MARKERS!</i> \n\nEveryone else, fill in <b>tight like sardines</b> behind or around them. <b>No gaps, no wasted space.</b>\n\n<color=#1E90FF><b>Teleport Smart</b></color>  \n◆ Stick to the <b>R4 markers</b>  \n◆ Leave <b>zero gaps</b>  \n◆ Stay close and ready to move when called  \n◆ Watch Discord for live reposition calls\n\n<color=#1E90FF><b>Altar Reminder</b></color>  \nAltars will be managed by coalition commands. <i>FOLLOW MARKERS!</i>  \nEveryone must be in VC with their team. This is critical for all future zone fights, rallies, and garrison defense <b>FOLLOW MARKERS!</b>\n\nIf your city is blocking a key position or needs adjustment, leadership may ask you to move. Don't take it personally, <b>efficiency and coordination win wars.</b>  \n\n<i>And just to make sure it's clear…</i> <b>FOLLOW MARKERS!</b>",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Teleporting 101 v2",
+        "image": "/images/mail/template_previews/KVK_Teleporting_101_v2_Fancy.webp",
+        "content": "<color=#000080><size=44>══════ ༺✿༻ ══════</size></color>  <size=38><b>                        TELEPORTING 101</b></size>  \n<color=#000080><size=44>══════ ༺✿༻ ══════</size></color>  \n\n<b><size=40>Hey Warriors,</size></b>\n<b><size=35>Fight Smart, Teleport Smarter</size></b>\n\n<b>Frontline teleports are reserved for our big guys, leadership, war leads, and heavy hitters with the power and tech to hold the line.</b> <i>FOLLOW THE MARKERS!</i>\n\nEveryone else, please fill in <b>tight like sardines</b> behind or around them. <b>No gaps, no wasted space</b>.\n\n<b>Teleport smart:</b>\n• Stick to the R4 markers\n• Leave <b>zero</b> gaps\n• Stay as close as possible to one another\n• Be ready to move if needed\n\n<b>Altars Reminder:</b>\nOur altars will be led by coalition commands.<i>FOLLOW MARKERS!</i> Everyone must be in VC with the team and <i>FOLLOW MARKERS!</i>. <b>This is also key for all future zone fights, rallies, garrisons, and keeping it efficient.</b>\n\nIf your city is in the wrong spot or taking up a key slot, we might ask you to move, don't take it personally. <b>It's all about making sure we stay efficient and secure as a front, did i mention…</b><i>FOLLOW MARKERS!</i>\n\n<color=#FF69B4><i>WE ARE STRONGER TOGETHER</i></color>  \n<color=#1E90FF><b><i>—Council</i></b></color>  \n<color=#000080><size=46>════════════════ </size></color>",
+        "tags": ["format:Fancy", "type:KVK"]
+    },
+    {
+        "title": "KVK | Zone Recap",
+        "image": "/images/mail/template_previews/KVK_Zone_Recap_Simple.webp",
+        "content": "<b><size=55>-ZONE 5 RECAP-</size></b>  \n\n<b>Hi warriors,</b>  \n\nFirst and foremost, <b>Thank you</b> warriors for the time and dedication you gave, whether it was rearranging work and family schedules or even playing while on vacation to be here locked in and contributing. <b>That kind of commitment does not go unnoticed. You gave it your best and left it all on the field. </b>While the sanctuary was lost, what we accomplished together in this zone was nothing short of an <b>AMAZING KD## performance,and we as a leadership team could not be more proud. </b>\n\n<b>KD## Stats This Zone:</b>  \n◆ <b>Power:</b> DATA  \n◆ <b>Kill Points:</b> DATA \n◆ <b>Deads:</b> DATA  \n◆ <b>T4 Kills:</b> DATA  \n◆ <b>T5 Kills:</b> DATA \n◆ <b>DKP:</b> DATA  \n\n<b>Special Shout-Outs:</b>  \nGOVERNOR NAMES  \n\n<b>These numbers tell the story, you fought hard, you made an impact, and you represented KD## with heart and strength.  </b>\n\n<b><i>Now it is time to recharge and get ready for the next zone. Every battle makes us sharper, every loss makes us stronger. The next push is coming, and when it does, we will be ready.  </i></b>\n\nStand tall warriors. The fight is not over. The best is still ahead of us.  ",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "KVK | Zone Recap v2",
+        "image": "/images/mail/template_previews/KVK_Zone_Recap_v2_Simple.webp",
+        "content": "<color=#008080><size=38>══════════════★XXXX★</size></color>\n<color=#008080><size=40><b>-XXXX CAMP-ZONE 5-</b></size></color>  \n\n<b>Hi warriors,</b>  \n\nFirst, thank you. You showed up, you fought hard, and you gave your time. Whether it was hours on the front lines or rearranging real life to make it work, it mattered. We see you, and we are proud of you.  \n\n<b>Zone 5 Totals:</b>  \n◇ <b>DATA KP gained</b> (DATA B from T5 alone)  \n◇ <b>DATA deads</b> for the camp  \n◇ <b>DATA heals</b> saved compared to others  \n\n<size=44><color=#008080><b>XXXX CAMP WON IN DKP!</b></color></size>  \nThis is huge. It means our camp stood stronger in contribution and impact than the rest. Every march you sent and every moment you gave put us ahead. That is something to celebrate.  \n\n<b>Mistakes happened, but mistakes are lessons, not losses. Lessons only make us sharper and hungrier for the zones ahead. This is not the end, it is the set up for something greater.  </b>\n\n<b>While we wait for the next zone, focus on:</b>  \n◇ <color=#008080><b>Farming:</b></color> Gather heavy, stock up resources.  \n◇ <color=#008080><b>Bastions:</b></color>Complete quests for crystal tech.  \n◇ <color=#008080><b>Training:</b></color> Keep Training nonstop. \n◇ <color=#008080><b>Research:</b></color> Keep pushing Tech!!\n\n<b><i>Be proud, warriors. You have proven XXXX Camp is resilient, united, and dangerous. Rest, recharge, and prepare, because our biggest battles and our biggest victories are still ahead.  <3 </i></b>\n\n<color=#32CD32><i>The best is yet to come. WE are STRONGER TOGETHER.</i></color> \n\n<color=#008080><b>-XXXX Camp Leadership</b></color> ",
+        "tags": ["format:Simple", "type:KVK"]
+    },
+    {
+        "title": "MGE | Sign-up v2",
+        "image": "/images/mail/template_previews/MGE_Sign-up_v2_Simple.webp",
+        "content": "Greetings! Next week begins our Mightiest Governor Event. This event will be <b>fixed</b>, and we will be accepting applications through our <i><b>#mge-applications</b></i> discord channel. Please post a comment with the following information:\n\n1. Name:  \n2. Power:  \n3. VIP Level:  \n4. Which commander are you applying for?: \n5. What skills does this commander have(Ex. 5111, 5551, Locked):  \n6. Why this commander (Open Field, Rally/Garrison, Canyon):  \n7. Screenshot of your best gear that will be used with this commander:\n\nIf you do not use discord, please send your application to an alliance leader.\n\nIf you have any questions, please direct them to your alliance officers and leaders.\n\nThank you!\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:MGE"]
+    },
+    {
+        "title": "MGE | Sign-up",
+        "image": "/images/mail/template_previews/MGE_Sign-up_Simple.webp",
+        "content": "<b><size=80>-MGE SIGN-UP-</size></b>  \n\n<b><size=30>Hey Warriors,</size></b>  \n\nOur next <b>Mightiest Governor Event</b> is right around the corner! If you're interested in competing for a ranked spot, <b>please apply on the next mail</b>.  \n\n<b>Priority will be given to Rally and Garrison Captains</b> who are actively leading or preparing to take leadership roles in the next KvK.  \n\n<b>Applications will close this Friday.</b>  \n\nPlease apply only if you're fully committed to competing and have the speedups and resources to follow through. We'll release the <b>final list</b> once all slots are confirmed.",
+        "tags": ["format:Simple", "type:MGE"]
+    },
+    {
+        "title": "MGE | Sign-up Leadership",
+        "image": "/images/mail/template_previews/MGE_Sign-up_Leadership_Fancy.webp",
+        "content": "<color=#1D8BFE><b><size=35>☆ﾟ°˖* Mightiest Governor Event * ˖°ﾟ☆\n                        Fixed Leadership</size></b></color>\n\n<i>Let's face it, this is all about Subutai – Rank bids now open!</i>\n\nThe next Mightiest Governor cycle will be a <b>fixed MGE</b>.  We are focusing on our cav and leadership <b>garrison leads</b>, with great equipment and those who have contributed to our latest KvK.\n\n<color=#fe901d><b>What commanders?</b></color>\nThe commanders available this cycle include:\n☆ Subutai – Apparently hooting. Like every cav commander. Ever. Cue archer tears.\n☆ John Hunyadi – Engineering. Amazing 70's handlebar.\n☆ Lapulapu – Bit meh\n☆ Heraclius – the garrison god!\n☆ Suleiman I – yeah nah (that's an Aussie saying!)\n☆ Moctezuma I – in the shop and only a barb farmer\n☆ Theodora & ☆ Wu Zetian – the old girls really aren't relevant\n\n<color=#fe901d><b>How do I apply?</b></color>\nJump onto our Kingdom Discord and apply away for the top 15 ranks.\n\nFor top 3 positions, there are some extra questions and you need to post a screenshot of equipment and armaments you'd use on this commander.\n\nApplications close: <b>Friday DATE 0:00UTC</b>\n\n<color=#fe901d><b>Selection Criteria</b></color>\n[outline how your kingdom decides this]\nThe MGE Team will prioritise Commander & pairings, current gear, available Legendary Commander Sculptures and DKP. Exceptions may apply for those who contribute to Kingdom life.\n\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:MGE"]
+    },
+    {
+        "title": "MGE | Sign-up Infantry",
+        "image": "/images/mail/template_previews/MGE_Sign-up_Infantry_Fancy.webp",
+        "content": "<color=#1D8BFE><b><size=35>☆ﾟ°˖* Mightiest Governor Event * ˖°ﾟ☆\n                       Fixed Infantry</size></b></color>\n\n<i>Calling those who love their infantry (& a few special archers) – Rank requests now open!</i>\n\nThe next Mightiest Governor cycle will be another <b>fixed MGE</b>.  You know the drill – we need to strengthen our infantry <b>rally and garrison leads</b> and those who have contributed to our latest KvK.\n\nBeing rewarded a fixed MGE rank is an honor set by the Kingdom.  \n\n<color=#fe901d><b>What commanders?</b></color>\nOur Kingdom needs investment in these commanders this cycle:\n☆ Ashurbanipal – Archers here we come!\n☆ Gorgo - Garrison\n☆ Tariq idn Ziyad - Rally\n\nThose below you will really need to justify:\n☆ Flavius Aetius\n☆ K'inich Janaab' Pakal\n☆ Zeonbia\n☆ Leonidas I\n☆ Constantine I\n\n<color=#fe901d><b>How do I apply?</b></color>\nJump onto our Kingdom Discord and apply away for the top 15 ranks.\n\nFor top 3 positions, there are some extra questions and you need to post a screenshot of equipment and armaments you'd use on this commander.\n\nApplications close: <b>Friday DATE 0:00UTC</b>\n\n<color=#fe901d><b>Selection Criteria</b></color>\n[outline how your kingdom decides this]\nThe MGE Team will prioritise Commander & pairings, current gear, available Legendary Commander Sculptures and DKP. Exceptions may apply for those who contribute to Kingdom life.\n\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:MGE"]
+    },
+    {
+        "title": "MGE | Sign-up Deadline",
+        "image": "/images/mail/template_previews/MGE_Sign-up_Deadline_Simple.webp",
+        "content": "MGE Applications will be closed in 24 Hours. If you have not submitted your FULL Application by reset tomorrow, you will not be considered for the rank positions. \n\nIf you have any questions, please message your alliance leadership.\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:MGE"]
+    },
+    {
+        "title": "MGE | Sign-up Cavalry",
+        "image": "/images/mail/template_previews/MGE_Sign-up_Cavalry_Fancy.webp",
+        "content": "<color=#1D8BFE><b><size=35>☆ﾟ°˖* Mightiest Governor Event * ˖°ﾟ☆\n                      Fixed Cavalry</size></b></color>\n\n<i>Calling those who love their ponies – Rank requests open!</i>\n\nThe next Mightiest Governor cycle will be a <b>fixed MGE</b>.  We are focusing on our cavalry <b>rally and garrison leads</b> and those who have contributed to our latest KvK.\n\nBeing rewarded a fixed MGE rank is an honor set by the Kingdom.  \n\n<color=#fe901d><b>What commanders?</b></color>\nInvest in:\n☆ Justinian I – Rally\n☆ Jan Žižka – Garrison\n\nJust no:\n☆ Bertrand du Guesclin – insufficiently pretty\n☆ Chandragupta Maurya – have you ever seen him on field?\n☆ Attlia – yep, we're ageist\n☆ Jadwiga – really ageist\n☆ Genghis Khan – too many wives\n\n<color=#fe901d><b>How do I apply?</b></color>\nJump onto our Kingdom Discord and apply away for the top 15 ranks.\n\nFor top 3 positions, there are some extra questions and you need to post a screenshot of equipment and armaments you'd use on this commander.\n\nApplications close: <b>Friday DATE 0:00UTC</b>\n\n<color=#fe901d><b>Selection Criteria</b></color>\n[outline how your kingdom decides this]\nThe MGE Team will prioritise Commander & pairings, current gear, available Legendary Commander Sculptures and DKP. Exceptions may apply for those who contribute to Kingdom life.\n\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:MGE"]
+    },
+    {
+        "title": "MGE | Sign-up Archer",
+        "image": "/images/mail/template_previews/MGE_Sign-up_Archer_Fancy.webp",
+        "content": "<color=#1D8BFE><b><size=35>☆ﾟ°˖* Mightiest Governor Event * ˖°ﾟ☆\n                       Fixed Archery</size></b></color>\n\n<i>Calling those who shoot for the stars – Rank requests now open!</i>\n\nThe next Mightiest Governor cycle will be a <b>fixed MGE</b>.  We are focusing on our archery <b>rally and garrison leads</b>, with great equipment and those who have contributed to our latest KvK.  \n\nBeing rewarded a fixed MGE rank is an honor set by the Kingdom.  \n\n<color=#fe901d><b>What commanders?</b></color>\nThe best commanders available this cycle include:\n☆ <b>Ashurbanipal</b>\n☆ <b>Dido</b>\n☆ Henry V\n\n<color=#fe901d><b>How do I apply?</b></color>\nJump onto our Kingdom Discord and apply away for the top 15 ranks.\n\nFor top 3 positions, there are some extra questions and you need to post a screenshot of equipment and armaments you'd use on this commander.\n\nApplications close: <b>Friday DATE 0:00UTC</b>\n\n<color=#fe901d><b>Selection Criteria</b></color>\n[outline how your kingdom decides this]\nThe MGE Team will prioritise Commander & pairings, current gear, available Legendary Commander Sculptures and DKP. Exceptions may apply for those who contribute to Kingdom life.\n\n<color=#070662><b><i>Leadership</i></b></color>\n<color=#066207><i>₊˚ ✧ ‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿︵‿ ✧ ₊˚</i></color>",
+        "tags": ["format:Fancy", "type:MGE"]
+    },
+    {
+        "title": "MGE | Ranks v3",
+        "image": "/images/mail/template_previews/MGE_Ranks_v3_Simple.webp",
+        "content": "<b><size=57>- MIGHTIEST GOVERNOR -</size></b>\n\n<b><size=35>MGE POINT LIMITS & RANKS</size></b>\n\nLet's keep this MGE <b>clean, fair, and competitive.</b>\n\n<color=#1E90FF><b>Point Limits</b></color>  \n◆ <b>1M points per day</b>  \n◆ <b>7M total MAX</b> for non-MGE ranked players  \n\n<b>Check in-game markers</b> and monitor your score carefully.  \nAnyone exceeding <b>7M points</b> outside the top 15 will face penalties.\n\n<color=#1E90FF><b>Current MGE Scores</b></color>  \n<i>name</i> – 15M+  \n<i>name</i> – 14.5M  \n<i>name</i> – 14M  \n<i>name</i> – 13.5M  \n<i>name</i> – 13M  \n<i>name</i> – 12.5M  \n\n<b>Ranks 7–10 (11–12M):</b>  \n<i>name</i>, <i>name</i>, <i>name</i>, <i>name</i>  \n\n<b>Ranks 11–15 (10–11M):</b>  \n<i>name</i>, <i>name</i>, <i>name</i>, <i>name</i>, <i>name</i>  \n\n<b>Reminder:</b>\nStay within your bracket, pace yourself, and follow Council updates.  \nConsistency, discipline, and teamwork keep our MGE fair for all.",
+        "tags": ["format:Simple", "type:MGE"]
+    },
+    {
+        "title": "MGE | Ranks v2",
+        "image": "/images/mail/template_previews/MGE_Ranks_v2_Simple.webp",
+        "content": "<size=18><color=#ff6900><b>Top 15 Finalists</b></color></size>\n1. [Player Name] - (Unlimited Points)\n2. [Player Name] - (16.5m Points)\n3. [Player Name] - (16m Points)\n4. [Player Name] - (15.5m Points)\n5. [Player Name] - (15m Points)\n6. [Player Name] - (14.5m Points)\n7. [Player Name] - (14m Points)\n8. [Player Name] - (13.5m Points)\n9. [Player Name] - (13m Points)\n10. [Player Name] - (12.5m Points)\n11. [Player Name] - (12m Points)\n12. [Player Name] - (11.5m Points)\n13. [Player Name] - (11m Points)\n14. [Player Name] - (10.5m Points)\n15. [Player Name] - (10m Points)\n\n<b>For all top 15 finalists, if for any reason you cannot reach your point requirements, please contact your alliance leader or anyone in Leadership, and we will help you.</b>\n\n<size=18><color=#ff6900><b>Rules for Top 15 Finalists</b></color></size>\n♦ Each player is responsible for reaching their rank.\n♦ Each player <i><b>MAY NOT</b></i> steal the rank above theirs.\n♦ Each player in the top 15 is <i><b>NOT ALLOWED </b></i>to zero another player to obtain points on day 5 or 6 \n\n<size=18><color=#ff6900><b>Rules for All players (Rank 16+)</b></color></size> \n♦ Players are not allowed to achieve a point value <i><b>ABOVE 8m Points</b></i>\n♦ Anyone who breaks this rule will be fined or zeroed, no exceptions.\n♦ The Leadership Council of xxxx reserves the right to change or alter any fine or punishment at any time.\n\nIf you have any questions, please direct them to your alliance leadership.\n\nSincerely,\n\n<b>xxxx Kingdom Leadership Council</b>",
+        "tags": ["format:Simple", "type:MGE"]
+    },
+    {
+        "title": "MGE | Ranks",
+        "image": "/images/mail/template_previews/MGE_Ranks_Simple.webp",
+        "content": "                               <size=30><b><color='#e60000'>FIXED MGE 5M POINTS CAP!</color></b></size>\n\nThis week MGE will be fixed! <b>There is punishment for anyone breaking the cap of 7,000,000 (Seven million) points total</b>. DO NOT BREAK CAP! Pushing close to the cap is at your own risk. \n\nPunishments:\n0-1M over cap: up to 750M ress fine of each rss type (total 3B payable within 3 days or zero)\n>1-2M over cap: get zeroed\n\nMGE is fixed, based on the applications received, gear, kvk performance (new players who can max commander, max tech and have top notch gear are also given spot to help the kingdom), and crystal tech and armaments. we have selected the following players for MGE spots:\n1. GOV NAME :  <b><color=#e91e63>∞</color></b>\n2. GOV NAME : <b><color=#e91e63>∞</color></b>\n3. GOV NAME: <b><color=#e91e63>∞</color></b>\n4. GOV NAME: 16M\n5.GOV NAME: 15M\n6. GOV NAME: 14M\n7-10.  GOV NAME : 12M \n11-15.  GOV NAME: 10M \n\nEveryone else 7M points.\n\nGood luck to all those who will compete!",
+        "tags": ["format:Simple", "type:MGE"]
+    },
+    {
+        "title": "MGE | Kill Event",
+        "image": "/images/mail/template_previews/MGE_Kill_Event_Simple.webp",
+        "content": "<b><size=65>- KILL EVENT -</size></b>\n\n<b>Hi warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\n<b>This Kill Event is DUELS ONLY.</b> No city hits, no farmer hunting, no exceptions. Let's keep it clean! <i> TEAM WORK MAKES THE DREAM WORK</i>\n\n<color=#1E90FF><b>1) City Hitting</b></color>  \nNo hitting or scouting cities unless approved by an R4. Leadership will handle any incidents, no exceptions.  \n\n<color=#1E90FF><b>2) Farmers</b></color>  \nDo not attack farmers, Respect the grind.\n\n<color=#1E90FF><b>3) Reports</b></color>  \nIf your farm is hit, message leadership privately.\n\n<b>Consequences:</b> Repay double what was taken or double the hospital bill within 24 hours. Multiple hits = immediate kick and SWAT TEAM visit.  \n\nStay disciplined, duel honorably, and keep XXXX strong for KVK.  ",
+        "tags": ["format:Simple", "type:MGE"]
+    },
+    {
+        "title": "MGE | Guide",
+        "image": "/images/mail/template_previews/MGE_Guide_Simple.webp",
+        "content": "<b><size=55>- MIGHTIEST GOVERNOR -</size></b>\n\n<b>Hi warriors,</b>\n\n<color=#FF69B4><b>ADD THIS MAIL TO FAVORITES!</b></color>\n\nThe <b>Mightiest Governor Event (MGE)</b> is one of the most competitive and rewarding events in Rise of Kingdoms. It runs every other week and lasts 6 days, where each day focuses on a different goal. Only push on the correct day to get the best value from your speedups.\n\nTop ranks earn <b>Legendary Commander Sculptures</b> — our first few MGEs will feature <b>Julius Caesar</b>, followed by <b>Charles Martel</b>. Plan carefully, as competition can be intense.\n\n<color=#1E90FF><b>Event Schedule</b></color>  \n<b>《Day 1》</b> Troop Training  \n<b>《Day 2》</b> Defeat Barbarians  \n<b>《Day 3》</b> Resource Gathering  \n<b>《Day 4》</b> Building & Research Power (use speedups here)  \n<b>《Day 5》</b> Kill Event (PvP day)  \n<b>《Day 6》</b> Final Push — Total Points  \n\n<b>Tip:</b> Always save your universal speedups and resources between MGEs so you can perform stronger next round.\n\n<b>Plan smart, push safely, and aim high — legendary rewards await!</b>",
+        "tags": ["format:Simple", "type:MGE", "type:"]
+    },
+    {
+        "title": "MGE | Fines",
+        "image": "/images/mail/template_previews/MGE_fines_Simple.webp",
+        "content": "<b><size=80>-MGE FINES-</size></b>\n\n<b><size=35>Hey Warriors,</size></b>\n\nThe following members went over the permitted MGE limits and are expected to pay their fines accordingly.\n\n<b>Please send your payment to:</b> <i>name</i> and <i>name</i>  \nOnce completed, submit a screenshot to <i>name</i> or any member of leadership so we can mark it off.\n\n<b>Outstanding Fines:</b>  \n<i>name</i> – 220M  \n<i>name</i> – 600M  \n<i>name</i> – 480M  \n<i>name</i> – 440M  \n<i>name</i> – 380M  \n<i>name</i> – 360M  \n\nThank you for taking care of this promptly and keeping our kingdom fair and competitive for all.",
+        "tags": ["format:Simple", "type:MGE"]
+    },
+    {
+        "title": "Banner | Kingdom v9",
+        "image": "/images/mail/template_previews/Banner_Kingdom_v9_Fancy.webp",
+        "content": "    <color=#00008B><size=40>❖ ⇢</size></color><color=#C99700><b><size=50> Greetings, Warriors! </size></b></color><color=#00008B><size=40>⇠ ❖</size></color> <color=#00008B><size=40>══════════════════</size></color>",
+        "tags": ["format:Fancy", "type:Banner"]
+    }
+]

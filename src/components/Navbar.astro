@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/images/global/logo-new.webp';
+import homeIcon from '../assets/images/navi/navi_home.webp';
+import faqIcon from '../assets/images/navi/navi_question.webp';
+import toolsIcon from '../assets/images/navi/navi_tools.webp';
+import patreonLogo from '../assets/images/navi/patreon.webp';
+
+const currentPath = Astro.url.pathname;
+const isToolsPage = currentPath.startsWith('/tools');
+---
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--spacing-2);">
+                <Image src={logo} alt="Codex Helper Logo" class="logo-image" width="40" height="40" />
+                <span>Codex Helper</span>
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="/" class:list={["nav-link", { "active": currentPath === "/" }]}>
+                <Image src={homeIcon} alt="Home" class="nav-icon" width="20" height="20" />
+                <span>Home</span>
+            </a>
+            <a href="/faq" class:list={["nav-link", { "active": currentPath.startsWith('/faq') }]}>
+                <Image src={faqIcon} alt="FAQ" class="nav-icon" width="20" height="20" />
+                <span>FAQ</span>
+            </a>
+            <a href="/tools" class:list={["nav-link", { "active": isToolsPage }]}>
+                <Image src={toolsIcon} alt="Tools" class="nav-icon" width="20" height="20" />
+                <span>Tools</span>
+            </a>
+
+            {isToolsPage ? (
+                <div id="auth-container"></div>
+            ) : (
+                <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="patreon-btn">
+                    <Image src={patreonLogo} alt="Patreon Logo" class="patreon-logo" width="30" height="30" />
+                    <span>Subscribe</span>
+                </a>
+            )}
+        </div>
+    </div>
+    
+    {isToolsPage && (
+        <div class="sub-navbar">
+            <div class="sub-nav-container">
+                <a href="/tools/mail/" class:list={["sub-nav-link", { "active": currentPath.startsWith('/tools/mail') }]}>Alliance Mail Generator</a>
+                <a href="/tools/calculators/" class:list={["sub-nav-link", { "active": currentPath.startsWith('/tools/calculators') }]}>General Calculators</a>
+                <a href="/tools/materials/" class:list={["sub-nav-link", { "active": currentPath.startsWith('/tools/materials') }]}>Crafting Calculator</a>
+                <a href="/tools/davor_toolkit/" class:list={["sub-nav-link", { "active": currentPath.startsWith('/tools/davor_toolkit') }]}>Davor's Toolkit</a>
+            </div>
+        </div>
+    )}
+</nav>

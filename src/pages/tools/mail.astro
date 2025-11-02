@@ -1,0 +1,301 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/mail.css'; 
+import templatesData from '../../data/templates.json';
+
+type ImageModule = { default: { src: string; } };
+
+import colourwheel from '../../assets/images/mail/icons/colourwheel.webp';
+import copyIcon from '../../assets/images/mail/icons/tools_copy_icon.webp';
+import loadIcon from '../../assets/images/mail/icons/tools_load_icon.webp';
+
+const allTemplatePreviews: Record<string, unknown> = import.meta.glob('../../assets/images/mail/template_previews/*.webp', { eager: true });
+
+const previewPathMap: Record<string, string> = {};
+for (const path in allTemplatePreviews) {
+    const filename = path.split('/').pop();
+    if (filename) {
+        const imageModule = allTemplatePreviews[path] as ImageModule;
+        previewPathMap[filename] = imageModule.default.src;
+    }
+}
+
+const processedTemplatesData = templatesData.map(template => {
+    const originalImagePath = template.image; 
+    const filename = originalImagePath.split('/').pop();
+    
+    if (filename && previewPathMap[filename]) {
+        return {
+            ...template,
+            image: previewPathMap[filename]
+        };
+    }
+    console.warn(`Template preview image not found for: ${filename}`);
+    return template;
+});
+---
+<Layout title="Alliance Mail Generator">
+    
+    <script define:vars={{ templatesData: processedTemplatesData }}>
+        window.templatesData = templatesData;
+    </script>
+
+    <main class="tool-page-wrapper">
+        <section class="tool-hero">
+            <div class="tool-hero-container">
+                <div class="section-badge">Community Tools</div>
+                <h1>Alliance Mail Generator</h1>
+                <p>Create formatted in-game mails for your alliance with ease.</p>
+            </div>
+        </section>
+    
+        <section class="tool-content">
+            <div class="tool-container">
+    
+                <div class="generator-tabs">
+                    <button class="generator-tab-btn active" data-tab="generator">Mail Generator</button>
+                    <button class="generator-tab-btn" data-tab="templates">Template Gallery</button>
+                    <button class="generator-tab-btn" data-tab="saved">Saved Templates</button>
+                </div>
+    
+                <div id="generator-view" class="generator-view active">
+                    <div class="generator-layout">
+                        <div class="generator-panel">
+                            <div class="mail-generator">
+                                <div class="toolbar">
+                                    <div class="toolbar-section">
+                                        <div class="toolbar-item">
+                                            <button id="bold-btn" class="toolbar-btn" aria-label="Bold"><i class="fas fa-bold"></i></button>
+                                            <label for="bold-btn" class="toolbar-label">Bold</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <button id="italic-btn" class="toolbar-btn" aria-label="Italic"><i class="fas fa-italic"></i></button>
+                                            <label for="italic-btn" class="toolbar-label">Italic</label>
+                                        </div>
+                                        <div id="bold-italic-item" class="toolbar-item">
+                                            <button id="bold-italic-btn" class="toolbar-btn" aria-label="Bold & Italic"><i class="fas fa-bold"></i><i class="fas fa-italic"></i></button>
+                                            <label for="bold-italic-btn" class="toolbar-label">B+I</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <div id="custom-size-dropdown" class="custom-dropdown">
+                                                <button id="custom-size-toggle" class="toolbar-btn" aria-label="Change text size">
+                                                    <i class="fas fa-text-height"></i>
+                                                </button>
+                                                <div id="custom-size-options" class="custom-dropdown-options">
+                                                    <div class="custom-option" data-value="12"><i class="fas fa-font fa-xs"></i><span>12</span></div>
+                                                    <div class="custom-option" data-value="16"><i class="fas fa-font fa-sm"></i><span>16</span></div>
+                                                    <div class="custom-option" data-value="20"><i class="fas fa-font"></i><span>20</span></div>
+                                                    <div class="custom-option" data-value="24"><i class="fas fa-font fa-lg"></i><span>24</span></div>
+                                                    <div class="custom-option" data-value="30"><i class="fas fa-font fa-xl"></i><span>30</span></div>
+                                                    <div class="custom-option" data-value="36"><i class="fas fa-font fa-2xl"></i><span>36</span></div>
+                                                    <div class="custom-option" data-value="custom"><i class="fas fa-edit"></i><span>Custom...</span></div>
+                                                </div>
+                                            </div>
+                                            <label for="custom-size-toggle" class="toolbar-label">Size</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <div id="custom-color-dropdown" class="custom-dropdown">
+                                                <button id="custom-color-toggle" class="toolbar-btn" aria-label="Change text color"><i class="fas fa-palette"></i></button>
+                                                <div id="custom-color-options" class="custom-dropdown-options">
+                                                    <div class="custom-option" data-value="red"><span class="color-swatch" style="background:red;"></span>Red</div>
+                                                    <div class="custom-option" data-value="green"><span class="color-swatch" style="background:green;"></span>Green</div>
+                                                    <div class="custom-option" data-value="blue"><span class="color-swatch" style="background:blue;"></span>Blue</div>
+                                                    <div class="custom-option" data-value="yellow"><span class="color-swatch" style="background:yellow;"></span>Yellow</div>
+                                                    <div class="custom-option" data-value="orange"><span class="color-swatch" style="background:orange;"></span>Orange</div>
+                                                    <div class="custom-option" data-value="purple"><span class="color-swatch" style="background:purple;"></span>Purple</div>
+                                                    <div class="custom-option" data-value="custom-toggle"><Image src={colourwheel} alt="Custom Color" class="color-wheel-icon" width="16" height="16" />Custom...</div>
+                                                    <div id="custom-color-picker-container">
+                                                        <div class="color-input-group">
+                                                            <label for="custom-color-input">Pick</label>
+                                                            <input type="color" id="custom-color-input" value="#3b82f6">
+                                                        </div>
+                                                        <button id="apply-custom-color-btn" class="btn-primary btn-primary-small">Apply</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label for="custom-color-toggle" class="toolbar-label">Color</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <div id="custom-gradient-dropdown" class="custom-dropdown">
+                                                <button id="custom-gradient-toggle" class="toolbar-btn" aria-label="Apply gradient">
+                                                    <i class="fas fa-brush"></i>
+                                                </button>
+                                                <div id="custom-gradient-options" class="custom-dropdown-options">
+                                                    <div class="gradient-picker-dropdown">
+                                                        <div class="color-input-group">
+                                                            <label for="gradient-color-1">Start</label>
+                                                            <input type="color" id="gradient-color-1" value="#3b82f6">
+                                                        </div>
+                                                        <div class="color-input-group">
+                                                            <label for="gradient-color-2">End</label>
+                                                            <input type="color" id="gradient-color-2" value="#ffffff">
+                                                        </div>
+                                                    </div>
+                                                    <div class="gradient-strength-container">
+                                                        <label for="gradient-strength-slider" class="gradient-control-label">Strength</label>
+                                                        <div class="slider-wrapper">
+                                                            <span>Low</span>
+                                                            <input type="range" id="gradient-strength-slider" min="1" max="10" value="1" step="1">
+                                                            <span>High</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="gradient-slider-container">
+                                                        <label for="gradient-bias-slider" class="gradient-control-label">Bias</label>
+                                                        <div class="slider-wrapper">
+                                                            <div id="gradient-preview-bar" class="gradient-preview-bar"></div>
+                                                            <input type="range" id="gradient-bias-slider" min="0.25" max="4" value="1" step="0.01">
+                                                        </div>
+                                                    </div>
+                                                    <div class="dropdown-actions">
+                                                        <span id="gradient-char-counter" class="gradient-char-counter">+0 chars</span>
+                                                        <button id="apply-gradient-btn" class="btn-primary btn-primary-small">Apply</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label for="custom-gradient-toggle" class="toolbar-label">Gradient</label>
+                                        </div>
+                                    </div>
+                                    <div class="toolbar-section">
+                                        <div class="toolbar-item">
+                                            <button id="undo-btn" class="toolbar-btn" aria-label="Undo"><i class="fas fa-undo"></i></button>
+                                            <label for="undo-btn" class="toolbar-label">Undo</label>
+                                        </div>
+                                        <div class="toolbar-item">
+                                            <button id="clear-btn" class="toolbar-btn" aria-label="Clear All"><i class="fas fa-trash"></i></button>
+                                            <label for="clear-btn" class="toolbar-label">Clear</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <textarea id="mail-input" placeholder="Enter the content you wish to format here..."></textarea>
+                                <div id="char-counter" class="char-counter">0/2000</div>
+                            </div>
+                        </div>
+                        <div class="preview-panel">
+                            <div class="preview-header">
+                                <div class="preview-tabs">
+                                    <button class="preview-tab-btn active" data-bg="mail">Mail Preview</button>
+                                    <button class="preview-tab-btn" data-bg="board">Board Preview</button>
+                                </div>
+                                <div class="preview-actions">
+                                    <button id="save-btn" class="btn-primary" title="Save Template">
+                                        <i class="fas fa-save"></i>
+                                        <span>Save</span>
+                                    </button>
+                                    <button id="copy-btn" class="btn-primary">
+                                        <Image src={copyIcon} alt="Copy Icon" width="16" height="16" />
+                                        <span>Copy Code</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="mail-preview-container" class="mail-preview-container mail-bg">
+                                <div id="mail-preview"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div id="templates-view" class="generator-view">
+                    <div class="template-layout">
+                        <div class="template-gallery-wrapper">
+                            <div class="template-gallery-header">
+                                <button id="filter-toggle-btn" class="btn-secondary"><i class="fas fa-filter"></i> Filters</button>
+                                <div id="filter-panel" class="filter-panel">
+                                    <div class="filter-panel-header">
+                                        <h3>Filter Templates</h3>
+                                        <button id="filter-reset-btn" class="btn-secondary">Reset</button>
+                                    </div>
+                                    <div id="filter-options" class="filter-options"></div>
+                                </div>
+                                <button id="load-template-btn" class="btn-primary" disabled>
+                                    <Image src={loadIcon} alt="Load Icon" width="16" height="16" />
+                                    <span>Load Template</span>
+                                </button>
+                            </div>
+                            <div id="template-gallery" class="template-gallery"></div>
+                            <div class="template-credits">
+                                <h4>Community Contributions</h4>
+                                <p>A special thank you to the governors who helped build & consolidate this collection of templates:</p>
+                                <ul>
+                                    <li>[1049] SECHSkies</li>
+                                    <li>[1215] Kat</li>
+                                    <li>[3542] Daysii</li>
+                                </ul>
+                                <p class="secondary-thanks">Another thank you to the governors who helped contribute templates to our gallery:</p>
+                                <ul class="contributors-secondary">
+                                    <li>[2308] Nemo</li>
+                                    <li>[3104] Eldest</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="template-preview-wrapper">
+                            <div id="magnified-preview-container" class="magnified-preview-container">
+                                <p id="magnified-placeholder">Hover or tap on a template to view its design & content</p>
+                                <img id="magnified-image" src="" alt="Magnified Template Preview">
+                            </div>
+                            <h4 id="magnified-title"></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="saved-templates-view" class="generator-view">
+                    <div id="saved-templates-content"></div>
+                    <div id="logged-out-overlay" style="display: none;">
+                        <div class="logged-out-message">
+                            <h3>You must be logged in to view and save templates.</h3>
+                            <div id="saved-templates-auth-container"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+    <div id="custom-confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 id="custom-confirm-title">Confirm</h3>
+            <p id="custom-confirm-message">Are you sure?</p>
+            <div class="modal-actions">
+                <button id="confirm-cancel-btn" class="btn-secondary">Cancel</button>
+                <button id="confirm-action-btn" class="btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+    <div id="custom-size-modal" class="simple-modal-overlay" style="display: none;">
+        <div class="simple-modal-content">
+            <h3>Enter Custom Size</h3>
+            <input type="number" id="custom-size-input" placeholder="e.g., 22" min="1">
+            <div class="simple-modal-actions">
+                <button id="custom-size-cancel-btn" class="btn-secondary">Cancel</button>
+                <button id="custom-size-apply-btn" class="btn-primary">Apply</button>
+            </div>
+        </div>
+    </div>
+    <div id="save-template-modal" class="simple-modal-overlay" style="display: none;">
+        <div class="simple-modal-content">
+            <h3>Save Template</h3>
+            <input type="text" id="save-template-name-input" placeholder="Enter a name for your template">
+            <div class="simple-modal-actions">
+                <button id="save-template-cancel-btn" class="btn-secondary">Cancel</button>
+                <button id="save-template-confirm-btn" class="btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+    <div id="custom-alert-modal" class="simple-modal-overlay" style="display: none;">
+        <div class="simple-modal-content">
+            <h3 id="custom-alert-title">Notice</h3>
+            <p id="custom-alert-message"></p>
+            <div class="simple-modal-actions">
+                <button id="custom-alert-ok-btn" class="btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+    <script src="../../scripts/mail.js"></script>
+</Layout>
+<style>
+    .toolbar-label {
+        font-size: var(--font-size-xs);
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+</style>

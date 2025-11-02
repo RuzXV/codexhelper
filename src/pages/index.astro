@@ -1,0 +1,297 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+
+import patreonLogo from '../assets/images/navi/patreon.webp';
+import commanderIcon from '../assets/images/features/icons/commander_icon.webp';
+import commanderShowcase from '../assets/images/features/showcase/commander_1.webp';
+import pairingsIcon from '../assets/images/features/icons/pairings_icon.webp';
+import pairingsShowcase from '../assets/images/features/showcase/pairings_1.webp';
+import arkIcon from '../assets/images/features/icons/ark_icon.webp';
+import arkShowcase from '../assets/images/features/showcase/ark_1.webp';
+import reminderIcon from '../assets/images/features/icons/reminder_icon.webp';
+import reminderShowcase from '../assets/images/features/showcase/reminder_1.webp';
+import trackerIcon from '../assets/images/features/icons/tracker_icon.webp';
+import trackerShowcase from '../assets/images/features/showcase/tracker_1.webp';
+import bundleIcon from '../assets/images/features/icons/bundle_icon.webp';
+import bundleShowcase from '../assets/images/features/showcase/bundle_1.webp';
+import kvkIcon from '../assets/images/features/icons/kvk_icon.webp';
+import kvkShowcase from '../assets/images/features/showcase/kvk_1.webp';
+import eventIcon from '../assets/images/features/icons/event_icon.webp';
+import eventShowcase from '../assets/images/features/showcase/event_1.webp';
+import mailIcon from '../assets/images/features/icons/mail_icon.webp';
+import mailShowcase from '../assets/images/features/showcase/mail_1.webp';
+---
+<Layout title="Home" bodyClass="home">
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-container">
+            <h1 class="hero-title">
+                Codex Helper
+            </h1>
+            <p class="hero-description">
+                ROK information done right. Enhance your Rise of Kingdoms experience on Discord today.
+            </p>
+            <div class="hero-buttons">
+                <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="btn-primary">
+                    <Image src={patreonLogo} alt="Patreon Logo" class="patreon-logo" width="28" height="28" />
+                    <span>Subscribe</span>
+                </a>
+                <a href="https://discord.gg/kingscodex" target="_blank" class="btn-secondary"><i class="fa-brands fa-discord"></i> Our Discord</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="top-servers">
+        <div class="top-servers-container">
+            <div class="features-header">
+                <div class="section-badge">TRUSTED BY THE BEST</div>
+                <h2>Codex Helper is trusted by some of the largest and most active Rise of Kingdoms communities on Discord.</h2>
+            </div>
+            
+            <div class="server-carousel-wrapper">
+                <div class="server-list-container">
+                    <ul class="server-list" id="serverListRow1" data-animated="true">
+                        <li class="server-placeholder">Loading servers...</li>
+                    </ul>
+                </div>
+                <div class="server-list-container">
+                    <ul class="server-list" id="serverListRow2" data-animated="true" data-direction="right">
+                    </ul>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number stat-animated-gradient" data-stat="total_servers">220</div>
+                        <div class="stat-label">Servers</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number stat-animated-gradient" data-stat="total_users">339,694</div>
+                        <div class="stat-label">Users</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-chess-knight"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number stat-animated-gradient" data-stat="total_commands_used">6,771</div>
+                        <div class="stat-label">Commands Used</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number stat-animated-gradient" data-stat="pricing">$3</div>
+                        <div class="stat-label">Price per month</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+     
+    <section id="features" class="features">
+        <div class="features-container">
+            <div class="features-header">
+                <div class="section-badge">FEATURES</div>
+                <h2>Explore the features that make Codex Helper the ultimate Rise of Kingdoms bot for Discord communities.</h2>
+            </div>
+            
+            <div class="features-showcase">
+                <div class="feature-showcase-item">
+                    <div class="feature-content">
+                        <h3>
+                            <Image src={commanderIcon} alt="Commander Guides Icon" width="32" height="32" loading="lazy" />
+                            Commander Guides
+                        </h3>
+                        <p>Comprehensive commander guides including <strong class="text-gradient">pairings, talents, equipment and formation recommendations</strong> for <strong class="text-gradient">EVERY</strong> commander in the game and their appropriate uses. Get the edge you need in battle with <strong class="text-gradient">min-maxed setups.</strong></p>
+                        <ul class="feature-dotpoints">
+                            <li><strong>Every commander in the game and their appropriate roles</strong></li>
+                            <li><strong>Curated talents for niche roles</strong></li>
+                            <li><strong>Handpicked equipment sets</strong></li>
+                            <li><strong>Most viable pairings as a primary commander</strong></li>
+                        </ul>
+                    </div>
+                    <div class="feature-image">
+                        <Image src={commanderShowcase} alt="Commander Guides" width={1024} height={768} loading="lazy" /> <!-- TODO: Replace with actual image dimensions -->
+                    </div>
+                </div>
+
+                <div class="feature-showcase-item">
+                    <div class="feature-image">
+                        <Image src={pairingsShowcase} alt="Meta Pairings" width={1024} height={768} loading="lazy" /> <!-- TODO: Replace with actual image dimensions -->
+                    </div>
+                    <div class="feature-content">
+                        <h3>
+                            <Image src={pairingsIcon} alt="Meta Pairings Icon" width="32" height="32" loading="lazy" />
+                            Meta Pairings
+                        </h3>
+                        <p>Stay ahead of the curve with <strong class="text-gradient">regularly updated meta commander pairings</strong> for <strong class="text-gradient">various game modes,</strong> ensuring you're always using the <strong class="text-gradient">most effective combinations</strong> as new commanders are released.</p>
+                        <ul class="feature-dotpoints">
+                            <li><strong>Pairing suggestions for all KvK seasons (1/2/LvD/SoC)</strong></li>
+                            <li><strong>Options for different Artifact combinations in appropriate kvks</strong></li>
+                            <li><strong>Updated alongside new commander releases to stay ahead of the meta</strong></li>
+                            <li><strong>Multiple variations to satisfy specific troop-type focused players</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="feature-showcase-item">
+                    <div class="feature-content">
+                        <h3>
+                            <Image src={arkIcon} alt="Ark of Osiris Signups Icon" width="32" height="32" loading="lazy" />
+                            Ark of Osiris Signups
+                        </h3>
+                        <p>Easily configured Ark of Osiris signups for <strong class="text-gradient">multiple teams & alliances.</strong> Streamline your AoO organization with <strong class="text-gradient">automated signup management and match reminders.</strong></p>
+                        <ul class="feature-dotpoints">
+                            <li><strong>Customizable reminders to alert when matches start</strong></li>
+                            <li><strong>Multiple alliance & team configurations</strong></li>
+                            <li><strong>Signups based on in-game name</strong></li>
+                            <li><strong>Automatically repeating bi-weekly</strong></li>
+                        </ul>
+                    </div>
+                    <div class="feature-image">
+                        <Image src={arkShowcase} alt="Ark of Osiris Signups" width={1024} height={768} loading="lazy" /> <!-- TODO: Replace with actual image dimensions -->
+                    </div>
+                </div>
+
+                <div class="feature-showcase-item">
+                    <div class="feature-image">
+                        <Image src={reminderShowcase} alt="Event Reminders" width={1024} height={768} loading="lazy" /> <!-- TODO: Replace with actual image dimensions -->
+                    </div>
+                    <div class="feature-content">
+                        <h3>
+                            <Image src={reminderIcon} alt="Event Reminders Icon" width="32" height="32" loading="lazy" />
+                            Event Reminders
+                        </h3>
+                        <p><strong class="text-gradient">Altar of Darkness and Ancient Ruins reminder setup.</strong> Never miss important KvK events again with <strong class="text-gradient">automated notifications and customizable reminder schedules</strong> for your alliance.</p>
+                        <ul class="feature-dotpoints">
+                            <li><strong>Enable either/both Ruins & Altar reminders based on your kvk timings</strong></li>
+                            <li><strong>Custom reminders can be created for other personalised events</strong></li>
+                            <li><strong>Options to remind 1, 4 or 8 hours prior to Ruins & Altar</strong></li>
+                            <li><strong>Automatic role menu for members to grab reminder roles</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="feature-showcase-item">
+                    <div class="feature-content">
+                        <h3>
+                            <Image src={trackerIcon} alt="Event Tracker Icon" width="32" height="32" loading="lazy" />
+                            Event Tracker
+                        </h3>
+                        <p>Comprehensive event tracker for <strong class="text-gradient">upcoming in-game events.</strong> Stay ahead of other governors and plan around <strong class="text-gradient">real-time detailed schedules.</strong></p>
+                        <ul class="feature-dotpoints">
+                            <li><strong>Daily updated in-game event tracker</strong></li>
+                            <li><strong>Has options to link Google or iCal calendars</strong></li>
+                            <li><strong>See up to 10 upcoming events within the next 14 days</strong></li>
+                            <li><strong>Automatic role menu for members to grab event roles</strong></li>
+                        </ul>
+                    </div>
+                    <div class="feature-image">
+                        <Image src={trackerShowcase} alt="Event Tracker" width={1024} height={768} loading="lazy" /> <!-- TODO: Replace with actual image dimensions -->
+                    </div>
+                </div>
+
+                <div class="feature-showcase-item">
+                    <div class="feature-image">
+                        <Image src={bundleShowcase} alt="Bundle Information" width={1024} height={768} loading="lazy" /> <!-- TODO: Replace with actual image dimensions -->
+                    </div>
+                    <div class="feature-content">
+                        <h3>
+                            <Image src={bundleIcon} alt="Bundle Information Icon" width="32" height="32" loading="lazy" />
+                            Bundle Information
+                        </h3>
+                        <p>Detailed bundle information for <strong class="text-gradient">most commonly rotated bundles in the game.</strong> Make informed purchasing decisions with <strong class="text-gradient">comprehensive bundle content analysis.</strong></p>
+                        <ul class="feature-dotpoints">
+                            <li><strong>Specific bundle contents and summary</strong></li>
+                            <li><strong>Easily compare total gems, speedups and other contents between bundles</strong></li>
+                            <li><strong>See how many tiers certain bundles have available</strong></li>
+                            <li><strong>Check the total cost to max certain bundles, and when they're available</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="feature-showcase-item">
+                    <div class="feature-content">
+                        <h3>
+                            <Image src={kvkIcon} alt="KvK Commands Icon" width="32" height="32" loading="lazy" />
+                            KvK Commands
+                        </h3>
+                        <p>Useful KvK related commands for <strong class="text-gradient">timers and flag calculations.</strong> Dominate your KvK experience with <strong class="text-gradient">precise timing tools and strategic planning.</strong></p>
+                        <ul class="feature-dotpoints">
+                            <li><strong>Track how long it takes to heal/burn structures</strong></li>
+                            <li><strong>Calculate timings for future kingdoms buffs to plan ahead</strong></li>
+                            <li><strong>Note the different timings when managing shielded structures like the RCF</strong></li>
+                            <li><strong>Plan ahead with the flag cost calculator to optimize your territory</strong></li>
+                        </ul>
+                    </div>
+                    <div class="feature-image">
+                        <Image src={kvkShowcase} alt="KvK Commands" width={1024} height={768} loading="lazy" /> <!-- TODO: Replace with actual image dimensions -->
+                    </div>
+                </div>
+
+                <div class="feature-showcase-item">
+                    <div class="feature-image">
+                        <Image src={eventShowcase} alt="Event Information" width={1024} height={768} loading="lazy" /> <!-- TODO: Replace with actual image dimensions -->
+                    </div>
+                    <div class="feature-content">
+                        <h3>
+                            <Image src={eventIcon} alt="Event Information Icon" width="32" height="32" loading="lazy" />
+                            Event Information
+                        </h3>
+                        <p>Comprehensive guides for <strong class="text-gradient">all active in-game events.</strong> Stay informed about <strong class="text-gradient">event mechanics, rewards, and strategies</strong> to maximize your performance during limited-time events.</p>
+                        <ul class="feature-dotpoints">
+                            <li><strong>Guides & information for all active in-game events</strong></li>
+                            <li><strong>Easily compare the value of different gem spending events for maximum efficiency</strong></li>
+                            <li><strong>Quick access to guides like the Arms Training skill order</strong></li>
+                            <li><strong>Find out what rewards certain events hold to know if it's worth your time</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="feature-showcase-item">
+                    <div class="feature-content">
+                        <h3>
+                            <Image src={mailIcon} alt="Mail Templates Icon" width="32" height="32" loading="lazy" />
+                            Mail Templates
+                        </h3>
+                        <p><strong class="text-gradient">Create your own or edit an existing template</strong> using our <a href="https://codexhelper.com/tools/mail/" target="_blank">Mail Generator</a> and <strong class="text-gradient"></strong>access them with ease inside of Discord.</strong></p>
+                        <ul class="feature-dotpoints">
+                            <li><strong>Save unlimited amounts of templates</strong></li>
+                            <li><strong>Access them in any server that Codex Helper is in</strong></li>
+                            <li><strong>Ability to load and copy templates from PC or Mobile</strong></li>
+                            <li><strong>Manage your templates straight from Discord</strong></li>
+                        </ul>
+                    </div>
+                    <div class="feature-image">
+                        <Image src={mailShowcase} alt="Mail Templates" width={1024} height={768} loading="lazy" /> <!-- TODO: Replace with actual image dimensions -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="cta-container">
+            <span class="cta-text-prefix animated-gradient-text">What are you waiting for?</span>
+            <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="btn-primary">
+                <Image src={patreonLogo} alt="Patreon Logo" class="patreon-logo" width="28" height="28" />
+                <span>Subscribe</span>
+            </a>
+            <h2 class="animated-gradient-text">to Codex Helper now!</h2>
+        </div>
+    </section>
+</Layout>

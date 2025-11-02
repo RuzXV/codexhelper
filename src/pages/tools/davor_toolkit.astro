@@ -1,0 +1,53 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/toolkit.css';
+import '../../scripts/toolkit.js';
+import davorIcon from '../../assets/images/davor_toolkit/davor_icon.webp';
+---
+<Layout title="Davor's Toolkit">
+    <main class="tool-page-wrapper">
+        <section class="tool-hero">
+            <div class="tool-hero-container">
+                <div class="section-badge">Community Tools</div>
+                <h1 class="tool-title">
+                    <Image src={davorIcon} alt="Davor Icon" class="title-icon" width="100" height="100" />
+                    Davor's Toolkit
+                </h1>
+                <div class="coming-soon-content">
+                    <i class="fas fa-tools"></i>
+                    <h2>Coming Soon</h2>
+                    <p>This new and exciting feature is currently under construction. Please check back later!</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="contributor-section">
+            <div class="contributor-container">
+                <div class="contributor-box">
+                    <div class="contributor-content">
+                        <h3>About Davor</h3>
+                        <p>Davor is a long-time mathematical ROK player who excels at understanding the true nature of the numbers behind the game we all play. He is one of our <span class="wizard-gradient">Codex Wizards</span> consistently answering questions related to the game and continues to create tools for the community to help optimize their gameplay and get the most of our their accounts.</p>
+                    </div>
+                    <div class="contributor-actions">
+                        <p class="contributor-connect">Contact Davor or find more of his tools and support his work here:</p>
+                        <div class="action-item">
+                            <span class="action-label">Discord:</span>
+                            <div class="action-btn discord-btn">
+                                <i class="fa-brands fa-discord"></i>
+                                <span>@davor5647</span>
+                            </div>
+                        </div>
+                        <div class="action-item">
+                            <span class="action-label">Support Him:</span>
+                            <a href="https://buymeacoffee.com/davorrok/davor-s-rok-tools-box" target="_blank" class="action-btn support-btn">
+                                <img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="Buy me a coffee">
+                                <span>Support Davor</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</Layout>

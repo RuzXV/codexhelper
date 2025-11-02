@@ -1,0 +1,47 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/tools.css';
+---
+<Layout title="Tools" description="A collection of community tools made to make players' lives easier.">
+    <main class="tool-page-wrapper">
+        <section class="tool-hero">
+            <div class="tool-hero-container">
+                <div class="section-badge">Community Tools</div>
+                <h1>Codex Helper Tools</h1>
+                <p>A collection of community tools designed to make your Rise of Kingdoms life easier.</p>
+            </div>
+        </section>
+    
+        <section class="tool-content">
+            <div class="tool-grid">
+                <a href="/tools/mail/" class="tool-card">
+                    <div class="tool-card-icon-wrapper">
+                        <i class="fas fa-envelope-open-text tool-card-icon"></i>
+                    </div>
+                    <div class="tool-card-content">
+                        <h3>Alliance Mail Generator</h3>
+                        <p>Create formatted in-game mails for your alliance with ease.</p>
+                    </div>
+                </a>
+                <a href="/tools/calculators/" class="tool-card">
+                    <div class="tool-card-icon-wrapper">
+                        <i class="fas fa-calculator tool-card-icon"></i>
+                    </div>
+                    <div class="tool-card-content">
+                        <h3>General Calculators</h3>
+                        <p>Calculate skill upgrade costs, passport requirements, and more.</p>
+                    </div>
+                </a>
+                <a href="/tools/materials/" class="tool-card">
+                    <div class="tool-card-icon-wrapper">
+                        <i class="fas fa-hammer tool-card-icon"></i>
+                    </div>
+                    <div class="tool-card-content">
+                        <h3>Crafting Calculator</h3>
+                        <p>Plan your equipment crafting and calculate your material needs.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </main>
+</Layout>
