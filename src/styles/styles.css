@@ -629,7 +629,7 @@ body.home .navbar {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-12);
-    align-items: center;
+    align-items: center; 
     max-width: 1200px;
     margin: 0 auto;
     opacity: 0;
@@ -706,12 +706,11 @@ body.home .navbar {
     align-items: center;
     justify-content: center;
     position: relative;
-    padding-left: var(--spacing-4);
-    padding-right: var(--spacing-4);
 }
 
 .feature-image img {
     max-width: 100%;
+    max-height: 500px;
     height: auto;
     border-radius: var(--radius-lg);
     object-fit: contain;
@@ -1845,19 +1844,210 @@ a, button, .nav-link, .faq-question, .carousel-arrow {
     }
 }
 
-@media (min-width: 768px) {
-  .feature-image {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .feature-image img {
-    max-height: 500px;
-  }
-}
-
 @media (hover: hover) {
   .feature-image img:hover {
      filter: drop-shadow(0 0 15px var(--accent-blue-bright));
   }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.3;
+    }
+    50% {
+        transform: translateY(-20px) rotate(180deg);
+        opacity: 0.8;
+    }
+}
+
+.hero-container {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-number {
+    transition: all 0.3s ease;
+}
+
+.server-carousel-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+    margin-top: 50px;
+}
+
+.server-list-container {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 80px;
+}
+
+.server-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: max-content;
+}
+
+.server-list.is-animated {
+    animation-name: scroll-left;
+    animation-duration: 60s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.server-list[data-direction="right"].is-animated {
+    animation-name: scroll-right;
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes scroll-right {
+    0% {
+        transform: translateX(-50%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.server-item {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 250px;
+}
+
+.server-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.server-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.server-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0 0 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+.server-members {
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.server-members svg {
+    margin-right: 5px;
+}
+
+.server-placeholder,
+.server-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 100%;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+.server-error {
+    color: #ef4444;
+}
+
+.top-servers-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 20px;
+}
+
+.top-servers-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.top-servers-text p {
+    color: #94a3b8;
+    max-width: 600px;
+    margin: 15px auto 0;
+}
+
+@media (max-width: 768px) {
+    .server-item {
+        min-width: 200px;
+        padding: 0 15px;
+    }
+    
+    .server-name {
+        font-size: 0.8rem;
+        max-width: 140px;
+    }
+    
+    .server-logo {
+        width: 35px;
+        height: 35px;
+        margin-right: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .server-item {
+        min-width: 180px;
+        padding: 0 10px;
+    }
+    
+    .server-name {
+        font-size: 0.75rem;
+        max-width: 120px;
+    }
+    
+    .server-members {
+        font-size: 0.7rem;
+    }
 }
