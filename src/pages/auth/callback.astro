@@ -1,0 +1,51 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Authenticating...">
+  <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; background-color: #0c0c0f; color: #ffffff;">
+    <p>Authenticating, please wait...</p>
+  </div>
+
+  <script>
+    (async () => {
+        const WORKER_URL = 'https://codex-discord-auth.ruzzxv.workers.dev';
+
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+
+        if (!code) {
+          throw new Error('No authorization code found in the URL.');
+        }
+
+        const response = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ code }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Authentication failed: ${errorText}`);
+        }
+
+        const user = await response.json();
+
+        if (window.opener) {
+          window.opener.postMessage({ type: 'auth-success', user: user }, window.location.origin);
+        }
+
+      } catch (error) {
+        console.error('Authentication process failed:', error);
+        if (window.opener) {
+          const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+          window.opener.postMessage({ type: 'auth-error', error: errorMessage }, window.location.origin);
+        }
+      } finally {
+        window.close();
+      }
+    })();
+  </script>
+</Layout>
