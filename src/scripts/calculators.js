@@ -66,16 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const CALCULATORS_CACHE_KEY = 'generalCalculatorsState';
 
-    const debounce = (callback, wait) => {
-        let timeoutId = null;
-        return (...args) => {
-            window.clearTimeout(timeoutId);
-            timeoutId = window.setTimeout(() => {
-                callback.apply(null, args);
-            }, wait);
-        };
-    };
-
     const saveAllCalculatorsState = debounce(() => {
         const state = {};
         const allInputs = document.querySelectorAll('.calculator-island input, .calculator-island select');
@@ -840,39 +830,6 @@ document.addEventListener('DOMContentLoaded', () => {
         element.classList.remove('result-success');
         void element.offsetWidth; 
         element.classList.add('result-success');
-    }
-
-    function animateCounter(element, target, duration, prefix = '') {
-        if (!element) return;
-        element.classList.add('counting-blur');
-        
-        const start = 0;
-        const range = target - start;
-        let startTime = null;
-
-        if (range === 0) {
-            element.textContent = prefix + target.toLocaleString();
-            element.classList.remove('counting-blur');
-            return;
-        }
-
-        function step(timestamp) {
-            if (!startTime) startTime = timestamp;
-            const progress = timestamp - startTime;
-            const percentage = Math.min(progress / duration, 1);
-            
-            const current = Math.floor(start + range * percentage);
-            element.textContent = prefix + current.toLocaleString();
-
-            if (progress < duration) {
-                window.requestAnimationFrame(step);
-            } else {
-                element.textContent = prefix + target.toLocaleString();
-                element.classList.remove('counting-blur');
-            }
-        }
-
-        window.requestAnimationFrame(step);
     }
 
     const initAndResize = () => {

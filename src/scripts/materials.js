@@ -46,11 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const screenshotTotalStatsWrapper = document.querySelector('.screenshot-total-stats-wrapper');
     const screenshotTotalCostWrapper = document.querySelector('.screenshot-total-cost-wrapper');
 
-    const customAlertModal = document.getElementById('custom-alert-modal');
-    const customAlertCloseBtn = document.getElementById('custom-alert-close-btn');
-    const customAlertOkBtn = document.getElementById('custom-alert-ok-btn');
-    const customAlertMessage = document.getElementById('custom-alert-message');
-
     const MATERIALS = ['iron', 'leather', 'ebony', 'bone'];
     const CHEST_MATERIAL = 'chest';
     const RARITIES = ['common', 'advanced', 'elite', 'epic', 'legendary'];
@@ -77,16 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentVirtualScrollItems = [];
     let virtualScrollListener = null;
-
-    const debounce = (callback, wait) => {
-        let timeoutId = null;
-        return (...args) => {
-            window.clearTimeout(timeoutId);
-            timeoutId = window.setTimeout(() => {
-                callback.apply(null, args);
-            }, wait);
-        };
-    };
     
     window.getPreLoginState = function() {
         const state = {};
@@ -171,33 +156,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (statKey.startsWith('siege')) return 'siege';
         if (statKey.startsWith('troop')) return 'troop';
         return 'general';
-    }
-
-    function showCustomAlert(message) {
-        if (customAlertModal && customAlertMessage) {
-            customAlertMessage.textContent = message;
-            customAlertModal.style.display = 'flex';
-        }
-    }
-
-    function closeCustomAlert() {
-        if (customAlertModal) {
-            customAlertModal.style.display = 'none';
-        }
-    }
-    
-    if (customAlertModal) {
-        customAlertModal.addEventListener('click', (e) => {
-            if (e.target === customAlertModal) {
-                closeCustomAlert();
-            }
-        });
-    }
-    if (customAlertCloseBtn) {
-        customAlertCloseBtn.addEventListener('click', closeCustomAlert);
-    }
-    if (customAlertOkBtn) {
-        customAlertOkBtn.addEventListener('click', closeCustomAlert);
     }
 
     function getHighestSelectedRarity() {
@@ -1178,7 +1136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function openScreenshotModal() {
         const hasLoadoutItems = Object.values(selectedLoadoutSlots).some(id => id !== null);
         if (!hasLoadoutItems) {
-            showCustomAlert("Please add at least one item to your equipment loadout first.");
+            showAlert("Please add at least one item to your equipment loadout first.");
             return;
         }
 
@@ -1269,7 +1227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (err) {
             console.error('Failed to generate or download image: ', err);
             downloadImageBtn.innerHTML = '<i class="fas fa-times"></i> Failed!';
-            showCustomAlert('Could not generate the image for download. Please try again.');
+            showAlert('Could not generate the image for download. Please try again.');
         } finally {
             setTimeout(() => {
                 downloadImageBtn.innerHTML = originalButtonText;
@@ -1313,7 +1271,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (err) {
             console.error('Failed to generate or copy image: ', err);
             copyImageBtn.innerHTML = '<i class="fas fa-times"></i> Failed!';
-            showCustomAlert('Could not generate the image. Please try again.');
+            showAlert('Could not generate the image. Please try again.');
         } finally {
             setTimeout(() => {
                 copyImageBtn.innerHTML = originalButtonText;

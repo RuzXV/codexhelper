@@ -1,150 +1,152 @@
-function getLoggedInUser() {
-    try {
-        const user = localStorage.getItem('codexUser');
-        return user ? JSON.parse(user) : null;
-    } catch (e) {
-        console.error("Failed to parse user data from localStorage", e);
-        return null;
-    }
-}
-
-function getStorageKey(key) {
-    const user = getLoggedInUser();
-    if (user && user.id) {
-        return `codex-user-${user.id}-${key}`;
-    }
-    return `codex-guest-${key}`;
-}
-
-window.saveUserData = (key, data) => {
-    try {
-        localStorage.setItem(getStorageKey(key), JSON.stringify(data));
-    } catch (e) {
-        console.error("Failed to save user data to localStorage", e);
-    }
-};
-
-window.loadUserData = (key) => {
-    try {
-        const data = localStorage.getItem(getStorageKey(key));
-        return data ? JSON.parse(data) : null;
-    } catch (e) {
-        console.error("Failed to load user data from localStorage", e);
-        return null;
-    }
-};
-
-const DISCORD_CLIENT_ID = '1434105087722258573';
-const REDIRECT_URI = 'https://codexhelper.com/auth/callback';
-let authPopup = null;
-
-function initAuth(container) {
-    const user = getLoggedInUser();
-    if (user) {
-        renderLoggedInState(container, user);
-    } else {
-        renderLoggedOutState(container);
-    }
-    
-    window.addEventListener('message', (event) => {
-        if (event.origin !== window.location.origin) {
-            return;
-        }
-
-        const { type, user, error } = event.data;
-        if (type === 'auth-success') {
-            localStorage.setItem('codexUser', JSON.stringify(user));
-            window.location.reload();
-        } else if (type === 'auth-error') {
-            console.error('Authentication error received from popup:', error);
-            const authContainer = document.getElementById('auth-container');
-            if(authContainer) renderLoggedOutState(authContainer);
-        }
-    });
-}
-
-function renderLoggedOutState(container) {
-    container.innerHTML = `
-        <button class="discord-login-btn">
-            <i class="fa-brands fa-discord"></i>
-            <span>Login with Discord</span>
-        </button>
-    `;
-    container.querySelector('.discord-login-btn').addEventListener('click', login);
-}
-
-function renderLoggedInState(container, user) {
-    const avatarUrl = user.avatar 
-        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-        : `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
-
-    container.innerHTML = `
-        <div class="user-profile">
-            <img src="${avatarUrl}" alt="Profile Picture" class="profile-pic">
-            <span class="username">@${user.username}</span>
-            <button class="logout-btn" title="Logout">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </div>
-    `;
-    container.querySelector('.logout-btn').addEventListener('click', logout);
-}
-
-function login(event) {
-    const loginButton = event.currentTarget;
-    loginButton.disabled = true;
-    loginButton.classList.add('is-loading');
-    loginButton.innerHTML = `
-        <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-        <span>Logging in...</span>
-    `;
-
-    if (typeof window.getPreLoginState === 'function') {
-        const state = window.getPreLoginState();
-        if (state) {
-            sessionStorage.setItem('preLoginState', JSON.stringify(state));
-            sessionStorage.setItem('preLoginToolPath', window.location.pathname);
-        }
-    }
-
-    const scope = 'identify';
-    const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
-    
-    const width = 500, height = 700;
-    const left = (window.innerWidth / 2) - (width / 2);
-    const top = (window.innerHeight / 2) - (height / 2);
-    
-    authPopup = window.open(authUrl, 'DiscordAuth', `width=${width},height=${height},top=${top},left=${left}`);
-
-    if (!authPopup || authPopup.closed || typeof authPopup.closed === 'undefined') {
-        alert("Popup was blocked! Please allow popups for this site and try again.");
-        const authContainer = document.getElementById('auth-container');
-        if (authContainer) renderLoggedOutState(authContainer);
-    }
-}
-
-function logout() {
-    localStorage.removeItem('codexUser');
-    window.location.reload();
-}
-
-function getAuthToken() {
-    try {
-        const userString = localStorage.getItem('codexUser');
-        if (!userString) return null;
-        const userData = JSON.parse(userString);
-        if (userData && userData.accessToken) {
-            return `Bearer ${userData.accessToken}`;
-        }
-        console.warn("User data found but is missing accessToken.");
-        return null;
-    } catch (e) {
-        console.error("Failed to get auth token from localStorage", e);
-        return null;
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
+    function getLoggedInUser() {
+        try {
+            const user = localStorage.getItem('codexUser');
+            return user ? JSON.parse(user) : null;
+        } catch (e) {
+            console.error("Failed to parse user data from localStorage", e);
+            return null;
+        }
+    }
+
+    function getStorageKey(key) {
+        const user = getLoggedInUser();
+        if (user && user.id) {
+            return `codex-user-${user.id}-${key}`;
+        }
+        return `codex-guest-${key}`;
+    }
+
+    window.saveUserData = (key, data) => {
+        try {
+            localStorage.setItem(getStorageKey(key), JSON.stringify(data));
+        } catch (e) {
+            console.error("Failed to save user data to localStorage", e);
+        }
+    };
+
+    window.loadUserData = (key) => {
+        try {
+            const data = localStorage.getItem(getStorageKey(key));
+            return data ? JSON.parse(data) : null;
+        } catch (e) {
+            console.error("Failed to load user data from localStorage", e);
+            return null;
+        }
+    };
+
+    const DISCORD_CLIENT_ID = '1434105087722258573';
+    const REDIRECT_URI = 'https://codexhelper.com/auth/callback';
+    let authPopup = null;
+
+    function initAuth(container) {
+        const user = getLoggedInUser();
+        if (user) {
+            renderLoggedInState(container, user);
+        } else {
+            renderLoggedOutState(container);
+        }
+        
+        window.addEventListener('message', (event) => {
+            if (event.origin !== window.location.origin) {
+                return;
+            }
+
+            const { type, user, error } = event.data;
+            if (type === 'auth-success') {
+                localStorage.setItem('codexUser', JSON.stringify(user));
+                window.location.reload();
+            } else if (type === 'auth-error') {
+                console.error('Authentication error received from popup:', error);
+                const authContainer = document.getElementById('auth-container');
+                if(authContainer) renderLoggedOutState(authContainer);
+            }
+        });
+    }
+
+    function renderLoggedOutState(container) {
+        container.innerHTML = `
+            <button class="discord-login-btn">
+                <i class="fa-brands fa-discord"></i>
+                <span>Login with Discord</span>
+            </button>
+        `;
+        container.querySelector('.discord-login-btn').addEventListener('click', login);
+    }
+
+    function renderLoggedInState(container, user) {
+        const avatarUrl = user.avatar 
+            ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+            : `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
+
+        container.innerHTML = `
+            <div class="user-profile">
+                <img src="${avatarUrl}" alt="Profile Picture" class="profile-pic">
+                <span class="username">@${user.username}</span>
+                <button class="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        `;
+        container.querySelector('.logout-btn').addEventListener('click', logout);
+    }
+
+    function login(event) {
+        const loginButton = event.currentTarget;
+        loginButton.disabled = true;
+        loginButton.classList.add('is-loading');
+        loginButton.innerHTML = `
+            <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+            <span>Logging in...</span>
+        `;
+
+        if (typeof window.getPreLoginState === 'function') {
+            const state = window.getPreLoginState();
+            if (state) {
+                sessionStorage.setItem('preLoginState', JSON.stringify(state));
+                sessionStorage.setItem('preLoginToolPath', window.location.pathname);
+            }
+        }
+
+        const scope = 'identify';
+        const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
+        
+        const width = 500, height = 700;
+        const left = (window.innerWidth / 2) - (width / 2);
+        const top = (window.innerHeight / 2) - (height / 2);
+        
+        authPopup = window.open(authUrl, 'DiscordAuth', `width=${width},height=${height},top=${top},left=${left}`);
+
+        if (!authPopup || authPopup.closed || typeof authPopup.closed === 'undefined') {
+            alert("Popup was blocked! Please allow popups for this site and try again.");
+            const authContainer = document.getElementById('auth-container');
+            if (authContainer) renderLoggedOutState(authContainer);
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('codexUser');
+        hasFetchedTemplates = false;
+        savedTemplatesCache = null;
+        window.location.reload();
+    }
+
+    function getAuthToken() {
+        try {
+            const userString = localStorage.getItem('codexUser');
+            if (!userString) return null;
+            const userData = JSON.parse(userString);
+            if (userData && userData.accessToken) {
+                return `Bearer ${userData.accessToken}`;
+            }
+            console.warn("User data found but is missing accessToken.");
+            return null;
+        } catch (e) {
+            console.error("Failed to get auth token from localStorage", e);
+            return null;
+        }
+    }
+
     const mailInput = document.getElementById('mail-input');
     const mailPreview = document.getElementById('mail-preview');
     const copyBtn = document.getElementById('copy-btn');
@@ -175,10 +177,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const customSizeInput = document.getElementById('custom-size-input');
     const customSizeApplyBtn = document.getElementById('custom-size-apply-btn');
     const customSizeCancelBtn = document.getElementById('custom-size-cancel-btn');
-    const customAlertModal = document.getElementById('custom-alert-modal');
-    const customAlertTitle = document.getElementById('custom-alert-title');
-    const customAlertMessage = document.getElementById('custom-alert-message');
-    const customAlertOkBtn = document.getElementById('custom-alert-ok-btn');
 
     const generatorTabBtn = document.querySelector('.generator-tab-btn[data-tab="generator"]');
     const templatesTabBtn = document.querySelector('.generator-tab-btn[data-tab="templates"]');
@@ -321,22 +319,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 300); 
             }
         }
-    }
-
-    function showCustomAlert(message, title = "Notice") {
-        if (customAlertModal && customAlertMessage && customAlertTitle) {
-            customAlertTitle.textContent = title;
-            customAlertMessage.textContent = message;
-            customAlertModal.style.display = 'flex';
-        } else {
-            alert(message);
-        }
-    }
-
-    if (customAlertOkBtn) {
-        customAlertOkBtn.addEventListener('click', () => {
-            if (customAlertModal) customAlertModal.style.display = 'none';
-        });
     }
 
     function escapeHtml(text) {
@@ -843,18 +825,30 @@ document.addEventListener('DOMContentLoaded', function() {
         return response.json();
     }
 
+    let savedTemplatesCache = null;
+    let hasFetchedTemplates = false;
+
     async function renderSavedTemplatesView() {
         const user = getLoggedInUser();
-
+    
         if (user && getAuthToken()) {
             loggedOutOverlay.style.display = 'none';
+            
+            if (hasFetchedTemplates && savedTemplatesCache) {
+                populateSavedTemplatesTable(savedTemplatesCache);
+                return;
+            }
+    
             savedTemplatesContent.innerHTML = `<p>Loading your templates...</p>`;
             try {
                 const templates = await fetchWithAuth('/api/templates');
+                savedTemplatesCache = templates;
+                hasFetchedTemplates = true;
                 populateSavedTemplatesTable(templates);
             } catch (error) {
                 console.error('Failed to fetch saved templates:', error);
                 savedTemplatesContent.innerHTML = `<p class="error-message">Could not load your templates. Please try logging in again.</p>`;
+                hasFetchedTemplates = false;
             }
         } else {
             savedTemplatesContent.innerHTML = '';
@@ -862,6 +856,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (savedTemplatesAuthContainer && !savedTemplatesAuthContainer.hasChildNodes()) {
                 initAuth(savedTemplatesAuthContainer);
             }
+            savedTemplatesCache = null;
+            hasFetchedTemplates = false;
         }
     }
 
@@ -896,16 +892,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         tableHtml += '</div>';
         savedTemplatesContent.innerHTML = tableHtml;
-
-        document.querySelectorAll('.copy-saved-btn').forEach(btn => btn.addEventListener('click', handleCopySavedTemplate));
-        document.querySelectorAll('.load-saved-btn').forEach(btn => btn.addEventListener('click', handleLoadSavedTemplate));
-        document.querySelectorAll('.delete-saved-btn').forEach(btn => btn.addEventListener('click', handleDeleteSavedTemplate));
     }
     
-    async function handleCopySavedTemplate(e) {
-        const row = e.target.closest('.grid-row');
-        const templateId = row.dataset.templateId;
-        const button = e.target.closest('button');
+    async function handleCopySavedTemplate(button, templateId) {
         const originalIcon = button.innerHTML;
 
         try {
@@ -923,10 +912,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    async function handleLoadSavedTemplate(e) {
-        const row = e.target.closest('.grid-row');
-        const templateId = row.dataset.templateId;
-
+    async function handleLoadSavedTemplate(templateId) {
         try {
             const templates = await fetchWithAuth('/api/templates');
             const template = templates.find(t => t.template_id == templateId);
@@ -943,20 +929,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    async function handleDeleteSavedTemplate(e) {
-        const row = e.target.closest('.grid-row');
-        const templateId = row.dataset.templateId;
+    async function handleDeleteSavedTemplate(row, templateId) {
         const templateName = row.querySelector('.template-name').textContent;
 
-        if (confirm(`Are you sure you want to delete the template "${templateName}"? This cannot be undone.`)) {
-            try {
-                await fetchWithAuth(`/api/templates/${templateId}`, { method: 'DELETE' });
-                renderSavedTemplatesView();
-            } catch (error) {
-                console.error('Failed to delete template:', error);
-                showCustomAlert('Could not delete the template.', "Delete Error");
+        showConfirm(
+            `Are you sure you want to delete the template "${templateName}"? This cannot be undone.`,
+            'Confirm Deletion',
+            async () => {
+                try {
+                    await fetchWithAuth(`/api/templates/${templateId}`, { method: 'DELETE' });
+                    hasFetchedTemplates = false;
+                    savedTemplatesCache = null;
+                    renderSavedTemplatesView();
+                } catch (error) {
+                    console.error('Failed to delete template:', error);
+                    showAlert('Could not delete the template.', "Delete Error");
+                }
             }
-        }
+        );
     }
     
     async function handleSaveTemplate() {
@@ -983,10 +973,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
             });
             saveTemplateModal.style.display = 'none';
+            hasFetchedTemplates = false;
+            savedTemplatesCache = null;
             switchView('saved');
         } catch (error) {
             console.error('Failed to save template:', error);
-            showCustomAlert(`Could not save template: ${error.message}`, "Save Error");
+            showAlert(`Could not save template: ${error.message}`, "Save Error");
         } finally {
             button.disabled = false;
             button.textContent = 'Save';
@@ -1009,22 +1001,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if(undoBtn) undoBtn.addEventListener('click', undo);
-    let confirmCallback = null;
-
-    function showCustomConfirm(message, title, onConfirm) {
-        const modalTitle = document.getElementById('custom-confirm-title');
-        const modalMessage = document.getElementById('custom-confirm-message');
-        
-        modalTitle.textContent = title;
-        modalMessage.textContent = message;
-        confirmCallback = onConfirm;
-        
-        customConfirmModal.style.display = 'flex';
-    }
 
     if(clearBtn) {
         clearBtn.addEventListener('click', () => {
-            showCustomConfirm(
+            showConfirm(
                 'Are you sure you want to clear the editor?',
                 'Confirm Clear',
                 () => {
@@ -1047,43 +1027,6 @@ document.addEventListener('DOMContentLoaded', function() {
             inputTimeout = setTimeout(() => saveState(), 500);
             updatePreview();
         });
-    }
-
-    if(confirmActionBtn) {
-        confirmActionBtn.addEventListener('click', () => {
-            if (typeof confirmCallback === 'function') {
-                confirmCallback();
-            }
-            customConfirmModal.style.display = 'none';
-            confirmCallback = null;
-        });
-    }
-
-    if(confirmCancelBtn) {
-        confirmCancelBtn.addEventListener('click', () => {
-            customConfirmModal.style.display = 'none';
-            confirmCallback = null;
-        });
-    }
-
-    async function handleDeleteSavedTemplate(e) {
-        const row = e.target.closest('.grid-row');
-        const templateId = row.dataset.templateId;
-        const templateName = row.querySelector('.template-name').textContent;
-    
-        showCustomConfirm(
-            `Are you sure you want to delete the template "${templateName}"? This cannot be undone.`,
-            'Confirm Deletion',
-            async () => {
-                try {
-                    await fetchWithAuth(`/api/templates/${templateId}`, { method: 'DELETE' });
-                    renderSavedTemplatesView();
-                } catch (error) {
-                    console.error('Failed to delete template:', error);
-                    showCustomAlert('Could not delete the template.', "Delete Error");
-                }
-            }
-        );
     }
     
     if(generatorTabBtn) generatorTabBtn.addEventListener('click', () => switchView('generator'));
@@ -1229,7 +1172,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
             if (!getLoggedInUser()) {
-                showCustomAlert('You must be logged in with Discord to save templates.');
+                showAlert('You must be logged in with Discord to save templates.');
                 return;
             }
             saveTemplateNameInput.value = '';
@@ -1240,6 +1183,25 @@ document.addEventListener('DOMContentLoaded', function() {
     if (saveTemplateConfirmBtn) saveTemplateConfirmBtn.addEventListener('click', handleSaveTemplate);
     if (saveTemplateCancelBtn) saveTemplateCancelBtn.addEventListener('click', () => saveTemplateModal.style.display = 'none');
 
+    if (savedTemplatesContent) {
+        savedTemplatesContent.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (!button) return;
+
+            const row = button.closest('.grid-row');
+            if (!row) return;
+
+            const templateId = row.dataset.templateId;
+
+            if (button.classList.contains('copy-saved-btn')) {
+                handleCopySavedTemplate(button, templateId);
+            } else if (button.classList.contains('load-saved-btn')) {
+                handleLoadSavedTemplate(templateId);
+            } else if (button.classList.contains('delete-saved-btn')) {
+                handleDeleteSavedTemplate(row, templateId);
+            }
+        });
+    }
 
     if(filterToggleBtn) {
         filterToggleBtn.addEventListener('click', (e) => {

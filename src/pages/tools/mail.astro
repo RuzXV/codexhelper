@@ -35,7 +35,7 @@ const processedTemplatesData = templatesData.map(template => {
     return template;
 });
 ---
-<Layout title="Alliance Mail Generator">
+<Layout title="Alliance Mail Generator" bodyClass="has-sub-nav">
     
     <script define:vars={{ templatesData: processedTemplatesData }}>
         window.templatesData = templatesData;
@@ -290,6 +290,7 @@ const processedTemplatesData = templatesData.map(template => {
             </div>
         </div>
     </div>
+    <script src="../../scripts/utils.js"></script>
     <script src="../../scripts/mail.js"></script>
 </Layout>
 <style>

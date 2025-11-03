@@ -29,7 +29,7 @@ const buildingIconPath = imagePathMap['book_of_covenant.webp'];
 const passportIconPath = imagePathMap['passport.webp'];
 const hohIconPath = imagePathMap['hoh_icon.webp'];
 ---
-<Layout title="General Calculators">
+<Layout title="General Calculators" bodyClass="has-sub-nav">
     
     <main class="tool-page-wrapper">
         <section class="tool-hero">
@@ -253,7 +253,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                         <div class="hoh-grid t5-group">
                                             <div class="hoh-item"><label for="t5-inf">Infantry</label><img src={imagePathMap['t5_inf.webp']} alt="T5 Infantry"/><input type="text" id="t5-inf" class="hoh-input" data-tier="t5" placeholder="0"></div>
                                             <div class="hoh-item"><label for="t5-cav">Cavalry</label><img src={imagePathMap['t5_cav.webp']} alt="T5 Cavalry"/><input type="text" id="t5-cav" class="hoh-input" data-tier="t5" placeholder="0"></div>
-                                            <div class="hoh-item"><label for="t5-arch">Archers</label><img src={imagePathMap['t5_arch.webp']} alt="T5 Archers"/><input type="text" id="t5-arch" class="hoh-input" data-tier="t5" placeholder="0"></div>
+                                            <div class="hoh-item"><label for="t5-arch">Archers</label><img src={imagePathMap['t4_arch.webp']} alt="T5 Archers"/><input type="text" id="t5-arch" class="hoh-input" data-tier="t5" placeholder="0"></div>
                                             <div class="hoh-item"><label for="t5-siege">Siege</label><img src={imagePathMap['t5_siege.webp']} alt="T5 Siege"/><input type="text" id="t5-siege" class="hoh-input" data-tier="t5" placeholder="0"></div>
                                         </div>
                                     </div>
@@ -283,5 +283,6 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
     <script define:vars={{ imagePaths: imagePathMap }}>
         window.CALCULATOR_IMAGE_PATHS = imagePaths;
     </script>
+    <script src="../../scripts/utils.js"></script>
     <script src="../../scripts/calculators.js"></script>
 </Layout>

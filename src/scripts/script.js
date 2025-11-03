@@ -1,4 +1,5 @@
-function toggleFAQ(button) {
+function toggleFAQ(event) {
+    const button = event.currentTarget;
     const faqItem = button.parentElement;
     const isActive = faqItem.classList.contains('active');
 
@@ -9,11 +10,6 @@ function toggleFAQ(button) {
     });
     
     faqItem.classList.toggle('active');
-}
-
-function subscribePatreon() {
-    const patreonURL = 'https://www.patreon.com/c/kingscodex';
-    window.open(patreonURL, '_blank');
 }
 
 function createStars() {
@@ -96,69 +92,6 @@ document.querySelectorAll('.feature-card, .stat-item, .faq-item, .feature-showca
     observer.observe(el);
 });
 
-const mobileMenuToggle = document.querySelector('.nav-menu-toggle');
-const navLinks = document.querySelector('.nav-links');
-const hamburger = document.querySelector('.hamburger');
-
-const overlay = document.createElement('div');
-overlay.className = 'nav-overlay';
-document.body.appendChild(overlay);
-
-let savedScrollY;
-
-function toggleMobileMenu() {
-    const isActive = navLinks.classList.contains('active');
-    const body = document.body;
-    
-    if (isActive) {
-        navLinks.classList.remove('active');
-        hamburger.classList.remove('active');
-        overlay.classList.remove('active');
-
-        body.style.position = '';
-        body.style.top = '';
-        body.style.width = '';
-        body.style.overflow = '';
-        
-        window.scrollTo({ top: savedScrollY, behavior: 'instant' });
-
-    } else {
-        savedScrollY = window.scrollY;
-
-        body.style.position = 'fixed';
-        body.style.top = `-${savedScrollY}px`;
-        body.style.width = '100%';
-        body.style.overflow = 'hidden';
-
-        navLinks.classList.add('active');
-        hamburger.classList.add('active');
-        overlay.classList.add('active');
-    }
-}
-    
-if (mobileMenuToggle && hamburger) {
-    mobileMenuToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleMobileMenu();
-    });
-}
-
-overlay.addEventListener('click', toggleMobileMenu);
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && navLinks.classList.contains('active')) {
-        toggleMobileMenu();
-    }
-});
-
-document.querySelectorAll('.nav-link, .patreon-btn').forEach(link => {
-    link.addEventListener('click', () => {
-        if (navLinks && navLinks.classList.contains('active')) {
-            toggleMobileMenu();
-        }
-    });
-});
 
 document.querySelectorAll('.btn-primary:not(#copy-btn):not(#copy-image-btn), .btn-secondary:not(#filter-toggle-btn):not(#download-image-btn)').forEach(button => {
     button.addEventListener('click', function(e) {
@@ -586,6 +519,11 @@ function updateStats(statsData) {
     statElements.forEach(element => {
         const statType = element.getAttribute('data-stat');
         
+        if (typeof animateCounter !== 'function') {
+            console.error('animateCounter is not defined. Make sure utils.js is loaded.');
+            return;
+        }
+
         switch(statType) {
             case 'total_servers':
                 animateCounter(element, statsData.total_servers, 2000);
@@ -605,37 +543,20 @@ function updateStats(statsData) {
     });
 }
 
-function animateCounter(element, target, duration) {
-    const start = 0;
-    const increment = target / (duration / 16);
-    let current = start;
-    
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-            current = target;
-            clearInterval(timer);
-        }
-        
-        element.textContent = Math.floor(current).toLocaleString();
-    }, 16);
-}
 
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('img').forEach(img => {
         img.addEventListener('error', function() {
             this.style.display = 'none';
         });
-        
     });
 
     const faqButtons = document.querySelectorAll('.faq-question');
     faqButtons.forEach(button => {
-        button.addEventListener('click', () => toggleFAQ(button));
+        button.addEventListener('click', toggleFAQ);
     });
 
     loadApiData();
-    
 });
 
 if ('IntersectionObserver' in window) {
