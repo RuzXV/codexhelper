@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalSearch = document.getElementById('modal-search');
     const selectedItemsList = document.getElementById('selected-items-list');
     const clearShoppingListBtn = document.getElementById('clear-shopping-list-btn');
+    const equipmentTooltip = document.createElement('div');
+    equipmentTooltip.id = 'equipment-tooltip';
+    document.body.appendChild(equipmentTooltip);
 
     const selectorSearch = document.getElementById('selector-search');
     const selectorFilterToggleBtn = document.getElementById('selector-filter-toggle-btn');
@@ -52,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const RARITIES_ORDERED = ['Normal', 'Advanced', 'Elite', 'Epic', 'Legendary'];
 
     const EQUIPMENT_DATA = window.equipmentData;
+    const EQUIPMENT_SET_DATA = window.equipmentSetData;
 
     const SLOT_PLACEHOLDERS = {
         helmet: getImagePath('helmet_slot.webp'),
@@ -171,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-        return highestRarityIndex > -1 ? RARITIES_ORDERED[highestRarityIndex] : null;
+        return highestRarityIndex > -1 ? RARITIES_ORDERED[highestRarityIndex] : 'Legendary';
     }
 
     function performCalculation() {
@@ -205,18 +209,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        let displayRarity = 'Legendary';
-        const highestRarity = getHighestSelectedRarity();
-        if (highestRarity) {
-            displayRarity = highestRarity;
-        } else {
-            const legendaryDivisor = RARITY_MULTIPLIERS.legendary;
-            const hasFractionalLegendary = MATERIALS.some(mat => (playerMaterialsCommon[mat] > 0 && playerMaterialsCommon[mat] < legendaryDivisor));
-            if (hasFractionalLegendary) {
-                displayRarity = 'Epic';
-            }
-        }
-
+        let displayRarity = getHighestSelectedRarity();
+        
         const materialsAreInput = Object.values(playerMaterialsCommon).some(val => val > 0) || playerChestsCommon > 0;
 
         if (materialsAreInput && !equipmentIsSelected) {
@@ -653,23 +647,48 @@ document.addEventListener('DOMContentLoaded', function() {
     
         const totalStats = {};
         const specialStats = new Set();
+        const equippedPieceIds = Object.values(selectedLoadoutSlots).filter(id => id !== null);
     
-        for (const slotKey in selectedLoadoutSlots) {
-            const itemId = selectedLoadoutSlots[slotKey];
-            if (itemId) {
-                const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
-                if (itemData) {
-                    if (itemData.stats) {
-                        for (const stat in itemData.stats) {
-                            totalStats[stat] = (totalStats[stat] || 0) + itemData.stats[stat];
-                        }
-                    }
-                    if (itemData.special_stats) {
-                        itemData.special_stats.forEach(stat => specialStats.add(stat));
+        equippedPieceIds.forEach(itemId => {
+            const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+            if (itemData) {
+                if (itemData.stats) {
+                    for (const stat in itemData.stats) {
+                        totalStats[stat] = (totalStats[stat] || 0) + itemData.stats[stat];
                     }
                 }
+                if (itemData.special_stats) {
+                    itemData.special_stats.forEach(stat => specialStats.add(stat));
+                }
             }
-        }
+        });
+        
+        EQUIPMENT_SET_DATA.forEach(set => {
+            const equippedCount = set.pieces.filter(pieceId => equippedPieceIds.includes(pieceId)).length;
+            let highestBonus = null;
+            set.bonuses.forEach(bonus => {
+                if (equippedCount >= bonus.count) {
+                    highestBonus = bonus;
+                }
+            });
+    
+            if (highestBonus) {
+                const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
+                const statMatch = highestBonus.description.match(/Troop (Attack|Defense|Health|Defence)[\s\+]+([\d\.]+)%/i);
+    
+                if (statMatch) {
+                    const statType = statMatch[1].toLowerCase().replace('defence', 'defense');
+                    const statValue = parseFloat(statMatch[2]);
+                    
+                    troopTypes.forEach(troopType => {
+                        const specificStatKey = `${troopType}_${statType}`;
+                        totalStats[specificStatKey] = (totalStats[specificStatKey] || 0) + statValue;
+                    });
+                } else {
+                    specialStats.add(highestBonus.description);
+                }
+            }
+        });
     
         const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
         const statTypes = ['attack', 'defense', 'health', 'march_speed'];
@@ -754,6 +773,28 @@ document.addEventListener('DOMContentLoaded', function() {
         return active;
     }
 
+    function getDominantTroopType(itemData) {
+        if (!itemData.stats) return null;
+        
+        const troopTotals = { infantry: 0, cavalry: 0, archer: 0, siege: 0 };
+        for (const stat in itemData.stats) {
+            const troopType = getTroopTypeFromStat(stat);
+            if (troopTotals.hasOwnProperty(troopType)) {
+                troopTotals[troopType] += itemData.stats[stat];
+            }
+        }
+        
+        let dominantType = null;
+        let maxStat = 0;
+        for (const troopType in troopTotals) {
+            if (troopTotals[troopType] > maxStat) {
+                maxStat = troopTotals[troopType];
+                dominantType = troopType;
+            }
+        }
+        return dominantType;
+    }
+
     function filterItems(grid, filterPanel, searchTerm) {
         const activeFilters = getActiveFilters(filterPanel);
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
@@ -766,13 +807,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const nameMatch = itemData.name.toLowerCase().includes(lowerCaseSearchTerm);
             const slotMatch = !activeFilters.slot || activeFilters.slot.length === 0 || activeFilters.slot.includes(itemData.slot);
             const qualityMatch = !activeFilters.quality || activeFilters.quality.length === 0 || activeFilters.quality.includes(itemData.quality);
+            const dominantTroopType = getDominantTroopType(itemData);
+            const troopTypeMatch = !activeFilters.troop_type || activeFilters.troop_type.length === 0 || activeFilters.troop_type.includes(dominantTroopType);
             
             const statsMatch = !activeFilters.stats || activeFilters.stats.length === 0 || 
                 activeFilters.stats.some(statFilter =>
                     itemData.stats && itemData.stats[statFilter] > 0
                 );
             
-            const shouldBeVisible = nameMatch && slotMatch && qualityMatch && statsMatch;
+            const shouldBeVisible = nameMatch && slotMatch && qualityMatch && statsMatch && troopTypeMatch;
 
             if (shouldBeVisible) {
                 item.style.display = 'flex';
@@ -800,7 +843,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 type: 'quality',
                 options: ['Legendary', 'Epic', 'Elite', 'Advanced', 'Normal']
             },
-            'Troop Type Stats': {
+            'Troop Type': {
+                type: 'troop_type',
+                options: ['infantry', 'cavalry', 'archer', 'siege']
+            },
+            'Specific Stats': {
                 type: 'stats',
                 options: [
                     'infantry_attack', 'cavalry_attack',
@@ -826,7 +873,7 @@ document.addEventListener('DOMContentLoaded', function() {
             html += '<div class="filter-category-grid">';
             category.options.forEach(opt => {
                 let className = '';
-                if (category.type === 'stats') {
+                if (category.type === 'stats' || category.type === 'troop_type') {
                     const troopType = getTroopTypeFromStat(opt);
                     className = `stat-${troopType}`;
                 }
@@ -834,7 +881,8 @@ document.addEventListener('DOMContentLoaded', function() {
                            <input type="checkbox" data-category="${category.type}" value="${opt}"> ${formatStatName(opt)}
                          </label>`;
             });
-            html += `</div></div>`;
+            html += '</div>';
+            html += `</div>`;
         }
 
         html += `</div>`;
@@ -1083,6 +1131,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function populateScreenshotTotalStats() {
         screenshotTotalStats.innerHTML = document.getElementById('total-stats-container').innerHTML;
+        adjustStatsFontSize(screenshotTotalStats);
     }
 
     function populateScreenshotTotalCost() {
@@ -1192,9 +1241,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     transform: `scale(${scale})`,
                     transformOrigin: 'top left'
                 },
-                bgcolor: window.getComputedStyle(node).backgroundColor || 'transparent'
+                bgcolor: window.getComputedStyle(node).backgroundColor || 'transparent',
+                cacheBust: true,
+                quality: 0.95
             });
-            
             const blob = await (await fetch(dataUrl)).blob();
             if (!blob) {
                 throw new Error('Data URL to Blob conversion failed.');
@@ -1325,6 +1375,73 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    function showTooltip(itemId, event) {
+        const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+        if (!itemData) return;
+
+        let statsHtml = '';
+        if (itemData.stats) {
+            Object.entries(itemData.stats).forEach(([key, value]) => {
+                if (value > 0) {
+                    const troopType = getTroopTypeFromStat(key);
+                    statsHtml += `<div class="stat-pair ${troopType}">${formatStatName(key)} <span>+${value}%</span></div>`;
+                }
+            });
+        }
+        if(itemData.special_stats) itemData.special_stats.forEach(stat => statsHtml += `<div class="special-stat">${stat}</div>`);
+
+        let costHtml = '';
+        if (itemData.cost) {
+            costHtml += '<div class="tooltip-cost">';
+            Object.entries(itemData.cost).forEach(([mat, amount]) => {
+                if (amount > 0) {
+                    costHtml += `<div class="cost-pair"><img src="${getMaterialIconPath(mat, itemData.quality)}" alt="${mat}"> <span class="text-${itemData.quality.toLowerCase()}">${amount}</span></div>`;
+                }
+            });
+            costHtml += '</div>';
+        }
+
+        let setHtml = '';
+        const itemSet = EQUIPMENT_SET_DATA.find(set => set.pieces.includes(itemId));
+        if (itemSet) {
+            setHtml += `<div class="tooltip-set-info">
+                <h5 class="set-name">${itemSet.name}</h5>`;
+            itemSet.bonuses.forEach(bonus => {
+                setHtml += `<div class="set-bonus">(${bonus.count}-piece): ${bonus.description}</div>`;
+            });
+            setHtml += `</div>`;
+        }
+
+        equipmentTooltip.innerHTML = `
+            <h4 class="item-name ${itemData.quality}">${itemData.name}</h4>
+            ${statsHtml ? `<div class="tooltip-section"><div class="tooltip-stats">${statsHtml}</div></div>` : ''}
+            ${costHtml ? `<div class="tooltip-section">${costHtml}</div>` : ''}
+            ${setHtml ? `<div class="tooltip-section">${setHtml}</div>` : ''}
+        `;
+        
+        positionTooltip(event);
+        equipmentTooltip.classList.add('visible');
+    }
+
+    function hideTooltip() {
+        equipmentTooltip.classList.remove('visible');
+    }
+
+    function positionTooltip(event) {
+        const tooltipRect = equipmentTooltip.getBoundingClientRect();
+        let x = event.clientX + 15;
+        let y = event.clientY + 15;
+
+        if (x + tooltipRect.width > window.innerWidth) {
+            x = event.clientX - tooltipRect.width - 15;
+        }
+        if (y + tooltipRect.height > window.innerHeight) {
+            y = window.innerHeight - tooltipRect.height - 5;
+        }
+        
+        equipmentTooltip.style.left = `${x}px`;
+        equipmentTooltip.style.top = `${y}px`;
+    }
 
     async function initializeCalculator() {
         try {
@@ -1350,6 +1467,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             updateUIDisplays();
+
+            ['mouseover', 'mousemove', 'mouseout'].forEach(eventType => {
+                document.body.addEventListener(eventType, e => {
+                    const itemElement = e.target.closest('.modal-item, .selector-item');
+                    if (eventType === 'mouseover' && itemElement) {
+                        showTooltip(itemElement.dataset.itemId, e);
+                    } else if (eventType === 'mousemove' && itemElement) {
+                        positionTooltip(e);
+                    } else if (eventType === 'mouseout' && itemElement) {
+                        hideTooltip();
+                    } else if (!itemElement) {
+                        hideTooltip();
+                    }
+                });
+            });
 
             requestAnimationFrame(() => {
                 adjustSelectorHeight();

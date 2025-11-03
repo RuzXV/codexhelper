@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
 import '../../styles/materials.css';
 import equipmentData from '../../data/equipment.json';
+import equipmentSetData from '../../data/equipment_sets.json';
 import siteLogo from '../../assets/images/global/logo-new.webp';
 
 type ImageModule = { default: { src: string; } };
@@ -23,8 +24,9 @@ for (const path in allMaterialImages) {
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image-more/2.9.5/dom-to-image-more.min.js" slot="head-scripts"></script>
 
-    <script define:vars={{ equipmentData, imagePaths: imagePathMap }}>
+    <script define:vars={{ equipmentData, equipmentSetData, imagePaths: imagePathMap }}>
         window.equipmentData = equipmentData;
+        window.equipmentSetData = equipmentSetData;
         window.EQUIPMENT_IMAGE_PATHS = imagePaths;
     </script>
 

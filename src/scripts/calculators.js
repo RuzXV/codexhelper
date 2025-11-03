@@ -327,8 +327,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalTomeExp += (parseInt(input.value.replace(/,/g, ''), 10) || 0) * (parseInt(input.dataset.value, 10));
             });
 
+            const totalExpToMax = cumulativeExp[rarity][maxLevel - 2];
+
             if (isTomeOnlyMode) {
-                const totalExpToMax = cumulativeExp[rarity][maxLevel - 2];
                 const commandersToMax = totalTomeExp > 0 && totalExpToMax > 0 ? Math.floor(totalTomeExp / totalExpToMax) : 0;
                 
                 expResultDiv.innerHTML = `
@@ -354,22 +355,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const totalExpToReachCurrentLevel = currentLevel > 1 ? cumulativeExp[rarity][currentLevel - 2] : 0;
             const totalCurrentExp = totalExpToReachCurrentLevel + currentExp;
-            const totalExpToReachMaxLevel = cumulativeExp[rarity][maxLevel - 2];
             
-            if (typeof totalExpToReachMaxLevel === 'undefined' || typeof totalCurrentExp === 'undefined') {
+            if (typeof totalExpToMax === 'undefined' || typeof totalCurrentExp === 'undefined') {
                 expResultDiv.textContent = 'Error in calculation. Please check commander data.';
                 expResultDiv.classList.add('error'); 
                 return;
             }
 
-            let expNeeded = totalExpToReachMaxLevel - totalCurrentExp;
+            let expNeeded = totalExpToMax - totalCurrentExp;
 
             if (expTomeToggle.checked) {
                 expNeeded -= totalTomeExp;
             }
 
             if (expNeeded <= 0) {
-                expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have enough EXP to reach level ${maxLevel}!</span>`;
+                const surplusExp = -expNeeded;
+                const commandersToMaxWithSurplus = Math.floor(surplusExp / totalExpToMax);
+                let surplusText = `with <strong>${surplusExp.toLocaleString()}</strong> EXP remaining!`;
+                if (commandersToMaxWithSurplus > 0) {
+                    surplusText = `with <strong>${surplusExp.toLocaleString()}</strong> EXP remaining. You can max <strong>${commandersToMaxWithSurplus}</strong> more ${rarity} commanders.`;
+                }
+                expResultDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>You have enough EXP to reach level ${maxLevel}, ${surplusText}</span>`;
             } else {
                 expResultDiv.innerHTML = `<img src="${getImagePath('experience_book.webp')}" alt="EXP Book"><span>Requires <strong id="exp-needed-value">0</strong> more EXP to max</span>`;
                 animateCounter(document.getElementById('exp-needed-value'), Math.round(expNeeded), 700);

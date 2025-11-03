@@ -677,7 +677,7 @@ function renderLoggedInState(container, user) {
     container.innerHTML = `
         <div class="user-profile">
             <img src="${avatarUrl}" alt="Profile Picture" class="profile-pic">
-            <span class="username">@${user.username}</span>
+            <span class="username">${user.display_name || user.global_name || user.username}</span>
             <button class="logout-btn" title="Logout">
                 <i class="fas fa-sign-out-alt"></i>
             </button>

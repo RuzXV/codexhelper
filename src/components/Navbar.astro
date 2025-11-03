@@ -13,21 +13,21 @@ const isToolsPage = currentPath.startsWith('/tools');
     <div class="nav-container">
         <div class="nav-brand">
             <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--spacing-2);">
-                <Image src={logo} alt="Codex Helper Logo" class="logo-image" width="40" height="40" />
+                <Image src={logo} alt="Codex Helper Logo" class="logo-image" width="40" height="40" loading="eager"/>
                 <span>Codex Helper</span>
             </a>
         </div>
         <div class="nav-links">
             <a href="/" class:list={["nav-link", { "active": currentPath === "/" }]}>
-                <Image src={homeIcon} alt="Home" class="nav-icon" width="20" height="20" />
+                <Image src={homeIcon} alt="Home" class="nav-icon" width="20" height="20" loading="eager"/>
                 <span>Home</span>
             </a>
             <a href="/faq" class:list={["nav-link", { "active": currentPath.startsWith('/faq') }]}>
-                <Image src={faqIcon} alt="FAQ" class="nav-icon" width="20" height="20" />
+                <Image src={faqIcon} alt="FAQ" class="nav-icon" width="20" height="20" loading="eager"/>
                 <span>FAQ</span>
             </a>
             <a href="/tools" class:list={["nav-link", { "active": isToolsPage }]}>
-                <Image src={toolsIcon} alt="Tools" class="nav-icon" width="20" height="20" />
+                <Image src={toolsIcon} alt="Tools" class="nav-icon" width="20" height="20" loading="eager"/>
                 <span>Tools</span>
             </a>
 
@@ -35,7 +35,7 @@ const isToolsPage = currentPath.startsWith('/tools');
                 <div id="auth-container"></div>
             ) : (
                 <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="patreon-btn">
-                    <Image src={patreonLogo} alt="Patreon Logo" class="patreon-logo" width="30" height="30" />
+                    <Image src={patreonLogo} alt="Patreon Logo" class="patreon-logo" width="30" height="30" loading="eager"/>
                     <span>Subscribe</span>
                 </a>
             )}

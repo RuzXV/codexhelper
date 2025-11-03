@@ -34,7 +34,7 @@ import mailShowcase from '../assets/images/features/showcase/mail_1.webp';
             </p>
             <div class="hero-buttons">
                 <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="btn-primary">
-                    <Image src={patreonLogo} alt="Patreon Logo" class="patreon-logo" width="28" height="28" />
+                    <Image src={patreonLogo} alt="Patreon Logo" class="patreon-logo" width="28" height="28" loading="eager"/>
                     <span>Subscribe</span>
                 </a>
                 <a href="https://discord.gg/kingscodex" target="_blank" class="btn-secondary"><i class="fa-brands fa-discord"></i> Our Discord</a>
@@ -125,7 +125,7 @@ import mailShowcase from '../assets/images/features/showcase/mail_1.webp';
                         </ul>
                     </div>
                     <div class="feature-image">
-                        <Image src={commanderShowcase} alt="Commander Guides" loading="lazy" />
+                        <img src={commanderShowcase.src} alt="Commander Guides" loading="lazy"/>
                     </div>
                 </div>
 

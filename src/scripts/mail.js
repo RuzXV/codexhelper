@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
         container.innerHTML = `
             <div class="user-profile">
                 <img src="${avatarUrl}" alt="Profile Picture" class="profile-pic">
-                <span class="username">@${user.username}</span>
+                <span class="username">${user.display_name || user.global_name || user.username}</span>
                 <button class="logout-btn" title="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
@@ -192,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterPanel = document.getElementById('filter-panel');
     const filterOptionsContainer = document.getElementById('filter-options');
     const filterResetBtn = document.getElementById('filter-reset-btn');
+    const templateSearchInput = document.getElementById('template-search-input');
     const magnifiedImage = document.getElementById('magnified-image');
     const magnifiedTitle = document.getElementById('magnified-title');
     const magnifiedPreviewContainer = document.getElementById('magnified-preview-container');
@@ -262,6 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderTemplates() {
         if (!templateGallery) return;
         const activeFilters = getActiveFilters();
+        const searchTerm = templateSearchInput ? templateSearchInput.value.toLowerCase() : '';
     
         if (!isGalleryPopulated) {
             templateGallery.innerHTML = '';
@@ -298,7 +300,9 @@ document.addEventListener('DOMContentLoaded', function() {
         for (const item of items) {
             const index = parseInt(item.dataset.index, 10);
             const template = templates[index];
-            const shouldBeVisible = checkVisibility(template.tags, activeFilters);
+            const titleMatch = template.title.toLowerCase().includes(searchTerm);
+            const filterMatch = checkVisibility(template.tags, activeFilters);
+            const shouldBeVisible = titleMatch && filterMatch;
             const isFadingOut = item.dataset.isFadingOut === 'true';
     
             if (shouldBeVisible) {
@@ -493,111 +497,87 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function parseGameTagsToHtml(text) {
-        let html = '';
         const stack = [];
-        let i = 0;
+        const tagRegex = /<(\/)?([a-zA-Z]+)(?:=([^>]*))?>/g;
+        const knownTags = new Set(['b', 'i', 'size', 'color']);
+        let tags = [];
+        let match;
     
-        const knownTags = ['b', 'i', 'size', 'color'];
-    
-        while (i < text.length) {
-            const openTagIndex = text.indexOf('<', i);
-            if (openTagIndex === -1) {
-                html += escapeHtml(text.substring(i));
-                break;
+        tagRegex.lastIndex = 0;
+        while ((match = tagRegex.exec(text)) !== null) {
+            const tagName = match[2].toLowerCase();
+            if (knownTags.has(tagName)) {
+                tags.push({
+                    fullTag: match[0],
+                    tagName: tagName,
+                    isClosing: !!match[1],
+                    index: match.index
+                });
             }
+        }
     
-            html += escapeHtml(text.substring(i, openTagIndex));
-    
-            const nextChar = text[openTagIndex + 1];
-            if (nextChar === undefined || (nextChar !== '/' && !/[a-zA-Z]/.test(nextChar))) {
-                html += escapeHtml(text.substring(openTagIndex, openTagIndex + 1));
-                i = openTagIndex + 1;
-                continue;
-            }
-    
-            const closeTagIndex = text.indexOf('>', openTagIndex);
-            if (closeTagIndex === -1) {
-                return escapeHtml(text);
-            }
-    
-            const tagStr = text.substring(openTagIndex + 1, closeTagIndex);
-            const isClosingTag = tagStr.startsWith('/');
-            
-            if (isClosingTag) {
-                const tagName = tagStr.substring(1).toLowerCase();
-    
-                if (!knownTags.includes(tagName)) {
-                    html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
-                    i = closeTagIndex + 1;
-                    continue;
+        for (const tag of tags) {
+            if (tag.isClosing) {
+                if (stack.length === 0 || stack[stack.length - 1].tagName !== tag.tagName) {
+                    const preError = escapeHtml(text.substring(0, tag.index));
+                    const errorTagHtml = `<span class="error-underline">${escapeHtml(tag.fullTag)}</span>`;
+                    const postError = escapeHtml(text.substring(tag.index + tag.fullTag.length));
+                    return preError + errorTagHtml + postError;
                 }
-    
-                let tagPositionInStack = -1;
-                for (let j = stack.length - 1; j >= 0; j--) {
-                    if (stack[j].name === tagName) {
-                        tagPositionInStack = j;
-                        break;
-                    }
-                }
-    
-                if (tagPositionInStack === -1) {
-                    return escapeHtml(text);
-                }
-    
-                for (let j = stack.length - 1; j >= tagPositionInStack; j--) {
-                    const tagToClose = stack.pop();
-                    switch (tagToClose.name) {
-                        case 'b': html += '</strong>'; break;
-                        case 'i': html += '</em>'; break;
-                        case 'size': case 'color': html += '</span>'; break;
-                    }
-                }
+                stack.pop();
             } else {
-                const parts = tagStr.match(/([a-zA-Z]+)(?:[=\s](?:"([^"]*)"|([^> ]*)))?/);
-                
-                if (!parts) {
-                    html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
-                    i = closeTagIndex + 1;
-                    continue;
-                }
-                
-                const tagName = parts[1].toLowerCase();
-                const tagValue = parts[2] || parts[3] || null;
-    
-                if (!knownTags.includes(tagName)) {
-                    html += escapeHtml(text.substring(openTagIndex, closeTagIndex + 1));
-                    i = closeTagIndex + 1;
-                    continue;
-                }
-    
-                stack.push({ name: tagName, value: tagValue });
-    
-                switch (tagName) {
-                    case 'b': html += '<strong>'; break;
-                    case 'i': html += '<em>'; break;
-                    case 'size':
-                        if (tagValue) {
-                            const scaledSize = Math.max(parseFloat(tagValue) * 0.55, 1);
-                            html += `<span style="font-size: ${scaledSize}px;">`;
-                        } else { html += '<span>'; }
-                        break;
-                    case 'color':
-                        if (tagValue) {
-                            let finalColor = tagValue.replace(/"/g, '');
-                            if (!finalColor.startsWith('#') && /^[a-fA-F0-9]{6}$/.test(finalColor)) {
-                                finalColor = '#' + finalColor;
-                            }
-                            html += `<span style="color: ${finalColor};">`;
-                        } else { html += '<span>'; }
-                        break;
-                }
+                stack.push(tag);
             }
-            
-            i = closeTagIndex + 1;
         }
     
         if (stack.length > 0) {
-            return escapeHtml(text);
+            const unclosedTag = stack[0];
+            const preError = escapeHtml(text.substring(0, unclosedTag.index));
+            const errorTagHtml = `<span class="error-underline">${escapeHtml(unclosedTag.fullTag)}</span>`;
+            const postError = escapeHtml(text.substring(unclosedTag.index + unclosedTag.fullTag.length));
+            return preError + errorTagHtml + postError;
+        }
+
+        let html = '';
+        let lastIndex = 0;
+        
+        tagRegex.lastIndex = 0;
+        while ((match = tagRegex.exec(text)) !== null) {
+            html += escapeHtml(text.substring(lastIndex, match.index));
+            lastIndex = tagRegex.lastIndex;
+    
+            const fullTag = match[0];
+            const isClosing = !!match[1];
+            const tagName = match[2].toLowerCase();
+            const tagValue = match[3];
+    
+            if (!knownTags.has(tagName)) {
+                html += escapeHtml(fullTag);
+                continue;
+            }
+    
+            if (isClosing) {
+                if (tagName === 'b') html += '</strong>';
+                else if (tagName === 'i') html += '</em>';
+                else html += '</span>';
+            } else {
+                if (tagName === 'b') html += '<strong>';
+                else if (tagName === 'i') html += '<em>';
+                else if (tagName === 'size' && tagValue) {
+                    const scaledSize = Math.max(parseFloat(tagValue) * 0.55, 1);
+                    html += `<span style="font-size: ${scaledSize}px;">`;
+                } else if (tagName === 'color' && tagValue) {
+                    let finalColor = tagValue.replace(/"/g, '').replace(/=/g, '');
+                    if (!finalColor.startsWith('#') && /^[a-fA-F0-9]{6}$/.test(finalColor)) {
+                        finalColor = '#' + finalColor;
+                    }
+                    html += `<span style="color: ${finalColor};">`;
+                }
+            }
+        }
+    
+        if (lastIndex < text.length) {
+            html += escapeHtml(text.substring(lastIndex));
         }
     
         return html;
@@ -1228,6 +1208,10 @@ document.addEventListener('DOMContentLoaded', function() {
             hoveredTemplate = null;
             updateMagnifiedPreview();
         });
+    }
+
+    if(templateSearchInput) {
+        templateSearchInput.addEventListener('input', debounce(renderTemplates, 250));
     }
 
     document.addEventListener('mousedown', (e) => {

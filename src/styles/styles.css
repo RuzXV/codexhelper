@@ -208,11 +208,40 @@ body.home .navbar { position: fixed; }
 
 .feature-dotpoints li { padding-left: 28px; background-image: url('/images/global/dotpoint.webp'); background-position: 0 5px; background-repeat: no-repeat; background-size: 16px 16px; margin-bottom: var(--spacing-2); font-size: var(--font-size-base); color: var(--text-secondary); }
 
-.feature-image { display: flex; align-items: center; justify-content: center; position: relative; }
+.feature-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    
+    /* Set a fixed height on the container (our "frame") */
+    height: 500px; 
+    
+    /* Apply border and radius to the container */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-lg);
+    
+    /* Hide any potential overflow from the inner image */
+    overflow: hidden; 
 
-.feature-image img { max-width: 100%; max-height: 500px; height: auto; border-radius: var(--radius-lg); object-fit: contain; border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s ease-in-out; transform: translateZ(0); }
+    /* Handle transitions on the container */
+    transition: all 0.3s ease-in-out;
+}
 
-.feature-image img:hover { transform: scale(1.05); border-color: rgba(255, 255, 255, 0.5); }
+.feature-image img {
+    /* Make the image element fill its container frame completely */
+    width: 100%;
+    height: 100%;
+
+    /* Scale the image content within the element, preserving aspect ratio */
+    object-fit: contain; 
+}
+
+.feature-image:hover {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.5);
+    filter: drop-shadow(0 0 15px var(--accent-blue-bright));
+}
 
 .image-placeholder { color: var(--text-muted); font-size: var(--font-size-lg); font-weight: 500; text-align: center; padding: var(--spacing-4); }
 

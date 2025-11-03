@@ -200,6 +200,7 @@ const processedTemplatesData = templatesData.map(template => {
                         <div class="template-gallery-wrapper">
                             <div class="template-gallery-header">
                                 <button id="filter-toggle-btn" class="btn-secondary"><i class="fas fa-filter"></i> Filters</button>
+                                <input type="search" id="template-search-input" placeholder="Search templates...">
                                 <div id="filter-panel" class="filter-panel">
                                     <div class="filter-panel-header">
                                         <h3>Filter Templates</h3>
@@ -207,10 +208,6 @@ const processedTemplatesData = templatesData.map(template => {
                                     </div>
                                     <div id="filter-options" class="filter-options"></div>
                                 </div>
-                                <button id="load-template-btn" class="btn-primary" disabled>
-                                    <Image src={loadIcon} alt="Load Icon" width="16" height="16" />
-                                    <span>Load Template</span>
-                                </button>
                             </div>
                             <div id="template-gallery" class="template-gallery"></div>
                             <div class="template-credits">
@@ -229,6 +226,10 @@ const processedTemplatesData = templatesData.map(template => {
                             </div>
                         </div>
                         <div class="template-preview-wrapper">
+                            <button id="load-template-btn" class="btn-primary" disabled>
+                                <Image src={loadIcon} alt="Load Icon" width="16" height="16" />
+                                <span>Load Template</span>
+                            </button>
                             <div id="magnified-preview-container" class="magnified-preview-container">
                                 <p id="magnified-placeholder">Hover or tap on a template to view its design & content</p>
                                 <img id="magnified-image" src="" alt="Magnified Template Preview">
