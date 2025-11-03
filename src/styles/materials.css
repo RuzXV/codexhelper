@@ -125,6 +125,15 @@ h5.legendary-text, h5.set-bonus-title { background: linear-gradient(90deg, #ffff
 .remove-item-btn { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: color 0.2s ease; padding: var(--spacing-2); min-width: auto; min-height: auto; }
 .remove-item-btn:hover { color: #ef4444; }
 
+/* astro-safelist */
+.text-normal,
+.text-advanced,
+.text-elite,
+.text-epic,
+.text-legendary,
+.text-gradient {
+}
+
 .text-gradient { -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
 .text-normal { color: var(--text-secondary); }
