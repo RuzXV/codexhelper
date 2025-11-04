@@ -1141,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const costs = Object.entries(itemData.cost).filter(([, amount]) => amount > 0);
                 if (costs.length > 0) {
                     costs.forEach(([mat, amount]) => {
-                        let qualityClass = `text-gradient text-${(itemData.quality || 'Normal').toLowerCase()}`;
+                        let qualityClass = `text-${(itemData.quality || 'Normal').toLowerCase()}`;
                         costHtml += `
                             <div class="cost-pair">
                                 <img src="${getMaterialIconPath(mat, itemData.quality)}" alt="${mat}">
