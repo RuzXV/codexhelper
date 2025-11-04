@@ -1050,7 +1050,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 shoppingListColumn.style.height = `${loadoutHeight}px`;
             });
         } else if (shoppingListColumn) {
-            shoppingListColumn.style.height = 'auto';
+            shoppingListColumn.style.height = '';
         }
     }
     

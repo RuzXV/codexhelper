@@ -413,25 +413,21 @@ input:checked + .slider:before { transform: translateX(20px); }
         line-clamp: 3;
     }
     
-    .shopping-list-column {
-        display: flex;
-        flex-direction: column;
-        height: auto;
+    .shopping-list-column #shopping-list-island {
+        flex: 0 0 auto;
+        height: 600px;
     }
-    #shopping-list-island {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        min-height: 70vh;
-    }
+    
     #selected-items-list {
         flex-grow: 1;
         overflow-y: auto;
         min-height: 0;
     }
     
-    #total-stats-island {
-        flex: 1;
+    .shopping-list-column #total-stats-island {
+        flex: 0 0 auto;
+        min-height: 250px;
+        height: auto;
         max-height: none;
     }
 
