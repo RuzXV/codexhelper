@@ -431,8 +431,8 @@ document.addEventListener('DOMContentLoaded', function() {
         activeSlotId = slotElement.id;
         const slotType = slotElement.dataset.slot;
         const itemSlotType = (slotType === 'accessory1' || slotType === 'accessory2') ? 'accessory' : slotType;
-
-        modalTitle.textContent = `Select ${formatStatName(slotType)}`;
+    
+        modalTitle.textContent = `Select ${formatStatName(itemSlotType)}`;
         modalSearch.value = '';
         
         populateModalGrid(itemSlotType);
@@ -620,27 +620,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function adjustStatsFontSize(container) {
-        if (!container || !container.hasChildNodes()) {
+        if (!container || !container.hasChildNodes() || container.dataset.resizing === 'true') {
             return;
         }
+        container.dataset.resizing = 'true';
     
         requestAnimationFrame(() => {
-            container.style.fontSize = ''; 
+            if (!container.dataset.initialFontSize) {
+                container.dataset.initialFontSize = window.getComputedStyle(container).fontSize;
+            }
+            container.style.fontSize = container.dataset.initialFontSize;
             
             requestAnimationFrame(() => {
-                if (container.scrollHeight <= container.clientHeight) {
-                    return;
+                if (container.scrollHeight > container.clientHeight) {
+                    let currentSize = parseFloat(container.dataset.initialFontSize);
+                    const minSize = 8;
+                    let iterations = 0;
+        
+                    while (container.scrollHeight > container.clientHeight && currentSize > minSize && iterations < 30) {
+                        currentSize -= 0.5; 
+                        container.style.fontSize = currentSize + 'px';
+                        iterations++;
+                    }
                 }
-                
-                let currentSize = parseFloat(window.getComputedStyle(container).fontSize);
-                const minSize = 8;
-                let iterations = 0;
-    
-                while (container.scrollHeight > container.clientHeight && currentSize > minSize && iterations < 30) {
-                    currentSize -= 0.5; 
-                    container.style.fontSize = currentSize + 'px';
-                    iterations++;
-                }
+                delete container.dataset.resizing;
             });
         });
     }

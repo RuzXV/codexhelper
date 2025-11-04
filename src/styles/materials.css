@@ -416,12 +416,14 @@ input:checked + .slider:before { transform: translateX(20px); }
     #shopping-list-island {
         display: flex;
         flex-direction: column;
-        min-height: 400px;
+        min-height: 450px;
+        flex-grow: 1;
     }
     
     #selected-items-list {
         flex-grow: 1;
         overflow-y: auto;
+        min-height: 0;
     }
     
     .modal-content {
