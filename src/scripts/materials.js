@@ -437,8 +437,22 @@ document.addEventListener('DOMContentLoaded', function() {
         
         populateModalGrid(itemSlotType);
         
+        const instructionP = document.querySelector('#equipment-modal .modal-body > p');
+        const isMobile = window.innerWidth <= 768;
+    
+        if (instructionP) {
+            if (isMobile) {
+                instructionP.textContent = "Click once to preview stats, double-click to equip item.";
+            } else {
+                instructionP.textContent = "Hover to preview stats, click an item to equip it.";
+            }
+        }
+        
         modal.style.display = 'flex';
-        modalSearch.focus();
+        
+        if (!isMobile) {
+            modalSearch.focus();
+        }
     }
 
     function closeModal() {
@@ -936,9 +950,22 @@ document.addEventListener('DOMContentLoaded', function() {
         setupFilterFunctionality(equipmentSelectorGrid, selectorFilterToggleBtn, selectorFilterPanel, selectorSearch);
     }
     
-    modalGrid.addEventListener('dblclick', (e) => {
+    modalGrid.addEventListener('click', (e) => {
+        const isMobile = window.innerWidth <= 768;
         const itemElement = e.target.closest('.modal-item');
-        if (itemElement) {
+        if (!itemElement) return;
+    
+        if (isMobile) {
+            const clickTimestamp = new Date().getTime();
+            const lastClick = parseInt(itemElement.dataset.lastClick || 0);
+            
+            if ((clickTimestamp - lastClick) < 300) {
+                delete itemElement.dataset.lastClick;
+                selectItem(itemElement.dataset.itemId);
+            } else {
+                itemElement.dataset.lastClick = clickTimestamp;
+            }
+        } else {
             selectItem(itemElement.dataset.itemId);
         }
     });
