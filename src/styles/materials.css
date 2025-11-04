@@ -416,11 +416,13 @@ input:checked + .slider:before { transform: translateX(20px); }
     .shopping-list-column {
         display: flex;
         flex-direction: column;
+        height: auto;
     }
     #shopping-list-island {
-        height: 400px;
         display: flex;
         flex-direction: column;
+        flex: 1;
+        min-height: 70vh;
     }
     #selected-items-list {
         flex-grow: 1;
@@ -428,6 +430,16 @@ input:checked + .slider:before { transform: translateX(20px); }
         min-height: 0;
     }
     
+    #total-stats-island {
+        flex: 1;
+        max-height: none;
+    }
+
+    #total-stats-container {
+        overflow: visible;
+        flex-grow: 0;
+    }
+
     .modal-content {
         max-height: 85vh;
     }
@@ -467,6 +479,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     flex-direction: column;
     flex-shrink: 0;
     max-height: 63vh;
+    min-height: 0;
 }
 
 #total-stats-container {

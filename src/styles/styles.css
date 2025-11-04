@@ -417,16 +417,37 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
     .btn-secondary { max-width: 300px; margin: 0; min-height: 48px; font-size: var(--font-size-base); flex-grow: 0; flex-shrink: 1; width: auto; padding: var(--spacing-3) var(--spacing-6); }
     .hero-buttons .btn-primary,
     .hero-buttons .btn-secondary { width: auto; max-width: 280px; }
+    .discord-login-btn {
+        white-space: nowrap;
+    }
     .navbar { margin: var(--spacing-1); border-radius: var(--radius-md); }
     .nav-container { padding: 0 var(--spacing-3); height: 56px; }
     .nav-brand span { font-size: var(--font-size-base); font-weight: 600; white-space: nowrap;}
     .logo-image { height: 32px; width: auto; }
-    .nav-links { display: flex; flex-direction: row; align-items: center; gap: var(--spacing-3); }
+    .nav-links { display: flex; flex-direction: row; align-items: center; gap: var(--spacing-2); }
     .nav-link, .patreon-btn { padding: var(--spacing-2); min-width: 44px; min-height: 44px; width: 44px; height: 44px; transition: transform 0.2s ease, background-color 0.2s ease; }
     .nav-link:hover, .patreon-btn:hover { transform: scale(1.1); }
     .nav-link.active::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: var(--radius-sm); background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: -1; }
     .nav-link span, .patreon-btn span { display: none; }
     .nav-icon { display: block; height: 24px; width: 24px; }
+    .sub-nav-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--spacing-1);
+        padding: var(--spacing-2) var(--spacing-3);
+        height: auto;
+        overflow-x: hidden;
+    }
+    .sub-nav-link {
+        font-size: var(--font-size-xs);
+        white-space: normal;
+        text-align: center;
+        height: 3.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--spacing-1);
+    }
     .patreon-btn { background: transparent; border: none; }
     .patreon-btn .patreon-logo { height: 28px; width: auto; }
     .hero { padding: 80px var(--spacing-3) var(--spacing-12); min-height: 80vh; }
