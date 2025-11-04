@@ -3,24 +3,20 @@ import { Image } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
 import '../../styles/calculators.css';
 
+const allCalculatorImageModules = import.meta.glob('../../assets/images/calculators/**/*.{webp,png,jpg}', { eager: true });
 
-type ImageModule = {
-    default: {
-        src: string;
-    };
-};
+const imageMap = {};
+const imagePathMap = {};
 
-const allCalculatorImages: Record<string, unknown> = import.meta.glob('../../assets/images/calculators/**/*.{webp,png,jpg}', { eager: true });
-
-const imagePathMap: Record<string, string> = {};
-for (const path in allCalculatorImages) {
+for (const path in allCalculatorImageModules) {
     const filename = path.split('/').pop();
-
     if (filename) {
-        const imageModule = allCalculatorImages[path] as ImageModule;
-        imagePathMap[filename] = imageModule.default.src;
+        const mod = allCalculatorImageModules[path];
+        imageMap[filename] = mod.default; 
+        imagePathMap[filename] = mod.default.src;
     }
 }
+
 
 const skillIconPath = imagePathMap['legendary_sculpture.webp'];
 const expIconPath = imagePathMap['experience_book.webp'];
@@ -61,10 +57,10 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                     <div class="form-group">
                                         <div class="form-group-label">Commander Rarity</div>
                                         <div class="rarity-selector">
-                                            <label><input type="radio" name="rarity" value="legendary" checked><span class="rarity-btn legendary"><img src={imagePathMap['legendary_sculpture.webp']} alt="Legendary"/><span>Legendary</span></span></label>
-                                            <label><input type="radio" name="rarity" value="epic"><span class="rarity-btn epic"><img src={imagePathMap['epic_sculpture.webp']} alt="Epic"/><span>Epic</span></span></label>
-                                            <label><input type="radio" name="rarity" value="elite"><span class="rarity-btn elite"><img src={imagePathMap['elite_sculpture.webp']} alt="Elite"/><span>Elite</span></span></label>
-                                            <label><input type="radio" name="rarity" value="advanced"><span class="rarity-btn advanced"><img src={imagePathMap['advanced_sculpture.webp']} alt="Advanced"/><span>Advanced</span></span></label>
+                                            <label><input type="radio" name="rarity" value="legendary" checked><span class="rarity-btn legendary"><Image src={imageMap['legendary_sculpture.webp']} alt="Legendary" width="24" height="24" loading="eager"/><span>Legendary</span></span></label>
+                                            <label><input type="radio" name="rarity" value="epic"><span class="rarity-btn epic"><Image src={imageMap['epic_sculpture.webp']} alt="Epic" width="24" height="24" loading="eager"/><span>Epic</span></span></label>
+                                            <label><input type="radio" name="rarity" value="elite"><span class="rarity-btn elite"><Image src={imageMap['elite_sculpture.webp']} alt="Elite" width="24" height="24" loading="eager"/><span>Elite</span></span></label>
+                                            <label><input type="radio" name="rarity" value="advanced"><span class="rarity-btn advanced"><Image src={imageMap['advanced_sculpture.webp']} alt="Advanced" width="24" height="24" loading="eager"/><span>Advanced</span></span></label>
                                         </div>
                                     </div>
                                     <button id="calculate-skill-btn" class="btn-primary">Calculate</button>
@@ -91,22 +87,22 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                     </div>
                                     <div id="exp-tome-grid-container" class="exp-tome-grid-container">
                                         <div class="exp-tome-grid">
-                                            <div class="exp-tome-item advanced"><img src={imagePathMap['experience_token_100.webp']} alt="100 EXP"/><div class="exp-tome-info"><label for="exp-100">100 EXP</label><input type="text" id="exp-100" class="exp-tome-input" data-value="100" placeholder="0"></div></div>
-                                            <div class="exp-tome-item elite"><img src={imagePathMap['experience_token_500.webp']} alt="500 EXP"/><div class="exp-tome-info"><label for="exp-500">500 EXP</label><input type="text" id="exp-500" class="exp-tome-input" data-value="500" placeholder="0"></div></div>
-                                            <div class="exp-tome-item epic"><img src={imagePathMap['experience_token_1000.webp']} alt="1k EXP"/><div class="exp-tome-info"><label for="exp-1k">1k EXP</label><input type="text" id="exp-1k" class="exp-tome-input" data-value="1000" placeholder="0"></div></div>
-                                            <div class="exp-tome-item epic"><img src={imagePathMap['experience_token_5000.webp']} alt="5k EXP"/><div class="exp-tome-info"><label for="exp-5k">5k EXP</label><input type="text" id="exp-5k" class="exp-tome-input" data-value="5000" placeholder="0"></div></div>
-                                            <div class="exp-tome-item epic"><img src={imagePathMap['experience_token_10000.webp']} alt="10k EXP"/><div class="exp-tome-info"><label for="exp-10k">10k EXP</label><input type="text" id="exp-10k" class="exp-tome-input" data-value="10000" placeholder="0"></div></div>
-                                            <div class="exp-tome-item legendary"><img src={imagePathMap['experience_token_20000.webp']} alt="20k EXP"/><div class="exp-tome-info"><label for="exp-20k">20k EXP</label><input type="text" id="exp-20k" class="exp-tome-input" data-value="20000" placeholder="0"></div></div>
-                                            <div class="exp-tome-item legendary"><img src={imagePathMap['experience_token_50000.webp']} alt="50k EXP"/><div class="exp-tome-info"><label for="exp-50k">50k EXP</label><input type="text" id="exp-50k" class="exp-tome-input" data-value="50000" placeholder="0"></div></div>
+                                            <div class="exp-tome-item advanced"><Image src={imageMap['experience_token_100.webp']} alt="100 EXP" width="28" height="28" loading="lazy"/><div class="exp-tome-info"><label for="exp-100">100 EXP</label><input type="text" id="exp-100" class="exp-tome-input" data-value="100" placeholder="0"></div></div>
+                                            <div class="exp-tome-item elite"><Image src={imageMap['experience_token_500.webp']} alt="500 EXP" width="28" height="28" loading="lazy"/><div class="exp-tome-info"><label for="exp-500">500 EXP</label><input type="text" id="exp-500" class="exp-tome-input" data-value="500" placeholder="0"></div></div>
+                                            <div class="exp-tome-item epic"><Image src={imageMap['experience_token_1000.webp']} alt="1k EXP" width="28" height="28" loading="lazy"/><div class="exp-tome-info"><label for="exp-1k">1k EXP</label><input type="text" id="exp-1k" class="exp-tome-input" data-value="1000" placeholder="0"></div></div>
+                                            <div class="exp-tome-item epic"><Image src={imageMap['experience_token_5000.webp']} alt="5k EXP" width="28" height="28" loading="lazy"/><div class="exp-tome-info"><label for="exp-5k">5k EXP</label><input type="text" id="exp-5k" class="exp-tome-input" data-value="5000" placeholder="0"></div></div>
+                                            <div class="exp-tome-item epic"><Image src={imageMap['experience_token_10000.webp']} alt="10k EXP" width="28" height="28" loading="lazy"/><div class="exp-tome-info"><label for="exp-10k">10k EXP</label><input type="text" id="exp-10k" class="exp-tome-input" data-value="10000" placeholder="0"></div></div>
+                                            <div class="exp-tome-item legendary"><Image src={imageMap['experience_token_20000.webp']} alt="20k EXP" width="28" height="28" loading="lazy"/><div class="exp-tome-info"><label for="exp-20k">20k EXP</label><input type="text" id="exp-20k" class="exp-tome-input" data-value="20000" placeholder="0"></div></div>
+                                            <div class="exp-tome-item legendary"><Image src={imageMap['experience_token_50000.webp']} alt="50k EXP" width="28" height="28" loading="lazy"/><div class="exp-tome-info"><label for="exp-50k">50k EXP</label><input type="text" id="exp-50k" class="exp-tome-input" data-value="50000" placeholder="0"></div></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="form-group-label">Commander Rarity</div>
                                         <div class="rarity-selector">
-                                            <label><input type="radio" name="exp-rarity" value="legendary" checked><span class="rarity-btn legendary"><img src={imagePathMap['legendary_sculpture.webp']} alt="Legendary"/><span>Legendary</span></span></label>
-                                            <label><input type="radio" name="exp-rarity" value="epic"><span class="rarity-btn epic"><img src={imagePathMap['epic_sculpture.webp']} alt="Epic"/><span>Epic</span></span></label>
-                                            <label><input type="radio" name="exp-rarity" value="elite"><span class="rarity-btn elite"><img src={imagePathMap['elite_sculpture.webp']} alt="Elite"/><span>Elite</span></span></label>
-                                            <label><input type="radio" name="exp-rarity" value="advanced"><span class="rarity-btn advanced"><img src={imagePathMap['advanced_sculpture.webp']} alt="Advanced"/><span>Advanced</span></span></label>
+                                            <label><input type="radio" name="exp-rarity" value="legendary" checked><span class="rarity-btn legendary"><Image src={imageMap['legendary_sculpture.webp']} alt="Legendary" width="24" height="24" loading="lazy"/><span>Legendary</span></span></label>
+                                            <label><input type="radio" name="exp-rarity" value="epic"><span class="rarity-btn epic"><Image src={imageMap['epic_sculpture.webp']} alt="Epic" width="24" height="24" loading="lazy"/><span>Epic</span></span></label>
+                                            <label><input type="radio" name="exp-rarity" value="elite"><span class="rarity-btn elite"><Image src={imageMap['elite_sculpture.webp']} alt="Elite" width="24" height="24" loading="lazy"/><span>Elite</span></span></label>
+                                            <label><input type="radio" name="exp-rarity" value="advanced"><span class="rarity-btn advanced"><Image src={imageMap['advanced_sculpture.webp']} alt="Advanced" width="24" height="24" loading="lazy"/><span>Advanced</span></span></label>
                                         </div>
                                     </div>
                                     <button id="calculate-exp-btn" class="btn-primary">Calculate</button>
@@ -129,14 +125,14 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                     </div>
                                     <div id="vip-token-grid-container" class="vip-token-grid-container">
                                         <div class="vip-token-grid">
-                                            <div class="vip-token-item common"><img src={imagePathMap['vip_token_5.webp']} alt="5 VIP"/><div class="vip-token-info"><label for="vip-5">5 VIP</label><input type="text" id="vip-5" class="vip-token-input" data-value="5" placeholder="0"></div></div>
-                                            <div class="vip-token-item common"><img src={imagePathMap['vip_token_10.webp']} alt="10 VIP"/><div class="vip-token-info"><label for="vip-10">10 VIP</label><input type="text" id="vip-10" class="vip-token-input" data-value="10" placeholder="0"></div></div>
-                                            <div class="vip-token-item common"><img src={imagePathMap['vip_token_50.webp']} alt="50 VIP"/><div class="vip-token-info"><label for="vip-50">50 VIP</label><input type="text" id="vip-50" class="vip-token-input" data-value="50" placeholder="0"></div></div>
-                                            <div class="vip-token-item advanced"><img src={imagePathMap['vip_token_100.webp']} alt="100 VIP"/><div class="vip-token-info"><label for="vip-100">100 VIP</label><input type="text" id="vip-100" class="vip-token-input" data-value="100" placeholder="0"></div></div>
-                                            <div class="vip-token-item advanced"><img src={imagePathMap['vip_token_200.webp']} alt="200 VIP"/><div class="vip-token-info"><label for="vip-200">200 VIP</label><input type="text" id="vip-200" class="vip-token-input" data-value="200" placeholder="0"></div></div>
-                                            <div class="vip-token-item elite"><img src={imagePathMap['vip_token_500.webp']} alt="500 VIP"/><div class="vip-token-info"><label for="vip-500">500 VIP</label><input type="text" id="vip-500" class="vip-token-input" data-value="500" placeholder="0"></div></div>
-                                            <div class="vip-token-item epic"><img src={imagePathMap['vip_token_1000.webp']} alt="1k VIP"/><div class="vip-token-info"><label for="vip-1k">1k VIP</label><input type="text" id="vip-1k" class="vip-token-input" data-value="1000" placeholder="0"></div></div>
-                                            <div class="vip-token-item legendary"><img src={imagePathMap['vip_token_5000.webp']} alt="5k VIP"/><div class="vip-token-info"><label for="vip-5k">5k VIP</label><input type="text" id="vip-5k" class="vip-token-input" data-value="5000" placeholder="0"></div></div>
+                                            <div class="vip-token-item common"><Image src={imageMap['vip_token_5.webp']} alt="5 VIP" width="28" height="28" loading="lazy"/><div class="vip-token-info"><label for="vip-5">5 VIP</label><input type="text" id="vip-5" class="vip-token-input" data-value="5" placeholder="0"></div></div>
+                                            <div class="vip-token-item common"><Image src={imageMap['vip_token_10.webp']} alt="10 VIP" width="28" height="28" loading="lazy"/><div class="vip-token-info"><label for="vip-10">10 VIP</label><input type="text" id="vip-10" class="vip-token-input" data-value="10" placeholder="0"></div></div>
+                                            <div class="vip-token-item common"><Image src={imageMap['vip_token_50.webp']} alt="50 VIP" width="28" height="28" loading="lazy"/><div class="vip-token-info"><label for="vip-50">50 VIP</label><input type="text" id="vip-50" class="vip-token-input" data-value="50" placeholder="0"></div></div>
+                                            <div class="vip-token-item advanced"><Image src={imageMap['vip_token_100.webp']} alt="100 VIP" width="28" height="28" loading="lazy"/><div class="vip-token-info"><label for="vip-100">100 VIP</label><input type="text" id="vip-100" class="vip-token-input" data-value="100" placeholder="0"></div></div>
+                                            <div class="vip-token-item advanced"><Image src={imageMap['vip_token_200.webp']} alt="200 VIP" width="28" height="28" loading="lazy"/><div class="vip-token-info"><label for="vip-200">200 VIP</label><input type="text" id="vip-200" class="vip-token-input" data-value="200" placeholder="0"></div></div>
+                                            <div class="vip-token-item elite"><Image src={imageMap['vip_token_500.webp']} alt="500 VIP" width="28" height="28" loading="lazy"/><div class="vip-token-info"><label for="vip-500">500 VIP</label><input type="text" id="vip-500" class="vip-token-input" data-value="500" placeholder="0"></div></div>
+                                            <div class="vip-token-item epic"><Image src={imageMap['vip_token_1000.webp']} alt="1k VIP" width="28" height="28" loading="lazy"/><div class="vip-token-info"><label for="vip-1k">1k VIP</label><input type="text" id="vip-1k" class="vip-token-input" data-value="1000" placeholder="0"></div></div>
+                                            <div class="vip-token-item legendary"><Image src={imageMap['vip_token_5000.webp']} alt="5k VIP" width="28" height="28" loading="lazy"/><div class="vip-token-info"><label for="vip-5k">5k VIP</label><input type="text" id="vip-5k" class="vip-token-input" data-value="5000" placeholder="0"></div></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -157,9 +153,9 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                     <div class="form-group">
                                         <div class="form-group-label">Building</div>
                                         <div class="building-selector">
-                                            <label><input type="radio" name="building" value="castle" checked><span class="building-btn castle"><img src={imagePathMap['castle.webp']} alt="Castle"/><span>Castle</span></span></label>
-                                            <label><input type="radio" name="building" value="watchtower"><span class="building-btn watchtower"><img src={imagePathMap['watchtower.webp']} alt="Watchtower"/><span>Watchtower</span></span></label>
-                                            <label><input type="radio" name="building" value="stateForum"><span class="building-btn state-forum"><img src={imagePathMap['stateforum.webp']} alt="State Forum"/><span>State Forum</span></span></label>
+                                            <label><input type="radio" name="building" value="castle" checked><span class="building-btn castle"><Image src={imageMap['castle.webp']} alt="Castle" width="32" height="32" loading="lazy"/><span>Castle</span></span></label>
+                                            <label><input type="radio" name="building" value="watchtower"><span class="building-btn watchtower"><Image src={imageMap['watchtower.webp']} alt="Watchtower" width="32" height="32" loading="lazy"/><span>Watchtower</span></span></label>
+                                            <label><input type="radio" name="building" value="stateForum"><span class="building-btn state-forum"><Image src={imageMap['stateforum.webp']} alt="State Forum" width="32" height="32" loading="lazy"/><span>State Forum</span></span></label>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -192,7 +188,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                                     <span class="toggle-slider"></span>
                                                 </label>
                                                 <label for="hoh-link-toggle" class="hoh-link-label-top">Link</label>
-                                                <a href="#" id="hoh-hyperlink" class="hoh-link-anchor">HoH<img src={hohIconPath} alt="HoH Icon" width="20" height="20" /></a>
+                                                <a href="#" id="hoh-hyperlink" class="hoh-link-anchor">HoH<Image src={imageMap['hoh_icon.webp']} alt="HoH Icon" width="20" height="20" loading="lazy"/></a>
                                             </div>
                                         </div>
                                         <input type="text" id="power-input" placeholder="Example: 50,000,000">
@@ -216,7 +212,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                         <label for="migration-date">Planned Migration Date</label>
                                         <div class="date-input-container">
                                             <label for="migration-date" class="calendar-icon-label" title="Select a date">
-                                                <img src={imagePathMap['calendar_icon.webp']} alt="Calendar Icon" width="48" height="48" />
+                                                <Image src={imageMap['calendar_icon.webp']} alt="Calendar Icon" width="48" height="48" loading="lazy"/>
                                             </label>
                                             <div class="input-wrapper">
                                                 <input type="date" id="migration-date">
@@ -251,19 +247,19 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                     <div class="form-group">
                                         <div class="form-group-label">T5 Dead Troops</div>
                                         <div class="hoh-grid t5-group">
-                                            <div class="hoh-item"><label for="t5-inf">Infantry</label><img src={imagePathMap['t5_inf.webp']} alt="T5 Infantry"/><input type="text" id="t5-inf" class="hoh-input" data-tier="t5" placeholder="0"></div>
-                                            <div class="hoh-item"><label for="t5-cav">Cavalry</label><img src={imagePathMap['t5_cav.webp']} alt="T5 Cavalry"/><input type="text" id="t5-cav" class="hoh-input" data-tier="t5" placeholder="0"></div>
-                                            <div class="hoh-item"><label for="t5-arch">Archers</label><img src={imagePathMap['t4_arch.webp']} alt="T5 Archers"/><input type="text" id="t5-arch" class="hoh-input" data-tier="t5" placeholder="0"></div>
-                                            <div class="hoh-item"><label for="t5-siege">Siege</label><img src={imagePathMap['t5_siege.webp']} alt="T5 Siege"/><input type="text" id="t5-siege" class="hoh-input" data-tier="t5" placeholder="0"></div>
+                                            <div class="hoh-item"><label for="t5-inf">Infantry</label><Image src={imageMap['t5_inf.webp']} alt="T5 Infantry" width="32" height="32" loading="lazy"/><input type="text" id="t5-inf" class="hoh-input" data-tier="t5" placeholder="0"></div>
+                                            <div class="hoh-item"><label for="t5-cav">Cavalry</label><Image src={imageMap['t5_cav.webp']} alt="T5 Cavalry" width="32" height="32" loading="lazy"/><input type="text" id="t5-cav" class="hoh-input" data-tier="t5" placeholder="0"></div>
+                                            <div class="hoh-item"><label for="t5-arch">Archers</label><Image src={imageMap['t4_arch.webp']} alt="T5 Archers" width="32" height="32" loading="lazy"/><input type="text" id="t5-arch" class="hoh-input" data-tier="t5" placeholder="0"></div>
+                                            <div class="hoh-item"><label for="t5-siege">Siege</label><Image src={imageMap['t5_siege.webp']} alt="T5 Siege" width="32" height="32" loading="lazy"/><input type="text" id="t5-siege" class="hoh-input" data-tier="t5" placeholder="0"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="form-group-label">T4 Dead Troops</div>
                                         <div class="hoh-grid t4-group">
-                                            <div class="hoh-item"><label for="t4-inf">Infantry</label><img src={imagePathMap['t4_inf.webp']} alt="T4 Infantry"/><input type="text" id="t4-inf" class="hoh-input" data-tier="t4" placeholder="0"></div>
-                                            <div class="hoh-item"><label for="t4-cav">Cavalry</label><img src={imagePathMap['t4_cav.webp']} alt="T4 Cavalry"/><input type="text" id="t4-cav" class="hoh-input" data-tier="t4" placeholder="0"></div>
-                                            <div class="hoh-item"><label for="t4-arch">Archers</label><img src={imagePathMap['t4_arch.webp']} alt="T4 Archers"/><input type="text" id="t4-arch" class="hoh-input" data-tier="t4" placeholder="0"></div>
-                                            <div class="hoh-item"><label for="t4-siege">Siege</label><img src={imagePathMap['t4_siege.webp']} alt="T4 Siege"/><input type="text" id="t4-siege" class="hoh-input" data-tier="t4" placeholder="0"></div>
+                                            <div class="hoh-item"><label for="t4-inf">Infantry</label><Image src={imageMap['t4_inf.webp']} alt="T4 Infantry" width="32" height="32" loading="lazy"/><input type="text" id="t4-inf" class="hoh-input" data-tier="t4" placeholder="0"></div>
+                                            <div class="hoh-item"><label for="t4-cav">Cavalry</label><Image src={imageMap['t4_cav.webp']} alt="T4 Cavalry" width="32" height="32" loading="lazy"/><input type="text" id="t4-cav" class="hoh-input" data-tier="t4" placeholder="0"></div>
+                                            <div class="hoh-item"><label for="t4-arch">Archers</label><Image src={imageMap['t4_arch.webp']} alt="T4 Archers" width="32" height="32" loading="lazy"/><input type="text" id="t4-arch" class="hoh-input" data-tier="t4" placeholder="0"></div>
+                                            <div class="hoh-item"><label for="t4-siege">Siege</label><Image src={imageMap['t4_siege.webp']} alt="T4 Siege" width="32" height="32" loading="lazy"/><input type="text" id="t4-siege" class="hoh-input" data-tier="t4" placeholder="0"></div>
                                         </div>
                                     </div>
                                     <button id="calculate-hoh-btn" class="btn-primary">Calculate</button>
@@ -283,6 +279,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
     <script define:vars={{ imagePaths: imagePathMap }}>
         window.CALCULATOR_IMAGE_PATHS = imagePaths;
     </script>
-    <script src="../../scripts/utils.js"></script>
-    <script src="../../scripts/calculators.js"></script>
+    <script>
+        import "../../scripts/calculators.js";
+    </script>
 </Layout>

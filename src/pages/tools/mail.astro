@@ -67,15 +67,15 @@ const processedTemplatesData = templatesData.map(template => {
                                     <div class="toolbar-section">
                                         <div class="toolbar-item">
                                             <button id="bold-btn" class="toolbar-btn" aria-label="Bold"><i class="fas fa-bold"></i></button>
-                                            <label for="bold-btn" class="toolbar-label">Bold</label>
+                                            <span class="toolbar-label">Bold</span>
                                         </div>
                                         <div class="toolbar-item">
                                             <button id="italic-btn" class="toolbar-btn" aria-label="Italic"><i class="fas fa-italic"></i></button>
-                                            <label for="italic-btn" class="toolbar-label">Italic</label>
+                                            <span class="toolbar-label">Italic</span>
                                         </div>
                                         <div id="bold-italic-item" class="toolbar-item">
                                             <button id="bold-italic-btn" class="toolbar-btn" aria-label="Bold & Italic"><i class="fas fa-bold"></i><i class="fas fa-italic"></i></button>
-                                            <label for="bold-italic-btn" class="toolbar-label">B+I</label>
+                                            <span class="toolbar-label">B+I</span>
                                         </div>
                                         <div class="toolbar-item">
                                             <div id="custom-size-dropdown" class="custom-dropdown">
@@ -92,7 +92,7 @@ const processedTemplatesData = templatesData.map(template => {
                                                     <div class="custom-option" data-value="custom"><i class="fas fa-edit"></i><span>Custom...</span></div>
                                                 </div>
                                             </div>
-                                            <label for="custom-size-toggle" class="toolbar-label">Size</label>
+                                            <span class="toolbar-label">Size</span>
                                         </div>
                                         <div class="toolbar-item">
                                             <div id="custom-color-dropdown" class="custom-dropdown">
@@ -114,7 +114,7 @@ const processedTemplatesData = templatesData.map(template => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <label for="custom-color-toggle" class="toolbar-label">Color</label>
+                                            <span class="toolbar-label">Color</span>
                                         </div>
                                         <div class="toolbar-item">
                                             <div id="custom-gradient-dropdown" class="custom-dropdown">
@@ -153,17 +153,17 @@ const processedTemplatesData = templatesData.map(template => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <label for="custom-gradient-toggle" class="toolbar-label">Gradient</label>
+                                            <span class="toolbar-label">Gradient</span>
                                         </div>
                                     </div>
                                     <div class="toolbar-section">
                                         <div class="toolbar-item">
                                             <button id="undo-btn" class="toolbar-btn" aria-label="Undo"><i class="fas fa-undo"></i></button>
-                                            <label for="undo-btn" class="toolbar-label">Undo</label>
+                                            <span class="toolbar-label">Undo</span>
                                         </div>
                                         <div class="toolbar-item">
                                             <button id="clear-btn" class="toolbar-btn" aria-label="Clear All"><i class="fas fa-trash"></i></button>
-                                            <label for="clear-btn" class="toolbar-label">Clear</label>
+                                            <span class="toolbar-label">Clear</span>
                                         </div>
                                     </div>
                                 </div>
@@ -227,14 +227,14 @@ const processedTemplatesData = templatesData.map(template => {
                         </div>
                         <div class="template-preview-wrapper">
                             <button id="load-template-btn" class="btn-primary" disabled>
-                                <Image src={loadIcon} alt="Load Icon" width="16" height="16" />
+                                <Image src={loadIcon} alt="Load Icon" width="16" height="16" loading="eager"/>
                                 <span>Load Template</span>
                             </button>
                             <div id="magnified-preview-container" class="magnified-preview-container">
                                 <p id="magnified-placeholder">Hover or tap on a template to view its design & content</p>
-                                <img id="magnified-image" src="" alt="Magnified Template Preview">
+                                <img id="magnified-image" src="" alt="Magnified Template Preview" width="0" height="0">
                             </div>
-                            <h4 id="magnified-title"></h4>
+                            <h4 id="magnified-title">&nbsp;</h4>
                         </div>
                     </div>
                 </div>
@@ -291,8 +291,10 @@ const processedTemplatesData = templatesData.map(template => {
             </div>
         </div>
     </div>
-    <script src="../../scripts/utils.js"></script>
-    <script src="../../scripts/mail.js"></script>
+    
+    <script>
+        import "../../scripts/mail.js";
+    </script>
 </Layout>
 <style>
     .toolbar-label {

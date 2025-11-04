@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         const html = filteredItems.map(item => `
             <div class="modal-item" data-item-id="${item.id}">
-                <img src="${getImagePath(item.image)}" alt="${item.name}">
+                <img src="${getImagePath(item.image)}" alt="${item.name}" loading="lazy" width="48" height="48">
                 <span class="item-name ${item.quality}">${item.name}</span>
             </div>`
         ).join('');
@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             let qualityClass = '';
                             const quality = itemData.quality || 'Normal';
                             if (quality !== 'Normal') {
-                                qualityClass = `text-gradient text-${quality.toLowerCase()}`;
+                                qualityClass = `text-${quality.toLowerCase()}`;
                             } else {
                                 qualityClass = 'text-normal';
                             }
@@ -912,10 +912,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!equipmentSelectorGrid || EQUIPMENT_DATA.length === 0) { return; }
         
         let html = '';
-        EQUIPMENT_DATA.forEach(item => {
+        EQUIPMENT_DATA.forEach((item, index) => {
+            const loadingAttr = index < 12 ? 'eager' : 'lazy';
             html += `
                 <div class="selector-item" data-item-id="${item.id}" title="Add ${item.name}">
-                    <img src="${getImagePath(item.image)}" alt="${item.name}">
+                    <img src="${getImagePath(item.image)}" alt="${item.name}" loading="${loadingAttr}" width="36" height="36">
                     <span class="item-name ${item.quality}">${item.name}</span>
                 </div>`;
         });

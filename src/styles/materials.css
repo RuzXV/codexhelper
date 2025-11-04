@@ -125,26 +125,15 @@ h5.legendary-text, h5.set-bonus-title { background: linear-gradient(90deg, #ffff
 .remove-item-btn { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: color 0.2s ease; padding: var(--spacing-2); min-width: auto; min-height: auto; }
 .remove-item-btn:hover { color: #ef4444; }
 
-/* astro-safelist */
-.text-normal,
-.text-advanced,
-.text-elite,
-.text-epic,
-.text-legendary,
-.text-gradient {
-}
-
-.text-gradient { -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-
 .text-normal { color: var(--text-secondary); }
 
-.text-advanced { background: linear-gradient(90deg, #57f287, #bde8bd); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.text-advanced { background: linear-gradient(90deg, #57f287, #bde8bd); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
-.text-elite { background: linear-gradient(90deg, #5aa0ff, #a4c6f5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.text-elite { background: linear-gradient(90deg, #5aa0ff, #a4c6f5); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
-.text-epic { background: linear-gradient(90deg, #ce6cff, #e1b4f5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.text-epic { background: linear-gradient(90deg, #ce6cff, #e1b4f5); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
-.text-legendary { background: linear-gradient(90deg, #ffb833, #fcd38b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.text-legendary { background: linear-gradient(90deg, #ffb833, #fcd38b); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
 .btn-clear-shopping-list { background: rgba(239, 68, 68, 0.35); border: 1px solid rgba(255, 100, 100, 0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: var(--spacing-2); padding: var(--spacing-1) var(--spacing-3); border-radius: var(--radius-md); cursor: pointer; color: var(--text-primary); }
 
@@ -427,7 +416,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    height: 67vh;
+    max-height: 63vh;
 }
 
 #total-stats-container {

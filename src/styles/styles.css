@@ -49,6 +49,18 @@ html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     --radius-xl: 1rem;
 }
 
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
 body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
 
 .faq-page-wrapper { background-image: radial-gradient(ellipse 65% 70% at 50% 45%, rgba(59, 130, 246, 0.15) 0%, transparent 70%); background-repeat: no-repeat; }
@@ -211,17 +223,35 @@ body.home .navbar { position: fixed; }
 .feature-image { display: flex; align-items: center; justify-content: center; position: relative; }
 
 .feature-image img {
-    width: 100%;
-    height: 500px;
+    display: block;
+    width: auto;
+    height: auto;
     max-width: 100%;
     max-height: 500px;
-    border-radius: var(--radius-lg);
     object-fit: contain;
-    transition: all 0.3s ease-in-out;
-    transform: translateZ(0);
+    border-radius: var(--radius-lg);
 }
 
-.feature-image img:hover { transform: scale(1.05); border-color: rgba(255, 255, 255, 0.5); }
+.feature-image-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+
+.feature-image-container::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -8px;
+    background: var(--accent-blue);
+    filter: blur(15px);
+    opacity: 0.6;
+    border-radius: inherit;
+}
 
 .image-placeholder { color: var(--text-muted); font-size: var(--font-size-lg); font-weight: 500; text-align: center; padding: var(--spacing-4); }
 
@@ -494,8 +524,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
     .contact-buttons .btn-primary,
     .contact-buttons .btn-secondary { width: 100%; font-size: var(--font-size-sm); }
 }
-
-@media (hover: hover) { .feature-image img:hover { filter: drop-shadow(0 0 15px var(--accent-blue-bright)); } }
 
 .animate-spin { animation: spin 1s linear infinite; }
 
