@@ -1057,7 +1057,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', debounce(() => {
         adjustSelectorHeight();
         adjustLayoutHeights();
-        adjustStatsFontSize(document.getElementById('total-stats-container'));
+        if (window.innerWidth > 768) {
+            adjustStatsFontSize(document.getElementById('total-stats-container'));
+        }
     }, 150));
 
     window.addEventListener('load', () => {

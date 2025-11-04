@@ -416,7 +416,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     .shopping-list-column {
         display: flex;
         flex-direction: column;
-        min-height: 500px;
     }
     #shopping-list-island {
         flex-grow: 1;
@@ -427,6 +426,10 @@ input:checked + .slider:before { transform: translateX(20px); }
         flex-grow: 1;
         overflow-y: auto;
         min-height: 0;
+    }
+
+    #total-stats-island {
+        max-height: none;
     }
     
     .modal-content {
