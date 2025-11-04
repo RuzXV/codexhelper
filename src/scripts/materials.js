@@ -475,6 +475,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
         
+        hideTooltip();
         closeModal();
         updateUIDisplays(itemId);
         saveCalculatorState();
@@ -935,7 +936,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setupFilterFunctionality(equipmentSelectorGrid, selectorFilterToggleBtn, selectorFilterPanel, selectorSearch);
     }
     
-    modalGrid.addEventListener('click', (e) => {
+    modalGrid.addEventListener('dblclick', (e) => {
         const itemElement = e.target.closest('.modal-item');
         if (itemElement) {
             selectItem(itemElement.dataset.itemId);
@@ -1435,12 +1436,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const tooltipRect = equipmentTooltip.getBoundingClientRect();
         let x = event.clientX + 15;
         let y = event.clientY + 15;
-
+    
         if (x + tooltipRect.width > window.innerWidth) {
             x = event.clientX - tooltipRect.width - 15;
         }
+        if (x < 0) {
+            x = 5;
+        }
         if (y + tooltipRect.height > window.innerHeight) {
             y = window.innerHeight - tooltipRect.height - 5;
+        }
+        if (y < 0) {
+            y = 5;
         }
         
         equipmentTooltip.style.left = `${x}px`;

@@ -578,6 +578,23 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
     .server-item { min-width: 200px; padding: 0 15px; }
     .server-name { font-size: 0.8rem; max-width: 140px; }
     .server-logo { width: 35px; height: 35px; margin-right: 10px; }
+    .sub-nav-container {
+        justify-content: center;
+        padding: 0 var(--spacing-3);
+        overflow-x: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    .sub-nav-container::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .sub-nav-link {
+        padding: var(--spacing-2) var(--spacing-3);
+        font-size: var(--font-size-sm);
+        white-space: nowrap;
+    }
 }
 
 @media (max-width: 480px) {

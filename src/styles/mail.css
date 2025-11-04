@@ -83,7 +83,7 @@
 
 .btn-primary-small { padding: var(--spacing-1) var(--spacing-2) !important; font-size: var(--font-size-xs) !important; font-weight: 500 !important; line-height: 1; height: auto; min-height: 0; }
 
-.preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-4); }
+.preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-4); gap: var(--spacing-4);}
 
 .preview-tabs { display: flex; gap: var(--spacing-2); }
 
