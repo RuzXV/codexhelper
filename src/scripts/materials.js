@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function analyzeAndDisplayCrafting(playerMaterialsCommon, playerChestsCommon, totalCostCommon, totalGoldCost, displayRarity) {
         const divisor = RARITY_MULTIPLIERS[displayRarity.toLowerCase()];
         const rarityName = formatStatName(displayRarity);
-        const rarityClass = displayRarity === 'Normal' ? 'text-normal' : `text-gradient text-${displayRarity.toLowerCase()}`;
+        const rarityClass = `text-${displayRarity.toLowerCase()}`;
 
         let neededFromChestsCommon = 0;
         let totalMaterialOwnedCommon = 0;
@@ -354,6 +354,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const haveChests = Math.floor(playerChestsCommon / divisor);
 
         if (haveChests > 0 || neededChests > 0) {
+            if (materialItemsHtml.trim().length > 0) {
+                materialItemsHtml += `<div class="result-or-divider">OR</div>`;
+            }
             materialItemsHtml += `
                 <div class="result-item">
                     <img src="${getImagePath(`chest_${displayRarity.toLowerCase()}.webp`)}" alt="Chests">
@@ -913,7 +916,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let html = '';
         EQUIPMENT_DATA.forEach((item, index) => {
-            const loadingAttr = index < 12 ? 'eager' : 'lazy';
+            const loadingAttr = 'lazy';
             html += `
                 <div class="selector-item" data-item-id="${item.id}" title="Add ${item.name}">
                     <img src="${getImagePath(item.image)}" alt="${item.name}" loading="${loadingAttr}" width="36" height="36">
