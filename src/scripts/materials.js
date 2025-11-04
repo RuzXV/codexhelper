@@ -620,30 +620,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function adjustStatsFontSize(container) {
-        if (!container || !container.hasChildNodes() || container.dataset.resizing === 'true') {
+        if (!container || container.dataset.isResizing === 'true') {
             return;
         }
-        container.dataset.resizing = 'true';
+        container.dataset.isResizing = 'true';
     
         requestAnimationFrame(() => {
-            if (!container.dataset.initialFontSize) {
-                container.dataset.initialFontSize = window.getComputedStyle(container).fontSize;
-            }
-            container.style.fontSize = container.dataset.initialFontSize;
+            container.style.fontSize = ''; 
             
             requestAnimationFrame(() => {
                 if (container.scrollHeight > container.clientHeight) {
-                    let currentSize = parseFloat(container.dataset.initialFontSize);
+                    let currentSize = parseFloat(window.getComputedStyle(container).fontSize);
                     const minSize = 8;
                     let iterations = 0;
         
-                    while (container.scrollHeight > container.clientHeight && currentSize > minSize && iterations < 30) {
+                    while (container.scrollHeight > container.clientHeight && currentSize > minSize && iterations < 20) {
                         currentSize -= 0.5; 
                         container.style.fontSize = currentSize + 'px';
                         iterations++;
                     }
                 }
-                delete container.dataset.resizing;
+                delete container.dataset.isResizing;
             });
         });
     }

@@ -294,9 +294,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const expTomeGrid = document.getElementById('exp-tome-grid-container');
         const expTomeInputs = form.querySelectorAll('.exp-tome-input');
         const rarityInputs = form.querySelectorAll('input[name="exp-rarity"]');
+
+        const adjustInputFontSize = (input) => {
+            const initialFontSize = parseFloat(getComputedStyle(input).fontSize);
+            if (!input.dataset.initialFontSize) {
+                input.dataset.initialFontSize = initialFontSize;
+            }
+            
+            input.style.fontSize = `${input.dataset.initialFontSize}px`;
+            let currentFontSize = parseFloat(input.dataset.initialFontSize);
         
-        formatNumberInput(currentExpInput);
-        expTomeInputs.forEach(formatNumberInput);
+            while (input.scrollWidth > input.clientWidth && currentFontSize > 8) {
+                currentFontSize -= 1;
+                input.style.fontSize = `${currentFontSize}px`;
+            }
+        };
+        
+        expTomeInputs.forEach(input => {
+            formatNumberInput(input);
+            input.addEventListener('input', () => adjustInputFontSize(input));
+            if(input.value) adjustInputFontSize(input);
+        });
         
         const expCosts = {
             legendary: [120, 360, 720, 1200, 3600, 7200, 10800, 14400, 18000, 22200, 27000, 32400, 38400, 45000, 52200, 60000, 67800, 75600, 84000, 90000, 96000, 103200, 110400, 117600, 126000, 134400, 142800, 151200, 162000, 180000, 204000, 234000, 270000, 312000, 360000, 414000, 474000, 540000, 660000, 810000, 960000, 1140000, 1320000, 1530000, 1740000, 1980000, 2220000, 2520000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000, 2820000],

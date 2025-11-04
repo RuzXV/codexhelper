@@ -346,4 +346,15 @@ input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; background: v
     .grid-date-saved::before { content: "Saved:"; }
     .grid-last-loaded::before { content: "Last Loaded:"; }
     .template-actions { margin-top: var(--spacing-3); justify-content: flex-start; }
+    .preview-header {
+        flex-wrap: wrap;
+    }
+    .preview-actions {
+        flex-basis: 100%;
+        justify-content: flex-end;
+        margin-top: var(--spacing-2);
+    }
+    #copy-btn span {
+        white-space: nowrap;
+    }
 }

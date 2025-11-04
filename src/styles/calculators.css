@@ -241,15 +241,18 @@ input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-a
     .tool-hero p { font-size: var(--font-size-sm); line-height: 1.5; }
     .quick-access-btn span { display: none; }
     .exp-tome-grid {
-        grid-template-columns: repeat(3, 1fr);
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: var(--spacing-3);
     }
-    .exp-tome-grid .exp-tome-item:nth-child(n) { grid-column: auto; }
-    .exp-tome-grid .exp-tome-item:last-child { grid-column: auto; }
-    .exp-tome-grid .exp-tome-item,
-    .exp-tome-grid .exp-tome-item:nth-child(-n+2),
-    .exp-tome-grid .exp-tome-item:nth-child(n+3):nth-child(-n+4),
-    .exp-tome-grid .exp-tome-item:nth-child(n+5) {
-        grid-column: auto;
+    .exp-tome-grid .exp-tome-item:nth-child(-n+2) {
+        grid-column: span 3;
+    }
+    .exp-tome-grid .exp-tome-item:nth-child(n+3):nth-child(-n+5) {
+        grid-column: span 2;
+    }
+    .exp-tome-grid .exp-tome-item:nth-child(n+6) {
+        grid-column: span 3;
     }
     .hoh-grid { grid-template-columns: repeat(2, 1fr); }
     .building-btn span {
