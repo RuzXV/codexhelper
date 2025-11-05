@@ -1,24 +1,122 @@
 ---
 import { Image } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
-import '../../styles/toolkit.css';
-import '../../scripts/toolkit.js';
+import '../../styles/davor_toolkit.css';
 import davorIcon from '../../assets/images/davor_toolkit/davor_icon.webp';
+import equipmentData from '../../data/equipment.json';
+
+import cavalryIcon from '../../assets/images/materials/troop_icons/cavalry_icon_mini.webp';
+import infantryIcon from '../../assets/images/materials/troop_icons/infantry_icon_mini.webp';
+import archerIcon from '../../assets/images/materials/troop_icons/archer_icon_mini.webp';
+import siegeIcon from '../../assets/images/materials/troop_icons/siege_icon_mini.webp';
+
+const allDavorImageModules = import.meta.glob<any>('../../assets/images/davor_toolkit/**/*.{webp,png,jpg}', { eager: true });
+const allCommanderImageModules = import.meta.glob<any>('../../assets/images/davor_toolkit/commanders/*.webp', { eager: true });
+const allEquipmentImageModules = import.meta.glob<any>('../../assets/images/materials/equipment/*.webp', { eager: true });
+
+
+const imagePathMap: { [key: string]: string } = {};
+
+function populateMap(modules: Record<string, any>) {
+    for (const path in modules) {
+        const filename = path.split('/').pop();
+        if (filename) {
+            imagePathMap[filename] = modules[path].default.src;
+        }
+    }
+}
+
+populateMap(allDavorImageModules);
+populateMap(allCommanderImageModules);
+populateMap(allEquipmentImageModules);
+
+const statsWeightingIconPath = imagePathMap['stats_icon.webp'] || '';
+const armamentsIconPath = imagePathMap['armaments_icon.webp'] || davorIcon.src;
+const davorIconPath = davorIcon.src; 
 ---
 <Layout title="Davor's Toolkit" bodyClass="has-sub-nav">
     <main class="tool-page-wrapper">
         <section class="tool-hero">
             <div class="tool-hero-container">
                 <div class="section-badge">Community Tools</div>
-                <h1 class="tool-title">
-                    <Image src={davorIcon} alt="Davor Icon" class="title-icon" width="300" height="300" quality={100} />
-                    Davor's Toolkit
-                </h1>
-                <div class="coming-soon-content">
-                    <i class="fas fa-tools"></i>
-                    <h2>Coming Soon</h2>
-                    <p>Under construction - check back later!</p>
+                
+                <div class="quick-access-container">
+                    <div class="quick-access-nav" id="quick-access-nav"></div>
                 </div>
+                <h1 id="calculator-main-title" class="calculator-main-title"></h1>
+                <p id="calculator-main-description"></p>
+            </div>
+        </section>
+
+        <section class="tool-content">
+            <div class="carousel-container">
+                <div class="carousel-track-container">
+                    <div class="carousel-track">
+                        <div class="carousel-slide" data-title="Stats Weighting" data-description="Analyze the stat weights for different commander pairings and equipment sets to optimize your gear." data-icon={statsWeightingIconPath}>
+                            <div class="calculator-island">
+                                <div class="island-content">
+                                    <div class="form-group">
+                                        <label>Troop Type</label>
+                                        <div id="troop-type-selector" class="button-selector">
+                                            <button class="selector-btn active" data-type="cavalry"><Image src={cavalryIcon} alt="Cavalry" width="24" height="24"/><span>Cavalry</span></button>
+                                            <button class="selector-btn" data-type="infantry"><Image src={infantryIcon} alt="Infantry" width="24" height="24"/><span>Infantry</span></button>
+                                            <button class="selector-btn" data-type="archer"><Image src={archerIcon} alt="Archers" width="24" height="24"/><span>Archers</span></button>
+                                            <button class="selector-btn" data-type="engineering"><Image src={siegeIcon} alt="Engineering" width="24" height="24"/><span>Engineering</span></button>
+                                        </div>
+                                    </div>
+
+                                    <div class="selectors-container">
+                                        <div class="pairing-selector-wrapper">
+                                            <label>Commander Pairing</label>
+                                            <div id="pairing-selector" class="pairing-selector"></div>
+                                        </div>
+                                        <div class="equipment-carousel-wrapper">
+                                            <label>Equipment Set</label>
+                                            <div id="equipment-set-carousel">
+                                                <div id="equipment-display"></div>
+                                                <button id="prev-set" class="equipment-arrow">&lt;</button>
+                                                <button id="next-set" class="equipment-arrow">&gt;</button>
+                                                <div id="pagination-dots"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="result-display" class="stats-result-display" style="display: none;">
+                                        <h4 id="stat-weights-title">Stat Weights:</h4>
+                                        <p id="stat-weights"></p>
+                                    </div>
+                                    <div class="form-group-horizontal-power">
+                                        <div class="form-group">
+                                            <label for="all-damage-input">All Damage (%)</label>
+                                            <input type="number" id="all-damage-input" placeholder="Example: 1.5">
+                                        </div>
+                                        <span class="input-divider">or</span>
+                                        <div class="form-group">
+                                            <label for="health-input">Health (%)</label>
+                                            <input type="number" id="health-input" placeholder="Example: 2.5">
+                                        </div>
+                                    </div>
+                                    <div id="conversion-result" class="calc-result">
+                                        <h4 id="conversion-label" class="conversion-label"></h4>
+                                        <div id="conversion-output"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="carousel-slide" data-title="Score my Armaments" data-description="A new tool is coming soon to help you score and optimize your armaments." data-icon={armamentsIconPath}>
+                            <div class="calculator-island">
+                                <div class="island-content coming-soon-content">
+                                    <h3>Coming Soon!</h3>
+                                    <p>The "Score my Armaments" calculator is under construction.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <button class="carousel-arrow prev" id="prev-slide"><i class="fas fa-chevron-left"></i></button>
+                <button class="carousel-arrow next" id="next-slide"><i class="fas fa-chevron-right"></i></button>
             </div>
         </section>
 
@@ -50,4 +148,13 @@ import davorIcon from '../../assets/images/davor_toolkit/davor_icon.webp';
             </div>
         </section>
     </main>
+
+    <script define:vars={{ imagePaths: imagePathMap, equipmentData, davorIconPath }}>
+        window.DAVOR_IMAGE_PATHS = imagePaths;
+        window.equipmentData = equipmentData;
+        window.davorIconPath = davorIconPath; 
+    </script>
+    <script>
+        import "../../scripts/davor_toolkit.js";
+    </script>
 </Layout>
