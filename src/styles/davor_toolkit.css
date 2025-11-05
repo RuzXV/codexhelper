@@ -199,14 +199,14 @@
     }
     
     .equipment-arrow {
-        top: 85%;
+        top: 90%;
         font-size: 1.5rem;
     }
     #prev-set {
-        left: calc(50% - 70px);
+        left: calc(45% - 95px);
     }
     #next-set {
-        right: calc(50% - 70px);
+        right: calc(45% - 95px);
     }
 
     .contributor-box { 
