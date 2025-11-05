@@ -203,10 +203,10 @@
         font-size: 1.5rem;
     }
     #prev-set {
-        left: calc(45% - 95px);
+        left: calc(40% - 95px);
     }
     #next-set {
-        right: calc(45% - 95px);
+        right: calc(40% - 95px);
     }
 
     .contributor-box { 
