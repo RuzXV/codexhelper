@@ -67,7 +67,7 @@
 
 .selector-btn span { text-shadow: 0 1px 2px black; }
 .selector-btn.active span { color: white !important; }
-.selector-btn img { height: 24px; width: 24px; filter: drop-shadow(0 0 1px black); }
+.selector-btn img { height: 24px; width: auto; filter: drop-shadow(0 0 1px black); }
 
 .selectors-container { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-6); margin-top: var(--spacing-4); height: 440px; }
 .pairing-selector-wrapper, .equipment-carousel-wrapper { min-height: 0; display: flex; flex-direction: column; height: 100%;}
@@ -96,7 +96,8 @@
 .equipment-set-name { font-weight: 600; font-size: var(--font-size-base); margin-top: var(--spacing-6); }
 .equipment-arrow { 
     position: absolute; 
-    top: 205px;
+    top: 50%; 
+    transform: translateY(-50%);
     background: rgba(0,0,0,0.3); 
     border: 1px solid var(--border-color); 
     color: white; 
@@ -109,7 +110,6 @@
     align-items: center; 
     justify-content: center; 
 }
-
 #prev-set { left: 10px; }
 #next-set { right: 10px; }
 #pagination-dots { display: flex; justify-content: center; gap: var(--spacing-2); margin-top: var(--spacing-3); }
@@ -168,8 +168,33 @@
     .quick-access-nav { overflow-x: auto; justify-content: flex-start; }
     .tool-title { flex-direction: column; gap: var(--spacing-2); }
     .selectors-container { grid-template-columns: 1fr; min-height: auto; height: auto; }
-    .pairing-selector { max-height: 200px; }
-    .contributor-box { padding: var(--spacing-5); }
+    .button-selector {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .pairing-selector { 
+        max-height: 280px; 
+    }
+    .pairing-item span {
+        font-size: calc(var(--font-size-sm) * 0.9);
+    }
+    
+    .equipment-arrow {
+        font-size: 1.5rem;
+    }
+    #prev-set { left: -5px; }
+    #next-set { right: -5px; }
+    
+    .contributor-box { 
+        padding: var(--spacing-6);
+    }
+    
+    .stats-result-display h4,
+    .calc-result .conversion-label {
+        font-size: var(--font-size-sm);
+    }
+    
     .action-item { flex-direction: column; align-items: flex-start; gap: var(--spacing-2); }
     .action-label { text-align: left; min-width: auto; }
     .action-btn { width: 100%; justify-content: center; }
