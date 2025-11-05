@@ -199,10 +199,15 @@
     }
     
     .equipment-arrow {
+        top: 85%;
         font-size: 1.5rem;
     }
-    #prev-set { left: -5px; }
-    #next-set { right: -5px; }
+    #prev-set {
+        left: calc(50% - 70px);
+    }
+    #next-set {
+        right: calc(50% - 70px);
+    }
 
     .contributor-box { 
         padding: var(--spacing-6);
