@@ -556,7 +556,9 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', toggleFAQ);
     });
 
-    loadApiData();
+    if (document.body.classList.contains('home')) {
+        loadApiData();
+    }
 });
 
 if ('IntersectionObserver' in window) {

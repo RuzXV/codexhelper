@@ -6,10 +6,10 @@ import equipmentData from '../../data/equipment.json';
 import equipmentSetData from '../../data/equipment_sets.json';
 import siteLogo from '../../assets/images/global/logo-new.webp';
 
-const allMaterialImageModules = import.meta.glob('../../assets/images/materials/**/*.{webp,png,jpg}', { eager: true });
+const allMaterialImageModules = import.meta.glob<any>('../../assets/images/materials/**/*.{webp,png,jpg}', { eager: true });
 
-const imageMap = {};
-const imagePathMap = {};
+const imageMap: { [key: string]: any } = {};
+const imagePathMap: { [key: string]: string } = {};
 
 for (const path in allMaterialImageModules) {
     const filename = path.split('/').pop();
@@ -45,35 +45,35 @@ for (const path in allMaterialImageModules) {
                     <div class="material-inputs-column">
                         <div class="calculator-grid">
                             <div class="material-island" id="iron-island">
-                                <h3 class="island-header"><Image src={imageMap['ore_legendary.webp']} alt="Iron Ore" width="32" height="32" loading="eager" /> Iron Ore</h3>
+                                <h3 class="island-header"><Image src={imageMap['ore_legendary.webp']} alt="Iron Ore" width="96" height="96" loading="eager" quality={100} /> Iron Ore</h3>
                                 <div class="island-content">
                                     <div class="rarity-input-group">
                                         <div class="rarity-label common">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['ore_common.webp']} alt="" width="24" height="24" loading="eager" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['ore_common.webp']} alt="" width="72" height="72" loading="eager" quality={100} /></div>
                                         </div>
                                         <input type="text" id="iron-common" class="material-input" data-material="iron" data-rarity="common" placeholder="0" aria-label="Common Iron Ore">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label advanced">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['ore_advanced.webp']} alt="" width="24" height="24" loading="eager" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['ore_advanced.webp']} alt="" width="72" height="72" loading="eager" quality={100} /></div>
                                         </div>
                                         <input type="text" id="iron-advanced" class="material-input" data-material="iron" data-rarity="advanced" placeholder="0" aria-label="Advanced Iron Ore">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label elite">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['ore_elite.webp']} alt="" width="24" height="24" loading="eager" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['ore_elite.webp']} alt="" width="72" height="72" loading="eager" quality={100} /></div>
                                         </div>
                                         <input type="text" id="iron-elite" class="material-input" data-material="iron" data-rarity="elite" placeholder="0" aria-label="Elite Iron Ore">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label epic">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['ore_epic.webp']} alt="" width="24" height="24" loading="eager" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['ore_epic.webp']} alt="" width="72" height="72" loading="eager" quality={100} /></div>
                                         </div>
                                         <input type="text" id="iron-epic" class="material-input" data-material="iron" data-rarity="epic" placeholder="0" aria-label="Epic Iron Ore">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label legendary">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['ore_legendary.webp']} alt="" width="24" height="24" loading="eager" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['ore_legendary.webp']} alt="" width="72" height="72" loading="eager" quality={100} /></div>
                                         </div>
                                         <input type="text" id="iron-legendary" class="material-input" data-material="iron" data-rarity="legendary" placeholder="0" aria-label="Legendary Iron Ore">
                                     </div>
@@ -81,35 +81,35 @@ for (const path in allMaterialImageModules) {
                             </div>
                 
                             <div class="material-island" id="leather-island">
-                                <h3 class="island-header"><Image src={imageMap['leather_legendary.webp']} alt="Leather" width="32" height="32" loading="eager" /> Leather</h3>
+                                <h3 class="island-header"><Image src={imageMap['leather_legendary.webp']} alt="Leather" width="96" height="96" loading="eager" quality={100} /> Leather</h3>
                                 <div class="island-content">
                                     <div class="rarity-input-group">
                                         <div class="rarity-label common">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['leather_common.webp']} alt="" width="24" height="24" loading="eager" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['leather_common.webp']} alt="" width="72" height="72" loading="eager" quality={100} /></div>
                                         </div>
                                         <input type="text" id="leather-common" class="material-input" data-material="leather" data-rarity="common" placeholder="0" aria-label="Common Leather">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label advanced">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['leather_advanced.webp']} alt="" width="24" height="24" loading="eager" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['leather_advanced.webp']} alt="" width="72" height="72" loading="eager" quality={100} /></div>
                                         </div>
                                         <input type="text" id="leather-advanced" class="material-input" data-material="leather" data-rarity="advanced" placeholder="0" aria-label="Advanced Leather">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label elite">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['leather_elite.webp']} alt="" width="24" height="24" loading="eager" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['leather_elite.webp']} alt="" width="72" height="72" loading="eager" quality={100} /></div>
                                         </div>
                                         <input type="text" id="leather-elite" class="material-input" data-material="leather" data-rarity="elite" placeholder="0" aria-label="Elite Leather">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label epic">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['leather_epic.webp']} alt="" width="24" height="24" loading="eager" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['leather_epic.webp']} alt="" width="72" height="72" loading="eager" quality={100} /></div>
                                         </div>
                                         <input type="text" id="leather-epic" class="material-input" data-material="leather" data-rarity="epic" placeholder="0" aria-label="Epic Leather">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label legendary">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['leather_legendary.webp']} alt="" width="24" height="24" loading="eager" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['leather_legendary.webp']} alt="" width="72" height="72" loading="eager" quality={100} /></div>
                                         </div>
                                         <input type="text" id="leather-legendary" class="material-input" data-material="leather" data-rarity="legendary" placeholder="0" aria-label="Legendary Leather">
                                     </div>
@@ -117,35 +117,35 @@ for (const path in allMaterialImageModules) {
                             </div>
                 
                             <div class="material-island" id="ebony-island">
-                                <h3 class="island-header"><Image src={imageMap['ebony_legendary.webp']} alt="Ebony" width="32" height="32" loading="lazy" /> Ebony</h3>
+                                <h3 class="island-header"><Image src={imageMap['ebony_legendary.webp']} alt="Ebony" width="96" height="96" loading="lazy" quality={100} /> Ebony</h3>
                                 <div class="island-content">
                                     <div class="rarity-input-group">
                                         <div class="rarity-label common">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['ebony_common.webp']} alt="" width="24" height="24" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['ebony_common.webp']} alt="" width="72" height="72" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="ebony-common" class="material-input" data-material="ebony" data-rarity="common" placeholder="0" aria-label="Common Ebony">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label advanced">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['ebony_advanced.webp']} alt="" width="24" height="24" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['ebony_advanced.webp']} alt="" width="72" height="72" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="ebony-advanced" class="material-input" data-material="ebony" data-rarity="advanced" placeholder="0" aria-label="Advanced Ebony">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label elite">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['ebony_elite.webp']} alt="" width="24" height="24" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['ebony_elite.webp']} alt="" width="72" height="72" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="ebony-elite" class="material-input" data-material="ebony" data-rarity="elite" placeholder="0" aria-label="Elite Ebony">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label epic">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['ebony_epic.webp']} alt="" width="24" height="24" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['ebony_epic.webp']} alt="" width="72" height="72" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="ebony-epic" class="material-input" data-material="ebony" data-rarity="epic" placeholder="0" aria-label="Epic Ebony">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label legendary">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['ebony_legendary.webp']} alt="" width="24" height="24" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['ebony_legendary.webp']} alt="" width="72" height="72" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="ebony-legendary" class="material-input" data-material="ebony" data-rarity="legendary" placeholder="0" aria-label="Legendary Ebony">
                                     </div>
@@ -153,35 +153,35 @@ for (const path in allMaterialImageModules) {
                             </div>
                 
                             <div class="material-island" id="bone-island">
-                                <h3 class="island-header"><Image src={imageMap['bone_legendary.webp']} alt="Animal Bone" width="32" height="32" loading="lazy" /> Animal Bone</h3>
+                                <h3 class="island-header"><Image src={imageMap['bone_legendary.webp']} alt="Animal Bone" width="96" height="96" loading="lazy" quality={100} /> Animal Bone</h3>
                                 <div class="island-content">
                                     <div class="rarity-input-group">
                                         <div class="rarity-label common">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['bone_common.webp']} alt="" width="24" height="24" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['bone_common.webp']} alt="" width="72" height="72" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="bone-common" class="material-input" data-material="bone" data-rarity="common" placeholder="0" aria-label="Common Animal Bone">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label advanced">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['bone_advanced.webp']} alt="" width="24" height="24" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['bone_advanced.webp']} alt="" width="72" height="72" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="bone-advanced" class="material-input" data-material="bone" data-rarity="advanced" placeholder="0" aria-label="Advanced Animal Bone">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label elite">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['bone_elite.webp']} alt="" width="24" height="24" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['bone_elite.webp']} alt="" width="72" height="72" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="bone-elite" class="material-input" data-material="bone" data-rarity="elite" placeholder="0" aria-label="Elite Animal Bone">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label epic">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['bone_epic.webp']} alt="" width="24" height="24" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['bone_epic.webp']} alt="" width="72" height="72" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="bone-epic" class="material-input" data-material="bone" data-rarity="epic" placeholder="0" aria-label="Epic Animal Bone">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label legendary">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['bone_legendary.webp']} alt="" width="24" height="24" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['bone_legendary.webp']} alt="" width="72" height="72" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="bone-legendary" class="material-input" data-material="bone" data-rarity="legendary" placeholder="0" aria-label="Legendary Animal Bone">
                                     </div>
@@ -191,35 +191,35 @@ for (const path in allMaterialImageModules) {
                 
                         <div class="chest-grid">
                             <div class="material-island" id="chest-island">
-                                <h3 class="island-header"><Image src={imageMap['chest_legendary.webp']} alt="Choice Chest" width="32" height="32" loading="lazy" /> Material Choice Chests</h3>
+                                <h3 class="island-header"><Image src={imageMap['chest_legendary.webp']} alt="Choice Chest" width="96" height="96" loading="lazy" quality={100} /> Material Choice Chests</h3>
                                 <div class="island-content chest-content">
                                     <div class="rarity-input-group">
                                         <div class="rarity-label common">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['chest_common.webp']} alt="" width="30" height="30" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['chest_common.webp']} alt="" width="90" height="90" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="chest-common" class="material-input" data-material="chest" data-rarity="common" placeholder="0" aria-label="Common Choice Chest">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label advanced">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['chest_advanced.webp']} alt="" width="30" height="30" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['chest_advanced.webp']} alt="" width="90" height="90" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="chest-advanced" class="material-input" data-material="chest" data-rarity="advanced" placeholder="0" aria-label="Advanced Choice Chest">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label elite">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['chest_elite.webp']} alt="" width="30" height="30" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['chest_elite.webp']} alt="" width="90" height="90" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="chest-elite" class="material-input" data-material="chest" data-rarity="elite" placeholder="0" aria-label="Elite Choice Chest">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label epic">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['chest_epic.webp']} alt="" width="30" height="30" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['chest_epic.webp']} alt="" width="90" height="90" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="chest-epic" class="material-input" data-material="chest" data-rarity="epic" placeholder="0" aria-label="Epic Choice Chest">
                                     </div>
                                     <div class="rarity-input-group">
                                         <div class="rarity-label legendary">
-                                            <div class="material-icon-wrapper"><Image src={imageMap['chest_legendary.webp']} alt="" width="30" height="30" loading="lazy" /></div>
+                                            <div class="material-icon-wrapper"><Image src={imageMap['chest_legendary.webp']} alt="" width="90" height="90" loading="lazy" quality={100} /></div>
                                         </div>
                                         <input type="text" id="chest-legendary" class="material-input" data-material="chest" data-rarity="legendary" placeholder="0" aria-label="Legendary Choice Chest">
                                     </div>
@@ -237,14 +237,14 @@ for (const path in allMaterialImageModules) {
                                 </button>
                             </h3>
                             <div class="loadout-grid">
-                                <button class="loadout-slot" id="slot-helmet" data-slot="helmet"><Image src={imageMap['helmet_slot.webp']} alt="Helmet Slot" width="70" height="70" loading="eager"/></button>
-                                <button class="loadout-slot" id="slot-weapon" data-slot="weapon"><Image src={imageMap['weapon_slot.webp']} alt="Weapon Slot" width="70" height="70" loading="eager"/></button>
-                                <button class="loadout-slot" id="slot-chest" data-slot="chest"><Image src={imageMap['chest_slot.webp']} alt="Chest Slot" width="70" height="70" loading="eager"/></button>
-                                <button class="loadout-slot" id="slot-gloves" data-slot="gloves"><Image src={imageMap['glove_slot.webp']} alt="Gloves Slot" width="70" height="70" loading="eager"/></button>
-                                <button class="loadout-slot" id="slot-legs" data-slot="legs"><Image src={imageMap['leggings_slot.webp']} alt="Legs Slot" width="70" height="70" loading="eager"/></button>
-                                <button class="loadout-slot" id="slot-boots" data-slot="boots"><Image src={imageMap['boots_slot.webp']} alt="Boots Slot" width="70" height="70" loading="eager"/></button>
-                                <button class="loadout-slot" id="slot-accessory1" data-slot="accessory1"><Image src={imageMap['accessory1_slot.webp']} alt="Accessory 1 Slot" width="70" height="70" loading="eager"/></button>
-                                <button class="loadout-slot" id="slot-accessory2" data-slot="accessory2"><Image src={imageMap['accessory1_slot.webp']} alt="Accessory 2 Slot" width="70" height="70" loading="eager"/></button>
+                                <button class="loadout-slot" id="slot-helmet" data-slot="helmet"><Image src={imageMap['helmet_slot.webp']} alt="Helmet Slot" width="210" height="210" loading="eager" quality={100}/></button>
+                                <button class="loadout-slot" id="slot-weapon" data-slot="weapon"><Image src={imageMap['weapon_slot.webp']} alt="Weapon Slot" width="210" height="210" loading="eager" quality={100}/></button>
+                                <button class="loadout-slot" id="slot-chest" data-slot="chest"><Image src={imageMap['chest_slot.webp']} alt="Chest Slot" width="210" height="210" loading="eager" quality={100}/></button>
+                                <button class="loadout-slot" id="slot-gloves" data-slot="gloves"><Image src={imageMap['glove_slot.webp']} alt="Gloves Slot" width="210" height="210" loading="eager" quality={100}/></button>
+                                <button class="loadout-slot" id="slot-legs" data-slot="legs"><Image src={imageMap['leggings_slot.webp']} alt="Legs Slot" width="210" height="210" loading="eager" quality={100}/></button>
+                                <button class="loadout-slot" id="slot-boots" data-slot="boots"><Image src={imageMap['boots_slot.webp']} alt="Boots Slot" width="210" height="210" loading="eager" quality={100}/></button>
+                                <button class="loadout-slot" id="slot-accessory1" data-slot="accessory1"><Image src={imageMap['accessory1_slot.webp']} alt="Accessory 1 Slot" width="210" height="210" loading="eager" quality={100}/></button>
+                                <button class="loadout-slot" id="slot-accessory2" data-slot="accessory2"><Image src={imageMap['accessory1_slot.webp']} alt="Accessory 2 Slot" width="210" height="210" loading="eager" quality={100}/></button>
                             </div>
                             <p class="loadout-instructions">Select a slot or use the search box below to add equipment to your crafting list</p>
                         </div>
@@ -342,7 +342,7 @@ for (const path in allMaterialImageModules) {
                 </div>
                 
                 <div class="screenshot-watermark">
-                    <Image src={siteLogo} alt="Codex Helper Logo" width="20" height="20" />
+                    <Image src={siteLogo} alt="Codex Helper Logo" width="60" height="60" quality={100} />
                     <span>Made using codexhelper.com</span>
                 </div>
             </div>

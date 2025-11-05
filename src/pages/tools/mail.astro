@@ -104,7 +104,7 @@ const processedTemplatesData = templatesData.map(template => {
                                                     <div class="custom-option" data-value="yellow"><span class="color-swatch" style="background:yellow;"></span>Yellow</div>
                                                     <div class="custom-option" data-value="orange"><span class="color-swatch" style="background:orange;"></span>Orange</div>
                                                     <div class="custom-option" data-value="purple"><span class="color-swatch" style="background:purple;"></span>Purple</div>
-                                                    <div class="custom-option" data-value="custom-toggle"><Image src={colourwheel} alt="Custom Color" class="color-wheel-icon" width="16" height="16" />Custom...</div>
+                                                    <div class="custom-option" data-value="custom-toggle"><Image src={colourwheel} alt="Custom Color" class="color-wheel-icon" width="48" height="48" quality={100} />Custom...</div>
                                                     <div id="custom-color-picker-container">
                                                         <div class="color-input-group">
                                                             <label for="custom-color-input">Pick</label>
@@ -183,7 +183,7 @@ const processedTemplatesData = templatesData.map(template => {
                                         <span>Save</span>
                                     </button>
                                     <button id="copy-btn" class="btn-primary">
-                                        <Image src={copyIcon} alt="Copy Icon" width="16" height="16" />
+                                        <Image src={copyIcon} alt="Copy Icon" width="48" height="48" quality={100} />
                                         <span>Copy Code</span>
                                     </button>
                                 </div>
@@ -227,7 +227,7 @@ const processedTemplatesData = templatesData.map(template => {
                         </div>
                         <div class="template-preview-wrapper">
                             <button id="load-template-btn" class="btn-primary" disabled>
-                                <Image src={loadIcon} alt="Load Icon" width="16" height="16" loading="eager"/>
+                                <Image src={loadIcon} alt="Load Icon" width="48" height="48" loading="eager" quality={100}/>
                                 <span>Load Template</span>
                             </button>
                             <div id="magnified-preview-container" class="magnified-preview-container">
