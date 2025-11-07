@@ -264,14 +264,17 @@
     margin-top: var(--spacing-4);
     padding-top: var(--spacing-4);
     border-top: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-2);
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
     min-height: 48px;
-    flex-wrap: wrap;
+    text-align: center;
+    line-height: 2.5;
+}
+
+.save-score-section > * {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 var(--spacing-1);
 }
 .save-score-section .discord-login-btn { min-height: 44px; height: auto; }
 .save-score-section .discord-login-btn span { display: inline; }

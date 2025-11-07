@@ -850,36 +850,42 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             if (isMobile) {
-                tableHtml += `<div class="grid-row-container" data-score-id="${score.score_id}">`;
+                tableHtml += `<div class="grid-row-container" data-score-id="${score.score_id}">
+                                <div class="score-pairing pairing-images">
+                                    <img src="${primaryImg}" alt="${primary}" class="commander-icon">
+                                    <img src="${secondaryImg}" alt="${secondary}" class="commander-icon secondary">
+                                </div>
+                                <div class="score-formation">
+                                    <img src="${formationImg}" alt="${score.formation}" class="formation-icon">
+                                    <span>${score.formation}</span>
+                                </div>
+                                <div class="score-inscriptions">${inscriptionsHtml}</div>
+                                <div class="score-stats">${statsHtml}</div>
+                                <div class="total-score"><strong>${score.total_score.toFixed(2)}</strong></div>
+                                <div class="score-actions">
+                                    <button class="btn-danger delete-score-btn" title="Delete Score"><i class="fas fa-trash"></i></button>
+                                </div>
+                              </div>`;
             } else {
-                 tableHtml += `<div class="grid-row" data-score-id="${score.score_id}">`;
-            }
-
-            tableHtml += `
-                <div class="score-pairing pairing-images">
-                    <img src="${primaryImg}" alt="${primary}" class="commander-icon">
-                    <img src="${secondaryImg}" alt="${secondary}" class="commander-icon secondary">
-                </div>
-                <div class="score-formation">
-                    <img src="${formationImg}" alt="${score.formation}" class="formation-icon">
-                    <span>${score.formation}</span>
-                </div>
-                <div class="score-inscriptions">${inscriptionsHtml}</div>
-                <div class="score-stats">${statsHtml}</div>
-                <div class="total-score"><strong>${score.total_score.toFixed(2)}</strong></div>
-                <div class="score-actions">
-                    <button class="btn-danger delete-score-btn" title="Delete Score"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
-
-            if (isMobile) {
-                tableHtml += `</div>`;
+                tableHtml += `<div class="grid-row" data-score-id="${score.score_id}">
+                                <div class="score-pairing pairing-images">
+                                    <img src="${primaryImg}" alt="${primary}" class="commander-icon">
+                                    <img src="${secondaryImg}" alt="${secondary}" class="commander-icon secondary">
+                                </div>
+                                <div class="score-formation">
+                                    <img src="${formationImg}" alt="${score.formation}" class="formation-icon">
+                                    <span>${score.formation}</span>
+                                </div>
+                                <div class="score-inscriptions">${inscriptionsHtml}</div>
+                                <div class="score-stats">${statsHtml}</div>
+                                <div class="total-score"><strong>${score.total_score.toFixed(2)}</strong></div>
+                                <div class="score-actions">
+                                    <button class="btn-danger delete-score-btn" title="Delete Score"><i class="fas fa-trash"></i></button>
+                                </div>
+                              </div>`;
             }
         });
 
-        if (!isMobile) {
-            tableHtml += '</div>';
-        }
         tableHtml += '</div>';
         savedScoresContent.innerHTML = tableHtml;
 
