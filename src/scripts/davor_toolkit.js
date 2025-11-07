@@ -703,11 +703,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = window.auth.getLoggedInUser();
 
         if (user) {
-             saveScoreSection.innerHTML = `
+                saveScoreSection.innerHTML = `
                 <span>You can </span>
                 <button id="save-score-btn" class="btn-primary">Save Score</button>
                 <span> and access or compare your scores in the 
-                    <a href="#" class="saved-scores-link">Saved Scores</a> tab.
+                    <span style="white-space: nowrap;">
+                        <a href="#" class="saved-scores-link">Saved Scores</a> tab.
+                    </span>
                 </span>`;
             document.getElementById('save-score-btn').addEventListener('click', handleSaveScore);
         } else {
