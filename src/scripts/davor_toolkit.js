@@ -811,6 +811,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const primaryImg = getImagePath(primaryFilename);
             const secondaryImg = getImagePath(secondaryFilename);
             
+            const formationFilename = score.formation.toLowerCase().replace(/ /g, '_') + '.webp';
+            const formationImg = getImagePath(formationFilename);
+
             let inscriptionsHtml = '<div class="inscription-grid">';
             if (score.inscriptions && score.inscriptions.length > 0) {
                 score.inscriptions.forEach(name => {
@@ -825,10 +828,10 @@ document.addEventListener('DOMContentLoaded', () => {
             inscriptionsHtml += '</div>';
 
             const statsHtml = `
-                Attack: ${score.stats.attack}%<br>
-                Defense: ${score.stats.defense}%<br>
-                Health: ${score.stats.health}%<br>
-                All Dmg: ${score.stats.allDamage}%
+                Attack: <strong>${score.stats.attack}%</strong><br>
+                Defense: <strong>${score.stats.defense}%</strong><br>
+                Health: <strong>${score.stats.health}%</strong><br>
+                All Dmg: <strong>${score.stats.allDamage}%</strong>
             `;
 
             if (isMobile) {
@@ -842,7 +845,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <img src="${primaryImg}" alt="${primary}" class="commander-icon">
                     <img src="${secondaryImg}" alt="${secondary}" class="commander-icon secondary">
                 </div>
-                <div class="score-formation">${score.formation}</div>
+                <div class="score-formation">
+                    <img src="${formationImg}" alt="${score.formation}" class="formation-icon">
+                    <span>${score.formation}</span>
+                </div>
                 <div class="score-inscriptions">${inscriptionsHtml}</div>
                 <div class="score-stats">${statsHtml}</div>
                 <div class="total-score"><strong>${score.total_score.toFixed(2)}</strong></div>

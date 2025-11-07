@@ -1,3 +1,5 @@
+/* --- START OF FILE davor_toolkit.css --- */
+
 @font-face {
     font-family: 'NotoSansHans';
     src: url('/fonts/NotoSansHans-Black.otf') format('opentype');
@@ -83,7 +85,7 @@
 .button-selector { display: flex; gap: var(--spacing-3); }
 #troop-type-selector {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
 }
 .selector-btn { background: var(--bg-tertiary); border: 2px solid var(--border-color); padding: var(--spacing-2) var(--spacing-4); border-radius: var(--radius-md); cursor: pointer; color: white; font-weight: 600; transition: all 0.2s ease; flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--spacing-2); position: relative; }
 .selector-btn:hover { border-color: rgba(255, 255, 255, 0.3); }
@@ -272,14 +274,39 @@
 .save-score-section .discord-login-btn { min-height: 44px; height: auto; }
 .save-score-section .discord-login-btn span { display: inline; }
 
-.saved-scores-grid { display: grid; grid-template-columns: 100px 100px 1.5fr 1fr 100px 80px; align-items: start; gap: var(--spacing-4); }
+.saved-scores-grid { display: grid; grid-template-columns: 100px 100px 2.5fr 1fr 100px 80px; align-items: start; gap: var(--spacing-4); }
 .saved-scores-grid .grid-header { font-weight: 600; color: var(--text-secondary); font-size: var(--font-size-sm); padding-bottom: var(--spacing-2); border-bottom: 1px solid var(--border-color); }
 .saved-scores-grid .grid-row { display: contents; }
 .saved-scores-grid .grid-row > div { padding: var(--spacing-3) 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; min-height: 85px; }
 .saved-scores-grid .grid-row:last-child > div { border-bottom: none; }
-.saved-scores-grid .score-inscriptions .inscription-grid { max-height: 65px; overflow-y: hidden; align-content: flex-start; }
-.saved-scores-grid .score-stats { flex-direction: column; align-items: flex-start; font-size: var(--font-size-xs); line-height: 1.5; }
+
+.saved-scores-grid .score-formation {
+    flex-direction: column;
+    gap: var(--spacing-1);
+    justify-content: center;
+    text-align: center;
+}
+.saved-scores-grid .score-formation img.formation-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+.saved-scores-grid .score-formation span {
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.saved-scores-grid .score-inscriptions .inscription-grid { max-height: 75px; overflow-y: auto; align-content: flex-start; }
+.saved-scores-grid .inscription-tag {
+    font-size: 10px;
+    padding: 1px 10px;
+    border-bottom-width: 1px;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 6px 100%, 0 50%);
+}
+.saved-scores-grid .score-stats { flex-direction: column; align-items: flex-start; font-size: var(--font-size-xs); line-height: 1.5; color: var(--text-secondary); }
+.saved-scores-grid .score-stats strong { color: var(--accent-blue-bright); font-weight: 500; }
 .saved-scores-grid .total-score { font-weight: 700; font-size: var(--font-size-lg); justify-content: center; }
+.saved-scores-grid .total-score strong { color: var(--accent-blue-bright); }
 .saved-scores-grid .score-actions { justify-content: center; }
 .saved-scores-grid .score-actions .btn-danger { padding: 0; width: 36px; height: 36px; min-width: 0; min-height: 0; font-size: var(--font-size-sm); background-color: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171; }
 .saved-scores-grid .score-actions .btn-danger:hover { background-color: rgba(239, 68, 68, 0.4); border-color: #ef4444; color: white; }
