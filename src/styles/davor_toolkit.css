@@ -278,7 +278,15 @@
 .save-score-section .discord-login-btn { min-height: 44px; height: auto; }
 .save-score-section .discord-login-btn span { display: inline; }
 .save-score-section .btn-primary { padding: var(--spacing-2) var(--spacing-4); }
-.save-score-section a.saved-scores-link { color: var(--accent-blue-bright); text-decoration: underline; font-weight: 500; }
+.save-score-section a.saved-scores-link {
+    color: var(--accent-blue-bright);
+    text-decoration: underline;
+    font-weight: 500;
+    display: inline;
+    min-width: auto;
+    min-height: auto;
+    vertical-align: baseline;
+}
 
 .saved-scores-grid { display: grid; grid-template-columns: 120px 100px 2.5fr 1fr 100px 80px; align-items: start; gap: var(--spacing-4); }
 .saved-scores-grid .grid-header { font-weight: 600; color: var(--text-secondary); font-size: var(--font-size-sm); padding-bottom: var(--spacing-2); border-bottom: 1px solid var(--border-color); text-align: center; }
