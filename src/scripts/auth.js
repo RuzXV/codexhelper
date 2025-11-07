@@ -3,29 +3,17 @@
     const DISCORD_CLIENT_ID = '1434105087722258573';
     const REDIRECT_URI = 'https://api.codexhelper.com/api/auth/callback';
     let authPopup = null;
+    let currentUser = null;
 
     function getLoggedInUser() {
+        if (currentUser) return currentUser;
         try {
             const user = localStorage.getItem('codexUser');
-            return user ? JSON.parse(user) : null;
+            currentUser = user ? JSON.parse(user) : null;
+            return currentUser;
         } catch (e) {
             console.error("Failed to parse user data from localStorage", e);
-            return null;
-        }
-    }
-
-    function getAuthToken() {
-        try {
-            const userString = localStorage.getItem('codexUser');
-            if (!userString) return null;
-            const userData = JSON.parse(userString);
-            if (userData && userData.accessToken) {
-                return `Bearer ${userData.accessToken}`;
-            }
-            console.warn("User data found but is missing accessToken.");
-            return null;
-        } catch (e) {
-            console.error("Failed to get auth token from localStorage", e);
+            localStorage.removeItem('codexUser');
             return null;
         }
     }
@@ -90,29 +78,37 @@
         }
     }
 
-    function logout() {
-        localStorage.removeItem('codexUser');
-        window.location.reload();
+    async function logout() {
+        try {
+            await fetch(`${API_BASE_URL}/api/auth/logout`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+        } catch (error) {
+            console.error("Logout request failed:", error);
+        } finally {
+            localStorage.removeItem('codexUser');
+            currentUser = null;
+            window.location.reload();
+        }
     }
     
     async function fetchWithAuth(endpoint, options = {}) {
-        const token = getAuthToken();
-        if (!token) {
-            throw new Error('User not authenticated');
-        }
-
-        const headers = {
-            ...options.headers,
-            'Authorization': token,
-            'Content-Type': 'application/json'
-        };
-
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            ...options,
+            credentials: 'include',
+            headers: {
+                ...options.headers,
+                'Content-Type': 'application/json',
+            },
+        });
 
         if (!response.ok) {
             if (response.status === 401) {
+                localStorage.removeItem('codexUser');
+                currentUser = null;
                 window.showAlert("Your session has expired. Please log in again.", "Session Expired");
-                logout(); 
+                setTimeout(() => window.location.reload(), 2000);
             }
             const errorData = await response.json().catch(() => ({ message: 'An unknown API error occurred.' }));
             throw new Error(errorData.message || `API request failed with status ${response.status}`);
@@ -128,22 +124,17 @@
         if (user) {
             renderLoggedInState(container, user);
         } else {
-            renderLoggedOutState(container);
+             renderLoggedOutState(container);
         }
         
         window.addEventListener('message', (event) => {
-            if (event.origin !== window.location.origin) {
-                return;
-            }
-
-            const { type, user, error } = event.data;
-            if (type === 'auth-success') {
-                localStorage.setItem('codexUser', JSON.stringify(user));
+            if (event.origin.startsWith('https://codexhelper.com') && event.data.type === 'auth-success') {
                 window.location.reload();
-            } else if (type === 'auth-error') {
-                console.error('Authentication error received from popup:', error);
-                const authContainer = document.querySelector(containerSelector);
-                if(authContainer) renderLoggedOutState(authContainer);
+            } else if (event.origin.startsWith('https://codexhelper.com') && event.data.type === 'auth-error') {
+                 console.error('Authentication error received from popup:', event.data.error);
+                 window.showAlert("Discord login failed. Please try again.", "Authentication Error");
+                 const authContainer = document.querySelector(containerSelector);
+                 if(authContainer) renderLoggedOutState(authContainer);
             }
         });
     }
@@ -152,6 +143,5 @@
         init: initAuth,
         fetchWithAuth: fetchWithAuth,
         getLoggedInUser: getLoggedInUser,
-        getAuthToken: getAuthToken,
     };
 })();
