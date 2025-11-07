@@ -267,14 +267,11 @@
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
     min-height: 48px;
-    text-align: center;
-    line-height: 2.5;
-}
-
-.save-score-section > * {
-    display: inline-block;
-    vertical-align: middle;
-    margin: 0 var(--spacing-1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-1);
 }
 .save-score-section .discord-login-btn { min-height: 44px; height: auto; }
 .save-score-section .discord-login-btn span { display: inline; }
