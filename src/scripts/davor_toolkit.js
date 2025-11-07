@@ -1,3 +1,5 @@
+// --- START OF FILE davor_toolkit.js ---
+
 document.addEventListener('DOMContentLoaded', () => {
     if (!window.weightingData || !window.scorePairings) {
         console.error("Critical data (weightingData or scorePairings) not found on window object. Aborting script initialization.");
@@ -8,27 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const equipmentData = window.equipmentData || [];
     const { equipmentSets, commanderPairings, scalingData } = window.weightingData;
     const { armamentPairingScalings, armamentPairingsByTroop } = window.scorePairings;
-
-    function login() {
-        console.warn('Login function is not implemented.');
-        alert('Login functionality is currently unavailable.');
-    }
-    function logout() {
-        console.warn('Logout function is not implemented.');
-        localStorage.removeItem('codexUser');
-        alert('You have been logged out due to an authentication error.');
-    }
-    function initAuth(container) {
-        if (container) {
-            container.innerHTML = `
-                <button class="discord-login-btn">
-                    <i class="fa-brands fa-discord"></i>
-                    <span>Login with Discord</span>
-                </button>
-            `;
-            container.querySelector('.discord-login-btn').addEventListener('click', login);
-        }
-    }
 
     function getImagePath(filename) {
         if (window.DAVOR_IMAGE_PATHS && window.DAVOR_IMAGE_PATHS[filename]) {
@@ -707,7 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateSaveScoreSection() {
         if (!saveScoreSection) return;
-        const user = getLoggedInUser();
+        const user = window.auth.getLoggedInUser();
 
         if (user) {
             saveScoreSection.innerHTML = `<button id="save-score-btn" class="btn-primary">Save Score</button>`;
@@ -715,12 +696,13 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             saveScoreSection.innerHTML = `
                 <span>Log into</span> 
-                <button class="discord-login-btn">
-                    <i class="fa-brands fa-discord"></i>
-                    <span>Discord</span>
-                </button> 
+                <div id="save-score-auth-container"></div>
                 <span>to save your scores!</span>`;
-            saveScoreSection.querySelector('.discord-login-btn').addEventListener('click', login);
+            const authContainer = document.getElementById('save-score-auth-container');
+            authContainer.innerHTML = `<button class="discord-login-btn"><i class="fa-brands fa-discord"></i><span>Discord</span></button>`;
+            if (window.auth && typeof window.auth.init === 'function') {
+                window.auth.init('#save-score-auth-container');
+            }
         }
     }
 
@@ -734,7 +716,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formation = activeFormationBtn ? activeFormationBtn.dataset.formation : null;
 
         if (!pairing || !formation) {
-            alert("Please select a pairing and formation before saving.");
+            window.showAlert("Please select a pairing and formation before saving.");
             return;
         }
 
@@ -755,7 +737,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.textContent = 'Saving...';
 
         try {
-            await fetchWithAuth('/api/scores', {
+            await window.auth.fetchWithAuth('/api/scores', {
                 method: 'POST',
                 body: JSON.stringify(scoreData)
             });
@@ -767,14 +749,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 2000);
         } catch (error) {
             console.error('Failed to save score:', error);
-            alert(`Could not save score: ${error.message}`);
+            window.showAlert(`Could not save score: ${error.message}`, "Save Error");
             btn.disabled = false;
             btn.textContent = 'Save Score';
         }
     }
     
     async function renderSavedScoresView() {
-        const user = getLoggedInUser();
+        const user = window.auth.getLoggedInUser();
 
         if (user) {
             savedScoresHeader.style.display = 'flex';
@@ -786,7 +768,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             savedScoresContent.innerHTML = `<p>Loading your saved scores...</p>`;
             try {
-                const scores = await fetchWithAuth('/api/scores');
+                const scores = await window.auth.fetchWithAuth('/api/scores');
                 savedScoresCache = scores;
                 populateSavedScoresTable(scores);
             } catch (error) {
@@ -798,8 +780,8 @@ document.addEventListener('DOMContentLoaded', () => {
             savedScoresContent.innerHTML = '';
             savedScoresHeader.style.display = 'none';
             loggedOutOverlayScores.style.display = 'flex';
-            if (savedScoresAuthContainer && !savedScoresAuthContainer.hasChildNodes()) {
-                initAuth(savedScoresAuthContainer);
+            if (savedScoresAuthContainer && !savedScoresAuthContainer.hasChildNodes() && window.auth) {
+                window.auth.init('#saved-scores-auth-container');
             }
             savedScoresCache = null;
         }
@@ -810,6 +792,8 @@ document.addEventListener('DOMContentLoaded', () => {
             savedScoresContent.innerHTML = `<p>You have no saved scores. Use the "Save Score" button in the tool to add one!</p>`;
             return;
         }
+        
+        const isMobile = window.innerWidth <= 768;
 
         let tableHtml = `<div class="saved-scores-grid">
             <div class="grid-header">Pairing</div>
@@ -847,7 +831,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 All Dmg: ${score.stats.allDamage}%
             `;
 
-            const isMobile = window.innerWidth <= 768;
             if (isMobile) {
                 tableHtml += `<div class="grid-row-container" data-score-id="${score.score_id}">`;
             } else {
@@ -889,51 +872,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const row = btn.closest('[data-score-id]');
         const scoreId = row.dataset.scoreId;
 
-        if (confirm('Are you sure you want to delete this saved score?')) {
-            try {
-                await fetchWithAuth(`/api/scores/${scoreId}`, { method: 'DELETE' });
-                savedScoresCache = null;
-                renderSavedScoresView();
-            } catch (error) {
-                console.error('Failed to delete score:', error);
-                alert(`Could not delete score: ${error.message}`);
+        window.showConfirm(
+            'Are you sure you want to delete this saved score?', 
+            'Confirm Deletion', 
+            async () => {
+                try {
+                    await window.auth.fetchWithAuth(`/api/scores/${scoreId}`, { method: 'DELETE' });
+                    savedScoresCache = null;
+                    renderSavedScoresView();
+                } catch (error) {
+                    console.error('Failed to delete score:', error);
+                    window.showAlert(`Could not delete score: ${error.message}`, "Delete Error");
+                }
             }
-        }
-    }
-    
-    const API_BASE_URL = 'https://api.codexhelper.com';
-
-    function getLoggedInUser() {
-        try {
-            const user = localStorage.getItem('codexUser');
-            return user ? JSON.parse(user) : null;
-        } catch (e) { return null; }
-    }
-
-    function getAuthToken() {
-        try {
-            const userString = localStorage.getItem('codexUser');
-            if (!userString) return null;
-            const userData = JSON.parse(userString);
-            return (userData && userData.accessToken) ? `Bearer ${userData.accessToken}` : null;
-        } catch (e) { return null; }
-    }
-    
-    async function fetchWithAuth(endpoint, options = {}) {
-        const token = getAuthToken();
-        if (!token) throw new Error('User not authenticated');
-        const headers = { ...options.headers, 'Authorization': token, 'Content-Type': 'application/json' };
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
-        if (!response.ok) {
-            if (response.status === 401) {
-                logout();
-                updateSaveScoreSection();
-                renderSavedScoresView();
-            }
-            const errorData = await response.json().catch(() => ({ message: 'An unknown API error occurred.' }));
-            throw new Error(errorData.message || `API request failed with status ${response.status}`);
-        }
-        return response.json().catch(() => ({}));
+        );
     }
     
     const initAndResize = () => {
