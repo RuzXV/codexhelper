@@ -471,14 +471,15 @@
     #save-score-auth-container .discord-login-btn,
     #saved-scores-auth-container .discord-login-btn {
         min-width: 120px;
+        justify-content: center;
     }
 
     #save-score-auth-container .discord-login-btn span,
     #saved-scores-auth-container .discord-login-btn span {
         display: inline-block !important;
-        position: relative;
         color: transparent;
         user-select: none;
+        line-height: 1;
     }
 
     #save-score-auth-container .discord-login-btn span::before,
@@ -487,12 +488,6 @@
         color: white;
         font-weight: 600;
         font-size: var(--font-size-base);
-        position: absolute;
-
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
     }
 }
 
