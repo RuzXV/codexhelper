@@ -1,7 +1,7 @@
 (function() {
     const API_BASE_URL = 'https://api.codexhelper.com';
     const DISCORD_CLIENT_ID = '1434105087722258573';
-    const REDIRECT_URI = 'https://codexhelper.com/auth/callback';
+    const REDIRECT_URI = 'https://api.codexhelper.com/api/auth/callback';
     let authPopup = null;
 
     function getLoggedInUser() {
