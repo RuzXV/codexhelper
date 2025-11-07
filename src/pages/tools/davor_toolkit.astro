@@ -4,6 +4,8 @@ import Layout from '../../layouts/Layout.astro';
 import '../../styles/davor_toolkit.css';
 import davorIcon from '../../assets/images/davor_toolkit/davor_icon.webp';
 import equipmentData from '../../data/equipment.json';
+import weightingData from '../../data/weighting_data.json';
+import scorePairings from '../../data/score_pairings.json';
 import inscriptionsData from '../../data/inscriptions.json';
 import inscriptionStats from '../../data/inscription_stats.json';
 
@@ -33,7 +35,7 @@ populateMap(allCommanderImageModules);
 populateMap(allEquipmentImageModules);
 
 const statsWeightingIconPath = imagePathMap['stats_icon.webp'] || '';
-const davorIconPath = davorIcon.src; 
+const davorIconPath = davorIcon.src;
 const davorIconWidth = davorIcon.width;
 const davorIconHeight = davorIcon.height;
 ---
@@ -42,7 +44,7 @@ const davorIconHeight = davorIcon.height;
         <section class="tool-hero">
             <div class="tool-hero-container">
                 <div class="section-badge">Community Tools</div>
-                
+
                 <div class="quick-access-container">
                     <div class="quick-access-nav" id="quick-access-nav"></div>
                 </div>
@@ -84,7 +86,7 @@ const davorIconHeight = davorIcon.height;
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div id="result-display" class="stats-result-display" style="display: none;">
                                         <h4 id="stat-weights-title">Stat Weights:</h4>
                                         <p id="stat-weights"></p>
@@ -117,7 +119,7 @@ const davorIconHeight = davorIcon.height;
                                     </div>
                                     <div id="armament-tool-view" class="generator-view active">
                                         <p class="tool-explanation">This tool utilizes a <span class="wizard-gradient">Score System</span> based on <span class="wizard-gradient">scale values</span> for the extra stats that you receive, on top of existing stats from your commanders and equipment. This Score system gives <span class="wizard-gradient">1 point per 1% attack,</span> and relative scoring for other stats, taking into account <span class="wizard-gradient">Bonus/Reduction</span> and <span class="wizard-gradient">Boost/Resistance</span>. The scale of values is based on the <span class="wizard-gradient">Damage Formula</span> and <span class="wizard-gradient">Combat Effectiveness</span>, and takes into consideration the updated <span class="wizard-gradient">Crystal Tech v5.</span> Total scores will allow you to compare two armaments, two inscriptions or even two full sets on a formation.</p>
-                                        
+
                                         <div class="form-group">
                                             <div class="form-label-heading">Troop Type</div>
                                             <div id="armament-troop-selector" class="button-selector">
@@ -231,7 +233,7 @@ const davorIconHeight = davorIcon.height;
         </section>
     </main>
 
-    <script define:vars={{ imagePaths: imagePathMap, equipmentData, inscriptionsData, inscriptionStats, davorIconPath }}>
+    <script define:vars={{ imagePaths: imagePathMap, equipmentData, inscriptionsData, inscriptionStats, davorIconPath, davorIconWidth, davorIconHeight, weightingData, scorePairings }}>
         window.DAVOR_IMAGE_PATHS = imagePaths;
         window.equipmentData = equipmentData;
         window.inscriptionsData = inscriptionsData;
@@ -239,6 +241,8 @@ const davorIconHeight = davorIcon.height;
         window.davorIconPath = davorIconPath;
         window.davorIconWidth = davorIconWidth;
         window.davorIconHeight = davorIconHeight;
+        window.weightingData = weightingData;
+        window.scorePairings = scorePairings;
     </script>
     <script>
         import "../../scripts/davor_toolkit.js";

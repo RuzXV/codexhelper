@@ -1,0 +1,31 @@
+{
+    "armamentPairingScalings": {
+      "Huo Qubing / Arthur Pendragon": { "attack": 1, "defense": 1.16, "health": 1.21, "allDamage": 3.09, "na": 0.62, "ca": 0.31, "skillDamage": 2.47, "smiteDamage": 0, "comboDamage": 0 },
+      "Huo Qubing / Joan of Arc Prime": { "attack": 1, "defense": 1.12, "health": 1.23, "allDamage": 3, "na": 0.6, "ca": 0.3, "skillDamage": 2.4, "smiteDamage": 0, "comboDamage": 0 },
+      "Huo Qubing / Belisarius Prime": { "attack": 1, "defense": 1.04, "health": 1.24, "allDamage": 2.8, "na": 0.56, "ca": 0.28, "skillDamage": 2.24, "smiteDamage": 0, "comboDamage": 0 },
+      "Alexander Nevsky / Joan of Arc Prime": { "attack": 1, "defense": 1.03, "health": 1, "allDamage": 2.62, "na": 0.66, "ca": 0.33, "skillDamage": 1.96, "smiteDamage": 0, "comboDamage": 0 },
+      "Joan of Arc Prime / Belisarius Prime": { "attack": 1, "defense": 1.16, "health": 1.23, "allDamage": 2.7, "na": 0.8, "ca": 0.4, "skillDamage": 1.9, "smiteDamage": 0, "comboDamage": 0 },
+      "Arthur Pendragon / William I": { "attack": 1, "defense": 1.25, "health": 1.3, "allDamage": 2.83, "na": 0.8, "ca": 0.4, "skillDamage": 0.6, "smiteDamage": 0, "comboDamage": 1.12 },
+      "Arthur Pendragon / Philip II": { "attack": 1, "defense": 1.33, "health": 1.25, "allDamage": 2.31, "na": 0.85, "ca": 0.42, "skillDamage": 0.31, "smiteDamage": 0, "comboDamage": 1.15 },
+      "Arthur Pendragon / Achilles": { "attack": 1, "defense": 1.2, "health": 1.28, "allDamage": 3.16, "na": 3.16, "ca": 0.4, "skillDamage": 0, "smiteDamage": 0, "comboDamage": 2.45 },
+      "Attila / Achilles": { "attack": 1, "defense": 1.4, "health": 1.44, "allDamage": 2.53, "na": 2.53, "ca": 0.6, "skillDamage": 0, "smiteDamage": 0, "comboDamage": 1.35 },
+      "Bai Qi / Liu Che": { "attack": 1, "defense": 0.95, "health": 1.47, "allDamage": 2.96, "na": 2.96, "ca": 0.37, "skillDamage": 0, "smiteDamage": 2.22, "comboDamage": 0.1 },
+      "Bai Qi / William Wallace": { "attack": 1, "defense": 0.88, "health": 1.44, "allDamage": 2.87, "na": 2.87, "ca": 0.41, "skillDamage": 0, "smiteDamage": 2.15, "comboDamage": 0 },
+      "Bai Qi / Cheok Jun Gyeong": { "attack": 1, "defense": 1.16, "health": 1.57, "allDamage": 3, "na": 3, "ca": 0.47, "skillDamage": 0, "smiteDamage": 2.06, "comboDamage": 0 },
+      "Liu Che / Alexander the Great": { "attack": 1, "defense": 0.85, "health": 1.53, "allDamage": 2.85, "na": 1.47, "ca": 0.3, "skillDamage": 0.8, "smiteDamage": 1.07, "comboDamage": 0.1 },
+      "Liu Che / Philip II": { "attack": 1, "defense": 0.77, "health": 1.46, "allDamage": 2.08, "na": 1.32, "ca": 0.3, "skillDamage": 0.32, "smiteDamage": 0.92, "comboDamage": 0.1 },
+      "Ragnar Lodbrok Prime / Scipio Africanus Prime": { "attack": 1, "defense": 0.88, "health": 1.36, "allDamage": 2.87, "na": 0.72, "ca": 0.36, "skillDamage": 2.15, "smiteDamage": 0, "comboDamage": 0 },
+      "Zhuge Liang / Hermann Prime": { "attack": 1, "defense": 1.08, "health": 1.24, "allDamage": 2.77, "na": 0.73, "ca": 0.36, "skillDamage": 2.04, "smiteDamage": 0, "comboDamage": 0 },
+      "Zhuge Liang / Philip II": { "attack": 1, "defense": 1.04, "health": 0.98, "allDamage": 2.04, "na": 0.76, "ca": 0.38, "skillDamage": 1.29, "smiteDamage": 0, "comboDamage": 0 },
+      "Ashurbanipal / Yi Seong-Gye": { "attack": 1, "defense": 1.02, "health": 1.54, "allDamage": 2.96, "na": 0.71, "ca": 0.36, "skillDamage": 2.25, "smiteDamage": 0, "comboDamage": 0 },
+      "Ashurbanipal / Hermann Prime": { "attack": 1, "defense": 1.02, "health": 1.55, "allDamage": 2.94, "na": 0.71, "ca": 0.36, "skillDamage": 2.25, "smiteDamage": 0, "comboDamage": 0 },
+      "Shajar al-Durr / Yi Seong-Gye": { "attack": 1, "defense": 1.05, "health": 1.2, "allDamage": 2.79, "na": 0.56, "ca": 0.28, "skillDamage": 2.23, "smiteDamage": 0, "comboDamage": 0 },
+      "Qin Shi Huang / Zhuge Liang": { "attack": 1, "defense": 0.94, "health": 0.94, "allDamage": 2.41, "na": 0.36, "ca": 0.36, "skillDamage": 2.41, "smiteDamage": 0, "comboDamage": 0 },
+      "Qin Shi Huang / Yi Seong-Gye": { "attack": 1, "defense": 0.96, "health": 1.16, "allDamage": 2.1, "na": 0.36, "ca": 0.36, "skillDamage": 2.1, "smiteDamage": 0, "comboDamage": 0 }
+    },
+    "armamentPairingsByTroop": {
+      "cavalry": ["Alexander Nevsky / Joan of Arc Prime", "Arthur Pendragon / Achilles", "Arthur Pendragon / Philip II", "Arthur Pendragon / William I", "Attila / Achilles", "Huo Qubing / Arthur Pendragon", "Huo Qubing / Belisarius Prime", "Huo Qubing / Joan of Arc Prime", "Joan of Arc Prime / Belisarius Prime"],
+      "infantry": ["Bai Qi / Cheok Jun Gyeong", "Bai Qi / Liu Che", "Bai Qi / William Wallace", "Liu Che / Alexander the Great", "Liu Che / Philip II", "Ragnar Lodbrok Prime / Scipio Africanus Prime"],
+      "archer": ["Ashurbanipal / Hermann Prime", "Ashurbanipal / Yi Seong-Gye", "Qin Shi Huang / Yi Seong-Gye", "Qin Shi Huang / Zhuge Liang", "Shajar al-Durr / Yi Seong-Gye", "Zhuge Liang / Hermann Prime", "Zhuge Liang / Philip II"]
+    }
+  }

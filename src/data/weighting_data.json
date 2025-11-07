@@ -1,0 +1,164 @@
+{
+    "equipmentSets": {
+      "cavalry": {
+        "Budget": ["Expedition War Helm", "Heart of the Saint", "Heavy Armor of the Hellish Wasteland", "Navar's Control", "Gladiator", "Boots of the Hellish Wasteland"],
+        "4 Piece Set": ["War Helm of the Hellish Wasteland", "Lance of the Hellish Wasteland", "Heavy Armor of the Hellish Wasteland", "Navar's Control", "Ash of the Dawn", "Boots of the Hellish Wasteland"],
+        "2/2/2": ["Pride of the Khan", "Sacred Dominion", "Heavy Armor of the Hellish Wasteland", "Navar's Control", "Ash of the Dawn", "Boots of the Hellish Wasteland"]
+      },
+      "infantry": {
+        "Budget": ["Gold Helm of the Eternal Empire", "Gatekeeper's Shield", "Hope Cloak", "Vambraces of the Eternal Empire", "Karuak's Humility", "Sturdy Boots of the Eternal Empire"],
+        "Budget+": ["Gold Helm of the Eternal Empire", "Gatekeeper's Shield", "Hope Cloak", "Vambraces of the Eternal Empire", "Eternal Night", "Sturdy Boots of the Eternal Empire"],
+        "2/2/2": ["Helm of the Conqueror", "Hammer of the Sun and Moon", "Hope Cloak", "Vambraces of the Eternal Empire", "Eternal Night", "Sturdy Boots of the Eternal Empire"],
+        "4 Piece Set + KvK": ["Helm of the Conqueror", "Hammer of the Sun and Moon", "Plate of the Eternal Empire", "Vambraces of the Eternal Empire", "Greaves of the Eternal Empire", "Sturdy Boots of the Eternal Empire"]
+      },
+      "archer": {
+        "Budget": ["Revival Helm", "Golden Age", "Revival Plate", "Revival Gauntlets", "Revival Greaves", "Flame Treads"],
+        "6 Piece Set": ["Dragon's Breath Helm", "Dragon's Breath Bow", "Dragon's Breath Plate", "Dragon's Breath Vambraces", "Dragon's Breath Tassets", "Dragon's Breath Boots"],
+        "4 Piece Set": ["Dragon's Breath Helm", "Dragon's Breath Bow", "Dragon's Breath Plate", "Dragon's Breath Vambraces", "Chausses of the Glorious Goddess", "Greaves of the Glorious Goddess"],
+        "4 Piece Set Alternate": ["Dragon's Breath Helm", "Dragon's Breath Bow", "Dragon's Breath Plate", "Gauntlets of the Glorious Goddess", "Chausses of the Glorious Goddess", "Dragon's Breath Boots"],
+        "4 Piece Set + KvK": ["Ancestral Mask of Night", "The Hydra's Blast", "Dragon's Breath Plate", "Dragon's Breath Vambraces", "Dragon's Breath Tassets", "Dragon's Breath Boots"]
+      },
+      "engineering": {
+        "Budget": ["Knight's Steel Diadem", "Knight's Oathsworn Bow", "Knight's Valorous Cloak", "Knight's Battleworn Gauntlets", "Knight's Triumphant Tassets", "Knight's Winter Sabatons"],
+        "Legendary Set": ["Fierce Wolf's Helmet", "Twilight Epiphany", "Vigilant Wolf's Leather Armor", "Wailing Wolf's Gauntlets", "Lone Wolf's Leather Tassets", "Roaring Wolf's Claws"]
+      }
+    },
+    "commanderPairings": {
+      "cavalry": [
+          "Alexander Nevsky / Joan of Arc Prime", "Arthur Pendragon / Achilles", "Arthur Pendragon / Hector", "Arthur Pendragon / Philip II", "Arthur Pendragon / William I", "Attila / Philip II", "Huo Qubing / Arthur Pendragon", "Huo Qubing / Belisarius Prime", "Huo Qubing / Joan of Arc Prime", "Joan of Arc Prime / Arthur Pendragon"
+      ],
+      "infantry": ["Bai Qi / Liu Che", "Bai Qi / William Wallace", "Liu Che / Alexander the Great", "Liu Che / Philip II", "Ragnar Lodbrok Prime / Scipio Africanus Prime"],
+      "archer": [
+          "Ashurbanipal / Hermann Prime", "Qin Shi Huang / Yi Seong-Gye", "Qin Shi Huang / Zhuge Liang", "Shajar al-Durr / Yi Seong-Gye", "Zhuge Liang / Hermann Prime", "Zhuge Liang / Philip II"
+      ],
+      "engineering": ["Gajah Mada / Gonzalo de Cordoba"]
+    },
+    "scalingData": {
+      "Huo Qubing / Arthur Pendragon": {
+          "Cavalry Set 1": { "allDamage": 1, "health": 2.4, "defense": 2.75, "attack": 2.9 },
+          "Cavalry Set 2": { "allDamage": 1, "health": 2.4, "defense": 2.6, "attack": 3.1 },
+          "Cavalry Set 3": { "allDamage": 1, "health": 2.4, "defense": 2.65, "attack": 3.1 }
+      },
+      "Huo Qubing / Joan of Arc Prime": {
+          "Cavalry Set 1": { "allDamage": 1, "health": 2.3, "defense": 2.75, "attack": 2.8 },
+          "Cavalry Set 2": { "allDamage": 1, "health": 2.3, "defense": 2.6, "attack": 2.95 },
+          "Cavalry Set 3": { "allDamage": 1, "health": 2.3, "defense": 2.6, "attack": 3 }
+      },
+      "Huo Qubing / Belisarius Prime": {
+          "Cavalry Set 1": { "allDamage": 1, "health": 1.95, "defense": 2.65, "attack": 2.55 },
+          "Cavalry Set 2": { "allDamage": 1, "health": 2, "defense": 2.55, "attack": 2.75 },
+          "Cavalry Set 3": { "allDamage": 1, "health": 2, "defense": 2.6, "attack": 2.8 }
+      },
+      "Alexander Nevsky / Joan of Arc Prime": {
+          "Cavalry Set 1": { "allDamage": 1, "health": 2.3, "defense": 2.35, "attack": 2.35 },
+          "Cavalry Set 2": { "allDamage": 1, "health": 2.35, "defense": 2.25, "attack": 2.5 },
+          "Cavalry Set 3": { "allDamage": 1, "health": 2.35, "defense": 2.3, "attack": 2.6 }
+      },
+      "Joan of Arc Prime / Arthur Pendragon": {
+          "Cavalry Set 1": { "allDamage": 1, "health": 2.5, "defense": 2.4, "attack": 2.7 },
+          "Cavalry Set 2": { "allDamage": 1, "health": 2.5, "defense": 2.25, "attack": 2.9 },
+          "Cavalry Set 3": { "allDamage": 1, "health": 2.45, "defense": 2.3, "attack": 2.9 }
+      },
+      "Arthur Pendragon / William I": {
+          "Cavalry Set 1": { "allDamage": 1, "health": 2.15, "defense": 2.35, "attack": 2.65 },
+          "Cavalry Set 2": { "allDamage": 1, "health": 2.15, "defense": 2.25, "attack": 2.8 },
+          "Cavalry Set 3": { "allDamage": 1, "health": 2.2, "defense": 2.25, "attack": 2.8 }
+      },
+      "Arthur Pendragon / Philip II": {
+          "Cavalry Set 1": { "allDamage": 1, "health": 1.85, "defense": 1.85, "attack": 2.2 },
+          "Cavalry Set 2": { "allDamage": 1, "health": 1.85, "defense": 1.75, "attack": 2.35 },
+          "Cavalry Set 3": { "allDamage": 1, "health": 1.85, "defense": 1.8, "attack": 2.4 }
+      },
+      "Arthur Pendragon / Achilles": {
+          "Cavalry Set 1": { "allDamage": 1, "health": 2.46, "defense": 2.39, "attack": 2.87 },
+          "Cavalry Set 2": { "allDamage": 1, "health": 2.47, "defense": 2.26, "attack": 3.06 },
+          "Cavalry Set 3": { "allDamage": 1, "health": 2.47, "defense": 2.29, "attack": 3.11 }
+      },
+      "Arthur Pendragon / Hector": {
+          "Cavalry Set 1": { "allDamage": 1, "health": 2.25, "defense": 2.44, "attack": 2.28 },
+          "Cavalry Set 2": { "allDamage": 1, "health": 2.26, "defense": 2.32, "attack": 2.45 },
+          "Cavalry Set 3": { "allDamage": 1, "health": 2.26, "defense": 2.36, "attack": 2.49 }
+      },
+      "Attila / Philip II": {
+          "Cavalry Set 1": { "allDamage": 1, "health": 1.55, "defense": 1.75, "attack": 2.1 },
+          "Cavalry Set 2": { "allDamage": 1, "health": 1.6, "defense": 1.65, "attack": 2.25 },
+          "Cavalry Set 3": { "allDamage": 1, "health": 1.6, "defense": 1.7, "attack": 2.35 }
+      },
+      "Bai Qi / Liu Che": {
+          "Infantry Set 1": { "allDamage": 1, "health": 2.2, "defense": 2.75, "attack": 2.7 },
+          "Infantry Set 2": { "allDamage": 1, "health": 2, "defense": 2.9, "attack": 2.9 },
+          "Infantry Set 3": { "allDamage": 1, "health": 2, "defense": 2.9, "attack": 2.95 },
+          "Infantry Set 4": { "allDamage": 1, "health": 2, "defense": 2.7, "attack": 3.15 }
+      },
+      "Bai Qi / William Wallace": {
+          "Infantry Set 1": { "allDamage": 1, "health": 2.25, "defense": 2.55, "attack": 2.8 },
+          "Infantry Set 2": { "allDamage": 1, "health": 2.05, "defense": 2.7, "attack": 3 },
+          "Infantry Set 3": { "allDamage": 1, "health": 2.05, "defense": 2.7, "attack": 3.05 },
+          "Infantry Set 4": { "allDamage": 1, "health": 2.05, "defense": 2.5, "attack": 3.2 }
+      },
+      "Liu Che / Philip II": {
+          "Infantry Set 1": { "allDamage": 1, "health": 1.6, "defense": 2.4, "attack": 1.8 },
+          "Infantry Set 2": { "allDamage": 1, "health": 1.45, "defense": 2.5, "attack": 1.95 },
+          "Infantry Set 3": { "allDamage": 1, "health": 1.45, "defense": 2.55, "attack": 2 },
+          "Infantry Set 4": { "allDamage": 1, "health": 1.45, "defense": 2.35, "attack": 2.15 }
+      },
+      "Liu Che / Alexander the Great": {
+          "Infantry Set 1": { "allDamage": 1, "health": 2.05, "defense": 2.95, "attack": 2.6 },
+          "Infantry Set 2": { "allDamage": 1, "health": 1.85, "defense": 3, "attack": 2.8 },
+          "Infantry Set 3": { "allDamage": 1, "health": 1.85, "defense": 3.1, "attack": 2.8 },
+          "Infantry Set 4": { "allDamage": 1, "health": 1.85, "defense": 2.9, "attack": 3.05 }
+      },
+      "Ragnar Lodbrok Prime / Scipio Africanus Prime": {
+          "Infantry Set 1": { "allDamage": 1, "health": 2.3, "defense": 2.95, "attack": 2.6 },
+          "Infantry Set 2": { "allDamage": 1, "health": 2.1, "defense": 3.1, "attack": 2.8 },
+          "Infantry Set 3": { "allDamage": 1, "health": 2.1, "defense": 3.1, "attack": 2.85 },
+          "Infantry Set 4": { "allDamage": 1, "health": 2.1, "defense": 2.9, "attack": 3.1 }
+      },
+      "Qin Shi Huang / Zhuge Liang": {
+          "Archer Set 1": { "allDamage": 1, "health": 2.1, "defense": 2.25, "attack": 2.05 },
+          "Archer Set 2": { "allDamage": 1, "health": 2.2, "defense": 2.2, "attack": 2.15 },
+          "Archer Set 3": { "allDamage": 1, "health": 2.25, "defense": 2.15, "attack": 2.1 },
+          "Archer Set 4": { "allDamage": 1, "health": 2.2, "defense": 2.25, "attack": 2 },
+          "Archer Set 5": { "allDamage": 1, "health": 2.1, "defense": 2.2, "attack": 2.2 }
+      },
+      "Qin Shi Huang / Yi Seong-Gye": {
+          "Archer Set 1": { "allDamage": 1, "health": 1.4, "defense": 1.8, "attack": 1.6 },
+          "Archer Set 2": { "allDamage": 1, "health": 1.45, "defense": 1.75, "attack": 1.7 },
+          "Archer Set 3": { "allDamage": 1, "health": 1.5, "defense": 1.7, "attack": 1.6 },
+          "Archer Set 4": { "allDamage": 1, "health": 1.45, "defense": 1.8, "attack": 1.6 },
+          "Archer Set 5": { "allDamage": 1, "health": 1.4, "defense": 1.8, "attack": 1.7 }
+      },
+      "Zhuge Liang / Hermann Prime": {
+          "Archer Set 1": { "allDamage": 1, "health": 2.2, "defense": 2.7, "attack": 2.65 },
+          "Archer Set 2": { "allDamage": 1, "health": 2.3, "defense": 2.6, "attack": 2.7 },
+          "Archer Set 3": { "allDamage": 1, "health": 2.4, "defense": 2.55, "attack": 2.65 },
+          "Archer Set 4": { "allDamage": 1, "health": 2.3, "defense": 2.7, "attack": 2.6 },
+          "Archer Set 5": { "allDamage": 1, "health": 2.25, "defense": 2.65, "attack": 2.8 }
+      },
+      "Zhuge Liang / Philip II": {
+          "Archer Set 1": { "allDamage": 1, "health": 2, "defense": 1.95, "attack": 1.9 },
+          "Archer Set 2": { "allDamage": 1, "health": 2.05, "defense": 1.85, "attack": 2 },
+          "Archer Set 3": { "allDamage": 1, "health": 2.1, "defense": 1.85, "attack": 1.9 },
+          "Archer Set 4": { "allDamage": 1, "health": 2.1, "defense": 1.9, "attack": 1.85 },
+          "Archer Set 5": { "allDamage": 1, "health": 2, "defense": 1.9, "attack": 2 }
+      },
+      "Ashurbanipal / Hermann Prime": {
+          "Archer Set 1": { "allDamage": 1, "health": 1.9, "defense": 2.9, "attack": 2.75 },
+          "Archer Set 2": { "allDamage": 1, "health": 2, "defense": 2.75, "attack": 2.85 },
+          "Archer Set 3": { "allDamage": 1, "health": 2.1, "defense": 2.75, "attack": 2.75 },
+          "Archer Set 4": { "allDamage": 1, "health": 2.05, "defense": 2.85, "attack": 2.7 },
+          "Archer Set 5": { "allDamage": 1, "health": 1.95, "defense": 2.8, "attack": 2.9 }
+      },
+      "Shajar al-Durr / Yi Seong-Gye": {
+          "Archer Set 1": { "allDamage": 1, "health": 2.25, "defense": 2.7, "attack": 2.55 },
+          "Archer Set 2": { "allDamage": 1, "health": 2.3, "defense": 2.6, "attack": 2.65 },
+          "Archer Set 3": { "allDamage": 1, "health": 2.45, "defense": 2.55, "attack": 2.55 },
+          "Archer Set 4": { "allDamage": 1, "health": 2.4, "defense": 2.7, "attack": 2.5 },
+          "Archer Set 5": { "allDamage": 1, "health": 2.3, "defense": 2.6, "attack": 2.7 }
+      },
+      "Gajah Mada / Gonzalo de Cordoba": {
+          "Engineering Set 1": { "allDamage": 1, "health": 2, "defense": 2.1, "attack": 2.45 },
+          "Engineering Set 2": { "allDamage": 1, "health": 2, "defense": 2.2, "attack": 2.65 }
+      }
+    }
+  }
