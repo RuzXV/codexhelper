@@ -1,5 +1,3 @@
-// --- START OF FILE mail.js ---
-
 document.addEventListener('DOMContentLoaded', function() {
     function getStorageKey(key) {
         const user = window.auth ? window.auth.getLoggedInUser() : null;
@@ -25,6 +23,10 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error("Failed to load user data from localStorage", e);
             return null;
         }
+    };
+
+    window.onAuthSuccess = function() {
+        renderSavedTemplatesView();
     };
 
     const mailInput = document.getElementById('mail-input');

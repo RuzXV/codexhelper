@@ -417,6 +417,18 @@ document.addEventListener('DOMContentLoaded', () => {
         armamentToolTabBtn.addEventListener('click', () => switchArmamentView('armament-tool'));
         savedScoresTabBtn.addEventListener('click', () => switchArmamentView('saved-scores'));
         
+        saveScoreSection.addEventListener('click', (e) => {
+            if (e.target.matches('.saved-scores-link, .saved-scores-link *')) {
+                e.preventDefault();
+                switchArmamentView('saved-scores');
+            }
+        });
+        
+        window.onAuthSuccess = () => {
+            updateSaveScoreSection();
+            renderSavedScoresView();
+        };
+
         updateArmamentPairingSelector('cavalry');
         updateSaveScoreSection();
         isArmamentCalculatorInitialized = true;
@@ -691,16 +703,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = window.auth.getLoggedInUser();
 
         if (user) {
-            saveScoreSection.innerHTML = `<button id="save-score-btn" class="btn-primary">Save Score</button>`;
+             saveScoreSection.innerHTML = `
+                <span>You can </span>
+                <button id="save-score-btn" class="btn-primary">Save Score</button>
+                <span> and access or compare your scores in the 
+                    <a href="#" class="saved-scores-link">Saved Scores</a> tab.
+                </span>`;
             document.getElementById('save-score-btn').addEventListener('click', handleSaveScore);
         } else {
             saveScoreSection.innerHTML = `
-                <span>Log into</span> 
                 <div id="save-score-auth-container"></div>
                 <span>to save your scores!</span>`;
             const authContainer = document.getElementById('save-score-auth-container');
-            authContainer.innerHTML = `<button class="discord-login-btn"><i class="fa-brands fa-discord"></i><span>Discord</span></button>`;
-            if (window.auth && typeof window.auth.init === 'function') {
+            if (authContainer && window.auth && typeof window.auth.init === 'function') {
                 window.auth.init('#save-score-auth-container');
             }
         }
@@ -828,10 +843,10 @@ document.addEventListener('DOMContentLoaded', () => {
             inscriptionsHtml += '</div>';
 
             const statsHtml = `
-                Attack: <strong>${score.stats.attack}%</strong><br>
-                Defense: <strong>${score.stats.defense}%</strong><br>
-                Health: <strong>${score.stats.health}%</strong><br>
-                All Dmg: <strong>${score.stats.allDamage}%</strong>
+                <div class="stat-line">Attack: <strong>${score.stats.attack}%</strong></div>
+                <div class="stat-line">Defense: <strong>${score.stats.defense}%</strong></div>
+                <div class="stat-line">Health: <strong>${score.stats.health}%</strong></div>
+                <div class="stat-line">All Dmg: <strong>${score.stats.allDamage}%</strong></div>
             `;
 
             if (isMobile) {
