@@ -811,7 +811,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const isMobile = window.innerWidth <= 768;
-
+    
         let tableHtml = `<div class="saved-scores-grid">
             <div class="grid-header">Pairing</div>
             <div class="grid-header">Formation</div>
@@ -830,7 +830,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const formationFilename = score.formation.toLowerCase().replace(/ /g, '_') + '.webp';
             const formationImg = getImagePath(formationFilename);
-
+    
             let inscriptionsHtml = '<div class="inscription-grid">';
             if (score.inscriptions && score.inscriptions.length > 0) {
                 score.inscriptions.forEach(name => {
@@ -843,14 +843,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 inscriptionsHtml += '<span>None</span>';
             }
             inscriptionsHtml += '</div>';
-
+    
             const statsHtml = `
                 <div class="stat-line">Attack: <strong>${score.stats.attack}%</strong></div>
                 <div class="stat-line">Defense: <strong>${score.stats.defense}%</strong></div>
                 <div class="stat-line">Health: <strong>${score.stats.health}%</strong></div>
                 <div class="stat-line">All Dmg: <strong>${score.stats.allDamage}%</strong></div>
             `;
-
+    
             if (isMobile) {
                 tableHtml += `<div class="grid-row-container" data-score-id="${score.score_id}">
                                 <div class="score-pairing pairing-images">
@@ -863,9 +863,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                                 <div class="score-inscriptions">${inscriptionsHtml}</div>
                                 <div class="score-stats">${statsHtml}</div>
-                                <div class="total-score"><strong>${score.total_score.toFixed(2)}</strong></div>
-                                <div class="score-actions">
-                                    <button class="btn-danger delete-score-btn" title="Delete Score"><i class="fas fa-trash"></i></button>
+                                <div class="score-footer">
+                                    <div class="total-score"><strong>${score.total_score.toFixed(2)}</strong></div>
+                                    <div class="score-actions">
+                                        <button class="btn-danger delete-score-btn" title="Delete Score"><i class="fas fa-trash"></i></button>
+                                    </div>
                                 </div>
                               </div>`;
             } else {
@@ -887,10 +889,10 @@ document.addEventListener('DOMContentLoaded', () => {
                               </div>`;
             }
         });
-
+    
         tableHtml += '</div>';
         savedScoresContent.innerHTML = tableHtml;
-
+    
         savedScoresContent.querySelectorAll('.delete-score-btn').forEach(btn => {
             btn.addEventListener('click', handleDeleteScore);
         });
