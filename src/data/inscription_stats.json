@@ -1,0 +1,576 @@
+{
+    "Arch": {
+      "bonuses": { "na": 5 },
+      "multipliers": {}
+    },
+    "Wedge": {
+      "bonuses": { "skillDamage": 5 },
+      "multipliers": {}
+    },
+    "Hollow Square": {
+      "bonuses": { "allDamage": 2 },
+      "multipliers": {}
+    },
+    "Delta": {
+      "bonuses": { "comboDamage": 10 },
+      "multipliers": {}
+    },
+    "Pincer": {
+      "bonuses": { "smiteDamage": 10 },
+      "multipliers": {}
+    },
+    "Warcry": {
+      "bonuses": { "attack": 3.5 },
+      "multipliers": {}
+    },
+    "Brutal": {
+      "bonuses": { "attack": 3.5 },
+      "multipliers": {}
+    },
+    "Spiked": {
+      "bonuses": { "attack": 3.5 },
+      "multipliers": {}
+    },
+    "Infamy": {
+      "bonuses": { "attack": 3.5 },
+      "multipliers": {}
+    },
+    "Well Clad": {
+      "bonuses": { "defense": 3.5 },
+      "multipliers": {}
+    },
+    "Armored": {
+      "bonuses": { "defense": 3.5 },
+      "multipliers": {}
+    },
+    "Metallics": {
+      "bonuses": { "defense": 3.5 },
+      "multipliers": {}
+    },
+    "Shielded": {
+      "bonuses": { "defense": 3.5 },
+      "multipliers": {}
+    },
+    "Robust": {
+      "bonuses": { "health": 3.5 },
+      "multipliers": {}
+    },
+    "Fit": {
+      "bonuses": { "health": 3.5 },
+      "multipliers": {}
+    },
+    "Vitality": {
+      "bonuses": { "health": 3.5 },
+      "multipliers": {}
+    },
+    "Hardy": {
+      "bonuses": { "health": 3.5 },
+      "multipliers": {}
+    },
+    "Onslaught": {
+      "bonuses": { "na": 1.5 },
+      "multipliers": {}
+    },
+    "Warhunger": {
+      "bonuses": { "na": 1.5 },
+      "multipliers": {}
+    },
+    "Striker": {
+      "bonuses": { "na": 1.5 },
+      "multipliers": {}
+    },
+    "Militant": {
+      "bonuses": { "na": 1.5 },
+      "multipliers": {}
+    },
+    "Iron Wall": {
+      "bonuses": { "na": 1.5 },
+      "multipliers": {}
+    },
+    "Retaliatory": {
+      "bonuses": { "ca": 2.5 },
+      "multipliers": {}
+    },
+    "Alert": {
+      "bonuses": { "ca": 2.5 },
+      "multipliers": {}
+    },
+    "Rebuff": {
+      "bonuses": { "ca": 2.5 },
+      "multipliers": {}
+    },
+    "Resistant": {
+      "bonuses": { "ca": 2.5 },
+      "multipliers": {}
+    },
+    "Evasive_Instrument": {
+      "bonuses": { "ca": 2.5 },
+      "multipliers": {}
+    },
+    "Enraged": {
+      "bonuses": { "ca": 1, "skillDamage": 2.5 },
+      "multipliers": {}
+    },
+    "Devious": {
+      "bonuses": { "ca": 1, "skillDamage": 2.5 },
+      "multipliers": {}
+    },
+    "Brawler": {
+      "bonuses": { "ca": 1, "skillDamage": 2.5 },
+      "multipliers": {}
+    },
+    "Daring": {
+      "bonuses": { "ca": 1, "skillDamage": 2.5 },
+      "multipliers": {}
+    },
+    "Valiant": {
+      "bonuses": { "allDamage": 1 },
+      "multipliers": {}
+    },
+    "Fearsome": {
+      "bonuses": { "allDamage": 1 },
+      "multipliers": {}
+    },
+    "Warflames": {
+      "bonuses": { "allDamage": 1 },
+      "multipliers": {}
+    },
+    "Elite": {
+      "bonuses": { "allDamage": 1 },
+      "multipliers": {}
+    },
+    "Evasive_Emblem": {
+      "bonuses": { "allDamage": 1 },
+      "multipliers": {}
+    },
+    "Bellicose": {
+      "bonuses": { "allDamage": 1.07 },
+      "multipliers": {}
+    },
+    "Pulverize": {
+      "bonuses": { "na": 1.42 },
+      "multipliers": {}
+    },
+    "Breaker": {
+      "bonuses": { "attack": 3.2 },
+      "multipliers": {}
+    },
+    "Furious": {
+      "bonuses": { "na": 1.5, "skillDamage": 4 },
+      "multipliers": {}
+    },
+    "Ward": {
+      "bonuses": { "allDamage": 1.87 },
+      "multipliers": {}
+    },
+    "Calm": {
+      "bonuses": { "attack": 2.3 },
+      "multipliers": {}
+    },
+    "Requital": {
+      "bonuses": { "na": 1.78 },
+      "multipliers": {}
+    },
+    "Respite": {
+      "bonuses": { "allDamage": 1.42 },
+      "multipliers": {}
+    },
+    "Guarded": {
+      "bonuses": { "skillDamage": 1.42 },
+      "multipliers": {}
+    },
+    "Embattled": {
+      "bonuses": {},
+      "multipliers": {}
+    },
+    "Vengeful": {
+      "bonuses": {},
+      "multipliers": {}
+    },
+    "Uplifting": {
+      "bonuses": { "na": 1 },
+      "multipliers": {}
+    },
+    "Spirited": {
+      "bonuses": { "na": 1 },
+      "multipliers": {}
+    },
+    "Lineshot": {
+      "bonuses": { "na": 1 },
+      "multipliers": {}
+    },
+    "Eclipsed": {
+      "bonuses": { "skillDamage": 2.5 },
+      "multipliers": {}
+    },
+    "Brave": {
+      "bonuses": { "ca": 5 },
+      "multipliers": {}
+    },
+    "Strategic": {
+      "bonuses": { "allDamage": 2 },
+      "multipliers": {}
+    },
+    "Desperado": {
+      "bonuses": { "allDamage": 2 },
+      "multipliers": {}
+    },
+    "Assertive": {
+      "bonuses": { "allDamage": 2 },
+      "multipliers": {}
+    },
+    "Cohesive": {
+      "bonuses": { "allDamage": 0.5 },
+      "multipliers": {}
+    },
+    "Pursuer": {
+      "bonuses": { "allDamage": 0.75 },
+      "multipliers": {}
+    },
+    "Siegework": {
+      "bonuses": {},
+      "multipliers": {}
+    },
+    "Sentries": {
+      "bonuses": {},
+      "multipliers": {}
+    },
+    "Ballistics": {
+      "bonuses": { "ca": 1.5 },
+      "multipliers": {}
+    },
+    "Smite": {
+      "bonuses": { "na": 2 },
+      "multipliers": {}
+    },
+    "Enduring": {
+      "bonuses": { "ca": 3 },
+      "multipliers": {}
+    },
+    "Artisan": {
+      "bonuses": { "ca": 1, "skillDamage": 3 },
+      "multipliers": {}
+    },
+    "Rapacious": {
+      "bonuses": { "allDamage": 1.5 },
+      "multipliers": {}
+    },
+    "Watchmen": {
+      "bonuses": { "allDamage": 1.5 },
+      "multipliers": {}
+    },
+    "Guardians": {
+      "bonuses": { "ca": 2 },
+      "multipliers": {}
+    },
+    "Counterer": {
+      "bonuses": { "ca": 3 },
+      "multipliers": {}
+    },
+    "Deflecter": {
+      "bonuses": { "skillDamage": 3 },
+      "multipliers": {}
+    },
+    "Destructive": {
+      "bonuses": {
+        "na": 3.5,
+        "skillDamage": -3.5,
+        "smiteDamage": -7,
+        "comboDamage": -3.5
+      },
+      "multipliers": {
+        "na": 0.035
+      }
+    },
+    "Straight to the Point": {
+      "bonuses": {
+        "na": 5.78,
+        "skillDamage": -2.1
+      },
+      "multipliers": {
+        "na": 0.035
+      }
+    },
+    "Invincible": {
+      "bonuses": {
+        "na": 4.5,
+        "skillDamage": 5
+      },
+      "multipliers": {
+        "skillDamage": 0.05
+      }
+    },
+    "Fearless": {
+      "bonuses": {
+        "na": 8
+      },
+      "multipliers": {
+        "na": 0.08
+      }
+    },
+    "Hunter": {
+      "bonuses": {
+        "skillDamage": 7
+      },
+      "multipliers": {
+        "skillDamage": 0.05
+      }
+    },
+    "Unstoppable": {
+      "bonuses": {
+        "skillDamage": 6
+      },
+      "multipliers": {
+        "skillDamage": 0.05
+      }
+    },
+    "Balanced": {
+      "bonuses": {
+        "na": 3.5,
+        "skillDamage": 4
+      },
+      "multipliers": {
+        "na": 0.035
+      }
+    },
+    "Intrepid": {
+      "bonuses": {
+        "skillDamage": 10
+      },
+      "multipliers": {
+        "skillDamage": 0.1
+      }
+    },
+    "Cocoon": {
+      "bonuses": {
+        "skillDamage": 5
+      },
+      "multipliers": {
+        "allDamage": 0.05
+      }
+    },
+    "Inviolable": {
+      "bonuses": {
+        "allDamage": 3.75
+      },
+      "multipliers": {}
+    },
+    "Crowned": {
+      "bonuses": {
+        "allDamage": 2.5
+      },
+      "multipliers": {}
+    },
+    "Rounded": {
+      "bonuses": {
+        "allDamage": 5
+      },
+      "multipliers": {
+        "allDamage": 0.05
+      }
+    },
+    "Thrasher": {
+      "bonuses": {
+        "comboDamage": 7.5
+      },
+      "multipliers": {
+        "comboDamage": 0.035
+      }
+    },
+    "Butterfly Effect": {
+      "bonuses": {
+        "comboDamage": 3.5,
+        "allDamage": 2.5
+      },
+      "multipliers": {
+        "comboDamage": 0.03
+      }
+    },
+    "Steelskin": {
+      "bonuses": {
+        "allDamage": 7.5
+      },
+      "multipliers": {}
+    },
+    "Flurry": {
+      "bonuses": {
+        "comboDamage": 8
+      },
+      "multipliers": {
+        "comboDamage": 0.08
+      }
+    },
+    "Toppler": {
+      "bonuses": {
+        "smiteDamage": 10
+      },
+      "multipliers": {
+        "smiteDamage": 0.05
+      }
+    },
+    "Demolisher": {
+      "bonuses": {
+        "attack": 3.75,
+        "smiteDamage": 5
+      },
+      "multipliers": {
+        "smiteDamage": 0.05
+      }
+    },
+    "Airtight": {
+      "bonuses": {
+        "allDamage": 3.75
+      },
+      "multipliers": {
+        "smiteDamage": 0.05
+      }
+    },
+    "Thundering": {
+      "bonuses": {
+        "smiteDamage": 10
+      },
+      "multipliers": {
+        "smiteDamage": 0.1
+      }
+    },
+    "Battle Ready": {
+      "bonuses": {
+        "na": 5,
+        "skillDamage": -3.5,
+        "smiteDamage": -6,
+        "comboDamage": -3.5
+      },
+      "multipliers": {}
+    },
+    "Even Keeled": {
+      "bonuses": {
+        "allDamage": 1.07,
+        "na": 1.5,
+        "skillDamage": 2.1
+      },
+      "multipliers": {}
+    },
+    "Unswerving": {
+      "bonuses": {
+        "skillDamage": 4
+      },
+      "multipliers": {}
+    },
+    "Forceful": {
+      "bonuses": {
+        "na": 3
+      },
+      "multipliers": {
+        "na": 0.03
+      }
+    },
+    "Crazed": {
+      "bonuses": {
+        "skillDamage": 2.5
+      },
+      "multipliers": {}
+    },
+    "Boiling Blood": {
+      "bonuses": {
+        "skillDamage": 3.15
+      },
+      "multipliers": {
+        "skillDamage": 0.02
+      }
+    },
+    "Defiant": {
+      "bonuses": {
+        "na": 3
+      },
+      "multipliers": {
+        "na": 0.03
+      }
+    },
+    "Focus Fire": {
+      "bonuses": {
+        "skillDamage": 4
+      },
+      "multipliers": {
+        "skillDamage": 0.04
+      }
+    },
+    "Self Defense": {
+      "bonuses": {},
+      "multipliers": {}
+    },
+    "Aegis": {
+      "bonuses": {
+        "allDamage": 1.875
+      },
+      "multipliers": {}
+    },
+    "Reinforced": {
+      "bonuses": {},
+      "multipliers": {}
+    },
+    "Tenacious": {
+      "bonuses": {
+        "allDamage": 2
+      },
+      "multipliers": {
+        "allDamage": 0.02
+      }
+    },
+    "Pummeler": {
+      "bonuses": {
+        "comboDamage": 4
+      },
+      "multipliers": {}
+    },
+    "Causative": {
+      "bonuses": {
+        "comboDamage": 1.5,
+        "allDamage": 1.2
+      },
+      "multipliers": {
+        "comboDamage": 0.018
+      }
+    },
+    "Determined": {
+      "bonuses": {
+        "allDamage": 1.5
+      },
+      "multipliers": {
+        "allDamage": 0.05
+      }
+    },
+    "Relentless": {
+      "bonuses": {
+        "comboDamage": 3.5
+      },
+      "multipliers": {
+        "comboDamage": 0.035
+      }
+    },
+    "Imploder": {
+      "bonuses": {
+        "defense": 5
+      },
+      "multipliers": {}
+    },
+    "Raider": {
+      "bonuses": {
+        "smiteDamage": 3.75
+      },
+      "multipliers": {
+        "smiteDamage": 0.02
+      }
+    },
+    "Hardheaded": {
+      "bonuses": {},
+      "multipliers": {}
+    },
+    "Rattling": {
+      "bonuses": {
+        "smiteDamage": 4
+      },
+      "multipliers": {
+        "smiteDamage": 0.04
+      }
+    }
+  }

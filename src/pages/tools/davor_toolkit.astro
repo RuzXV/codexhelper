@@ -5,6 +5,7 @@ import '../../styles/davor_toolkit.css';
 import davorIcon from '../../assets/images/davor_toolkit/davor_icon.webp';
 import equipmentData from '../../data/equipment.json';
 import inscriptionsData from '../../data/inscriptions.json';
+import inscriptionStats from '../../data/inscription_stats.json';
 
 import cavalryIcon from '../../assets/images/materials/troop_icons/cavalry_icon_mini.webp';
 import infantryIcon from '../../assets/images/materials/troop_icons/infantry_icon_mini.webp';
@@ -210,10 +211,11 @@ const davorIconHeight = davorIcon.height;
         </section>
     </main>
 
-    <script define:vars={{ imagePaths: imagePathMap, equipmentData, inscriptionsData, davorIconPath }}>
+    <script define:vars={{ imagePaths: imagePathMap, equipmentData, inscriptionsData, inscriptionStats, davorIconPath }}>
         window.DAVOR_IMAGE_PATHS = imagePaths;
         window.equipmentData = equipmentData;
         window.inscriptionsData = inscriptionsData;
+        window.inscriptionStats = inscriptionStats;
         window.davorIconPath = davorIconPath;
         window.davorIconWidth = davorIconWidth;
         window.davorIconHeight = davorIconHeight;

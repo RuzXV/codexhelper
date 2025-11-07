@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const div = document.createElement('div');
                 div.className = 'pairing-item';
                 div.dataset.pairing = pairing;
-                const loadingAttr = index < 2 ? 'loading="eager"' : 'loading="lazy"';
+                const loadingAttr = index < 3 ? 'loading="eager"' : 'loading="lazy"';
 
                 div.innerHTML = `
                     <div class="pairing-images">
@@ -492,6 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const armamentAllDamageInput = document.getElementById('armament-all-damage');
     const armamentScoreResult = document.getElementById('armament-score-result');
     const inscriptionsData = window.inscriptionsData;
+    const INSCRIPTION_STATS_DATA = window.inscriptionStats || {}; 
     let isArmamentCalculatorInitialized = false;
     let selectedInscriptions = new Set();
     let inscriptionCache = new Map();
@@ -527,24 +528,8 @@ document.addEventListener('DOMContentLoaded', () => {
         archer: ['Ashurbanipal / Hermann Prime', 'Ashurbanipal / Yi Seong-Gye', 'Qin Shi Huang / Yi Seong-Gye', 'Qin Shi Huang / Zhuge Liang', 'Shajar al-Durr / Yi Seong-Gye', 'Zhuge Liang / Hermann Prime', 'Zhuge Liang / Philip II']
     };
 
-    const INSCRIPTION_DATA = {};
     const SPECIAL_INSCRIPTIONS = ["Destructive", "Straight to the Point", "Invincible", "Fearless", "Hunter", "Unstoppable", "Balanced", "Intrepid", "Cocoon", "Inviolable", "Crowned", "Rounded", "Thrasher", "Butterfly Effect", "Steelskin", "Flurry", "Toppler", "Demolisher", "Airtight", "Thundering"];
     const RARE_INSCRIPTIONS = ["Battle Ready", "Even Keeled", "Unswerving", "Forceful", "Crazed", "Boiling Blood", "Defiant", "Focus Fire", "Self Defense", "Aegis", "Reinforced", "Tenacious", "Pummeler", "Causative", "Determined", "Relentless", "Imploder", "Raider", "Hardheaded", "Rattling"];
-
-    [
-        { name: 'Arch', bonuses: { na: 5 } }, { name: 'Wedge', bonuses: { skillDamage: 5 } }, { name: 'Hollow Square', bonuses: { allDamage: 2 } }, { name: 'Delta', bonuses: { comboDamage: 10 } }, { name: 'Pincer', bonuses: { smiteDamage: 10 } },
-        { names: ["Warcry", "Brutal", "Spiked", "Infamy"], bonuses: { attack: 3.5 } }, { names: ["Well Clad", "Armored", "Metallics", "Shielded"], bonuses: { defense: 3.5 } }, { names: ["Robust", "Fit", "Vitality", "Hardy"], bonuses: { health: 3.5 } }, { names: ["Onslaught", "Warhunger", "Striker", "Militant", "Iron Wall"], bonuses: { na: 1.5 } }, { names: ["Retaliatory", "Alert", "Rebuff", "Resistant", "Evasive_Instrument"], bonuses: { ca: 2.5 } }, { names: ["Enraged", "Devious", "Brawler", "Daring"], bonuses: { ca: 1, skillDamage: 2.5 } }, { names: ["Valiant", "Fearsome", "Warflames", "Elite", "Evasive_Emblem"], bonuses: { allDamage: 1 } }, { name: "Bellicose", bonuses: { allDamage: 1.07 } }, { name: "Pulverize", bonuses: { na: 1.42 } }, { name: "Breaker", bonuses: { attack: 3.2 } }, { name: "Furious", bonuses: { na: 1.5, skillDamage: 4 } }, { name: "Ward", bonuses: { allDamage: 1.87 } }, { name: "Calm", bonuses: { attack: 2.3 } }, { name: "Requital", bonuses: { na: 1.78 } }, { name: "Respite", bonuses: { allDamage: 1.42 } }, { name: "Guarded", bonuses: { skillDamage: 1.42 } }, { names: ["Embattled", "Vengeful"], bonuses: {} }, { names: ["Uplifting", "Spirited", "Lineshot"], bonuses: { na: 1 } }, { name: "Eclipsed", bonuses: { skillDamage: 2.5 } }, { name: "Brave", bonuses: { ca: 5 } }, { names: ["Strategic", "Desperado", "Assertive"], bonuses: { allDamage: 2 } }, { name: "Cohesive", bonuses: { allDamage: 0.5 } }, { name: "Pursuer", bonuses: { allDamage: 0.75 } }, { names: ["Siegework", "Sentries"], bonuses: {} }, { name: "Ballistics", bonuses: { ca: 1.5 } }, { name: "Smite", bonuses: { na: 2 } }, { name: "Enduring", bonuses: { ca: 3 } }, { name: "Artisan", bonuses: { ca: 1, skillDamage: 3 } }, { names: ["Rapacious", "Watchmen"], bonuses: { allDamage: 1.5 } }, { name: "Guardians", bonuses: { ca: 2 } }, { name: "Counterer", bonuses: { ca: 3 } }, { name: "Deflecter", bonuses: { skillDamage: 3 } },
-        { name: 'Destructive', bonuses: { na: 3.5, skillDamage: -3.5, smiteDamage: -7, comboDamage: -3.5 }, multipliers: { na: 0.035 } }, { name: 'Straight to the Point', bonuses: { na: 5.78, skillDamage: -2.1 }, multipliers: { na: 0.035 } }, { name: 'Invincible', bonuses: { na: 4.5, skillDamage: 5 }, multipliers: { skillDamage: 0.05 } }, { name: 'Fearless', bonuses: { na: 8 }, multipliers: { na: 0.08 } }, { name: 'Hunter', bonuses: { skillDamage: 7 }, multipliers: { skillDamage: 0.05 } }, { name: 'Unstoppable', bonuses: { skillDamage: 6 }, multipliers: { skillDamage: 0.05 } }, { name: 'Balanced', bonuses: { na: 3.5, skillDamage: 4 }, multipliers: { na: 0.035 } }, { name: 'Intrepid', bonuses: { skillDamage: 10 }, multipliers: { skillDamage: 0.1 } }, { name: 'Cocoon', bonuses: { skillDamage: 5 }, multipliers: { allDamage: 0.05 } }, { name: 'Inviolable', bonuses: { allDamage: 3.75 } }, { name: 'Crowned', bonuses: { allDamage: 2.5 } }, { name: 'Rounded', bonuses: { allDamage: 5 }, multipliers: { allDamage: 0.05 } }, { name: 'Thrasher', bonuses: { comboDamage: 7.5 }, multipliers: { comboDamage: 0.035 } }, { name: 'Butterfly Effect', bonuses: { comboDamage: 3.5 }, multipliers: { comboDamage: 0.03 } }, { name: 'Steelskin', bonuses: { allDamage: 5 } }, { name: 'Flurry', bonuses: { comboDamage: 8 }, multipliers: { comboDamage: 0.08 } }, { name: 'Toppler', bonuses: { smiteDamage: 10 }, multipliers: { smiteDamage: 0.05 } }, { name: 'Demolisher', bonuses: { attack: 3.75, smiteDamage: 5 }, multipliers: { smiteDamage: 0.05 } }, { name: 'Airtight', bonuses: { allDamage: 3.75 }, multipliers: { smiteDamage: 0.05 } }, { name: 'Thundering', bonuses: { smiteDamage: 10 }, multipliers: { smiteDamage: 0.1 } },
-        { name: 'Battle Ready', bonuses: { na: 5, skillDamage: -3.5, smiteDamage: -6, comboDamage: -3.5 } }, { name: 'Even Keeled', bonuses: { allDamage: 1.07, na: 1.5, skillDamage: 2.1 } }, { name: 'Unswerving', bonuses: { skillDamage: 4 } }, { name: 'Forceful', bonuses: { na: 3 }, multipliers: { na: 0.03 } }, { name: 'Crazed', bonuses: { skillDamage: 2.5 } }, { name: 'Boiling Blood', bonuses: { skillDamage: 3.15 }, multipliers: { skillDamage: 0.02 } }, { name: 'Defiant', bonuses: { na: 3 }, multipliers: { na: 0.03 } }, { name: 'Focus Fire', bonuses: { skillDamage: 4 }, multipliers: { skillDamage: 0.04 } }, { name: 'Self Defense', bonuses: {} }, { name: 'Aegis', bonuses: { allDamage: 1.875 } }, { name: 'Reinforced', bonuses: {} }, { name: 'Tenacious', bonuses: { allDamage: 2 }, multipliers: { allDamage: 0.02 } }, { name: 'Pummeler', bonuses: {} }, { name: 'Causative', bonuses: { comboDamage: 1.5 }, multipliers: { comboDamage: 0.018 } }, { name: 'Determined', bonuses: { allDamage: 1.5 }, multipliers: { allDamage: 0.05 } }, { name: 'Relentless', bonuses: { comboDamage: 3.5 }, multipliers: { comboDamage: 0.035 } }, { name: 'Imploder', bonuses: { defense: 5 } }, { name: 'Raider', bonuses: { smiteDamage: 3.75 }, multipliers: { smiteDamage: 0.02 } }, { name: 'Hardheaded', bonuses: {} }, { name: 'Rattling', bonuses: { smiteDamage: 4 }, multipliers: { smiteDamage: 0.04 } }
-    ].forEach(item => {
-        const data = { bonuses: item.bonuses || {}, multipliers: item.multipliers || {} };
-        if (item.names) {
-            item.names.forEach(name => INSCRIPTION_DATA[name] = data);
-        } else {
-            INSCRIPTION_DATA[item.name] = data;
-        }
-    });
-
 
     function initArmamentCalculator() {
         if (isArmamentCalculatorInitialized) return;
@@ -802,13 +787,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const totalMultipliers = { allDamage: 0, na: 0, skillDamage: 0, smiteDamage: 0, comboDamage: 0 };
 
-        const formationData = INSCRIPTION_DATA[formationName] || { bonuses: {}, multipliers: {} };
+        const formationData = INSCRIPTION_STATS_DATA[formationName] || { bonuses: {}, multipliers: {} };
         for (const stat in formationData.bonuses) {
             totalBonuses[stat] = (totalBonuses[stat] || 0) + formationData.bonuses[stat];
         }
 
         selectedInscriptions.forEach(inscriptionName => {
-            const inscriptionData = INSCRIPTION_DATA[inscriptionName] || { bonuses: {}, multipliers: {} };
+            const inscriptionData = INSCRIPTION_STATS_DATA[inscriptionName] || { bonuses: {}, multipliers: {} };
             for (const stat in inscriptionData.bonuses) {
                 totalBonuses[stat] = (totalBonuses[stat] || 0) + inscriptionData.bonuses[stat];
             }
