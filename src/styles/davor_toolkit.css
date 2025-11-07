@@ -475,21 +475,24 @@
 
     #save-score-auth-container .discord-login-btn span,
     #saved-scores-auth-container .discord-login-btn span {
-        display: inline !important;
-        font-size: 0;
+        display: inline-block !important;
         position: relative;
-        width: 40px;
+        color: transparent;
+        user-select: none;
     }
 
     #save-score-auth-container .discord-login-btn span::before,
     #saved-scores-auth-container .discord-login-btn span::before {
         content: 'Login';
-        font-size: var(--font-size-base);
         color: white;
+        font-weight: 600;
+        font-size: var(--font-size-base);
         position: absolute;
-        left: 0;
-        right: 0;
-        text-align: center;
+
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
     }
 }
 
