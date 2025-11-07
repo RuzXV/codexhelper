@@ -935,21 +935,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 span.textContent = isMobile ? textMap[type].short : textMap[type].long;
             }
         });
-    
-        const loginBtn = document.querySelector('.discord-login-btn');
-        if (loginBtn) {
-            const loginBtnText = loginBtn.querySelector('span');
-            if (loginBtnText) {
-                if (isMobile) {
-                    loginBtnText.textContent = 'Login';
-                    loginBtn.style.minWidth = '120px';
-                    loginBtn.style.justifyContent = 'center';
-                } else {
-                    loginBtnText.textContent = 'Login with Discord';
-                    loginBtn.style.minWidth = '';
-                }
-            }
-        }
     };
 
     let resizeTimer;

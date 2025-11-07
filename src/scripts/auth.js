@@ -11,10 +11,14 @@
     }
 
     function renderLoggedOutState(container) {
+        const isMobile = window.innerWidth <= 768;
+        const buttonText = isMobile ? 'Login' : 'Login with Discord';
+        const buttonStyle = isMobile ? 'style="min-width: 120px; justify-content: center;"' : '';
+    
         container.innerHTML = `
-            <button class="discord-login-btn">
+            <button class="discord-login-btn" ${buttonStyle}>
                 <i class="fa-brands fa-discord"></i>
-                <span>Login with Discord</span>
+                <span>${buttonText}</span>
             </button>
         `;
         container.querySelector('.discord-login-btn').addEventListener('click', login);
@@ -108,15 +112,17 @@
                 'Content-Type': 'application/json',
             },
         });
-
+    
         if (!response.ok) {
             if (response.status === 401) {
-                currentUser = null;
-                if (!document.body.dataset.sessionExpiredAlertShown) {
-                    document.body.dataset.sessionExpiredAlertShown = "true";
-                    window.showAlert("Your session has expired. Please log in again.", "Session Expired");
-                    refreshAuthState();
-                    setTimeout(() => { delete document.body.dataset.sessionExpiredAlertShown; }, 5000);
+                if (currentUser) {
+                    currentUser = null;
+                    if (!document.body.dataset.sessionExpiredAlertShown) {
+                        document.body.dataset.sessionExpiredAlertShown = "true";
+                        window.showAlert("Your session has expired. Please log in again.", "Session Expired");
+                        refreshAuthState();
+                        setTimeout(() => { delete document.body.dataset.sessionExpiredAlertShown; }, 5000);
+                    }
                 }
             }
             const errorData = await response.json().catch(() => ({ message: 'An unknown API error occurred.' }));
