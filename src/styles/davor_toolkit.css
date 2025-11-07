@@ -1,11 +1,9 @@
-/* --- START OF FILE davor_toolkit.css --- */
-
 @font-face {
     font-family: 'NotoSansHans';
     src: url('/fonts/NotoSansHans-Black.otf') format('opentype');
     font-weight: 700;
     font-style: normal;
-    font-display: swap;
+    font-display: block;
 }
 
 .calculator-main-title { 
@@ -476,14 +474,11 @@
 
     #save-score-auth-container .discord-login-btn span,
     #saved-scores-auth-container .discord-login-btn span {
-        display: inline-block !important;
-        color: transparent;
-        user-select: none;
-        line-height: 1;
+        display: none !important;
     }
 
-    #save-score-auth-container .discord-login-btn span::before,
-    #saved-scores-auth-container .discord-login-btn span::before {
+    #save-score-auth-container .discord-login-btn::after,
+    #saved-scores-auth-container .discord-login-btn::after {
         content: 'Login';
         color: white;
         font-weight: 600;
