@@ -11,14 +11,10 @@
     }
 
     function renderLoggedOutState(container) {
-        const isMobile = window.innerWidth <= 768;
-        const buttonText = isMobile ? 'Login' : 'Login with Discord';
-        const buttonStyle = isMobile ? 'style="min-width: 120px; justify-content: center;"' : '';
-    
         container.innerHTML = `
-            <button class="discord-login-btn" ${buttonStyle}>
+            <button class="discord-login-btn">
                 <i class="fa-brands fa-discord"></i>
-                <span>${buttonText}</span>
+                <span>Login with Discord</span>
             </button>
         `;
         container.querySelector('.discord-login-btn').addEventListener('click', login);
@@ -171,4 +167,19 @@
         fetchWithAuth: fetchWithAuth,
         getLoggedInUser: getLoggedInUser,
     };
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && authPopup && authPopup.closed) {
+            console.log("Tab is visible again, re-checking auth state.");
+            
+            refreshAuthState();
+
+            if (typeof window.onAuthSuccess === 'function') {
+                window.onAuthSuccess();
+            }
+            
+            authPopup = null;
+        }
+    });
+
 })();

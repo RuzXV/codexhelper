@@ -468,6 +468,30 @@
     .saved-scores-grid .score-actions {
         justify-content: flex-end;
     }
+    #save-score-auth-container .discord-login-btn,
+    #saved-scores-auth-container .discord-login-btn {
+        min-width: 120px;
+        justify-content: center;
+    }
+
+    #save-score-auth-container .discord-login-btn span,
+    #saved-scores-auth-container .discord-login-btn span {
+        display: inline-block !important;
+        font-size: var(--font-size-base);
+        content: 'Login';
+        color: transparent;
+        position: relative;
+    }
+
+    #save-score-auth-container .discord-login-btn span::before,
+    #saved-scores-auth-container .discord-login-btn span::before {
+        content: 'Login';
+        color: white;
+        position: absolute;
+        left: 0;
+        right: 0;
+        text-align: center;
+    }
 }
 
 .island-content input[type="number"]::-webkit-outer-spin-button,
