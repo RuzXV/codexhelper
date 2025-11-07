@@ -111,67 +111,87 @@ const davorIconHeight = davorIcon.height;
                         <div class="carousel-slide" data-title="Score my Armaments" data-description="Score and optimize your armaments based on pairings, formations, and inscriptions.">
                            <div class="calculator-island">
                                  <div class="island-content">
-                                    <p class="tool-explanation">This tool utilizes a <span class="wizard-gradient">Score System</span> based on <span class="wizard-gradient">scale values</span> for the extra stats that you receive, on top of existing stats from your commanders and equipment. This Score system gives <span class="wizard-gradient">1 point per 1% attack,</span> and relative scoring for other stats, taking into account <span class="wizard-gradient">Bonus/Reduction</span> and <span class="wizard-gradient">Boost/Resistance</span>. The scale of values is based on the <span class="wizard-gradient">Damage Formula</span> and <span class="wizard-gradient">Combat Effectiveness</span>, and takes into consideration the updated <span class="wizard-gradient">Crystal Tech v5.</span> Total scores will allow you to compare two armaments, two inscriptions or even two full sets on a formation.</p>
-                                    
-                                    <div class="form-group">
-                                        <div class="form-label-heading">Troop Type</div>
-                                        <div id="armament-troop-selector" class="button-selector">
-                                            <button class="selector-btn active" data-type="cavalry"><Image loading="eager" src={cavalryIcon} alt="Cavalry" width="24" height="24"/><span>Cavalry</span></button>
-                                            <button class="selector-btn" data-type="infantry"><Image loading="eager" src={infantryIcon} alt="Infantry" width="24" height="24"/><span>Infantry</span></button>
-                                            <button class="selector-btn" data-type="archer"><Image loading="eager" src={archerIcon} alt="Archers" width="24" height="24"/><span>Archers</span></button>
-                                        </div>
+                                    <div class="generator-tabs">
+                                        <button class="generator-tab-btn active" data-tab="armament-tool">Armament Tool</button>
+                                        <button class="generator-tab-btn" data-tab="saved-scores">Saved Scores</button>
                                     </div>
-
-                                    <div class="selectors-container">
-                                        <div class="pairing-selector-wrapper">
-                                            <div class="form-label-heading">Commander Pairing</div>
-                                            <div id="armament-pairing-selector" class="pairing-selector"></div>
-                                        </div>
-                                        <div id="inscription-selector-wrapper" class="inscription-selector-wrapper">
-                                            <div class="form-group">
-                                                <label class="form-label-heading">Formation</label>
-                                                <div id="formation-selector" class="formation-selector"></div>
+                                    <div id="armament-tool-view" class="generator-view active">
+                                        <p class="tool-explanation">This tool utilizes a <span class="wizard-gradient">Score System</span> based on <span class="wizard-gradient">scale values</span> for the extra stats that you receive, on top of existing stats from your commanders and equipment. This Score system gives <span class="wizard-gradient">1 point per 1% attack,</span> and relative scoring for other stats, taking into account <span class="wizard-gradient">Bonus/Reduction</span> and <span class="wizard-gradient">Boost/Resistance</span>. The scale of values is based on the <span class="wizard-gradient">Damage Formula</span> and <span class="wizard-gradient">Combat Effectiveness</span>, and takes into consideration the updated <span class="wizard-gradient">Crystal Tech v5.</span> Total scores will allow you to compare two armaments, two inscriptions or even two full sets on a formation.</p>
+                                        
+                                        <div class="form-group">
+                                            <div class="form-label-heading">Troop Type</div>
+                                            <div id="armament-troop-selector" class="button-selector">
+                                                <button class="selector-btn active" data-type="cavalry"><Image loading="eager" src={cavalryIcon} alt="Cavalry" width="24" height="24"/><span>Cavalry</span></button>
+                                                <button class="selector-btn" data-type="infantry"><Image loading="eager" src={infantryIcon} alt="Infantry" width="24" height="24"/><span>Infantry</span></button>
+                                                <button class="selector-btn" data-type="archer"><Image loading="eager" src={archerIcon} alt="Archers" width="24" height="24"/><span>Archers</span></button>
                                             </div>
-                                            <div class="form-group" style="display: flex; flex-direction: column; flex-grow: 1;">
-                                                <label class="form-label-heading">Inscriptions</label>
-                                                <input type="search" id="inscription-search" class="inscription-search" placeholder="Search inscriptions...">
-                                                <div id="inscription-selector" class="inscription-selector">
-                                                    <p class="inscription-placeholder">Select a formation to see available inscriptions.</p>
+                                        </div>
+
+                                        <div class="selectors-container">
+                                            <div class="pairing-selector-wrapper">
+                                                <div class="form-label-heading">Commander Pairing</div>
+                                                <div id="armament-pairing-selector" class="pairing-selector"></div>
+                                            </div>
+                                            <div id="inscription-selector-wrapper" class="inscription-selector-wrapper">
+                                                <div class="form-group">
+                                                    <label class="form-label-heading">Formation</label>
+                                                    <div id="formation-selector" class="formation-selector"></div>
+                                                </div>
+                                                <div class="form-group" style="display: flex; flex-direction: column; flex-grow: 1;">
+                                                    <label class="form-label-heading">Inscriptions</label>
+                                                    <input type="search" id="inscription-search" class="inscription-search" placeholder="Search inscriptions...">
+                                                    <div id="inscription-selector" class="inscription-selector">
+                                                        <p class="inscription-placeholder">Select a formation to see available inscriptions.</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="armaments-bottom-row">
-                                        <div class="stat-inputs-grid">
-                                            <div class="form-group">
-                                                <label for="armament-attack">Attack (%)</label>
-                                                <input type="number" id="armament-attack" placeholder="10.0">
+                                        <div class="armaments-bottom-row">
+                                            <div class="stat-inputs-grid">
+                                                <div class="form-group">
+                                                    <label for="armament-attack">Attack (%)</label>
+                                                    <input type="number" id="armament-attack" placeholder="10.0">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="armament-defense">Defense (%)</label>
+                                                    <input type="number" id="armament-defense" placeholder="10.0">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="armament-health">Health (%)</label>
+                                                    <input type="number" id="armament-health" placeholder="8.0">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="armament-all-damage">All Damage (%)</label>
+                                                    <input type="number" id="armament-all-damage" placeholder="2.0">
+                                                </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label for="armament-defense">Defense (%)</label>
-                                                <input type="number" id="armament-defense" placeholder="10.0">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="armament-health">Health (%)</label>
-                                                <input type="number" id="armament-health" placeholder="8.0">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="armament-all-damage">All Damage (%)</label>
-                                                <input type="number" id="armament-all-damage" placeholder="2.0">
+                                            <div class="selected-inscriptions-wrapper">
+                                                <div class="form-label-heading">Selected Inscriptions</div>
+                                                <div id="selected-inscriptions-display">
+                                                <p class="inscription-placeholder">No inscriptions selected.</p>
+                                                </div>
+                                                <p class="inscription-deselect-note">Tap an inscription to de-select it.</p>
+                                        </div>
+                                        </div>
+
+                                        <div id="armament-score-result" class="calc-result"><span>Select a pairing and formation to calculate your score.</span></div>
+                                        <div id="save-score-section" class="save-score-section"></div>
+                                        <p class="last-updated-note">Last Updated: November 2025</p>
+                                    </div>
+                                    <div id="saved-scores-view" class="generator-view">
+                                        <div id="saved-scores-header" class="saved-templates-header">
+                                            <h2>Your Saved Scores</h2>
+                                        </div>
+                                        <div id="saved-scores-content">
+                                        </div>
+                                        <div id="logged-out-overlay-scores" class="logged-out-overlay" style="display: none;">
+                                            <div class="logged-out-message">
+                                                <h3>Log in to view and manage your saved scores.</h3>
+                                                <div id="saved-scores-auth-container"></div>
                                             </div>
                                         </div>
-                                        <div class="selected-inscriptions-wrapper">
-                                            <div class="form-label-heading">Selected Inscriptions</div>
-                                            <div id="selected-inscriptions-display">
-                                               <p class="inscription-placeholder">No inscriptions selected.</p>
-                                            </div>
-                                            <p class="inscription-deselect-note">Tap an inscription to de-select it.</p>
-                                       </div>
                                     </div>
-
-                                    <div id="armament-score-result" class="calc-result"><span>Select a pairing and formation to calculate your score.</span></div>
-                                    <p class="last-updated-note">Last Updated: November 2025</p>
                                 </div>
                             </div>
                         </div>

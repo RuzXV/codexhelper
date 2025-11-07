@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const conversionLabel = document.getElementById('conversion-label');
     const conversionResultEl = document.getElementById('conversion-result');
     const conversionOutputEl = document.getElementById('conversion-output');
-    let state = { troopType: 'cavalry', pairing: null, equipmentSet: null, equipmentSetIndex: 0 };
+    let state = { troopType: 'cavalry', pairing: null, equipmentSet: null, equipmentSetIndex: 0, totalScore: 0 };
     
     function updatePairingSelector() {
         if (!pairingSelector) return;
@@ -480,6 +480,11 @@ document.addEventListener('DOMContentLoaded', () => {
         calculateAndDisplay();
     });
 
+    const armamentToolTabBtn = document.querySelector('.generator-tab-btn[data-tab="armament-tool"]');
+    const savedScoresTabBtn = document.querySelector('.generator-tab-btn[data-tab="saved-scores"]');
+    const armamentToolView = document.getElementById('armament-tool-view');
+    const savedScoresView = document.getElementById('saved-scores-view');
+
     const armamentTroopSelector = document.getElementById('armament-troop-selector');
     const armamentPairingSelector = document.getElementById('armament-pairing-selector');
     const formationSelector = document.getElementById('formation-selector');
@@ -491,11 +496,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const armamentHealthInput = document.getElementById('armament-health');
     const armamentAllDamageInput = document.getElementById('armament-all-damage');
     const armamentScoreResult = document.getElementById('armament-score-result');
+    const saveScoreSection = document.getElementById('save-score-section');
+    const savedScoresContent = document.getElementById('saved-scores-content');
+    const savedScoresHeader = document.getElementById('saved-scores-header');
+    const loggedOutOverlayScores = document.getElementById('logged-out-overlay-scores');
+    const savedScoresAuthContainer = document.getElementById('saved-scores-auth-container');
     const inscriptionsData = window.inscriptionsData;
     const INSCRIPTION_STATS_DATA = window.inscriptionStats || {}; 
     let isArmamentCalculatorInitialized = false;
     let selectedInscriptions = new Set();
     let inscriptionCache = new Map();
+    let savedScoresCache = null;
 
     const ARMAMENT_PAIRING_SCALINGS = {
         'Huo Qubing / Arthur Pendragon': { attack: 1, defense: 1.16, health: 1.21, allDamage: 3.09, na: 0.62, ca: 0.31, skillDamage: 2.47, smiteDamage: 0, comboDamage: 0 },
@@ -589,9 +600,34 @@ document.addEventListener('DOMContentLoaded', () => {
         [armamentAttackInput, armamentDefenseInput, armamentHealthInput, armamentAllDamageInput].forEach(input => {
             input.addEventListener('input', calculateArmamentScore);
         });
+
+        armamentToolTabBtn.addEventListener('click', () => switchArmamentView('armament-tool'));
+        savedScoresTabBtn.addEventListener('click', () => switchArmamentView('saved-scores'));
         
         updateArmamentPairingSelector('cavalry');
+        updateSaveScoreSection();
         isArmamentCalculatorInitialized = true;
+    }
+
+    function switchArmamentView(tabName) {
+        const views = {
+            'armament-tool': armamentToolView,
+            'saved-scores': savedScoresView
+        };
+        const tabs = {
+            'armament-tool': armamentToolTabBtn,
+            'saved-scores': savedScoresTabBtn
+        };
+
+        for (const key in views) {
+            const isActive = key === tabName;
+            views[key].classList.toggle('active', isActive);
+            tabs[key].classList.toggle('active', isActive);
+        }
+
+        if (tabName === 'saved-scores') {
+            renderSavedScoresView();
+        }
     }
 
     function updateArmamentPairingSelector(troopType) {
@@ -772,6 +808,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!pairing || !activeFormationBtn) {
             armamentScoreResult.innerHTML = '<span>Select a pairing and formation to calculate your score.</span>';
+            state.totalScore = 0;
+            updateSaveScoreSection();
             return;
         }
 
@@ -805,6 +843,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const scaling = ARMAMENT_PAIRING_SCALINGS[pairing];
         if (!scaling) {
             armamentScoreResult.innerHTML = '<span>Error: Scaling data not found for this pairing.</span>';
+            state.totalScore = 0;
+            updateSaveScoreSection();
             return;
         }
 
@@ -819,9 +859,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalScore += statScore;
             }
         }
-
-        armamentScoreResult.innerHTML = `<span>Total Armament Score: <strong>${totalScore.toFixed(2)}</strong></span>`;
+        
+        state.totalScore = totalScore.toFixed(2);
+        armamentScoreResult.innerHTML = `<span>Total Armament Score: <strong>${state.totalScore}</strong></span>`;
         triggerSuccessAnimation(armamentScoreResult);
+        updateSaveScoreSection();
     }
     
     function triggerSuccessAnimation(element) {
@@ -831,16 +873,245 @@ document.addEventListener('DOMContentLoaded', () => {
         element.classList.add('result-success');
     }
 
-    const initAndResize = () => {
+    function updateSaveScoreSection() {
+        if (!saveScoreSection) return;
+        const user = getLoggedInUser();
 
-        const troopButtons = document.querySelectorAll('#troop-type-selector .selector-btn');
+        if (user) {
+            saveScoreSection.innerHTML = `<button id="save-score-btn" class="btn-primary">Save Score</button>`;
+            document.getElementById('save-score-btn').addEventListener('click', handleSaveScore);
+        } else {
+            saveScoreSection.innerHTML = `
+                <span>Log into</span> 
+                <button class="discord-login-btn">
+                    <i class="fa-brands fa-discord"></i>
+                    <span>Discord</span>
+                </button> 
+                <span>to save your scores!</span>`;
+            saveScoreSection.querySelector('.discord-login-btn').addEventListener('click', login);
+        }
+    }
+
+    async function handleSaveScore() {
+        const btn = document.getElementById('save-score-btn');
+        if (!btn) return;
+
+        const activePairingEl = armamentPairingSelector.querySelector('.pairing-item.active');
+        const pairing = activePairingEl ? activePairingEl.dataset.pairing : null;
+        const activeFormationBtn = formationSelector.querySelector('.formation-btn.active');
+        const formation = activeFormationBtn ? activeFormationBtn.dataset.formation : null;
+
+        if (!pairing || !formation) {
+            alert("Please select a pairing and formation before saving.");
+            return;
+        }
+
+        const scoreData = {
+            pairing: pairing,
+            formation: formation,
+            inscriptions: Array.from(selectedInscriptions),
+            stats: {
+                attack: parseFloat(armamentAttackInput.value) || 0,
+                defense: parseFloat(armamentDefenseInput.value) || 0,
+                health: parseFloat(armamentHealthInput.value) || 0,
+                allDamage: parseFloat(armamentAllDamageInput.value) || 0,
+            },
+            total_score: parseFloat(state.totalScore)
+        };
+        
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        try {
+            await fetchWithAuth('/api/scores', {
+                method: 'POST',
+                body: JSON.stringify(scoreData)
+            });
+            btn.textContent = 'Saved!';
+            savedScoresCache = null;
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = 'Save Score';
+            }, 2000);
+        } catch (error) {
+            console.error('Failed to save score:', error);
+            alert(`Could not save score: ${error.message}`);
+            btn.disabled = false;
+            btn.textContent = 'Save Score';
+        }
+    }
+    
+    async function renderSavedScoresView() {
+        const user = getLoggedInUser();
+
+        if (user) {
+            savedScoresHeader.style.display = 'flex';
+            loggedOutOverlayScores.style.display = 'none';
+            if (savedScoresCache) {
+                populateSavedScoresTable(savedScoresCache);
+                return;
+            }
+
+            savedScoresContent.innerHTML = `<p>Loading your saved scores...</p>`;
+            try {
+                const scores = await fetchWithAuth('/api/scores');
+                savedScoresCache = scores;
+                populateSavedScoresTable(scores);
+            } catch (error) {
+                console.error('Failed to fetch saved scores:', error);
+                savedScoresContent.innerHTML = `<p class="error-message">Could not load your scores. Please try logging in again.</p>`;
+                savedScoresCache = null;
+            }
+        } else {
+            savedScoresContent.innerHTML = '';
+            savedScoresHeader.style.display = 'none';
+            loggedOutOverlayScores.style.display = 'flex';
+            if (savedScoresAuthContainer && !savedScoresAuthContainer.hasChildNodes()) {
+                initAuth(savedScoresAuthContainer);
+            }
+            savedScoresCache = null;
+        }
+    }
+
+    function populateSavedScoresTable(scores) {
+        if (!scores || scores.length === 0) {
+            savedScoresContent.innerHTML = `<p>You have no saved scores. Use the "Save Score" button in the tool to add one!</p>`;
+            return;
+        }
+
+        let tableHtml = `<div class="saved-scores-grid">
+            <div class="grid-header">Pairing</div>
+            <div class="grid-header">Formation</div>
+            <div class="grid-header">Inscriptions</div>
+            <div class="grid-header">Stats</div>
+            <div class="grid-header">Score</div>
+            <div class="grid-header">Actions</div>
+        `;
+        
+        scores.forEach(score => {
+            const [primary, secondary] = score.pairing.split(' / ');
+            const primaryFilename = `${primary.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
+            const secondaryFilename = `${secondary.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
+            const primaryImg = getImagePath(primaryFilename);
+            const secondaryImg = getImagePath(secondaryFilename);
+            
+            let inscriptionsHtml = '<div class="inscription-grid">';
+            if (score.inscriptions && score.inscriptions.length > 0) {
+                score.inscriptions.forEach(name => {
+                    let tagClass = 'inscription-tag';
+                    if (SPECIAL_INSCRIPTIONS.includes(name)) tagClass += ' special';
+                    else if (RARE_INSCRIPTIONS.includes(name)) tagClass += ' rare';
+                    inscriptionsHtml += `<div class="${tagClass}" data-name="${name}">${name.replace(/_/g, ' ')}</div>`;
+                });
+            } else {
+                inscriptionsHtml += '<span>None</span>';
+            }
+            inscriptionsHtml += '</div>';
+
+            const statsHtml = `
+                Attack: ${score.stats.attack}%<br>
+                Defense: ${score.stats.defense}%<br>
+                Health: ${score.stats.health}%<br>
+                All Dmg: ${score.stats.allDamage}%
+            `;
+
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                tableHtml += `<div class="grid-row-container" data-score-id="${score.score_id}">`;
+            } else {
+                 tableHtml += `<div class="grid-row" data-score-id="${score.score_id}">`;
+            }
+
+            tableHtml += `
+                <div class="score-pairing pairing-images">
+                    <img src="${primaryImg}" alt="${primary}" class="commander-icon">
+                    <img src="${secondaryImg}" alt="${secondary}" class="commander-icon secondary">
+                </div>
+                <div class="score-formation">${score.formation}</div>
+                <div class="score-inscriptions">${inscriptionsHtml}</div>
+                <div class="score-stats">${statsHtml}</div>
+                <div class="total-score"><strong>${score.total_score.toFixed(2)}</strong></div>
+                <div class="score-actions">
+                    <button class="btn-danger delete-score-btn" title="Delete Score"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+
+            if (isMobile) {
+                tableHtml += `</div>`;
+            }
+        });
+
+        if (!isMobile) {
+            tableHtml += '</div>';
+        }
+        tableHtml += '</div>';
+        savedScoresContent.innerHTML = tableHtml;
+
+        savedScoresContent.querySelectorAll('.delete-score-btn').forEach(btn => {
+            btn.addEventListener('click', handleDeleteScore);
+        });
+    }
+
+    async function handleDeleteScore(e) {
+        const btn = e.currentTarget;
+        const row = btn.closest('[data-score-id]');
+        const scoreId = row.dataset.scoreId;
+
+        if (confirm('Are you sure you want to delete this saved score?')) {
+            try {
+                await fetchWithAuth(`/api/scores/${scoreId}`, { method: 'DELETE' });
+                savedScoresCache = null;
+                renderSavedScoresView();
+            } catch (error) {
+                console.error('Failed to delete score:', error);
+                alert(`Could not delete score: ${error.message}`);
+            }
+        }
+    }
+    
+    const API_BASE_URL = 'https://api.codexhelper.com';
+
+    function getLoggedInUser() {
+        try {
+            const user = localStorage.getItem('codexUser');
+            return user ? JSON.parse(user) : null;
+        } catch (e) { return null; }
+    }
+
+    function getAuthToken() {
+        try {
+            const userString = localStorage.getItem('codexUser');
+            if (!userString) return null;
+            const userData = JSON.parse(userString);
+            return (userData && userData.accessToken) ? `Bearer ${userData.accessToken}` : null;
+        } catch (e) { return null; }
+    }
+    
+    async function fetchWithAuth(endpoint, options = {}) {
+        const token = getAuthToken();
+        if (!token) throw new Error('User not authenticated');
+        const headers = { ...options.headers, 'Authorization': token, 'Content-Type': 'application/json' };
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+        if (!response.ok) {
+            if (response.status === 401) {
+                logout();
+                updateSaveScoreSection();
+                renderSavedScoresView();
+            }
+            const errorData = await response.json().catch(() => ({ message: 'An unknown API error occurred.' }));
+            throw new Error(errorData.message || `API request failed with status ${response.status}`);
+        }
+        return response.json().catch(() => ({}));
+    }
+    
+    const initAndResize = () => {
+        const troopButtons = document.querySelectorAll('#troop-type-selector .selector-btn, #armament-troop-selector .selector-btn');
         const textMap = {
             'cavalry': { long: 'Cavalry', short: 'Cav' },
             'infantry': { long: 'Infantry', short: 'Inf' },
             'archer': { long: 'Archer', short: 'Arch' },
             'engineering': { long: 'Engineering', short: 'Siege' }
         };
-
         const isMobile = window.innerWidth <= 768;
         troopButtons.forEach(btn => {
             const type = btn.dataset.type;
