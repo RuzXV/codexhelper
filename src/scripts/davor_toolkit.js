@@ -706,7 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveScoreSection.innerHTML = `
                 <span>You can </span>
                 <button id="save-score-btn" class="btn-primary">Save Score</button>
-                <span> and access or compare your scores in the 
+                <span> and access/compare your scores in the 
                     <span style="white-space: nowrap;">
                         <a href="#" class="saved-scores-link">Saved Scores</a> tab.
                     </span>
