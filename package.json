@@ -9,6 +9,11 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.15.3"
+    "astro": "^5.15.3",
+    "hono": "^4.2.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240419.0",
+    "wrangler": "^3.51.0"  
   }
 }
