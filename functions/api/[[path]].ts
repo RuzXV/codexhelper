@@ -1,7 +1,7 @@
 import { Hono, Context, Next } from 'hono'; 
 import { cors } from 'hono/cors';
 import { getCookie } from 'hono/cookie';
-import { decryptFernetToken } from './crypto';
+import { decryptFernetToken } from '../crypto';
 
 type Bindings = {
     DB: D1Database;
