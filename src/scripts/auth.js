@@ -116,7 +116,6 @@
                     if (!document.body.dataset.sessionExpiredAlertShown) {
                         document.body.dataset.sessionExpiredAlertShown = "true";
                         window.showAlert("Your session has expired. Please log in again.", "Session Expired");
-                        refreshAuthState();
                         setTimeout(() => { delete document.body.dataset.sessionExpiredAlertShown; }, 5000);
                     }
                 }
