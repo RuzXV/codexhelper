@@ -1537,4 +1537,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     initializeCalculator();
+    
+    window.restoreToolState = function(state) {
+        if (state) {
+            loadCalculatorState(state);
+        }
+    };
 });

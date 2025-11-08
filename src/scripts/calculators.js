@@ -886,4 +886,9 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(initAndResize, 100);
     });
+    window.restoreToolState = function(state) {
+        if (state) {
+            loadAllCalculatorsState(state);
+        }
+    };
 });

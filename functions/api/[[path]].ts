@@ -2,7 +2,7 @@ import { Hono, Context, Next } from 'hono';
 import { handle } from 'hono/cloudflare-pages';
 import { cors } from 'hono/cors';
 import { getCookie } from 'hono/cookie';
-import { decryptFernetToken } from '../crypto';
+import { encryptFernetToken, decryptFernetToken } from '../crypto';
 
 type Bindings = {
     DB: D1Database;
@@ -166,6 +166,64 @@ app.post('/api/internal/update-cache', async (c) => {
     await c.env.API_CACHE.put('top_servers', JSON.stringify(top_servers));
     await c.env.API_CACHE.put('bot_stats', JSON.stringify(bot_stats));
     return c.json({ success: true });
+});
+
+app.get('/api/auth/callback', async (c) => {
+    const code = c.req.query('code');
+    if (!code) {
+        return c.text('Authorization code is missing.', 400);
+    }
+
+    const tokenData = new URLSearchParams({
+        client_id: c.env.WEBSITE_APP_ID,
+        client_secret: c.env.WEBSITE_APP_SECRET,
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: 'https://codexhelper.com/api/auth/callback',
+    });
+
+    const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: tokenData,
+    });
+
+    if (!tokenResponse.ok) {
+        console.error("Failed to get token from Discord:", await tokenResponse.text());
+        return c.text('Failed to authenticate with Discord.', 500);
+    }
+
+    type TokenResponse = { access_token: string; };
+    const tokenJson = await tokenResponse.json() as TokenResponse;
+    const accessToken = tokenJson.access_token;
+
+    const userResponse = await fetch('https://discord.com/api/users/@me', {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+    });
+
+    if (!userResponse.ok) {
+        console.error("Failed to get user data from Discord:", await userResponse.text());
+        return c.text('Failed to fetch user data from Discord.', 500);
+    }
+
+    type UserResponse = { id: string; };
+    const userData = await userResponse.json() as UserResponse;
+    const userId = userData.id;
+
+    const sessionToken = crypto.randomUUID().replace(/-/g, '');
+    const SESSION_DURATION_SECONDS = 86400 * 30; // 30 days
+    const expiryDate = (Date.now() / 1000) + SESSION_DURATION_SECONDS;
+
+    const encryptedAccessToken = await encryptFernetToken(c.env.DB_ENCRYPTION_KEY, accessToken);
+
+    await c.env.DB.prepare(
+        'INSERT INTO user_sessions (session_token, user_id, discord_access_token, expiry_date) VALUES (?, ?, ?, ?)'
+    ).bind(sessionToken, userId, encryptedAccessToken, expiryDate).run();
+
+    const cookieOptions = `Max-Age=${SESSION_DURATION_SECONDS}; Path=/; HttpOnly; Secure; SameSite=Lax`;
+    c.header('Set-Cookie', `session_token=${sessionToken}; ${cookieOptions}`);
+    
+    return c.redirect('/');
 });
 
 export const onRequest = handle(app);

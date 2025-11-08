@@ -29,6 +29,23 @@ document.addEventListener('DOMContentLoaded', function() {
         renderSavedTemplatesView();
     };
 
+    window.getPreLoginState = function() {
+        const mailInput = document.getElementById('mail-input');
+        if (mailInput && mailInput.value) {
+            return { mailContent: mailInput.value };
+        }
+        return null;
+    };
+    
+    window.restoreToolState = function(state) {
+        const mailInput = document.getElementById('mail-input');
+        if (mailInput && state && state.mailContent) {
+            mailInput.value = state.mailContent;
+            updatePreview();
+            saveState();
+        }
+    };
+
     const mailInput = document.getElementById('mail-input');
     const mailPreview = document.getElementById('mail-preview');
     const copyBtn = document.getElementById('copy-btn');

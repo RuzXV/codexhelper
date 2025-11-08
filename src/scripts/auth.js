@@ -1,8 +1,8 @@
 (function() {
-    const API_BASE_URL = 'https://api.codexhelper.com';
+    const API_BASE_URL = '';
     const WEBSITE_APP_ID = '1434105087722258573';
-    const REDIRECT_URI = 'https://api.codexhelper.com/api/auth/callback';
-    let authPopup = null;
+    const REDIRECT_URI = `${window.location.origin}/api/auth/callback`;
+    
     let currentUser = null;
     let authContainerSelector = null;
 
@@ -56,15 +56,12 @@
     function login(event) {
         const loginButton = event.currentTarget;
         loginButton.disabled = true;
-        loginButton.classList.add('is-loading');
-        loginButton.innerHTML = `
-            <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-            <span>Logging in...</span>
-        `;
+        loginButton.innerHTML = `<span>Redirecting...</span>`;
 
         if (typeof window.getPreLoginState === 'function') {
             const state = window.getPreLoginState();
             if (state) {
+                console.log("Saving pre-login state...", state);
                 sessionStorage.setItem('preLoginState', JSON.stringify(state));
                 sessionStorage.setItem('preLoginToolPath', window.location.pathname);
             }
@@ -73,16 +70,7 @@
         const scope = 'identify';
         const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${WEBSITE_APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
         
-        const width = 500, height = 700;
-        const left = (window.innerWidth / 2) - (width / 2);
-        const top = (window.innerHeight / 2) - (height / 2);
-        
-        authPopup = window.open(authUrl, 'DiscordAuth', `width=${width},height=${height},top=${top},left=${left}`);
-
-        if (!authPopup || authPopup.closed || typeof authPopup.closed === 'undefined') {
-            window.showAlert("Popup was blocked! Please allow popups for this site and try again.");
-            if (event.currentTarget) renderLoggedOutState(event.currentTarget.parentElement);
-        }
+        window.location.href = authUrl;
     }
 
     async function logout() {
@@ -128,6 +116,24 @@
 
     async function initAuth(containerSelector) {
         authContainerSelector = containerSelector;
+        
+        const preLoginToolPath = sessionStorage.getItem('preLoginToolPath');
+        if (preLoginToolPath) {
+            if (window.location.pathname !== preLoginToolPath) {
+                window.location.href = preLoginToolPath;
+                return;
+            } else {
+                const stateJSON = sessionStorage.getItem('preLoginState');
+                if (stateJSON && typeof window.restoreToolState === 'function') {
+                    console.log("Restoring tool state...");
+                    const state = JSON.parse(stateJSON);
+                    window.restoreToolState(state);
+                }
+                sessionStorage.removeItem('preLoginState');
+                sessionStorage.removeItem('preLoginToolPath');
+            }
+        }
+
         const container = document.querySelector(containerSelector);
         if (!container) return;
 
@@ -140,25 +146,6 @@
             currentUser = null;
             renderLoggedOutState(container);
         }
-        
-        window.addEventListener('message', (event) => {
-            const isSafeOrigin = event.origin === 'https://codexhelper.com' || event.origin === 'https://api.codexhelper.com';
-            if (!isSafeOrigin) return;
-
-            if (event.data.type === 'auth-success') {
-                if (authPopup) authPopup.close();
-                refreshAuthState();
-                if (typeof window.onAuthSuccess === 'function') {
-                    window.onAuthSuccess();
-                }
-            } else if (event.data.type === 'auth-error') {
-                 if (authPopup) authPopup.close();
-                 console.error('Authentication error received from popup:', event.data.error);
-                 window.showAlert("Discord login failed. Please try again.", "Authentication Error");
-                 const authContainer = document.querySelector(containerSelector);
-                 if(authContainer) renderLoggedOutState(authContainer);
-            }
-        });
     }
 
     window.auth = {
