@@ -121,7 +121,7 @@ if (isToolsPage && window.auth) {
     window.auth.init('#auth-container');
 }
 
-const API_BASE_URL = 'https://api.codexhelper.com';
+const API_BASE_URL = '';
 const STATS_ENDPOINT = '/api/stats';
 const TOP_SERVERS_ENDPOINT = '/api/top-servers';
 
