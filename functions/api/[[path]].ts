@@ -1,4 +1,5 @@
-import { Hono, Context, Next } from 'hono'; 
+import { Hono, Context, Next } from 'hono';
+import { handle } from 'hono/cloudflare-pages';
 import { cors } from 'hono/cors';
 import { getCookie } from 'hono/cookie';
 import { decryptFernetToken } from '../crypto';
@@ -11,14 +12,12 @@ type Bindings = {
     DB_ENCRYPTION_KEY: string;
     BOT_SECRET_KEY: string;
 };
-
 type Variables = {
     user: {
         id: string;
         accessToken: string;
     };
 };
-
 const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
 app.use('/api/*', cors({
@@ -163,13 +162,10 @@ app.post('/api/internal/update-cache', async (c) => {
     if (secret !== c.env.BOT_SECRET_KEY) {
         return c.json({ error: 'Unauthorized' }, 401);
     }
-
     const { top_servers, bot_stats } = await c.req.json();
-
     await c.env.API_CACHE.put('top_servers', JSON.stringify(top_servers));
     await c.env.API_CACHE.put('bot_stats', JSON.stringify(bot_stats));
-    
     return c.json({ success: true });
 });
 
-export default app;
+export const onRequest = handle(app);
