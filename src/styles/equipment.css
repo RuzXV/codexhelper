@@ -773,6 +773,9 @@ input:checked + .slider:before { transform: translateX(20px); }
     .comparison-stats-column .material-island {
         min-height: auto;
     }
+    .compare-layout-grid > .equipment-loadout-column:nth-of-type(1) { order: 1; }
+    .compare-layout-grid > .equipment-loadout-column:nth-of-type(2) { order: 2; }
+    .compare-layout-grid > .comparison-stats-column { order: 3; }    
 }
 
 @media (max-width: 1024px) {
@@ -844,6 +847,23 @@ input:checked + .slider:before { transform: translateX(20px); }
     
     #modal-grid {
         min-height: 300px;
+    }
+    .compare-layout-grid .loadout-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: var(--spacing-4);
+        min-height: 450px;
+    }
+
+    .compare-layout-grid .loadout-grid {
+        transform: scale(0.9);
+        transform-origin: top center;
+    }
+
+    .comparison-stat-row .stat-value,
+    .comparison-stat-row .delta-value {
+        white-space: nowrap;
     }
 }
 

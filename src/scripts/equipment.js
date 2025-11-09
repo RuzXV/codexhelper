@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function closeModal() {
         modal.style.display = 'none';
-        activeSlotId = null;
+        activeSlotElement = null;
         
         if (virtualScrollListener) {
             modalGrid.removeEventListener('scroll', virtualScrollListener);
@@ -1105,13 +1105,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const debouncedModalSearch = debounce(() => {
-        const slotType = document.getElementById(activeSlotId)?.dataset.slot;
-        if (slotType) {
+        if (activeSlotElement) {
+            const slotType = activeSlotElement.dataset.slot;
             const itemSlotType = (slotType === 'accessory1' || slotType === 'accessory2') ? 'accessory' : slotType;
             populateModalGrid(itemSlotType, modalSearch.value);
         }
     }, 250);
-    modalSearch.addEventListener('input', debouncedModalSearch);
 
 
     function triggerSuccessAnimation(element) {
@@ -1706,57 +1705,77 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateComparisonStats() {
-        if(!comparisonStatsContainer) return;
+        if (!comparisonStatsContainer) return;
         const statsA = calculateLoadoutStats(compareLoadoutA);
         const statsB = calculateLoadoutStats(compareLoadoutB);
-        
-        const allStatKeys = [...new Set([...Object.keys(statsA.stats), ...Object.keys(statsB.stats)])];
+    
+        const allStatKeys = [...new Set([...Object.keys(statsA.stats), ...Object.keys(statsB.stats)])].filter(key => !key.startsWith('troop_'));
         const allSpecialKeys = [...new Set([...statsA.special, ...statsB.special])];
     
         if (allStatKeys.length === 0 && allSpecialKeys.length === 0) {
-            comparisonStatsContainer.innerHTML = '<p class="no-items-placeholder">Select equipment in both loadouts to see a comparison.</p>';
+            comparisonStatsContainer.innerHTML = '<p class="no-items-placeholder">Select equipment in a loadout to see its stats.</p>';
             return;
         }
+    
+        const groupedStats = {
+            infantry: { stats: [], total: 0 },
+            cavalry: { stats: [], total: 0 },
+            archer: { stats: [], total: 0 },
+            siege: { stats: [], total: 0 }
+        };
+    
+        allStatKeys.forEach(key => {
+            const troopType = getTroopTypeFromStat(key);
+            if (groupedStats[troopType]) {
+                groupedStats[troopType].stats.push(key);
+                groupedStats[troopType].total += (statsA.stats[key] || 0) + (statsB.stats[key] || 0);
+            }
+        });
+    
+        const sortedTroopTypes = Object.keys(groupedStats).sort((a, b) => groupedStats[b].total - groupedStats[a].total);
+    
+        const statOrderSuffixes = ['attack', 'defense', 'health', 'march_speed'];
     
         let html = '<div class="comparison-grid">';
         html += '<div class="comparison-header">Stats</div><div class="comparison-header">Loadout A</div><div class="comparison-header">Loadout B</div><div class="comparison-header">Delta</div>';
     
-        allStatKeys.sort().forEach(key => {
-            if (key.startsWith('troop_')) return;
-            const troopType = getTroopTypeFromStat(key);
+        sortedTroopTypes.forEach(troopType => {
+            const troopGroup = groupedStats[troopType];
+            if (troopGroup.stats.length === 0) return;
     
-            if (activeComparisonFilter !== 'all' && troopType !== activeComparisonFilter) {
-                return; 
-            }
+            const sortedStatsInGroup = troopGroup.stats.sort((a, b) => {
+                const suffixA = a.substring(a.indexOf('_') + 1);
+                const suffixB = b.substring(b.indexOf('_') + 1);
+                return statOrderSuffixes.indexOf(suffixA) - statOrderSuffixes.indexOf(suffixB);
+            });
     
-            const valA = statsA.stats[key] || 0;
-            const valB = statsB.stats[key] || 0;
-            if(valA === 0 && valB === 0) return;
+            sortedStatsInGroup.forEach(key => {
+                if (activeComparisonFilter !== 'all' && troopType !== activeComparisonFilter) {
+                    return;
+                }
+                const valA = statsA.stats[key] || 0;
+                const valB = statsB.stats[key] || 0;
+                if (valA === 0 && valB === 0) return;
     
-            const delta = valB - valA;
-            
-            let deltaHtml = '';
-            if (delta !== 0) {
-                const deltaClass = delta > 0 ? 'stat-increase' : 'stat-decrease';
-                const deltaIcon = delta > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
-                deltaHtml = `<span class="${deltaClass}"><i class="fas ${deltaIcon}"></i> <span class="delta-value-text">${delta.toFixed(1).replace('.0','')}%</span></span>`;
-            } else {
-                deltaHtml = `<span class="stat-no-change">-</span>`;
-            }
-            
-            const iconHtml = `<img src="${getImagePath(`${troopType}_icon_mini.webp`)}" alt="${troopType} icon" class="stat-icon-mini">`;
+                const delta = valB - valA;
+                let deltaHtml = (delta !== 0)
+                    ? `<span class="${delta > 0 ? 'stat-increase' : 'stat-decrease'}"><i class="fas ${delta > 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i> <span class="delta-value-text">${delta.toFixed(1).replace('.0', '')}%</span></span>`
+                    : `<span class="stat-no-change">-</span>`;
+                
+                const iconHtml = `<img src="${getImagePath(`${troopType}_icon_mini.webp`)}" alt="${troopType} icon" class="stat-icon-mini">`;
     
-            html += `
-                <div class="comparison-stat-row ${troopType}">
-                    <div class="stat-name">${iconHtml}${formatStatName(key)}</div>
-                    <div class="stat-value">${valA.toFixed(1).replace('.0','')}%</div>
-                    <div class="stat-value">${valB.toFixed(1).replace('.0','')}%</div>
-                    <div class="delta-value">${deltaHtml}</div>
-                </div>
-            `;
+                html += `
+                    <div class="comparison-stat-row ${troopType}">
+                        <div class="stat-name">${iconHtml}${formatStatName(key)}</div>
+                        <div class="stat-value">${valA.toFixed(1).replace('.0', '')}%</div>
+                        <div class="stat-value">${valB.toFixed(1).replace('.0', '')}%</div>
+                        <div class="delta-value">${deltaHtml}</div>
+                    </div>
+                `;
+            });
         });
-        
-        if(allSpecialKeys.length > 0) {
+    
+        if (allSpecialKeys.length > 0) {
             html += `<div class="comparison-special-divider">Extra Bonuses</div>`;
             allSpecialKeys.forEach(key => {
                 const inA = statsA.special.includes(key);
