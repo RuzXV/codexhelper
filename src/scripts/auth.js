@@ -154,18 +154,4 @@
         getLoggedInUser: getLoggedInUser,
     };
 
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && authPopup && authPopup.closed) {
-            console.log("Tab is visible again, re-checking auth state.");
-            
-            refreshAuthState();
-
-            if (typeof window.onAuthSuccess === 'function') {
-                window.onAuthSuccess();
-            }
-            
-            authPopup = null;
-        }
-    });
-
 })();

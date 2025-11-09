@@ -14,10 +14,33 @@ document.addEventListener('DOMContentLoaded', function() {
         return `/images/materials/equipment/${filename}`;
     }
 
+    const craftingTabBtn = document.querySelector('.generator-tab-btn[data-tab="crafting-calculator"]');
+    const compareTabBtn = document.querySelector('.generator-tab-btn[data-tab="compare-sets"]');
+    const craftingView = document.getElementById('crafting-calculator-view');
+    const compareView = document.getElementById('compare-sets-view');
+
+    function switchView(tabName) {
+        const views = { 'crafting-calculator': craftingView, 'compare-sets': compareView };
+        const tabs = { 'crafting-calculator': craftingTabBtn, 'compare-sets': compareTabBtn };
+        for (const key in views) {
+            const isActive = key === tabName;
+            if(views[key]) views[key].classList.toggle('active', isActive);
+            if(tabs[key]) tabs[key].classList.toggle('active', isActive);
+        }
+    }
+    if(craftingTabBtn) craftingTabBtn.addEventListener('click', () => switchView('crafting-calculator'));
+    if(compareTabBtn) compareTabBtn.addEventListener('click', () => switchView('compare-sets'));
+
+    const compareLoadoutASlots = document.querySelectorAll('#compare-a-loadout-grid .loadout-slot');
+    const compareLoadoutBSlots = document.querySelectorAll('#compare-b-loadout-grid .loadout-slot');
+    const comparisonStatsContainer = document.getElementById('comparison-stats-container');
+    let compareLoadoutA = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
+    let compareLoadoutB = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
+
     const calculateBtn = document.getElementById('calculate-btn');
     const allInputs = document.querySelectorAll('.material-input');
     const resultDiv = document.getElementById('materials-result');
-    const loadoutSlots = document.querySelectorAll('.loadout-slot');
+    const craftingLoadoutSlots = document.querySelectorAll('#crafting-calculator-view .loadout-slot');
     const modal = document.getElementById('equipment-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const modalGrid = document.getElementById('modal-grid');
@@ -68,11 +91,20 @@ document.addEventListener('DOMContentLoaded', function() {
         accessory2: getImagePath('accessory2_slot.webp')
     };
 
+    const comparisonFilterToggleBtn = document.getElementById('comparison-filter-toggle-btn');
+    const comparisonFilterPanel = document.getElementById('comparison-filter-panel');
+    let activeComparisonFilter = 'all';
+
+    const compareLoadoutADetailsToggle = document.getElementById('details-toggle-a');
+    const compareLoadoutBDetailsToggle = document.getElementById('details-toggle-b');
+    const compareLoadoutADetailsList = document.getElementById('details-list-a');
+    const compareLoadoutBDetailsList = document.getElementById('details-list-b');
+
     const RARITY_MULTIPLIERS = { common: 1, advanced: 4, elite: 16, epic: 64, legendary: 256 };
 
     let craftingList = {};
     let selectedLoadoutSlots = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
-    let activeSlotId = null;
+    let activeSlotElement = null;
 
     let currentVirtualScrollItems = [];
     let virtualScrollListener = null;
@@ -104,6 +136,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         state.craftingList = craftingList;
         state.selectedLoadoutSlots = selectedLoadoutSlots;
+        state.compareLoadoutA = compareLoadoutA;
+        state.compareLoadoutB = compareLoadoutB;
     
         window.saveUserData(MATERIALS_CACHE_KEY, state);
     }, 500);
@@ -137,6 +171,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         updateUIDisplays();
+
+        if(savedState.compareLoadoutA) {
+            compareLoadoutA = savedState.compareLoadoutA;
+            Object.keys(compareLoadoutA).forEach(slotKey => {
+                const itemId = compareLoadoutA[slotKey];
+                if(itemId) {
+                    const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+                    const slotElement = document.getElementById(`slot-a-${slotKey}`);
+                    if(itemData && slotElement) slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
+                }
+            });
+        }
+        if(savedState.compareLoadoutB) {
+            compareLoadoutB = savedState.compareLoadoutB;
+             Object.keys(compareLoadoutB).forEach(slotKey => {
+                const itemId = compareLoadoutB[slotKey];
+                if(itemId) {
+                    const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+                    const slotElement = document.getElementById(`slot-b-${slotKey}`);
+                    if(itemData && slotElement) slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
+                }
+            });
+        }
+        updateComparisonStats();
     }
 
     const getMaterialIconPath = (mat, rarity = 'legendary') => {
@@ -428,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     function openModalForSlot(slotElement) {
-        activeSlotId = slotElement.id;
+        activeSlotElement = slotElement;
         const slotType = slotElement.dataset.slot;
         const itemSlotType = (slotType === 'accessory1' || slotType === 'accessory2') ? 'accessory' : slotType;
     
@@ -467,14 +525,12 @@ document.addEventListener('DOMContentLoaded', function() {
         currentVirtualScrollItems = [];
     }
 
-    function selectItem(itemId) {
+    function selectItemForCrafting(itemId) {
         const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
-        if (!itemData || !activeSlotId) return;
+        if (!itemData || !activeSlotElement) return;
     
-        const slotElement = document.getElementById(activeSlotId);
-        if (!slotElement) return;
-    
-        const slotKey = activeSlotId.replace('slot-', '');
+        const slotElement = activeSlotElement;
+        const slotKey = slotElement.dataset.slot;
         
         const oldItemId = selectedLoadoutSlots[slotKey];
         if (oldItemId) {
@@ -483,7 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 delete craftingList[oldItemId];
             }
         }
-
+    
         craftingList[itemId] = (craftingList[itemId] || 0) + 1;
         selectedLoadoutSlots[slotKey] = itemId;
         
@@ -493,7 +549,7 @@ document.addEventListener('DOMContentLoaded', function() {
         closeModal();
         updateUIDisplays(itemId);
         saveCalculatorState();
-        if (calculateBtn.style.display === 'none') performCalculation();
+        if (calculateBtn && calculateBtn.style.display === 'none') performCalculation();
     }
 
     function addItemFromSelector(itemId) {
@@ -951,9 +1007,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     modalGrid.addEventListener('click', (e) => {
-        const isMobile = window.innerWidth <= 768;
         const itemElement = e.target.closest('.modal-item');
-        if (!itemElement) return;
+        if (!itemElement || !activeSlotElement) return;
+    
+        const itemId = itemElement.dataset.itemId;
+        const isMobile = window.innerWidth <= 768;
+    
+        const selectLogic = () => {
+            if (activeSlotElement.dataset.loadout) {
+                selectItemForComparison(itemId);
+            } else {
+                selectItemForCrafting(itemId);
+            }
+        };
     
         if (isMobile) {
             const clickTimestamp = new Date().getTime();
@@ -961,12 +1027,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if ((clickTimestamp - lastClick) < 300) {
                 delete itemElement.dataset.lastClick;
-                selectItem(itemElement.dataset.itemId);
+                selectLogic();
             } else {
                 itemElement.dataset.lastClick = clickTimestamp;
             }
         } else {
-            selectItem(itemElement.dataset.itemId);
+            selectLogic();
         }
     });
 
@@ -1010,15 +1076,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleSlotClick(slotElement) {
-        const slotKey = slotElement.dataset.slot;
-        if (selectedLoadoutSlots[slotKey]) {
-            removeItemFromSlot(slotKey);
+        const loadoutIdentifier = slotElement.dataset.loadout;
+        if (loadoutIdentifier) {
+            const slotKey = slotElement.dataset.slot;
+            const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+            if (targetLoadout[slotKey]) {
+                removeItemFromComparisonSlot(slotElement);
+            } else {
+                openModalForSlot(slotElement);
+            }
         } else {
-            openModalForSlot(slotElement);
+            const slotKey = slotElement.dataset.slot;
+            if (selectedLoadoutSlots[slotKey]) {
+                removeItemFromSlot(slotKey);
+            } else {
+                openModalForSlot(slotElement);
+            }
         }
     }
 
-    loadoutSlots.forEach(slot => slot.addEventListener('click', () => handleSlotClick(slot)));
+    [...craftingLoadoutSlots, ...compareLoadoutASlots, ...compareLoadoutBSlots].forEach(slot => {
+        slot.addEventListener('click', () => handleSlotClick(slot));
+    });
     modalCloseBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     if (clearShoppingListBtn) {
@@ -1493,6 +1572,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             initializeEquipmentSelector();
+            initializeComparisonFilters();
             
             const preLoginPath = sessionStorage.getItem('preLoginToolPath');
             if (preLoginPath === window.location.pathname) {
@@ -1528,11 +1608,302 @@ document.addEventListener('DOMContentLoaded', function() {
                 adjustLayoutHeights();
             });
 
+            if (compareLoadoutADetailsToggle) {
+                compareLoadoutADetailsToggle.addEventListener('change', () => handleDetailsToggle('A'));
+            }
+            if (compareLoadoutBDetailsToggle) {
+                compareLoadoutBDetailsToggle.addEventListener('change', () => handleDetailsToggle('B'));
+            }
+
         } catch (error) {
             console.error("Could not initialize calculator:", error);
             if(equipmentSelectorGrid) {
                 equipmentSelectorGrid.innerHTML = `<p style="color: var(--text-secondary); grid-column: 1 / -1; text-align: center;">Error: Could not load equipment data.</p>`;
             }
+        }
+    }
+
+    function selectItemForComparison(itemId) {
+        const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+        if (!itemData || !activeSlotElement) return;
+        
+        const slotElement = activeSlotElement;
+        const slotKey = slotElement.dataset.slot;
+        const loadoutIdentifier = slotElement.dataset.loadout;
+        const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+    
+        targetLoadout[slotKey] = itemId;
+        slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
+        
+        hideTooltip();
+        closeModal();
+        updateComparisonStats();
+        handleDetailsToggle(loadoutIdentifier);
+        saveCalculatorState();
+    }
+    
+    function removeItemFromComparisonSlot(slotElement) {
+        const slotKey = slotElement.dataset.slot;
+        const loadoutIdentifier = slotElement.dataset.loadout;
+        const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+    
+        targetLoadout[slotKey] = null;
+        slotElement.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${slotKey} Slot">`;
+        updateComparisonStats();
+        handleDetailsToggle(loadoutIdentifier);
+        saveCalculatorState();
+    }
+    
+    function calculateLoadoutStats(loadout) {
+        const totalStats = {};
+        const specialStats = new Set();
+        const equippedPieceIds = Object.values(loadout).filter(id => id !== null);
+    
+        equippedPieceIds.forEach(itemId => {
+            const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+            if (!itemData) return;
+            if (itemData.stats) {
+                for (const stat in itemData.stats) {
+                    totalStats[stat] = (totalStats[stat] || 0) + itemData.stats[stat];
+                }
+            }
+            if (itemData.special_stats) {
+                itemData.special_stats.forEach(stat => specialStats.add(stat));
+            }
+        });
+        
+        EQUIPMENT_SET_DATA.forEach(set => {
+            const equippedCount = set.pieces.filter(pieceId => equippedPieceIds.includes(pieceId)).length;
+            let highestBonus = null;
+            set.bonuses.forEach(bonus => {
+                if (equippedCount >= bonus.count) highestBonus = bonus;
+            });
+            if (highestBonus) {
+                const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
+                const statMatch = highestBonus.description.match(/Troop (Attack|Defense|Health|Defence)[\s\+]+([\d\.]+)%/i);
+                if (statMatch) {
+                    const statType = statMatch[1].toLowerCase().replace('defence', 'defense');
+                    const statValue = parseFloat(statMatch[2]);
+                    troopTypes.forEach(troop => {
+                        totalStats[`${troop}_${statType}`] = (totalStats[`${troop}_${statType}`] || 0) + statValue;
+                    });
+                } else {
+                    specialStats.add(highestBonus.description);
+                }
+            }
+        });
+        
+        ['infantry', 'cavalry', 'archer', 'siege'].forEach(troop => {
+            ['attack', 'defense', 'health', 'march_speed'].forEach(stat => {
+                const universalValue = totalStats[`troop_${stat}`] || 0;
+                if (universalValue > 0) {
+                    totalStats[`${troop}_${stat}`] = (totalStats[`${troop}_${stat}`] || 0) + universalValue;
+                }
+            });
+        });
+        
+        return { stats: totalStats, special: Array.from(specialStats) };
+    }
+    
+    function updateComparisonStats() {
+        if(!comparisonStatsContainer) return;
+        const statsA = calculateLoadoutStats(compareLoadoutA);
+        const statsB = calculateLoadoutStats(compareLoadoutB);
+        
+        const allStatKeys = [...new Set([...Object.keys(statsA.stats), ...Object.keys(statsB.stats)])];
+        const allSpecialKeys = [...new Set([...statsA.special, ...statsB.special])];
+    
+        if (allStatKeys.length === 0 && allSpecialKeys.length === 0) {
+            comparisonStatsContainer.innerHTML = '<p class="no-items-placeholder">Select equipment in both loadouts to see a comparison.</p>';
+            return;
+        }
+    
+        let html = '<div class="comparison-grid">';
+        html += '<div class="comparison-header">Stats</div><div class="comparison-header">Loadout A</div><div class="comparison-header">Loadout B</div><div class="comparison-header">Delta</div>';
+    
+        allStatKeys.sort().forEach(key => {
+            if (key.startsWith('troop_')) return;
+            const troopType = getTroopTypeFromStat(key);
+    
+            if (activeComparisonFilter !== 'all' && troopType !== activeComparisonFilter) {
+                return; 
+            }
+    
+            const valA = statsA.stats[key] || 0;
+            const valB = statsB.stats[key] || 0;
+            if(valA === 0 && valB === 0) return;
+    
+            const delta = valB - valA;
+            
+            let deltaHtml = '';
+            if (delta !== 0) {
+                const deltaClass = delta > 0 ? 'stat-increase' : 'stat-decrease';
+                const deltaIcon = delta > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                deltaHtml = `<span class="${deltaClass}"><i class="fas ${deltaIcon}"></i> <span class="delta-value-text">${delta.toFixed(1).replace('.0','')}%</span></span>`;
+            } else {
+                deltaHtml = `<span class="stat-no-change">-</span>`;
+            }
+            
+            const iconHtml = `<img src="${getImagePath(`${troopType}_icon_mini.webp`)}" alt="${troopType} icon" class="stat-icon-mini">`;
+    
+            html += `
+                <div class="comparison-stat-row ${troopType}">
+                    <div class="stat-name">${iconHtml}${formatStatName(key)}</div>
+                    <div class="stat-value">${valA.toFixed(1).replace('.0','')}%</div>
+                    <div class="stat-value">${valB.toFixed(1).replace('.0','')}%</div>
+                    <div class="delta-value">${deltaHtml}</div>
+                </div>
+            `;
+        });
+        
+        if(allSpecialKeys.length > 0) {
+            html += `<div class="comparison-special-divider">Extra Bonuses</div>`;
+            allSpecialKeys.forEach(key => {
+                const inA = statsA.special.includes(key);
+                const inB = statsB.special.includes(key);
+                if (!inA && !inB) return;
+                html += `<div class="comparison-special-row">
+                    <div class="special-stat-name">${key}</div>
+                    <div class="special-stat-value">${inA ? `<i class="fas fa-check"></i>` : ''}</div>
+                    <div class="special-stat-value">${inB ? `<i class="fas fa-check"></i>` : ''}</div>
+                    <div></div>
+                </div>`;
+            });
+        }
+    
+        html += '</div>';
+        comparisonStatsContainer.innerHTML = html;
+    }
+
+    function initializeComparisonFilters() {
+        if (!comparisonFilterPanel || !comparisonFilterToggleBtn) return;
+    
+        const filterTypes = ['all', 'infantry', 'cavalry', 'archer', 'siege'];
+        let filterHtml = '<div class="filter-options">';
+        filterTypes.forEach(type => {
+            const isActive = type === 'all' ? 'active' : '';
+            const troopClass = type !== 'all' ? `stat-${type}` : '';
+            let iconHtml = '';
+            if (type !== 'all') {
+                const iconPath = getImagePath(`${type}_icon_mini.webp`);
+                iconHtml = `<img src="${iconPath}" alt="${type}" class="filter-icon-mini">`;
+            }
+            filterHtml += `<button class="filter-option-btn ${isActive} ${troopClass}" data-filter-type="${type}">${iconHtml}<span>${formatStatName(type)}</span></button>`;
+        });
+        filterHtml += '</div>';
+        comparisonFilterPanel.innerHTML = filterHtml;
+    
+        comparisonFilterToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            comparisonFilterPanel.classList.toggle('visible');
+        });
+    
+        comparisonFilterPanel.addEventListener('click', (e) => {
+            const target = e.target.closest('.filter-option-btn');
+            if (target) {
+                activeComparisonFilter = target.dataset.filterType;
+                
+                comparisonFilterPanel.querySelectorAll('.filter-option-btn').forEach(btn => btn.classList.remove('active'));
+                target.classList.add('active');
+                
+                updateComparisonStats();
+                comparisonFilterPanel.classList.remove('visible');
+            }
+        });
+    
+        document.addEventListener('click', (e) => {
+            if (!comparisonFilterPanel.contains(e.target) && !comparisonFilterToggleBtn.contains(e.target)) {
+                comparisonFilterPanel.classList.remove('visible');
+            }
+        });
+    }
+
+    function handleDetailsToggle(loadoutIdentifier) {
+        const loadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+        const detailsList = loadoutIdentifier === 'A' ? compareLoadoutADetailsList : compareLoadoutBDetailsList;
+        const toggle = loadoutIdentifier === 'A' ? compareLoadoutADetailsToggle : compareLoadoutBDetailsToggle;
+        const grid = loadoutIdentifier === 'A' ? document.getElementById('compare-a-loadout-grid') : document.getElementById('compare-b-loadout-grid');
+
+        if (toggle.checked) {
+            populateDetailsList(loadout, detailsList);
+            grid.style.opacity = '0';
+            grid.style.pointerEvents = 'none';
+            detailsList.style.opacity = '1';
+            detailsList.style.pointerEvents = 'auto';
+        } else {
+            grid.style.opacity = '1';
+            grid.style.pointerEvents = 'auto';
+            detailsList.style.opacity = '0';
+            detailsList.style.pointerEvents = 'none';
+        }
+    }
+
+    function populateDetailsList(loadout, detailsListElement) {
+        detailsListElement.innerHTML = '';
+        const equippedItems = Object.values(loadout).filter(id => id !== null);
+
+        if (equippedItems.length === 0) {
+            detailsListElement.innerHTML = '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary); padding: var(--spacing-8) 0;">No items in this loadout.</p>';
+            adjustDetailsListLayout(detailsListElement);
+            return;
+        }
+
+        equippedItems.forEach(itemId => {
+            const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+            if (itemData) {
+                let statsHtml = '<div class="details-item-stats">';
+                if (itemData.stats) {
+                    Object.entries(itemData.stats).forEach(([statKey, statValue]) => {
+                        if (statValue > 0) {
+                            const troopType = getTroopTypeFromStat(statKey);
+                            statsHtml += `<div class="stat-pair ${troopType}"><span>${formatStatName(statKey)}</span> <span>+${statValue}%</span></div>`;
+                        }
+                    });
+                }
+                if (itemData.special_stats && itemData.special_stats.length > 0) {
+                    itemData.special_stats.forEach(stat => {
+                        statsHtml += `<div class="special-stat">${stat}</div>`;
+                    });
+                }
+                statsHtml += '</div>';
+
+                const itemEl = document.createElement('div');
+                itemEl.className = 'details-item';
+                itemEl.innerHTML = `
+                    <img src="${getImagePath(itemData.image)}" alt="${itemData.name}" class="details-item-icon">
+                    <div class="details-item-details">
+                        <span class="item-name ${itemData.quality}">${itemData.name}</span>
+                        ${statsHtml}
+                    </div>`;
+                detailsListElement.appendChild(itemEl);
+            }
+        });
+        
+        adjustDetailsListLayout(detailsListElement);
+    }
+
+    function adjustDetailsListLayout(detailsListElement) {
+        const container = detailsListElement.parentElement;
+        if (!container) return;
+    
+        const itemCount = detailsListElement.children.length;
+        if (itemCount === 0 || (detailsListElement.children[0] && detailsListElement.children[0].classList.contains('no-items-placeholder'))) {
+            detailsListElement.style.fontSize = '';
+            return;
+        }
+    
+        const containerHeight = container.clientHeight;
+        
+        detailsListElement.style.fontSize = '1rem'; 
+        
+        const totalContentHeight = detailsListElement.scrollHeight;
+        
+        if (totalContentHeight > containerHeight) {
+            const scaleFactor = containerHeight / totalContentHeight;
+            const newFontSize = Math.max(1 * scaleFactor * 0.95, 0.65);
+            detailsListElement.style.fontSize = `${newFontSize}rem`;
+        } else {
+            detailsListElement.style.fontSize = '1rem';
         }
     }
 

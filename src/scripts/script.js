@@ -93,7 +93,7 @@ document.querySelectorAll('.feature-card, .stat-item, .faq-item, .feature-showca
 });
 
 
-document.querySelectorAll('.btn-primary:not(#copy-btn):not(#copy-image-btn), .btn-secondary:not(#filter-toggle-btn):not(#download-image-btn)').forEach(button => {
+document.querySelectorAll('.btn-primary:not(#copy-btn):not(#copy-image-btn), .btn-secondary:not(#filter-toggle-btn):not(#download-image-btn):not(#comparison-filter-toggle-btn)').forEach(button => {
     button.addEventListener('click', function(e) {
         if (this.getAttribute('href') && this.getAttribute('href').startsWith('http')) {
             return;
@@ -116,8 +116,7 @@ document.addEventListener('visibilitychange', () => {
     });
 });
 
-const isToolsPage = window.location.pathname.startsWith('/tools');
-if (isToolsPage && window.auth) {
+if (window.auth) {
     window.auth.init('#auth-container');
 }
 
