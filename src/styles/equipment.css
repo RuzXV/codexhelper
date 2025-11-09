@@ -869,6 +869,20 @@ input:checked + .slider:before { transform: translateX(20px); }
     .comparison-stat-row .delta-value {
         white-space: nowrap;
     }
+    .comparison-header {
+        white-space: nowrap;
+    }
+    
+    .comparison-stat-row {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-template-columns: subgrid;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .comparison-stat-row > div {
+        border-bottom: none;
+    }
 }
 
 @media (max-width: 480px) {
