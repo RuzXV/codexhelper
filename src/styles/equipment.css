@@ -856,6 +856,10 @@ input:checked + .slider:before { transform: translateX(20px); }
         min-height: 450px;
     }
 
+    .compare-layout-grid .loadout-view-wrapper {
+        width: 100%;
+    }
+
     .compare-layout-grid .loadout-grid {
         transform: scale(0.9);
         transform-origin: top center;
