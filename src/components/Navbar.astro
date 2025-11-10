@@ -5,6 +5,7 @@ import homeIcon from '../assets/images/navi/navi_home.webp';
 import faqIcon from '../assets/images/navi/navi_question.webp';
 import toolsIcon from '../assets/images/navi/navi_tools.webp';
 import patreonLogo from '../assets/images/navi/patreon.webp';
+import subscribedIcon from '../assets/images/navi/subscribed.webp';
 
 const currentPath = Astro.url.pathname;
 const isToolsPage = currentPath.startsWith('/tools');
@@ -54,12 +55,12 @@ const isToolsPage = currentPath.startsWith('/tools');
     )}
 </nav>
 
-<script>
+<script define:vars={{ subscribedIconPath: subscribedIcon.src }}>
     document.addEventListener('auth:loggedIn', (event) => {
-        const user = (event as CustomEvent).detail.user;
+        const user = event.detail.user;
         
         if (user && user.is_active_patron) {
-            const patreonButton = document.querySelector('.patreon-btn') as HTMLElement;
+            const patreonButton = document.querySelector('.patreon-btn');
             if (patreonButton) {
                 patreonButton.removeAttribute('href');
                 patreonButton.style.pointerEvents = 'none';
@@ -73,11 +74,13 @@ const isToolsPage = currentPath.startsWith('/tools');
                     span.textContent = 'Subscribed!';
                 }
                 
-                const image = patreonButton.querySelector('img');
-                if (image) {
-                    const checkIcon = document.createElement('i');
-                    checkIcon.className = 'fas fa-check-circle';
-                    patreonButton.replaceChild(checkIcon, image);
+                const oldIcon = patreonButton.querySelector('img'); 
+                if (oldIcon) {
+                    const newIcon = document.createElement('img');
+                    newIcon.src = subscribedIconPath;
+                    newIcon.alt = "Subscribed";
+                    newIcon.className = 'subscribed-icon'; 
+                    patreonButton.replaceChild(newIcon, oldIcon);
                 }
             }
         }
@@ -94,9 +97,12 @@ const isToolsPage = currentPath.startsWith('/tools');
         border-radius: var(--radius-md);
         font-weight: 500;
         font-size: var(--font-size-sm);
+        
         background: rgba(87, 242, 135, 0.25);
-        border: 1px solid rgba(87, 242, 135, 0.6);
-        color: #57f287;
+        
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        color: var(--text-primary);
+
         height: 46px;
     }
 
@@ -105,8 +111,8 @@ const isToolsPage = currentPath.startsWith('/tools');
         box-shadow: none;
         background: rgba(87, 242, 135, 0.25);
     }
-
-    .subscribed-btn .fa-check-circle {
-        font-size: 1.2em;
+    .subscribed-btn .subscribed-icon {
+        height: 28px;
+        width: auto;
     }
 </style>
