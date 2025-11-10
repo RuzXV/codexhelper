@@ -83,14 +83,14 @@ app.get('/api/users/@me', authMiddleware, async (c) => {
     if (!userResponse.ok) {
         return c.json({ error: 'Failed to fetch fresh user data from Discord.' }, 500);
     }
-    const userData = await userResponse.json();
+    const userData = await userResponse.json() as { id: string; [key: string]: any };
 
-    const activePatrons: number[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
+    const activePatrons: string[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
     
-    const isActivePatron = activePatrons ? activePatrons.includes(Number(user.id)) : false;
+    const isActivePatron = activePatrons ? activePatrons.includes(user.id) : false;
 
     const enrichedUserData = {
-        ...(typeof userData === 'object' && userData !== null ? userData : {}),
+        ...userData,
         is_active_patron: isActivePatron
     };
 
