@@ -83,7 +83,18 @@ app.get('/api/users/@me', authMiddleware, async (c) => {
     if (!userResponse.ok) {
         return c.json({ error: 'Failed to fetch fresh user data from Discord.' }, 500);
     }
-    return c.json(await userResponse.json());
+    const userData = await userResponse.json();
+
+    const activePatrons: number[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
+    
+    const isActivePatron = activePatrons ? activePatrons.includes(Number(user.id)) : false;
+
+    const enrichedUserData = {
+        ...(typeof userData === 'object' && userData !== null ? userData : {}),
+        is_active_patron: isActivePatron
+    };
+
+    return c.json(enrichedUserData);
 });
 
 app.get('/api/templates', authMiddleware, async (c) => {
@@ -162,9 +173,21 @@ app.post('/api/internal/update-cache', async (c) => {
     if (secret !== c.env.BOT_SECRET_KEY) {
         return c.json({ error: 'Unauthorized' }, 401);
     }
-    const { top_servers, bot_stats } = await c.req.json();
-    await c.env.API_CACHE.put('top_servers', JSON.stringify(top_servers));
-    await c.env.API_CACHE.put('bot_stats', JSON.stringify(bot_stats));
+    const { top_servers, bot_stats, active_patrons } = await c.req.json();
+    
+    const promises = [];
+    if (top_servers) {
+        promises.push(c.env.API_CACHE.put('top_servers', JSON.stringify(top_servers)));
+    }
+    if (bot_stats) {
+        promises.push(c.env.API_CACHE.put('bot_stats', JSON.stringify(bot_stats)));
+    }
+    if (active_patrons) {
+        promises.push(c.env.API_CACHE.put('active_patrons', JSON.stringify(active_patrons)));
+    }
+
+    await Promise.all(promises);
+
     return c.json({ success: true });
 });
 

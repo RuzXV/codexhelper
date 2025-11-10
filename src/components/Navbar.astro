@@ -53,3 +53,60 @@ const isToolsPage = currentPath.startsWith('/tools');
         </div>
     )}
 </nav>
+
+<script>
+    document.addEventListener('auth:loggedIn', (event) => {
+        const user = (event as CustomEvent).detail.user;
+        
+        if (user && user.is_active_patron) {
+            const patreonButton = document.querySelector('.patreon-btn') as HTMLElement;
+            if (patreonButton) {
+                patreonButton.removeAttribute('href');
+                patreonButton.style.pointerEvents = 'none';
+                patreonButton.style.cursor = 'default';
+                
+                patreonButton.classList.remove('patreon-btn');
+                patreonButton.classList.add('subscribed-btn');
+                
+                const span = patreonButton.querySelector('span');
+                if (span) {
+                    span.textContent = 'Subscribed!';
+                }
+                
+                const image = patreonButton.querySelector('img');
+                if (image) {
+                    const checkIcon = document.createElement('i');
+                    checkIcon.className = 'fas fa-check-circle';
+                    patreonButton.replaceChild(checkIcon, image);
+                }
+            }
+        }
+    });
+</script>
+
+<style is:global>
+    .subscribed-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-2);
+        padding: var(--spacing-1) var(--spacing-3);
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        font-size: var(--font-size-sm);
+        background: rgba(87, 242, 135, 0.25);
+        border: 1px solid rgba(87, 242, 135, 0.6);
+        color: #57f287;
+        height: 46px;
+    }
+
+    .subscribed-btn:hover {
+        transform: none;
+        box-shadow: none;
+        background: rgba(87, 242, 135, 0.25);
+    }
+
+    .subscribed-btn .fa-check-circle {
+        font-size: 1.2em;
+    }
+</style>

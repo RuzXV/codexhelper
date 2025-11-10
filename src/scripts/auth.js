@@ -2,7 +2,9 @@
     const API_BASE_URL = '';
     const WEBSITE_APP_ID = '1434105087722258573';
     const REDIRECT_URI = `${window.location.origin}/api/auth/callback`;
-    
+    const CACHE_KEY = 'codex-auth-user';
+    const CACHE_DURATION_MS = 5 * 60 * 1000;
+
     let currentUser = null;
     let authContainerSelector = null;
 
@@ -21,7 +23,7 @@
     }
 
     function renderLoggedInState(container, user) {
-        const avatarUrl = user.avatar 
+        const avatarUrl = user.avatar
             ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
             : `https://cdn.discordapp.com/embed/avatars/${parseInt(user.discriminator) % 5}.png`;
 
@@ -35,6 +37,20 @@
             </div>
         `;
         container.querySelector('.logout-btn').addEventListener('click', logout);
+        
+        document.dispatchEvent(new CustomEvent('auth:loggedIn', { detail: { user } }));
+    }
+
+    function cacheUser(user) {
+        const cacheData = {
+            timestamp: Date.now(),
+            user: user
+        };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+    }
+    
+    function clearUserCache() {
+        localStorage.removeItem(CACHE_KEY);
     }
 
     async function refreshAuthState() {
@@ -45,10 +61,12 @@
         try {
             const user = await fetchWithAuth('/api/users/@me');
             currentUser = user;
+            cacheUser(user);
             renderLoggedInState(container, user);
         } catch (error) {
             console.log("No active session found or session is invalid during refresh.");
             currentUser = null;
+            clearUserCache();
             renderLoggedOutState(container);
         }
     }
@@ -83,6 +101,7 @@
             console.error("Logout request failed:", error);
         } finally {
             currentUser = null;
+            clearUserCache();
             window.location.reload();
         }
     }
@@ -101,6 +120,7 @@
             if (response.status === 401) {
                 if (currentUser) {
                     currentUser = null;
+                    clearUserCache();
                     if (!document.body.dataset.sessionExpiredAlertShown) {
                         document.body.dataset.sessionExpiredAlertShown = "true";
                         window.showAlert("Your session has expired. Please log in again.", "Session Expired");
@@ -116,7 +136,22 @@
 
     async function initAuth(containerSelector) {
         authContainerSelector = containerSelector;
-        
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        const cachedItem = localStorage.getItem(CACHE_KEY);
+        if (cachedItem) {
+            const { timestamp, user } = JSON.parse(cachedItem);
+            if (Date.now() - timestamp < CACHE_DURATION_MS) {
+                currentUser = user;
+                renderLoggedInState(container, user);
+                refreshAuthState(); 
+                return;
+            } else {
+                clearUserCache();
+            }
+        }
+
         const preLoginToolPath = sessionStorage.getItem('preLoginToolPath');
         if (preLoginToolPath) {
             if (window.location.pathname !== preLoginToolPath) {
@@ -134,16 +169,15 @@
             }
         }
 
-        const container = document.querySelector(containerSelector);
-        if (!container) return;
-
         try {
             const user = await fetchWithAuth('/api/users/@me');
             currentUser = user;
+            cacheUser(user);
             renderLoggedInState(container, user);
         } catch (error) {
             console.log("No active session found or session is invalid.");
             currentUser = null;
+            clearUserCache();
             renderLoggedOutState(container);
         }
     }
