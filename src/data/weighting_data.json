@@ -25,7 +25,7 @@
     },
     "commanderPairings": {
       "cavalry": [
-          "Alexander Nevsky / Joan of Arc Prime", "Arthur Pendragon / Achilles", "Arthur Pendragon / Hector", "Arthur Pendragon / Philip II", "Arthur Pendragon / William I", "Attila / Philip II", "Huo Qubing / Arthur Pendragon", "Huo Qubing / Belisarius Prime", "Huo Qubing / Joan of Arc Prime", "Joan of Arc Prime / Arthur Pendragon"
+          "Alexander Nevsky / Joan of Arc Prime", "Arthur Pendragon / Achilles", "Arthur Pendragon / Hector", "Arthur Pendragon / Philip II", "Arthur Pendragon / William I", "Attila / Philip II", "Huo Qubing / Arthur Pendragon", "Huo Qubing / Belisarius Prime", "Huo Qubing / Joan of Arc Prime", "Joan of Arc Prime / Arthur Pendragon", "Arthur Pendragon / Gang Gamchan", "Achilles / Gang Gamchan"
       ],
       "infantry": ["Bai Qi / Liu Che", "Bai Qi / William Wallace", "Liu Che / Alexander the Great", "Liu Che / Philip II", "Ragnar Lodbrok Prime / Scipio Africanus Prime"],
       "archer": [
@@ -83,6 +83,16 @@
           "Cavalry Set 1": { "allDamage": 1, "health": 1.55, "defense": 1.75, "attack": 2.1 },
           "Cavalry Set 2": { "allDamage": 1, "health": 1.6, "defense": 1.65, "attack": 2.25 },
           "Cavalry Set 3": { "allDamage": 1, "health": 1.6, "defense": 1.7, "attack": 2.35 }
+      },
+      "Arthur Pendragon / Gang Gamchan": {
+        "Cavalry Set 1": { "allDamage": 1, "health": 2.12, "defense": 2.4, "attack": 2.18 },
+        "Cavalry Set 2": { "allDamage": 1, "health": 2.13, "defense": 2.28, "attack": 2.35 },
+        "Cavalry Set 3": { "allDamage": 1, "health": 2.13, "defense": 2.31, "attack": 2.39 }
+      },
+      "Achilles / Gang Gamchan": {
+        "Cavalry Set 1": { "allDamage": 1, "health": 2.04, "defense": 2.4, "attack": 2.26 },
+        "Cavalry Set 2": { "allDamage": 1, "health": 2.05, "defense": 2.28, "attack": 2.43 },
+        "Cavalry Set 3": { "allDamage": 1, "health": 2.05, "defense": 2.31, "attack": 2.47 }
       },
       "Bai Qi / Liu Che": {
           "Infantry Set 1": { "allDamage": 1, "health": 2.2, "defense": 2.75, "attack": 2.7 },
