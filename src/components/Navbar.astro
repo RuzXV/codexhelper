@@ -32,9 +32,9 @@ const isToolsPage = currentPath.startsWith('/tools');
                 <span>Tools</span>
             </a>
 
-            {isToolsPage ? (
-                <div id="auth-container"></div>
-            ) : (
+            <div id="auth-container" style={!isToolsPage ? 'display: none;' : ''}></div>
+            
+            {!isToolsPage && (
                 <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="patreon-btn">
                     <Image src={patreonLogo} alt="Patreon Logo" class="patreon-logo" width="90" height="90" loading="eager" quality={100}/>
                     <span>Subscribe</span>
