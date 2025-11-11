@@ -56,6 +56,14 @@ const authMiddleware = async (c: Context, next: Next) => {
     }
 };
 
+const botAuthMiddleware = async (c: Context, next: Next) => {
+    const secret = c.req.header('X-Internal-Secret');
+    if (secret !== c.env.BOT_SECRET_KEY) {
+        return c.json({ error: 'Unauthorized: Invalid secret key' }, 401);
+    }
+    await next();
+};
+
 app.get('/health', (c) => c.json({ status: 'ok' }));
 
 app.get('/api/stats', async (c) => {
@@ -131,6 +139,47 @@ app.put('/api/templates/:id/load', authMiddleware, async (c) => {
     await c.env.DB.prepare(
         `UPDATE user_templates SET last_loaded = ? WHERE template_id = ? AND user_id = ?`
     ).bind(Date.now() / 1000, id, user.id).run();
+    return c.json({ status: 'success' });
+});
+
+app.get('/api/bot/templates/list/:userId', botAuthMiddleware, async (c) => {
+    const { userId } = c.req.param();
+    const { results } = await c.env.DB.prepare(
+      'SELECT template_name, date_saved, last_loaded FROM user_templates WHERE user_id = ? ORDER BY date_saved DESC'
+    ).bind(userId).all();
+    return c.json(results || []);
+});
+
+app.get('/api/bot/templates/autocomplete/:userId', botAuthMiddleware, async (c) => {
+    const { userId } = c.req.param();
+    const current = c.req.query('current') || '';
+    const { results } = await c.env.DB.prepare(
+        "SELECT template_id, template_name, date_saved FROM user_templates WHERE user_id = ? AND template_name LIKE ? ORDER BY date_saved DESC LIMIT 25"
+    ).bind(userId, `%${current}%`).all();
+    return c.json(results || []);
+});
+
+app.get('/api/bot/templates/load/:templateId/:userId', botAuthMiddleware, async (c) => {
+    const { templateId, userId } = c.req.param();
+    const result = await c.env.DB.prepare(
+      'SELECT * FROM user_templates WHERE template_id = ? AND user_id = ?'
+    ).bind(templateId, userId).first();
+    return result ? c.json(result) : c.json({ error: 'Template not found' }, 404);
+});
+
+app.delete('/api/bot/templates/delete/:templateId/:userId', botAuthMiddleware, async (c) => {
+    const { templateId, userId } = c.req.param();
+    const { success } = await c.env.DB.prepare(
+      'DELETE FROM user_templates WHERE template_id = ? AND user_id = ?'
+    ).bind(templateId, userId).run();
+    return success ? c.json({ status: 'success' }) : c.json({ error: 'Deletion failed or template not found' }, 404);
+});
+
+app.post('/api/bot/templates/update-loaded/:templateId', botAuthMiddleware, async (c) => {
+    const { templateId } = c.req.param();
+    await c.env.DB.prepare(
+      'UPDATE user_templates SET last_loaded = ? WHERE template_id = ?'
+    ).bind(Date.now() / 1000, templateId).run();
     return c.json({ status: 'success' });
 });
 
