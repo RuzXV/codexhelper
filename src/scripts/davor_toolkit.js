@@ -1,5 +1,3 @@
-// --- START OF FILE davor_toolkit.js ---
-
 document.addEventListener('DOMContentLoaded', () => {
     if (!window.weightingData || !window.scorePairings) {
         console.error("Critical data (weightingData or scorePairings) not found on window object. Aborting script initialization.");
