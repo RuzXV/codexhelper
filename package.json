@@ -1,20 +1,19 @@
 {
-  "name": "codex-helper",
+  "name": "codex-helper-astro",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/preact": "^3.5.0",
-    "@nanostores/preact": "^0.5.1",
-    "astro": "^4.12.2",
-    "dom-to-image-more": "^3.3.0",
-    "nanostores": "^0.10.3",
-    "preact": "^10.22.1"
+    "astro": "^5.15.3",
+    "hono": "^4.2.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240419.0",
+    "wrangler": "^3.51.0"  
   }
 }
