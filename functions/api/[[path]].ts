@@ -243,6 +243,7 @@ app.post('/api/internal/update-cache', async (c) => {
 app.get('/api/auth/callback', async (c) => {
     const code = c.req.query('code');
     if (!code) {
+        console.error("Auth callback error: Authorization code is missing.");
         return c.text('Authorization code is missing.', 400);
     }
 
@@ -261,7 +262,9 @@ app.get('/api/auth/callback', async (c) => {
     });
 
     if (!tokenResponse.ok) {
-        console.error("Failed to get token from Discord:", await tokenResponse.text());
+        const errorBody = await tokenResponse.text();
+        console.error("Failed to get token from Discord. Status:", tokenResponse.status);
+        console.error("Discord Response Body:", errorBody);
         return c.text('Failed to authenticate with Discord.', 500);
     }
 
@@ -274,7 +277,9 @@ app.get('/api/auth/callback', async (c) => {
     });
 
     if (!userResponse.ok) {
-        console.error("Failed to get user data from Discord:", await userResponse.text());
+        const errorBody = await userResponse.text();
+        console.error("Failed to get user data from Discord. Status:", userResponse.status);
+        console.error("Discord Response Body:", errorBody);
         return c.text('Failed to fetch user data from Discord.', 500);
     }
 
@@ -283,7 +288,7 @@ app.get('/api/auth/callback', async (c) => {
     const userId = userData.id;
 
     const sessionToken = crypto.randomUUID().replace(/-/g, '');
-    const SESSION_DURATION_SECONDS = 86400 * 30; // 30 days
+    const SESSION_DURATION_SECONDS = 86400 * 90;
     const expiryDate = (Date.now() / 1000) + SESSION_DURATION_SECONDS;
 
     const encryptedAccessToken = await encryptFernetToken(c.env.DB_ENCRYPTION_KEY, accessToken);
