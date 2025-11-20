@@ -34,8 +34,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const compareLoadoutASlots = document.querySelectorAll('#compare-a-loadout-grid .loadout-slot');
     const compareLoadoutBSlots = document.querySelectorAll('#compare-b-loadout-grid .loadout-slot');
     const comparisonStatsContainer = document.getElementById('comparison-stats-container');
-    let compareLoadoutA = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
-    let compareLoadoutB = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
+    const awakenModeBtn = document.getElementById('awaken-mode-btn');
+    const comparisonFilterToggleBtn = document.getElementById('comparison-filter-toggle-btn');
+    const comparisonFilterPanel = document.getElementById('comparison-filter-panel');
+    const refineModeBtn = document.getElementById('refine-mode-btn');
+    const kvkSeasonSelector = document.getElementById('kvk-season-selector');
+    const awakenLevelModal = document.getElementById('awaken-level-modal');
+    const awakenItemName = document.getElementById('awaken-item-name');
+    const loadoutViewSelector = document.getElementById('loadout-view-selector');
+    const extraBonusesToggle = document.getElementById('extra-bonuses-toggle');
+    let currentComparisonMode = 'none';
+    let currentKvkSeason = 'soc';
+    let activeComparisonSlot = null;
+
+    let compareLoadoutA = {};
+    let compareLoadoutB = {};
 
     const calculateBtn = document.getElementById('calculate-btn');
     const allInputs = document.querySelectorAll('.material-input');
@@ -76,9 +89,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const CHEST_MATERIAL = 'chest';
     const RARITIES = ['common', 'advanced', 'elite', 'epic', 'legendary'];
     const RARITIES_ORDERED = ['Normal', 'Advanced', 'Elite', 'Epic', 'Legendary'];
+    const MARCH_BASE_CAPACITY = 200000;
 
     const EQUIPMENT_DATA = window.equipmentData;
     const EQUIPMENT_SET_DATA = window.equipmentSetData;
+    const ICONIC_DATA = window.iconicData;
 
     const SLOT_PLACEHOLDERS = {
         helmet: getImagePath('helmet_slot.webp'),
@@ -90,13 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
         accessory1: getImagePath('accessory1_slot.webp'),
         accessory2: getImagePath('accessory2_slot.webp')
     };
-
-    const comparisonFilterToggleBtn = document.getElementById('comparison-filter-toggle-btn');
-    const comparisonFilterPanel = document.getElementById('comparison-filter-panel');
-    let activeComparisonFilter = 'all';
-
-    const compareLoadoutADetailsToggle = document.getElementById('details-toggle-a');
-    const compareLoadoutBDetailsToggle = document.getElementById('details-toggle-b');
+    
     const compareLoadoutADetailsList = document.getElementById('details-list-a');
     const compareLoadoutBDetailsList = document.getElementById('details-list-b');
 
@@ -105,9 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let craftingList = {};
     let selectedLoadoutSlots = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
     let activeSlotElement = null;
-
-    let currentVirtualScrollItems = [];
-    let virtualScrollListener = null;
     
     window.getPreLoginState = function() {
         const state = {};
@@ -138,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
         state.selectedLoadoutSlots = selectedLoadoutSlots;
         state.compareLoadoutA = compareLoadoutA;
         state.compareLoadoutB = compareLoadoutB;
+        state.kvkSeason = currentKvkSeason;
     
         window.saveUserData(MATERIALS_CACHE_KEY, state);
     }, 500);
@@ -171,13 +178,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         updateUIDisplays();
-
+    
         if(savedState.compareLoadoutA) {
             compareLoadoutA = savedState.compareLoadoutA;
-            Object.keys(compareLoadoutA).forEach(slotKey => {
-                const itemId = compareLoadoutA[slotKey];
-                if(itemId) {
-                    const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+             Object.keys(compareLoadoutA).forEach(slotKey => {
+                const item = compareLoadoutA[slotKey];
+                if(item && item.id) {
+                    const itemData = EQUIPMENT_DATA.find(i => i.id === item.id);
                     const slotElement = document.getElementById(`slot-a-${slotKey}`);
                     if(itemData && slotElement) slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
                 }
@@ -186,15 +193,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if(savedState.compareLoadoutB) {
             compareLoadoutB = savedState.compareLoadoutB;
              Object.keys(compareLoadoutB).forEach(slotKey => {
-                const itemId = compareLoadoutB[slotKey];
-                if(itemId) {
-                    const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+                const item = compareLoadoutB[slotKey];
+                if(item && item.id) {
+                    const itemData = EQUIPMENT_DATA.find(i => i.id === item.id);
                     const slotElement = document.getElementById(`slot-b-${slotKey}`);
                     if(itemData && slotElement) slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
                 }
             });
         }
-        updateComparisonStats();
+
+        if (savedState.kvkSeason) {
+            currentKvkSeason = savedState.kvkSeason;
+            const seasonRadio = document.querySelector(`#kvk-season-selector input[value="${currentKvkSeason}"]`);
+            if (seasonRadio) seasonRadio.checked = true;
+        }
+
+        updateComparisonDisplays();
     }
 
     const getMaterialIconPath = (mat, rarity = 'legendary') => {
@@ -208,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     const formatStatName = (key) => {
-        return key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     };
     
     const getTroopTypeFromStat = (statKey) => {
@@ -468,11 +482,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return slotMatch && nameMatch;
         });
     
-        if (virtualScrollListener) {
-            modalGrid.removeEventListener('scroll', virtualScrollListener);
-            virtualScrollListener = null;
-        }
-    
         const html = filteredItems.map(item => `
             <div class="modal-item" data-item-id="${item.id}">
                 <img src="${getImagePath(item.image)}" alt="${item.name}" loading="lazy" width="48" height="48">
@@ -516,13 +525,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeModal() {
         modal.style.display = 'none';
         activeSlotElement = null;
-        
-        if (virtualScrollListener) {
-            modalGrid.removeEventListener('scroll', virtualScrollListener);
-            virtualScrollListener = null;
-        }
-        modalGrid.innerHTML = '';
-        currentVirtualScrollItems = [];
     }
 
     function selectItemForCrafting(itemId) {
@@ -595,17 +597,24 @@ document.addEventListener('DOMContentLoaded', function() {
         craftingList = {};
         selectedLoadoutSlots = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
 
-        loadoutSlots.forEach(slot => {
-            const slotKey = slot.dataset.slot;
-            if (SLOT_PLACEHOLDERS[slotKey]) {
-                slot.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${slotKey} Slot">`;
-            }
-        });
-        
         updateUIDisplays();
+        
+        try {
+            if (craftingLoadoutSlots && craftingLoadoutSlots.length > 0) {
+                craftingLoadoutSlots.forEach(slot => {
+                    const slotKey = slot.dataset.slot;
+                    if (slotKey && SLOT_PLACEHOLDERS[slotKey]) {
+                        slot.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${formatStatName(slotKey)} Slot">`;
+                    }
+                });
+            }
+        } catch (e) {
+            console.error("Error resetting loadout slots:", e);
+        }
+
         saveCalculatorState();
         
-        if (calculateBtn.style.display === 'none') {
+        if (calculateBtn && calculateBtn.style.display === 'none') {
             performCalculation();
         }
     }
@@ -686,32 +695,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         selectedItemsList.querySelectorAll('.remove-item-btn').forEach(btn => {
             btn.addEventListener('click', (e) => removeItem(e.currentTarget.dataset.itemId));
-        });
-    }
-
-    function adjustStatsFontSize(container) {
-        if (!container || container.dataset.isResizing === 'true') {
-            return;
-        }
-        container.dataset.isResizing = 'true';
-    
-        requestAnimationFrame(() => {
-            container.style.fontSize = ''; 
-            
-            requestAnimationFrame(() => {
-                if (container.scrollHeight > container.clientHeight) {
-                    let currentSize = parseFloat(window.getComputedStyle(container).fontSize);
-                    const minSize = 8;
-                    let iterations = 0;
-        
-                    while (container.scrollHeight > container.clientHeight && currentSize > minSize && iterations < 20) {
-                        currentSize -= 0.5; 
-                        container.style.fontSize = currentSize + 'px';
-                        iterations++;
-                    }
-                }
-                delete container.dataset.isResizing;
-            });
         });
     }
 
@@ -829,12 +812,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
         container.innerHTML = html;
+        window.fitTextToContainer(container); 
     }
     
     function updateUIDisplays(newItemId = null) {
         updateSelectedItemsDisplay(newItemId);
         calculateAndDisplayTotalStats();
-        adjustStatsFontSize(document.getElementById('total-stats-container'));
     }
     
     function getActiveFilters(panel) {
@@ -1076,21 +1059,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleSlotClick(slotElement) {
-        const loadoutIdentifier = slotElement.dataset.loadout;
-        if (loadoutIdentifier) {
-            const slotKey = slotElement.dataset.slot;
-            const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
-            if (targetLoadout[slotKey]) {
-                removeItemFromComparisonSlot(slotElement);
-            } else {
-                openModalForSlot(slotElement);
-            }
-        } else {
+        if (slotElement.closest('#crafting-calculator-view')) {
             const slotKey = slotElement.dataset.slot;
             if (selectedLoadoutSlots[slotKey]) {
                 removeItemFromSlot(slotKey);
             } else {
                 openModalForSlot(slotElement);
+            }
+        } else {
+            const loadoutIdentifier = slotElement.dataset.loadout;
+            const slotKey = slotElement.dataset.slot;
+            const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+            const item = targetLoadout[slotKey];
+
+            if (currentComparisonMode === 'refine') {
+                if (item) toggleRefine(slotElement);
+            } else if (currentComparisonMode === 'awaken') {
+                if (item) openAwakenMenu(slotElement);
+            } else {
+                if (item) {
+                    removeItemFromComparisonSlot(slotElement);
+                } else {
+                    openModalForSlot(slotElement);
+                }
             }
         }
     }
@@ -1098,21 +1089,13 @@ document.addEventListener('DOMContentLoaded', function() {
     [...craftingLoadoutSlots, ...compareLoadoutASlots, ...compareLoadoutBSlots].forEach(slot => {
         slot.addEventListener('click', () => handleSlotClick(slot));
     });
+
     modalCloseBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     if (clearShoppingListBtn) {
         clearShoppingListBtn.addEventListener('click', clearAllSelections);
     }
-
-    const debouncedModalSearch = debounce(() => {
-        if (activeSlotElement) {
-            const slotType = activeSlotElement.dataset.slot;
-            const itemSlotType = (slotType === 'accessory1' || slotType === 'accessory2') ? 'accessory' : slotType;
-            populateModalGrid(itemSlotType, modalSearch.value);
-        }
-    }, 250);
-
-
+    
     function triggerSuccessAnimation(element) {
         if (!element) return;
         element.classList.remove('result-success');
@@ -1124,52 +1107,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (selectorFilterPanel && !selectorFilterPanel.contains(e.target) && !selectorFilterToggleBtn.contains(e.target)) {
             selectorFilterPanel.classList.remove('visible');
         }
-    });
-
-    function adjustSelectorHeight() {
-        const chestIsland = document.getElementById('chest-island');
-        const selectorWrapper = document.getElementById('equipment-selector-wrapper');
-    
-        if (chestIsland && selectorWrapper && window.innerWidth > 1200) {
-            const chestBottom = chestIsland.getBoundingClientRect().bottom;
-            const selectorTop = selectorWrapper.getBoundingClientRect().top;
-            const availableHeight = chestBottom - selectorTop;
-    
-            if (availableHeight > 200) {
-                selectorWrapper.style.height = `${availableHeight}px`;
-            } else {
-                 selectorWrapper.style.height = 'auto';
-            }
-        } else if (selectorWrapper) {
-            selectorWrapper.style.height = 'auto';
-        }
-    }
-
-    function adjustLayoutHeights() {
-        const loadoutColumn = document.querySelector('.equipment-loadout-column');
-        const shoppingListColumn = document.querySelector('.shopping-list-column');
-    
-        if (window.innerWidth > 1200 && loadoutColumn && shoppingListColumn) {
-            requestAnimationFrame(() => {
-                const loadoutHeight = loadoutColumn.offsetHeight;
-                shoppingListColumn.style.height = `${loadoutHeight}px`;
-            });
-        } else if (shoppingListColumn) {
-            shoppingListColumn.style.height = '';
-        }
-    }
-    
-    window.addEventListener('resize', debounce(() => {
-        adjustSelectorHeight();
-        adjustLayoutHeights();
-        if (window.innerWidth > 768) {
-            adjustStatsFontSize(document.getElementById('total-stats-container'));
-        }
-    }, 150));
-
-    window.addEventListener('load', () => {
-        adjustSelectorHeight();
-        adjustLayoutHeights();
     });
 
     function populateScreenshotLoadout() {
@@ -1243,7 +1180,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function populateScreenshotTotalStats() {
         screenshotTotalStats.innerHTML = document.getElementById('total-stats-container').innerHTML;
-        adjustStatsFontSize(screenshotTotalStats);
     }
 
     function populateScreenshotTotalCost() {
@@ -1442,17 +1378,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    screenshotBtn.addEventListener('click', openScreenshotModal);
-    screenshotModalCloseBtn.addEventListener('click', closeScreenshotModal);
-    screenshotModal.addEventListener('click', (e) => {
+    if (screenshotBtn) screenshotBtn.addEventListener('click', openScreenshotModal);
+    if (screenshotModalCloseBtn) screenshotModalCloseBtn.addEventListener('click', closeScreenshotModal);
+    if (screenshotModal) screenshotModal.addEventListener('click', (e) => {
         if (e.target === screenshotModal) closeScreenshotModal();
     });
-    copyImageBtn.addEventListener('click', handleCopyImage);
+    if (copyImageBtn) copyImageBtn.addEventListener('click', handleCopyImage);
     if (downloadImageBtn) {
         downloadImageBtn.addEventListener('click', handleDownloadImage);
     }
     
-    screenshotViewToggle.addEventListener('change', () => {
+   if (screenshotViewToggle) screenshotViewToggle.addEventListener('change', () => {
         const isCostView = screenshotViewToggle.checked;
         screenshotTotalStatsWrapper.classList.remove('fade-in-up', 'fade-out-down');
         screenshotTotalCostWrapper.classList.remove('fade-in-up', 'fade-out-down');
@@ -1571,7 +1507,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             initializeEquipmentSelector();
-            initializeComparisonFilters();
+            initializeComparisonFeatures();
             
             const preLoginPath = sessionStorage.getItem('preLoginToolPath');
             if (preLoginPath === window.location.pathname) {
@@ -1602,16 +1538,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
 
-            requestAnimationFrame(() => {
-                adjustSelectorHeight();
-                adjustLayoutHeights();
-            });
-
-            if (compareLoadoutADetailsToggle) {
-                compareLoadoutADetailsToggle.addEventListener('change', () => handleDetailsToggle('A'));
-            }
-            if (compareLoadoutBDetailsToggle) {
-                compareLoadoutBDetailsToggle.addEventListener('change', () => handleDetailsToggle('B'));
+            if (loadoutViewSelector) {
+                loadoutViewSelector.addEventListener('change', updateLoadoutViews);
             }
 
         } catch (error) {
@@ -1631,13 +1559,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const loadoutIdentifier = slotElement.dataset.loadout;
         const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
     
-        targetLoadout[slotKey] = itemId;
+        targetLoadout[slotKey] = {
+            id: itemId,
+            refined: false,
+            awakenLevel: 0
+        };
         slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
         
         hideTooltip();
         closeModal();
-        updateComparisonStats();
-        handleDetailsToggle(loadoutIdentifier);
+        updateComparisonDisplays();
         saveCalculatorState();
     }
     
@@ -1645,63 +1576,228 @@ document.addEventListener('DOMContentLoaded', function() {
         const slotKey = slotElement.dataset.slot;
         const loadoutIdentifier = slotElement.dataset.loadout;
         const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+
+        slotElement.classList.remove('refined');
+        slotElement.querySelector('.awaken-level')?.remove();
     
-        targetLoadout[slotKey] = null;
+        delete targetLoadout[slotKey];
         slotElement.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${slotKey} Slot">`;
-        updateComparisonStats();
-        handleDetailsToggle(loadoutIdentifier);
+        updateComparisonDisplays();
         saveCalculatorState();
     }
-    
+
+    function getRefinedBonus(value) {
+        return Math.round(value * 0.3 * 2) / 2;
+    }
+
     function calculateLoadoutStats(loadout) {
         const totalStats = {};
-        const specialStats = new Set();
-        const equippedPieceIds = Object.values(loadout).filter(id => id !== null);
-    
-        equippedPieceIds.forEach(itemId => {
-            const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+        const specialStats = {};
+        const tempAggregates = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {} };
+        const iconicBonusesByTier = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {} };
+        
+        let accumulatedUnitCapacity = 0;
+        
+        const equippedPieces = Object.values(loadout).filter(item => item && item.id);
+        const equippedPieceIds = equippedPieces.map(item => item.id);
+
+        equippedPieces.forEach(item => {
+            const itemData = EQUIPMENT_DATA.find(d => d.id === item.id);
             if (!itemData) return;
+
             if (itemData.stats) {
                 for (const stat in itemData.stats) {
                     totalStats[stat] = (totalStats[stat] || 0) + itemData.stats[stat];
                 }
             }
+
+            if (item.refined && itemData.stats) {
+                for (const stat in itemData.stats) {
+                    totalStats[stat] += getRefinedBonus(itemData.stats[stat]);
+                }
+            }
+            
+            let iconicInfo = ICONIC_DATA[itemData.name];
+            if (!iconicInfo && itemData.quality === 'Legendary' && itemData.slot === 'accessory') {
+                iconicInfo = ICONIC_DATA['Accessory'];
+            }
+
+            if (iconicInfo && item.awakenLevel > 0) {
+                for (let i = 1; i <= item.awakenLevel; i++) {
+                    const tier = iconicInfo.tiers[i];
+                    if (!tier) continue;
+                    
+                    let tierValue = 0;
+                    let critBuff = 0;
+                    
+                    let statName = null;
+                    if (tier.stat) {
+                        statName = formatStatName(tier.stat);
+                        if (!tempAggregates[i][statName]) {
+                            tempAggregates[i][statName] = { value: 0, isPercent: false, isSpecial: false };
+                        }
+                    }
+
+                    switch (tier.type) {
+                        case 'base_stat':
+                            tierValue = tier.values[currentKvkSeason] || 0;
+                            if (item.refined) critBuff = tier.crit_bonus || 0;
+                            const baseVal = tierValue + critBuff;
+                            
+                            const baseStatKey = `base_${tier.stat}`;
+                            totalStats[baseStatKey] = (totalStats[baseStatKey] || 0) + baseVal;
+
+                            if (statName) tempAggregates[i][statName].value += baseVal;
+                            break;
+
+                            case 'percent_stat':
+                                tierValue = tier.value || 0;
+                                if (item.refined) critBuff = tier.crit_buff || 0;
+                                const percentVal = tierValue + critBuff;
+                                
+                                let stat_key = tier.stat.toLowerCase().replace(/ /g, '_');
+                                let flatAmountToAdd = 0;
+    
+                                if (stat_key === 'unit_cap' || stat_key === 'unit_capacity') {
+                                    flatAmountToAdd = percentVal * 2000;
+                                    accumulatedUnitCapacity += flatAmountToAdd;
+                                }
+    
+                                if (statName) {
+                                    if (stat_key === 'unit_cap' || stat_key === 'unit_capacity') {
+                                        tempAggregates[i][statName].value += flatAmountToAdd;
+                                        tempAggregates[i][statName].isPercent = false; 
+                                    } else {
+                                        tempAggregates[i][statName].value += percentVal;
+                                        tempAggregates[i][statName].isPercent = true;
+                                    }
+                                }
+                                break;
+
+                        case 'flat_stat':
+                            tierValue = tier.value || 0;
+                            if (item.refined) critBuff = Math.round((tier.crit_buff || 0) / 10) * 10;
+                            const flatVal = tierValue + critBuff;
+
+                            if (statName) {
+                                tempAggregates[i][statName].value += flatVal;
+                                tempAggregates[i][statName].isPercent = false;
+                            }
+
+                            if (tier.stat.toLowerCase().includes('capacity') || tier.stat.toLowerCase().includes('cap')) {
+                                accumulatedUnitCapacity += flatVal;
+                            } else {
+                                totalStats['unit_capacity_flat'] = (totalStats['unit_capacity_flat'] || 0) + flatVal;
+                            }
+                            break;
+
+                        case 'special':
+                            let desc = tier.description;
+                            if (tier.values) {
+                                for (const key in tier.values) {
+                                    let val = tier.values[key];
+                                    if (item.refined && tier.crit_bonus && tier.crit_bonus[key]) {
+                                        val += tier.crit_bonus[key];
+                                    }
+                                    desc = desc.replace(`{${key}}`, val);
+                                }
+                            }
+                            iconicBonusesByTier[i][desc] = true;
+                            break;
+                    }
+                }
+            }
+            
             if (itemData.special_stats) {
-                itemData.special_stats.forEach(stat => specialStats.add(stat));
+                itemData.special_stats.forEach(stat => {
+                    let finalStat = stat;
+                    if (item.refined) {
+                        if (stat.includes("Horn of Fury") || stat.includes("Karuak's War Drums")) {
+                            finalStat = stat.replace("50", "65 <span class='refined-bonus'>(50 + 15)</span>");
+                        } else if (stat.includes("Ring of Doom")) {
+                            finalStat = stat.replace("50%", "65% <span class='refined-bonus'>(50% + 15%)</span>");
+                        } else if (stat.includes("Greatest Glory")) {
+                            finalStat = stat.replace("5%", "6.5% <span class='refined-bonus'>(5% + 1.5%)</span>");
+                        }
+                    }
+                     specialStats[finalStat] = true;
+                });
             }
         });
-        
+
+        for (let i = 1; i <= 5; i++) {
+            for (const [name, data] of Object.entries(tempAggregates[i])) {
+                if (data.value > 0) {
+                    let formattedValue = '';
+                    
+                    const isUnitCap = name.toLowerCase().includes('cap');
+                    
+                    if (data.isPercent && !isUnitCap) {
+                        formattedValue = `+${parseFloat(data.value.toFixed(1))}%`;
+                    } else {
+                        formattedValue = `+${data.value.toLocaleString()}`;
+                    }
+                    iconicBonusesByTier[i][name] = formattedValue;
+                }
+            }
+        }
+
         EQUIPMENT_SET_DATA.forEach(set => {
             const equippedCount = set.pieces.filter(pieceId => equippedPieceIds.includes(pieceId)).length;
-            let highestBonus = null;
             set.bonuses.forEach(bonus => {
-                if (equippedCount >= bonus.count) highestBonus = bonus;
-            });
-            if (highestBonus) {
-                const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
-                const statMatch = highestBonus.description.match(/Troop (Attack|Defense|Health|Defence)[\s\+]+([\d\.]+)%/i);
-                if (statMatch) {
-                    const statType = statMatch[1].toLowerCase().replace('defence', 'defense');
-                    const statValue = parseFloat(statMatch[2]);
-                    troopTypes.forEach(troop => {
-                        totalStats[`${troop}_${statType}`] = (totalStats[`${troop}_${statType}`] || 0) + statValue;
-                    });
-                } else {
-                    specialStats.add(highestBonus.description);
+                if (equippedCount >= bonus.count) {
+                     const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
+                     const statMatch = bonus.description.match(/(Troop|Infantry|Cavalry|Archer|Siege) (Attack|Defense|Health|Defence)[\s\+]+([\d\.]+)%/i);
+                     if(statMatch){
+                         const scope = statMatch[1].toLowerCase();
+                         const type = statMatch[2].toLowerCase().replace('defence', 'defense');
+                         const value = parseFloat(statMatch[3]);
+
+                         if(scope === 'troop'){
+                            troopTypes.forEach(troop => {
+                                totalStats[`${troop}_${type}`] = (totalStats[`${troop}_${type}`] || 0) + value;
+                            });
+                         } else {
+                            totalStats[`${scope}_${type}`] = (totalStats[`${scope}_${type}`] || 0) + value;
+                         }
+                     } else {
+                         specialStats[bonus.description] = true;
+                     }
                 }
+            });
+        });
+        
+        const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
+        ['attack', 'defense', 'health'].forEach(statType => {
+            const universalStat = `troop_${statType}`;
+            if (totalStats[universalStat]) {
+                troopTypes.forEach(troop => {
+                    totalStats[`${troop}_${statType}`] = (totalStats[`${troop}_${statType}`] || 0) + totalStats[universalStat];
+                });
             }
         });
         
-        ['infantry', 'cavalry', 'archer', 'siege'].forEach(troop => {
-            ['attack', 'defense', 'health', 'march_speed'].forEach(stat => {
-                const universalValue = totalStats[`troop_${stat}`] || 0;
-                if (universalValue > 0) {
-                    totalStats[`${troop}_${stat}`] = (totalStats[`${troop}_${stat}`] || 0) + universalValue;
-                }
-            });
+        const baseStats = Object.keys(totalStats).filter(k => k.startsWith('base_'));
+        baseStats.forEach(key => {
+            const value = totalStats[key];
+            delete totalStats[key];
+            let statName = key.substring(5);
+            
+            if (statName.startsWith('Troop')) {
+                const statSuffix = statName.substring(5).toLowerCase().replace(/ /g, '_');
+                ['infantry', 'cavalry', 'archer', 'siege'].forEach(troop => {
+                    const newKey = `${troop}${statSuffix}`;
+                    totalStats[newKey] = (totalStats[newKey] || 0) + value;
+                });
+            } else {
+                const newKey = statName.toLowerCase().replace(/ /g, '_');
+                totalStats[newKey] = (totalStats[newKey] || 0) + value;
+            }
         });
         
-        return { stats: totalStats, special: Array.from(specialStats) };
+        if (totalStats['unit_capacity_flat']) delete totalStats['unit_capacity_flat'];
+
+        return { stats: totalStats, special: specialStats, iconicBonusesByTier };
     }
     
     function updateComparisonStats() {
@@ -1710,141 +1806,323 @@ document.addEventListener('DOMContentLoaded', function() {
         const statsB = calculateLoadoutStats(compareLoadoutB);
     
         const allStatKeys = [...new Set([...Object.keys(statsA.stats), ...Object.keys(statsB.stats)])].filter(key => !key.startsWith('troop_'));
-        const allSpecialKeys = [...new Set([...statsA.special, ...statsB.special])];
-    
-        if (allStatKeys.length === 0 && allSpecialKeys.length === 0) {
+
+        const allSpecialStatKeys = [...new Set([...Object.keys(statsA.special),...Object.keys(statsB.special)])];
+        let hasIconicBonuses = false;
+        for(let i = 1; i <= 5; i++){
+            if(Object.keys(statsA.iconicBonusesByTier[i]).length > 0 || Object.keys(statsB.iconicBonusesByTier[i]).length > 0) {
+                hasIconicBonuses = true; break;
+            }
+        }
+        if (allStatKeys.length === 0 && allSpecialStatKeys.length === 0 && !hasIconicBonuses) {
             comparisonStatsContainer.innerHTML = '<p class="no-items-placeholder">Select equipment in a loadout to see its stats.</p>';
             return;
         }
     
-        const groupedStats = {
-            infantry: { stats: [], total: 0 },
-            cavalry: { stats: [], total: 0 },
-            archer: { stats: [], total: 0 },
-            siege: { stats: [], total: 0 }
-        };
-    
+        const groupedStats = {};
+        const statOrder = ['attack', 'defense', 'health', 'base_attack', 'base_defense', 'base_health', 'march_speed'];
+
         allStatKeys.forEach(key => {
             const troopType = getTroopTypeFromStat(key);
-            if (groupedStats[troopType]) {
-                groupedStats[troopType].stats.push(key);
-                groupedStats[troopType].total += (statsA.stats[key] || 0) + (statsB.stats[key] || 0);
-            }
+            if (!groupedStats[troopType]) groupedStats[troopType] = [];
+            groupedStats[troopType].push(key);
         });
-    
-        const sortedTroopTypes = Object.keys(groupedStats).sort((a, b) => groupedStats[b].total - groupedStats[a].total);
-    
-        const statOrderSuffixes = ['attack', 'defense', 'health', 'march_speed'];
-    
-        let html = '<div class="comparison-grid">';
-        html += '<div class="comparison-header">Stats</div><div class="comparison-header">Loadout A</div><div class="comparison-header">Loadout B</div><div class="comparison-header">Delta</div>';
-    
-        sortedTroopTypes.forEach(troopType => {
-            const troopGroup = groupedStats[troopType];
-            if (troopGroup.stats.length === 0) return;
-    
-            const sortedStatsInGroup = troopGroup.stats.sort((a, b) => {
-                const suffixA = a.substring(a.indexOf('_') + 1);
-                const suffixB = b.substring(b.indexOf('_') + 1);
-                return statOrderSuffixes.indexOf(suffixA) - statOrderSuffixes.indexOf(suffixB);
+        
+        for(const troop in groupedStats) {
+            groupedStats[troop].sort((a, b) => {
+                const suffixA = a.replace(`${troop}_`, '').replace('base_', 'zz_base_');
+                const suffixB = b.replace(`${troop}_`, '').replace('base_', 'zz_base_');
+                return suffixA.localeCompare(suffixB);
             });
-    
-            sortedStatsInGroup.forEach(key => {
-                if (activeComparisonFilter !== 'all' && troopType !== activeComparisonFilter) {
-                    return;
-                }
+        }
+        
+        const sortedTroopTypes = Object.keys(groupedStats).sort((a, b) => {
+            const order = ['infantry', 'cavalry', 'archer', 'siege', 'general'];
+            return order.indexOf(a) - order.indexOf(b);
+        });
+
+        let mainStatsHtml = '';
+        sortedTroopTypes.forEach(troopType => {
+            groupedStats[troopType].forEach(key => {
                 const valA = statsA.stats[key] || 0;
                 const valB = statsB.stats[key] || 0;
                 if (valA === 0 && valB === 0) return;
     
                 const delta = valB - valA;
+                const isPercentage = !key.includes('_base_');
+                const suffix = isPercentage ? '%' : '';
+                
                 let deltaHtml = (delta !== 0)
-                    ? `<span class="${delta > 0 ? 'stat-increase' : 'stat-decrease'}"><i class="fas ${delta > 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i> <span class="delta-value-text">${delta.toFixed(1).replace('.0', '')}%</span></span>`
+                    ? `<span class="${delta > 0 ? 'stat-increase' : 'stat-decrease'}"><i class="fas ${delta > 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i> ${delta.toFixed(isPercentage ? 1 : 0).replace('.0', '')}${suffix}</span>`
                     : `<span class="stat-no-change">-</span>`;
                 
-                const iconHtml = `<img src="${getImagePath(`${troopType}_icon_mini.webp`)}" alt="${troopType} icon" class="stat-icon-mini">`;
-    
-                html += `
+                let iconHtml = '';
+                if (troopType !== 'general') {
+                    iconHtml = `<img src="${getImagePath(`${troopType}_icon_mini.webp`)}" alt="${troopType} icon" class="stat-icon-mini">`;
+                }
+
+                const formattedStatName = formatStatName(key);
+
+                mainStatsHtml += `
                     <div class="comparison-stat-row ${troopType}">
-                        <div class="stat-name">${iconHtml}${formatStatName(key)}</div>
-                        <div class="stat-value">${valA.toFixed(1).replace('.0', '')}%</div>
-                        <div class="stat-value">${valB.toFixed(1).replace('.0', '')}%</div>
+                        <div class="stat-name">${iconHtml}${formattedStatName}</div>
+                        <div class="stat-value">${valA.toFixed(isPercentage ? 1 : 0).replace('.0', '')}${suffix}</div>
+                        <div class="stat-value">${valB.toFixed(isPercentage ? 1 : 0).replace('.0', '')}${suffix}</div>
                         <div class="delta-value">${deltaHtml}</div>
                     </div>
                 `;
             });
         });
-    
-        if (allSpecialKeys.length > 0) {
-            html += `<div class="comparison-special-divider">Extra Bonuses</div>`;
-            allSpecialKeys.forEach(key => {
-                const inA = statsA.special.includes(key);
-                const inB = statsB.special.includes(key);
-                if (!inA && !inB) return;
-                html += `<div class="comparison-special-row">
-                    <div class="special-stat-name">${key}</div>
-                    <div class="special-stat-value">${inA ? `<i class="fas fa-check"></i>` : ''}</div>
-                    <div class="special-stat-value">${inB ? `<i class="fas fa-check"></i>` : ''}</div>
-                    <div></div>
-                </div>`;
+
+        let specialStatsHtml = '';
+
+        const allSpecialKeys = Object.keys(statsA.special).concat(Object.keys(statsB.special));
+        const uniqueSpecialKeys = [...new Set(allSpecialKeys)];
+
+        if (uniqueSpecialKeys.length > 0) {
+            specialStatsHtml += '<div class="comparison-special-row"><div class="comparison-special-title" style="border-bottom: 1px solid var(--border-color);">Extra Bonuses</div></div>';
+            uniqueSpecialKeys.forEach(key => {
+                const valA = statsA.special[key];
+                const valB = statsB.special[key];
+                
+                const valueA_html = valA === true ? '<i class="fas fa-check"></i>' : (valA ? valA.toLocaleString() : '');
+                const valueB_html = valB === true ? '<i class="fas fa-check"></i>' : (valB ? valB.toLocaleString() : '');
+
+                 specialStatsHtml += `
+                    <div class="comparison-special-row">
+                        <div class="special-stat-name" style="grid-column: 1 / 2;">${key.replace(/<[^>]*>/g, '')}</div>
+                        <div class="stat-value" style="grid-column: 2 / 3;">${valueA_html}</div>
+                        <div class="stat-value" style="grid-column: 3 / 4;">${valueB_html}</div>
+                        <div class="delta-value" style="grid-column: 4 / 5;"></div>
+                    </div>
+                `;
             });
         }
-    
-        html += '</div>';
-        comparisonStatsContainer.innerHTML = html;
+        
+        for (let tier = 1; tier <= 5; tier++) {
+            const allTierBonuses = [...new Set([...Object.keys(statsA.iconicBonusesByTier[tier]), ...Object.keys(statsB.iconicBonusesByTier[tier])])];
+            
+            if (allTierBonuses.length > 0) {
+                 specialStatsHtml += `<div class="comparison-special-row"><div class="comparison-special-title" style="border-bottom: 1px solid var(--border-color);">Tier ${tier} Iconic Bonuses</div></div>`;
+                 
+                 allTierBonuses.forEach(bonusName => {
+                    const valA = statsA.iconicBonusesByTier[tier][bonusName];
+                    const valB = statsB.iconicBonusesByTier[tier][bonusName];
+                    
+                    const displayA = valA === true ? '<i class="fas fa-check"></i>' : (valA || '');
+                    const displayB = valB === true ? '<i class="fas fa-check"></i>' : (valB || '');
+
+                    specialStatsHtml += `<div class="comparison-special-row">
+                        <div class="special-stat-name" style="grid-column: 1 / 2;">${bonusName}</div>
+                        <div class="special-stat-value" style="grid-column: 2 / 3;">${displayA}</div>
+                        <div class="special-stat-value" style="grid-column: 3 / 4;">${displayB}</div>
+                        <div class="delta-value" style="grid-column: 4 / 5;"></div>
+                    </div>`;
+                 });
+            }
+        }
+
+        const showExtraBonuses = extraBonusesToggle.checked;
+        
+        comparisonStatsContainer.innerHTML = `
+        <div class="comparison-grid" id="comparison-main-stats-grid" style="opacity: ${showExtraBonuses ? 0 : 1}; pointer-events: ${showExtraBonuses ? 'none' : 'auto'};">
+            <div class="comparison-header">Stats</div>
+            <div class="comparison-header">Loadout A</div>
+            <div class="comparison-header">Loadout B</div>
+            <div class="comparison-header">Delta</div>
+            ${mainStatsHtml}
+        </div>
+        <div class="comparison-grid" id="comparison-extra-bonuses-grid" style="opacity: ${showExtraBonuses ? 1 : 0}; pointer-events: ${showExtraBonuses ? 'auto' : 'none'}; grid-template-columns: 2fr 1fr 1fr 0.8fr;">
+            <!-- Fixed headers to align 1-to-1 with columns -->
+            <div class="comparison-header">Extra Bonuses</div>
+            <div class="comparison-header">Loadout A</div>
+            <div class="comparison-header">Loadout B</div>
+            <div class="comparison-header"></div>
+            ${specialStatsHtml ? specialStatsHtml : '<p class="no-items-placeholder" style="grid-column: 1 / -1;">No extra bonuses to display.</p>'}
+        </div>`;
     }
 
-    function initializeComparisonFilters() {
-        if (!comparisonFilterPanel || !comparisonFilterToggleBtn) return;
-    
-        const filterTypes = ['all', 'infantry', 'cavalry', 'archer', 'siege'];
-        let filterHtml = '<div class="filter-options">';
-        filterTypes.forEach(type => {
-            const isActive = type === 'all' ? 'active' : '';
-            const troopClass = type !== 'all' ? `stat-${type}` : '';
-            let iconHtml = '';
-            if (type !== 'all') {
-                const iconPath = getImagePath(`${type}_icon_mini.webp`);
-                iconHtml = `<img src="${iconPath}" alt="${type}" class="filter-icon-mini">`;
-            }
-            filterHtml += `<button class="filter-option-btn ${isActive} ${troopClass}" data-filter-type="${type}">${iconHtml}<span>${formatStatName(type)}</span></button>`;
-        });
-        filterHtml += '</div>';
-        comparisonFilterPanel.innerHTML = filterHtml;
-    
-        comparisonFilterToggleBtn.addEventListener('click', (e) => {
+    function initializeComparisonFeatures() {
+        const filterOptions = `
+            <button class="filter-option-btn" data-filter-type="all">All Stats</button>
+            <button class="filter-option-btn stat-infantry" data-filter-type="infantry">Infantry</button>
+            <button class="filter-option-btn stat-cavalry" data-filter-type="cavalry">Cavalry</button>
+            <button class="filter-option-btn stat-archer" data-filter-type="archer">Archer</button>
+            <button class="filter-option-btn stat-siege" data-filter-type="siege">Siege</button>`;
+        if(comparisonFilterPanel) comparisonFilterPanel.querySelector('.filter-options').innerHTML = filterOptions;
+
+        if(comparisonFilterToggleBtn) comparisonFilterToggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             comparisonFilterPanel.classList.toggle('visible');
         });
-    
-        comparisonFilterPanel.addEventListener('click', (e) => {
-            const target = e.target.closest('.filter-option-btn');
-            if (target) {
-                activeComparisonFilter = target.dataset.filterType;
-                
+
+        if(comparisonFilterPanel) comparisonFilterPanel.addEventListener('click', (e) => {
+            if(e.target.matches('.filter-option-btn')) {
+                const filterType = e.target.dataset.filterType;
+                document.querySelectorAll('#comparison-main-stats-grid .comparison-stat-row').forEach(row => {
+                    const isVisible = filterType === 'all' || Array.from(row.classList).includes(filterType);
+                    row.style.display = isVisible ? 'contents' : 'none';
+                });
                 comparisonFilterPanel.querySelectorAll('.filter-option-btn').forEach(btn => btn.classList.remove('active'));
-                target.classList.add('active');
-                
-                updateComparisonStats();
-                comparisonFilterPanel.classList.remove('visible');
+                e.target.classList.add('active');
             }
         });
-    
-        document.addEventListener('click', (e) => {
-            if (!comparisonFilterPanel.contains(e.target) && !comparisonFilterToggleBtn.contains(e.target)) {
+
+        if (!awakenModeBtn || !refineModeBtn || !kvkSeasonSelector) return;
+
+        awakenModeBtn.addEventListener('click', () => setComparisonMode('awaken'));
+        refineModeBtn.addEventListener('click', () => setComparisonMode('refine'));
+
+        kvkSeasonSelector.addEventListener('change', (e) => {
+            currentKvkSeason = e.target.value;
+            updateComparisonDisplays();
+            saveCalculatorState();
+        });
+
+        awakenLevelModal.addEventListener('click', (e) => {
+            if (e.target.matches('.awaken-level-menu button')) {
+                const level = parseInt(e.target.dataset.level, 10);
+                setAwakenLevel(level);
+            }
+             if (e.target === awakenLevelModal) {
+                awakenLevelModal.style.display = 'none';
+            }
+        });
+        
+        extraBonusesToggle.addEventListener('change', () => {
+            const mainGrid = document.getElementById('comparison-main-stats-grid');
+            const extraGrid = document.getElementById('comparison-extra-bonuses-grid');
+            if (!mainGrid || !extraGrid) return;
+
+            comparisonFilterToggleBtn.style.display = extraBonusesToggle.checked ? 'none' : 'flex';
+
+            if (extraBonusesToggle.checked) {
+                mainGrid.style.opacity = 0;
+                mainGrid.style.pointerEvents = 'none';
+                extraGrid.style.opacity = 1;
+                extraGrid.style.pointerEvents = 'auto';
                 comparisonFilterPanel.classList.remove('visible');
+            } else {
+                extraGrid.style.opacity = 0;
+                extraGrid.style.pointerEvents = 'none';
+                mainGrid.style.opacity = 1;
+                mainGrid.style.pointerEvents = 'auto';
             }
         });
     }
 
-    function handleDetailsToggle(loadoutIdentifier) {
+    function setComparisonMode(mode) {
+        if (currentComparisonMode === mode) {
+            currentComparisonMode = 'none';
+        } else {
+            currentComparisonMode = mode;
+        }
+        awakenModeBtn.classList.toggle('active', currentComparisonMode === 'awaken');
+        refineModeBtn.classList.toggle('active', currentComparisonMode === 'refine');
+    }
+    
+    function toggleRefine(slotElement) {
+        const loadoutIdentifier = slotElement.dataset.loadout;
+        const slotKey = slotElement.dataset.slot;
+        const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+
+        if (targetLoadout[slotKey]) {
+            targetLoadout[slotKey].refined = !targetLoadout[slotKey].refined;
+            updateComparisonDisplays();
+            saveCalculatorState();
+        }
+    }
+
+    function openAwakenMenu(slotElement) {
+        const loadoutIdentifier = slotElement.dataset.loadout;
+        const slotKey = slotElement.dataset.slot;
+        const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+
+        const item = targetLoadout[slotKey];
+        if (!item) return;
+
+        const itemData = EQUIPMENT_DATA.find(d => d.id === item.id);
+        let iconicInfo = ICONIC_DATA[itemData.name];
+        
+        if (!iconicInfo && itemData.quality === 'Legendary' && itemData.slot === 'accessory') {
+            iconicInfo = ICONIC_DATA['Accessory'];
+        }
+        
+        if (!iconicInfo) {
+            showAlert("This item cannot be awakened.", "Notice");
+            return;
+        }
+
+        activeComparisonSlot = slotElement;
+        awakenItemName.textContent = `Awaken: ${itemData.name}`;
+        awakenLevelModal.style.display = 'flex';
+    }
+
+    function setAwakenLevel(level) {
+        if (!activeComparisonSlot) return;
+
+        const loadoutIdentifier = activeComparisonSlot.dataset.loadout;
+        const slotKey = activeComparisonSlot.dataset.slot;
+        const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+
+        if (targetLoadout[slotKey]) {
+            targetLoadout[slotKey].awakenLevel = level;
+            updateComparisonDisplays();
+            saveCalculatorState();
+        }
+        awakenLevelModal.style.display = 'none';
+        activeComparisonSlot = null;
+    }
+
+    function toRoman(num) {
+        if (num < 1 || num > 5) return '';
+        return ['I', 'II', 'III', 'IV', 'V'][num - 1];
+    }
+
+    function updateComparisonVisuals(loadoutIdentifier) {
         const loadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+        
+        Object.keys(SLOT_PLACEHOLDERS).forEach(slotKey => {
+            const slotElement = document.getElementById(`slot-${loadoutIdentifier.toLowerCase()}-${slotKey}`);
+            if (!slotElement) return;
+    
+            const item = loadout[slotKey];
+            
+            slotElement.classList.toggle('refined', !!(item && item.refined));
+    
+            let awakenEl = slotElement.querySelector('.awaken-level');
+            if (item && item.awakenLevel > 0) {
+                if (!awakenEl) {
+                    awakenEl = document.createElement('span');
+                    awakenEl.className = 'awaken-level';
+                    slotElement.appendChild(awakenEl);
+                }
+                awakenEl.textContent = toRoman(item.awakenLevel);
+            } else if (awakenEl) {
+                awakenEl.remove();
+            }
+        });
+    }
+
+    function updateComparisonDisplays() {
+        updateComparisonStats();
+        updateComparisonVisuals('A');
+        updateComparisonVisuals('B');
+        updateLoadoutViews();
+    }
+
+    function updateLoadoutViews() {
+        const viewMode = document.querySelector('#loadout-view-selector input:checked').value;
+        handleDetailsToggle('A', viewMode);
+        handleDetailsToggle('B', viewMode);
+    }
+
+    function handleDetailsToggle(loadoutIdentifier, viewMode) {
         const detailsList = loadoutIdentifier === 'A' ? compareLoadoutADetailsList : compareLoadoutBDetailsList;
-        const toggle = loadoutIdentifier === 'A' ? compareLoadoutADetailsToggle : compareLoadoutBDetailsToggle;
         const grid = loadoutIdentifier === 'A' ? document.getElementById('compare-a-loadout-grid') : document.getElementById('compare-b-loadout-grid');
 
-        if (toggle.checked) {
-            populateDetailsList(loadout, detailsList);
+        if (viewMode !== 'default') {
+            populateDetailsList(loadoutIdentifier, viewMode);
             grid.style.opacity = '0';
             grid.style.pointerEvents = 'none';
             detailsList.style.opacity = '1';
@@ -1857,73 +2135,122 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function populateDetailsList(loadout, detailsListElement) {
+    function populateDetailsList(loadoutIdentifier, viewMode) {
+        const loadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+        const detailsListElement = loadoutIdentifier === 'A' ? compareLoadoutADetailsList : compareLoadoutBDetailsList;
+        
         detailsListElement.innerHTML = '';
-        const equippedItems = Object.values(loadout).filter(id => id !== null);
+        
+        const slotOrder = ['helmet', 'weapon', 'chest', 'gloves', 'legs', 'boots', 'accessory1', 'accessory2'];
+        const equippedItems = slotOrder
+            .map(slot => loadout[slot])
+            .filter(item => item && item.id);
 
         if (equippedItems.length === 0) {
-            detailsListElement.innerHTML = '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary); padding: var(--spacing-8) 0;">No items in this loadout.</p>';
-            adjustDetailsListLayout(detailsListElement);
+            detailsListElement.innerHTML = '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary); padding: var(--spacing-8) 0;">No items in this loadout.</p>';;
             return;
         }
 
-        equippedItems.forEach(itemId => {
-            const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
-            if (itemData) {
-                let statsHtml = '<div class="details-item-stats">';
-                if (itemData.stats) {
-                    Object.entries(itemData.stats).forEach(([statKey, statValue]) => {
-                        if (statValue > 0) {
+        equippedItems.forEach(item => {
+            const itemData = EQUIPMENT_DATA.find(i => i.id === item.id);
+            if (!itemData) return;
+            
+            const individualStats = calculateLoadoutStats({ [itemData.slot]: item });
+
+            let statsHtml = '<div class="details-item-stats">';
+            if (viewMode === 'stats') {
+                if(itemData.stats) {
+                    for(const statKey in itemData.stats) {
+                        const statValue = itemData.stats[statKey];
+                        if(statValue > 0) {
                             const troopType = getTroopTypeFromStat(statKey);
-                            statsHtml += `<div class="stat-pair ${troopType}"><span>${formatStatName(statKey)}</span> <span>+${statValue}%</span></div>`;
+                            statsHtml += `<div class="stat-pair ${troopType}"><span>${formatStatName(statKey)}</span> <span>+${statValue.toFixed(1).replace('.0','')}%</span></div>`;
                         }
-                    });
+                    }
                 }
-                if (itemData.special_stats && itemData.special_stats.length > 0) {
-                    itemData.special_stats.forEach(stat => {
+                if(itemData.special_stats) {
+                     itemData.special_stats.forEach(stat => {
                         statsHtml += `<div class="special-stat">${stat}</div>`;
                     });
                 }
-                statsHtml += '</div>';
+            } else if (viewMode === 'iconic') {
+                for (let tier = 1; tier <= 5; tier++) {
+                   const tierEntries = Object.entries(individualStats.iconicBonusesByTier[tier]);
+                   
+                   if (tierEntries.length > 0) {
+                       tierEntries.forEach(([statName, statValue]) => {
+                          let fullText = '';
 
-                const itemEl = document.createElement('div');
-                itemEl.className = 'details-item';
-                itemEl.innerHTML = `
-                    <img src="${getImagePath(itemData.image)}" alt="${itemData.name}" class="details-item-icon">
-                    <div class="details-item-details">
-                        <span class="item-name ${itemData.quality}">${itemData.name}</span>
-                        ${statsHtml}
-                    </div>`;
-                detailsListElement.appendChild(itemEl);
+                          if (statValue === true) {
+                              fullText = statName;
+                          } 
+                          else {
+                              fullText = `${statName} ${statValue}`;
+                          }
+                          
+                          const highlightedText = fullText.replace(
+                              /([±+]?[\d,]+(?:\.\d+)?%?)/g, 
+                              '<span style="color: #57f287;">$1</span>'
+                          );
+
+                          statsHtml += `
+                              <div class="special-stat" style="color: #ffffff;">
+                                   <strong style="color: var(--accent-yellow); margin-right: 4px;">Tier ${toRoman(tier)}:</strong> ${highlightedText}
+                              </div>`;
+                      });
+                   }
+                }
+           }
+            statsHtml += '</div>';
+
+            if (statsHtml === '<div class="details-item-stats"></div>') {
+                statsHtml = `<div class="details-item-stats"><p class="no-items-placeholder" style="font-size: 0.8em; text-align: left;">No ${viewMode === 'stats' ? 'standard stats' : 'iconic buffs'} on this item.</p></div>`;
             }
+
+            const itemEl = document.createElement('div');
+            itemEl.className = 'details-item';
+            itemEl.innerHTML = `
+                <img src="${getImagePath(itemData.image)}" alt="${itemData.name}" class="details-item-icon">
+                <div class="details-item-details">
+                    <span class="item-name ${itemData.quality}">${itemData.name}</span>
+                    ${statsHtml}
+                </div>`;
+            detailsListElement.appendChild(itemEl);
         });
-        
-        adjustDetailsListLayout(detailsListElement);
     }
 
-    function adjustDetailsListLayout(detailsListElement) {
-        const container = detailsListElement.parentElement;
-        if (!container) return;
-    
-        const itemCount = detailsListElement.children.length;
-        if (itemCount === 0 || (detailsListElement.children[0] && detailsListElement.children[0].classList.contains('no-items-placeholder'))) {
-            detailsListElement.style.fontSize = '';
-            return;
-        }
-    
-        const containerHeight = container.clientHeight;
+    const clearLoadoutABtn = document.getElementById('clear-loadout-a-btn');
+    const clearLoadoutBBtn = document.getElementById('clear-loadout-b-btn');
+
+    function clearCompareLoadout(loadoutIdentifier) {
+        const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
         
-        detailsListElement.style.fontSize = '1rem'; 
-        
-        const totalContentHeight = detailsListElement.scrollHeight;
-        
-        if (totalContentHeight > containerHeight) {
-            const scaleFactor = containerHeight / totalContentHeight;
-            const newFontSize = Math.max(1 * scaleFactor * 0.95, 0.65);
-            detailsListElement.style.fontSize = `${newFontSize}rem`;
-        } else {
-            detailsListElement.style.fontSize = '1rem';
-        }
+        for (const key in targetLoadout) delete targetLoadout[key];
+
+        Object.keys(SLOT_PLACEHOLDERS).forEach(slotKey => {
+            const slotElement = document.getElementById(`slot-${loadoutIdentifier.toLowerCase()}-${slotKey}`);
+            if (slotElement) {
+                slotElement.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${formatStatName(slotKey)} Slot">`;
+                slotElement.classList.remove('refined');
+                const awakenBadge = slotElement.querySelector('.awaken-level');
+                if (awakenBadge) awakenBadge.remove();
+            }
+        });
+
+        updateComparisonDisplays();
+        saveCalculatorState();
+    }
+
+    if (clearLoadoutABtn) {
+        clearLoadoutABtn.addEventListener('click', () => {
+             clearCompareLoadout('A');
+        });
+    }
+
+    if (clearLoadoutBBtn) {
+        clearLoadoutBBtn.addEventListener('click', () => {
+             clearCompareLoadout('B');
+        });
     }
 
     initializeCalculator();

@@ -99,3 +99,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+window.fitTextToContainer = function(containerElement) {
+    if (!containerElement) return;
+
+    const MAX_FONT_SIZE = 16;
+    const MIN_FONT_SIZE = 8;
+    const STEP = 0.5;
+
+    const elementsToResize = containerElement.querySelectorAll('.stats-group, .special-stat, .no-items-placeholder');
+    if (elementsToResize.length === 0) return;
+
+    elementsToResize.forEach(el => el.style.fontSize = `${MAX_FONT_SIZE}px`);
+    
+    let currentFontSize = MAX_FONT_SIZE;
+    while (containerElement.scrollHeight > containerElement.clientHeight && currentFontSize > MIN_FONT_SIZE) {
+        currentFontSize -= STEP;
+        elementsToResize.forEach(el => el.style.fontSize = `${currentFontSize}px`);
+    }
+};

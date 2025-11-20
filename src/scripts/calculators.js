@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isMobile = window.innerWidth <= 768;
 
         if (isMobile) {
-            const slideWidth = container.clientWidth;
+            const slideWidth = slides[0].getBoundingClientRect().width;
             newTransform = -(targetIndex * slideWidth);
         } else {
             const containerWidth = container.clientWidth;
