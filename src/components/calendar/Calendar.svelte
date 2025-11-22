@@ -120,7 +120,16 @@
             }
 
             const dateStr = `${cellYear}-${String(cellMonth + 1).padStart(2, '0')}-${String(cellDay).padStart(2, '0')}`;
-            cells.push({ day: cellDay, dateStr, isOtherMonth, isToday: dateStr === todayStr, events: [] });
+            const isPast = dateStr < todayStr; 
+
+            cells.push({ 
+                day: cellDay, 
+                dateStr, 
+                isOtherMonth, 
+                isToday: dateStr === todayStr, 
+                isPast,
+                events: [] 
+            });
         }
 
         const sortedEvents = [...currentEvents].sort((a, b) => {
@@ -330,9 +339,8 @@
                     {/if}
 
                     {#each calendarCells as cell}
-                        <div class="day-cell" class:other-month={cell.isOtherMonth} class:today={cell.isToday}>
+                    <div class="day-cell" class:other-month={cell.isOtherMonth} class:today={cell.isToday} class:past={cell.isPast}>
                             <span class="day-number">{cell.day}</span>
-                            
                             <div class="event-stack">
                                 {#each cell.events as event}
                                     {#if event}
@@ -513,6 +521,25 @@
         border: 4px solid rgba(255,255,255,0.3);
         border-top-color: var(--accent-blue); border-radius: 50%;
         animation: spin 1s linear infinite;
+    }
+    .day-cell.past::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        pointer-events: none;
+        
+        background-image: linear-gradient(
+            to bottom left,
+            transparent calc(50% - 1px),
+            rgba(255, 255, 255, 0.1) calc(50% - 1px),
+            rgba(255, 255, 255, 0.1) calc(50% + 1px),
+            transparent calc(50% + 1px)
+        );
+    }
+
+    .day-cell.past {
+        opacity: 0.7;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 

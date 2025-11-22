@@ -152,7 +152,7 @@
 
 <style>
     .simple-modal-overlay { position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(5px); }
-    .simple-modal-content { background: var(--bg-secondary); padding: var(--spacing-6); border-radius: var(--radius-lg); border: 1px solid var(--border-color); width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: zoomIn 0.2s ease-out forwards; }
+    .simple-modal-content { background: var(--bg-secondary); padding: var(--spacing-6); border-radius: var(--radius-lg); border: 1px solid var(--border-color); width: 90%; max-width: 400px; animation: zoomIn 0.2s ease-out forwards; }
     h3 { margin: 0 0 var(--spacing-6); color: var(--text-primary); font-size: 1.25rem; text-align: center; }
     .simple-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
     .form-group { margin-bottom: 15px; text-align: left; }
