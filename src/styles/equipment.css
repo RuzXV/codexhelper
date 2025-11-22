@@ -1316,3 +1316,16 @@ input:checked + .slider:before { transform: translateX(20px); }
     padding: 8px 12px !important;
     line-height: 1.2;
 }
+
+#comparison-main-stats-grid,
+#comparison-extra-bonuses-grid {
+    align-content: start !important;
+    grid-auto-rows: min-content !important;
+}
+
+.comparison-grid .comparison-header {
+    height: auto !important;
+    min-height: 35px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+}
