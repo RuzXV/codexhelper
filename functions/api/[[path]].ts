@@ -30,7 +30,12 @@ const CALENDAR_ADMIN_IDS = [
 const TROOP_CYCLE = ["Infantry", "Archer", "Cavalry", "Leadership"];
 
 app.use('/api/*', cors({
-    origin: ['https://codexhelper.com', 'https://www.codexhelper.com'],
+    origin: [
+        'https://codexhelper.com', 
+        'https://www.codexhelper.com',
+        'http://localhost:4321',
+        'http://localhost:8788'
+    ],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
 }));
@@ -264,13 +269,16 @@ app.get('/api/auth/callback', async (c) => {
         return c.text('Authorization code is missing.', 400);
     }
 
+    const url = new URL(c.req.url);
+    const origin = url.origin;
+
     const tokenData = new URLSearchParams({
         client_id: c.env.WEBSITE_APP_ID,
         client_secret: c.env.WEBSITE_APP_SECRET,
         grant_type: 'authorization_code',
         code: code,
-        redirect_uri: 'https://codexhelper.com/api/auth/callback',
-    });
+        redirect_uri: `${origin}/api/auth/callback`,
+    })
 
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
         method: 'POST',
