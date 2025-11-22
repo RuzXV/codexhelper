@@ -432,9 +432,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const passportBrackets = [ { maxPower: 9999999, normal: 1, discount: 1 }, { maxPower: 14999999, normal: 2, discount: 1 }, { maxPower: 19999999, normal: 3, discount: 1 }, { maxPower: 24999999, normal: 4, discount: 1 }, { maxPower: 29999999, normal: 6, discount: 1 }, { maxPower: 34999999, normal: 9, discount: 2 }, { maxPower: 39999999, normal: 12, discount: 3 }, { maxPower: 44999999, normal: 15, discount: 5 }, { maxPower: 49999999, normal: 20, discount: 8 }, { maxPower: 54999999, normal: 25, discount: 12 }, { maxPower: 59999999, normal: 30, discount: 15 }, { maxPower: 64999999, normal: 35, discount: 20 }, { maxPower: 69999999, normal: 40, discount: 25 }, { maxPower: 74999999, normal: 45, discount: 32 }, { maxPower: 79999999, normal: 50, discount: 40 }, { maxPower: 84999999, normal: 55, discount: 47 }, { maxPower: 89999999, normal: 60, discount: 54 }, { maxPower: 94999999, normal: 65, discount: 61 }, { maxPower: 99999999, normal: 70, discount: 67 }, { maxPower: Infinity, normal: 75, discount: 73 } ];
         
-        hospitalCapacityInput.addEventListener('input', () => {
-            hospitalTierToggle.disabled = !hospitalCapacityInput.value;
-        });
+        const hospitalToggleParent = hospitalTierToggle.closest('.toggle-switch');
+
+        const updateHospitalToggleState = () => {
+            const hasValue = hospitalCapacityInput.value.trim().length > 0;
+            
+            hospitalTierToggle.disabled = !hasValue;
+            
+            if (!hasValue) {
+                hospitalToggleParent.classList.add('is-disabled');
+            } else {
+                hospitalToggleParent.classList.remove('is-disabled');
+            }
+        };
+
+        hospitalCapacityInput.addEventListener('input', updateHospitalToggleState);
+
+        updateHospitalToggleState();
 
         hohHyperlink.addEventListener('click', (e) => {
             e.preventDefault();

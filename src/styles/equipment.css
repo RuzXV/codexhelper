@@ -450,6 +450,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     grid-template-columns: 2fr 1fr 1fr 0.8fr;
     gap: 0;
     align-items: stretch;
+    align-content: start;
 }
 
 .comparison-header {
@@ -1307,4 +1308,11 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 .btn-clear-loadout i {
     font-size: 12px;
+}
+
+.comparison-special-title {
+    min-height: 35px !important;
+    height: auto !important;
+    padding: 8px 12px !important;
+    line-height: 1.2;
 }

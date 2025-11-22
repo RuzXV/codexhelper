@@ -110,6 +110,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-a
 .toggle-switch input:disabled + .toggle-slider { cursor: not-allowed; background-color: var(--bg-secondary); }
 .toggle-switch input:disabled + .toggle-slider:before { background-color: var(--border-hover); }
 .toggle-switch input:focus-visible + .toggle-slider { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); }
+.toggle-switch.is-disabled {
+    opacity: 0.4;
+    filter: grayscale(100%);
+    cursor: not-allowed;
+}
 
 #hospital-tier-toggle + .toggle-slider { background-image: radial-gradient(circle, #ca62e6 0%, #8113a7 100%); background-color: transparent; border-color: rgba(255, 255, 255, 0.15); }
 

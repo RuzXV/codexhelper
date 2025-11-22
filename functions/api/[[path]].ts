@@ -20,11 +20,26 @@ type Variables = {
 };
 const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
+const CALENDAR_ADMIN_IDS = [
+    '285201373266575361', 
+    '1121488445836103820',
+    '593329463245144084',
+    '545152090910228492'
+];
+
+const TROOP_CYCLE = ["Infantry", "Archer", "Cavalry", "Leadership"];
+
 app.use('/api/*', cors({
     origin: ['https://codexhelper.com', 'https://www.codexhelper.com'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
 }));
+
+function addDays(dateStr: string, days: number): string {
+    const date = new Date(dateStr + 'T00:00:00Z');
+    date.setUTCDate(date.getUTCDate() + days);
+    return date.toISOString().split('T')[0];
+}
 
 const authMiddleware = async (c: Context, next: Next) => {
     const sessionToken = getCookie(c, 'session_token');
@@ -94,12 +109,14 @@ app.get('/api/users/@me', authMiddleware, async (c) => {
     const userData = await userResponse.json() as { id: string; [key: string]: any };
 
     const activePatrons: string[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
-    
     const isActivePatron = activePatrons ? activePatrons.includes(user.id) : false;
+
+    const isCalendarAdmin = CALENDAR_ADMIN_IDS.includes(user.id);
 
     const enrichedUserData = {
         ...userData,
-        is_active_patron: isActivePatron
+        is_active_patron: isActivePatron,
+        is_calendar_admin: isCalendarAdmin
     };
 
     return c.json(enrichedUserData);
@@ -301,6 +318,116 @@ app.get('/api/auth/callback', async (c) => {
     c.header('Set-Cookie', `session_token=${sessionToken}; ${cookieOptions}`);
     
     return c.redirect('/');
+});
+
+app.get('/api/events', async (c) => {
+    try {
+        const { results } = await c.env.DB.prepare(
+            'SELECT * FROM events ORDER BY start_date ASC'
+        ).all();
+        return c.json(results || []);
+    } catch (e) {
+        console.error("Failed to fetch events:", e);
+        return c.json({ error: 'Failed to fetch events' }, 500);
+    }
+});
+
+app.post('/api/events', authMiddleware, async (c) => {
+    const user = c.get('user'); 
+
+    if (!CALENDAR_ADMIN_IDS.includes(user.id)) {
+        return c.json({ error: 'Unauthorized' }, 403);
+    }
+
+    try {
+        const body = await c.req.json();
+        const { title, type, troop_type, start, duration, repeat_count, repeat_interval } = body;
+
+        if (!title || !start || !duration) {
+            return c.json({ error: 'Missing required fields' }, 400);
+        }
+
+        const seriesId = crypto.randomUUID();
+        
+        const stmt = c.env.DB.prepare(
+            `INSERT INTO events (series_id, title, type, troop_type, start_date, duration, created_by) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)`
+        );
+
+        const batch = [];
+        const count = repeat_count || 1;
+        const interval = repeat_interval || 0;
+
+        let currentTroopIndex = troop_type ? TROOP_CYCLE.indexOf(troop_type) : -1;
+
+        for (let i = 0; i < count; i++) {
+            const currentStart = addDays(start, i * interval);
+            let thisTroop = null;
+
+            if (currentTroopIndex !== -1) {
+                thisTroop = TROOP_CYCLE[(currentTroopIndex + i) % TROOP_CYCLE.length];
+            }
+            
+            batch.push(stmt.bind(seriesId, title, type, thisTroop || troop_type || null, currentStart, duration, user.id));
+        }
+
+        await c.env.DB.batch(batch);
+
+        return c.json({ status: 'success', message: `Created ${count} events` }, 201);
+    } catch (e) {
+        console.error("Failed to create event:", e);
+        return c.json({ error: 'Internal server error' }, 500);
+    }
+});
+
+app.post('/api/events/shift', authMiddleware, async (c) => {
+    const user = c.get('user');
+
+    if (!CALENDAR_ADMIN_IDS.includes(user.id)) {
+        return c.json({ error: 'Unauthorized' }, 403);
+    }
+
+    try {
+        const { series_id, shift_days } = await c.req.json();
+
+        if (!series_id || !shift_days) {
+            return c.json({ error: 'Missing series_id or shift_days' }, 400);
+        }
+
+        const modifier = `${shift_days > 0 ? '+' : ''}${shift_days} days`;
+
+        const { success } = await c.env.DB.prepare(
+            `UPDATE events 
+             SET start_date = date(start_date, ?) 
+             WHERE series_id = ?`
+        ).bind(modifier, series_id).run();
+
+        return c.json({ status: 'success', message: 'Events shifted' });
+    } catch (e) {
+        console.error("Failed to shift events:", e);
+        return c.json({ error: 'Internal server error' }, 500);
+    }
+});
+
+app.delete('/api/events/:id', authMiddleware, async (c) => {
+    const user = c.get('user');
+    const { id } = c.req.param();
+
+    if (!CALENDAR_ADMIN_IDS.includes(user.id)) {
+        return c.json({ error: 'Unauthorized' }, 403);
+    }
+
+    try {
+        const { success } = await c.env.DB.prepare(
+            `DELETE FROM events WHERE id = ?`
+        ).bind(id).run();
+
+        return success 
+            ? c.json({ status: 'success' }) 
+            : c.json({ error: 'Event not found' }, 404);
+    } catch (e) {
+        return c.json({ error: 'Internal server error' }, 500);
+    }
 });
 
 export const onRequest = handle(app);

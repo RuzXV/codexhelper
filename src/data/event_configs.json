@@ -1,0 +1,96 @@
+{
+    "events": {
+      "mge": {
+        "title": "Mightiest Governor",
+        "duration": 6,
+        "has_troop_type": true,
+        "recurrence_interval": 14,
+        "color_hex": "#EAB308"
+      },
+      "wof": {
+        "title": "Wheel of Fortune",
+        "duration": 3,
+        "has_troop_type": true,
+        "recurrence_interval": 14,
+        "color_hex": "#A855F7"
+      },
+      "mtg": {
+        "title": "More Than Gems",
+        "duration": 2,
+        "has_troop_type": false,
+        "recurrence_interval": 28,
+        "color_hex": "#3B82F6"
+      },
+      "gk": {
+        "title": "Golden Kingdom",
+        "duration": 4,
+        "has_troop_type": false,
+        "recurrence_interval": 14,
+        "color_hex": "#F59E0B"
+      },
+      "ceroli": {
+        "title": "Ceroli Crisis",
+        "duration": 3,
+        "has_troop_type": false,
+        "recurrence_interval": 14,
+        "color_hex": "#10B981"
+      },
+      "rom": {
+        "title": "Realm of Mystique",
+        "duration": 3,
+        "has_troop_type": false,
+        "recurrence_interval": 14,
+        "color_hex": "#6366F1"
+      },
+      "esm": {
+        "title": "Esmeralda’s House",
+        "duration": 2,
+        "has_troop_type": false,
+        "recurrence_interval": 14,
+        "color_hex": "#EC4899"
+      },
+      "arma": {
+        "title": "Armament, Reveal Thyself",
+        "duration": 2,
+        "has_troop_type": false,
+        "recurrence_interval": 14,
+        "color_hex": "#8B5CF6"
+      },
+      "dhal": {
+        "title": "Dhalruk’s Puzzle Box",
+        "duration": 2,
+        "has_troop_type": false,
+        "recurrence_interval": 14,
+        "color_hex": "#14B8A6"
+      },
+      "hammer": {
+        "title": "Hunt for History",
+        "duration": 2,
+        "has_troop_type": false,
+        "recurrence_interval": 14,
+        "color_hex": "#F97316"
+      },
+      "egg": {
+        "title": "Holy Knight's Treasure",
+        "duration": 2,
+        "has_troop_type": false,
+        "recurrence_interval": 14,
+        "color_hex": "#84CC16"
+      },
+      "egg_hammer": {
+        "title": "Egg / Hammer Event",
+        "duration": 2,
+        "has_troop_type": false,
+        "recurrence_interval": 14,
+        "color_hex": "#06B6D4"
+      },
+      "goldhead": {
+        "title": "20 Gold Head Event",
+        "duration": 2,
+        "has_troop_type": false,
+        "recurrence_interval": 14,
+        "color_hex": "#EAB308"
+      }
+    },
+    "troop_types": ["Infantry", "Archer", "Cavalry", "Leadership"]
+  }

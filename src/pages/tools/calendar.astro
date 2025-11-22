@@ -1,0 +1,10 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalendarComponent from '../../components/calendar/Calendar.svelte';
+---
+
+<Layout title="Event Calendar" bodyClass="has-sub-nav">
+    <main class="tool-page-wrapper">
+        <CalendarComponent client:only="svelte" />
+    </main>
+</Layout>

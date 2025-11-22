@@ -1107,6 +1107,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (selectorFilterPanel && !selectorFilterPanel.contains(e.target) && !selectorFilterToggleBtn.contains(e.target)) {
             selectorFilterPanel.classList.remove('visible');
         }
+
+        if (comparisonFilterPanel && !comparisonFilterPanel.contains(e.target) && !comparisonFilterToggleBtn.contains(e.target)) {
+            comparisonFilterPanel.classList.remove('visible');
+        }
     });
 
     function populateScreenshotLoadout() {
