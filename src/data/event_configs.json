@@ -5,91 +5,88 @@
         "duration": 6,
         "has_troop_type": true,
         "recurrence_interval": 14,
-        "color_hex": "#EAB308"
+        "color_hex": "#EAB308",
+        "icon": "mge.webp"
       },
       "wof": {
         "title": "Wheel of Fortune",
         "duration": 3,
         "has_troop_type": true,
         "recurrence_interval": 14,
-        "color_hex": "#A855F7"
+        "color_hex": "#A855F7",
+        "icon": "wheel.webp"
       },
       "mtg": {
         "title": "More Than Gems",
         "duration": 2,
         "has_troop_type": false,
         "recurrence_interval": 28,
-        "color_hex": "#3B82F6"
+        "color_hex": "#3B82F6",
+        "icon": "mtg.webp"
       },
       "gk": {
         "title": "Golden Kingdom",
         "duration": 4,
         "has_troop_type": false,
         "recurrence_interval": 14,
-        "color_hex": "#F59E0B"
+        "color_hex": "#F59E0B",
+        "icon": "golden_kingdom.webp"
       },
       "ceroli": {
         "title": "Ceroli Crisis",
         "duration": 3,
         "has_troop_type": false,
         "recurrence_interval": 14,
-        "color_hex": "#10B981"
+        "color_hex": "#10B981",
+        "icon": "ceroli.webp"
       },
       "rom": {
         "title": "Realm of Mystique",
         "duration": 3,
         "has_troop_type": false,
         "recurrence_interval": 14,
-        "color_hex": "#6366F1"
+        "color_hex": "#6366F1",
+        "icon": "realm_of_mystique.webp"
       },
       "esm": {
         "title": "Esmeralda’s House",
         "duration": 2,
         "has_troop_type": false,
         "recurrence_interval": 14,
-        "color_hex": "#EC4899"
+        "color_hex": "#EC4899",
+        "icon": "esmeraldas_house.webp"
       },
       "arma": {
         "title": "Armament, Reveal Thyself",
         "duration": 2,
         "has_troop_type": false,
         "recurrence_interval": 14,
-        "color_hex": "#8B5CF6"
+        "color_hex": "#8B5CF6",
+        "icon": "reveal.webp"
       },
       "dhal": {
         "title": "Dhalruk’s Puzzle Box",
         "duration": 2,
         "has_troop_type": false,
         "recurrence_interval": 14,
-        "color_hex": "#14B8A6"
-      },
-      "hammer": {
-        "title": "Hunt for History",
-        "duration": 2,
-        "has_troop_type": false,
-        "recurrence_interval": 14,
-        "color_hex": "#F97316"
-      },
-      "egg": {
-        "title": "Holy Knight's Treasure",
-        "duration": 2,
-        "has_troop_type": false,
-        "recurrence_interval": 14,
-        "color_hex": "#84CC16"
+        "color_hex": "#14B8A6",
+        "icon": "dhalruk.webp"
       },
       "egg_hammer": {
         "title": "Egg / Hammer Event",
         "duration": 2,
         "has_troop_type": false,
         "recurrence_interval": 14,
-        "color_hex": "#06B6D4"
+        "color_hex": "#06B6D4",
+        "icon": "egg_hammer.webp"
       },
       "goldhead": {
         "title": "20 Gold Head Event",
         "duration": 2,
         "has_troop_type": false,
         "recurrence_interval": 14,
-        "color_hex": "#EAB308"
+        "color_hex": "#EAB308",
+        "icon": "legendary_head.webp"
       }
     },
     "troop_types": ["Infantry", "Archer", "Cavalry", "Leadership"]

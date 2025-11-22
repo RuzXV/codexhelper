@@ -6,6 +6,14 @@
     import ShiftModal from './ShiftModal.svelte';
     import RemoveModal from './RemoveModal.svelte';
 
+    const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', { eager: true });
+
+    function getIconSrc(filename) {
+        if (!filename) return null;
+        const path = `../../assets/images/calendar/event_icons/${filename}`;
+        return iconModules[path]?.default?.src || iconModules[path]?.default || null;
+    }
+
     let viewDate = new Date();
     let events = [];
     let isAdmin = false;
@@ -20,10 +28,10 @@
     };
 
     $: activeSeries = getUniqueSeries(events);
-
     $: year = viewDate.getUTCFullYear();
     $: month = viewDate.getUTCMonth();
     $: monthName = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(viewDate);
+    
     $: calendarCells = generateGrid(year, month, events);
 
     onMount(async () => {
@@ -78,6 +86,7 @@
     }
 
     function toISODate(d) { return d.toISOString().split('T')[0]; }
+    
     function addDays(dateStr, days) {
         const d = new Date(dateStr + 'T00:00:00Z');
         d.setUTCDate(d.getUTCDate() + days);
@@ -88,7 +97,7 @@
         const daysInMonth = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
         const firstDayIndex = new Date(Date.UTC(y, m, 1)).getUTCDay();
         const prevMonthDays = new Date(Date.UTC(y, m, 0)).getUTCDate();
-        const totalCells = 42; 
+        const totalCells = 42;
         const cells = [];
         const todayStr = new Date().toISOString().split('T')[0];
 
@@ -111,27 +120,80 @@
             }
 
             const dateStr = `${cellYear}-${String(cellMonth + 1).padStart(2, '0')}-${String(cellDay).padStart(2, '0')}`;
-            
-            let dayEvents = currentEvents.filter(e => {
-                const endStr = addDays(e.start_date, e.duration - 1);
-                return dateStr >= e.start_date && dateStr <= endStr;
-            });
-            dayEvents.sort((a, b) => a.series_id.localeCompare(b.series_id));
+            cells.push({ day: cellDay, dateStr, isOtherMonth, isToday: dateStr === todayStr, events: [] });
+        }
 
-            const processedEvents = dayEvents.map(e => {
+        const sortedEvents = [...currentEvents].sort((a, b) => {
+            if (a.start_date !== b.start_date) return a.start_date.localeCompare(b.start_date);
+            if (a.duration !== b.duration) return b.duration - a.duration;
+            return a.title.localeCompare(b.title);
+        });
+
+        let laneFreeDates = []; 
+        const eventLaneMap = new Map();
+
+        sortedEvents.forEach(event => {
+            const eventStart = event.start_date;
+            const eventEnd = addDays(event.start_date, event.duration); 
+            
+            let assignedLane = -1;
+
+            for (let i = 0; i < laneFreeDates.length; i++) {
+                if (eventStart >= laneFreeDates[i]) {
+                    assignedLane = i;
+                    break;
+                }
+            }
+
+            if (assignedLane === -1) {
+                assignedLane = laneFreeDates.length;
+                laneFreeDates.push(eventEnd);
+            } else {
+                laneFreeDates[assignedLane] = eventEnd;
+            }
+
+            eventLaneMap.set(event.id, assignedLane);
+        });
+
+        cells.forEach(cell => {
+            const dayActiveEvents = currentEvents.filter(e => {
                 const endStr = addDays(e.start_date, e.duration - 1);
-                const isStart = dateStr === e.start_date;
-                const isEnd = dateStr === endStr;
+                return cell.dateStr >= e.start_date && cell.dateStr <= endStr;
+            });
+
+            if (dayActiveEvents.length === 0) return;
+
+            const maxLane = dayActiveEvents.length > 0 
+                ? Math.max(...dayActiveEvents.map(e => eventLaneMap.get(e.id))) 
+                : 0;
+            
+            const cellEvents = new Array(maxLane + 1).fill(null);
+
+            dayActiveEvents.forEach(e => {
+                const lane = eventLaneMap.get(e.id);
+                const endStr = addDays(e.start_date, e.duration - 1);
                 
-                const dayOfWeek = new Date(dateStr + 'T00:00:00Z').getUTCDay();
+                const isStart = cell.dateStr === e.start_date;
+                const isEnd = cell.dateStr === endStr;
+                const dayOfWeek = new Date(cell.dateStr + 'T00:00:00Z').getUTCDay();
                 const isRowStart = dayOfWeek === 0;
                 const isRowEnd = dayOfWeek === 6;
 
-                return { ...e, isStart, isEnd, isRowStart, isRowEnd };
+                const config = eventConfigs.events[e.type];
+                const iconSrc = config ? getIconSrc(config.icon) : null;
+                const colorHex = config ? config.color_hex : '#3b82f6';
+
+                cellEvents[lane] = { 
+                    ...e, 
+                    isStart, isEnd, isRowStart, isRowEnd,
+                    iconSrc, 
+                    colorHex 
+                };
             });
 
-            cells.push({ day: cellDay, dateStr, isOtherMonth, isToday: dateStr === todayStr, events: processedEvents });
-        }
+            cell.events = cellEvents;
+        });
+
         return cells;
     }
 
@@ -146,7 +208,6 @@
         
         const currentYear = new Date().getUTCFullYear();
         const limitDate = new Date(Date.UTC(currentYear + 1, 11, 31)).toISOString().split('T')[0];
-
         const daysDiff = (new Date(limitDate) - new Date(start)) / (1000 * 60 * 60 * 24);
         const interval = config.recurrence_interval || 14;
         
@@ -169,7 +230,6 @@
                     repeat_interval: interval
                 })
             });
-            
             await fetchEvents();
             window.showAlert(`Generated ${count} events successfully.`);
         } catch (err) {
@@ -275,20 +335,29 @@
                             
                             <div class="event-stack">
                                 {#each cell.events as event}
-                                    <div 
-                                        class="event-bar" 
-                                        class:start={event.isStart || event.isRowStart}
-                                        class:end={event.isEnd || event.isRowEnd}
-                                        style={getEventStyle(event.type, eventConfigs.events[event.type]?.color_hex)}
-                                    >
-                                        {#if event.isStart || event.isRowStart}
-                                            <span class="event-title">
-                                                {event.title} {event.troop_type ? `(${event.troop_type})` : ''}
-                                            </span>
-                                        {:else}
-                                            &nbsp;
-                                        {/if}
-                                    </div>
+                                    {#if event}
+                                        <div 
+                                            class="event-bar" 
+                                            class:start={event.isStart || event.isRowStart}
+                                            class:end={event.isEnd || event.isRowEnd}
+                                            style={getEventStyle(event.type, event.colorHex)}
+                                        >
+                                            {#if event.isStart || event.isRowStart}
+                                                <div class="event-content">
+                                                    {#if event.iconSrc}
+                                                        <img src={event.iconSrc} alt="" class="event-icon" />
+                                                    {/if}
+                                                    <span class="event-title">
+                                                        {event.title} {event.troop_type ? `(${event.troop_type})` : ''}
+                                                    </span>
+                                                </div>
+                                            {:else}
+                                                &nbsp;
+                                            {/if}
+                                        </div>
+                                    {:else}
+                                        <div class="event-bar placeholder"></div>
+                                    {/if}
                                 {/each}
                             </div>
                         </div>
@@ -352,7 +421,8 @@
     }
     .admin-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-right: 5px; }
     .admin-btn {
-        display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+        display: flex; align-items: center; gap: 6px;
+        padding: 6px 12px;
         border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
         border: 1px solid transparent; transition: all 0.2s;
     }
@@ -368,18 +438,21 @@
         border-radius: 0 0 12px 12px; overflow: hidden; position: relative;
     }
     .weekdays {
-        display: grid; grid-template-columns: repeat(7, 1fr);
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
         background: var(--bg-tertiary); padding: 10px 0;
         border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
     }
     .weekdays div { text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
     
     .grid {
-        display: grid; grid-template-columns: repeat(7, 1fr);
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
         background: var(--border-color); gap: 1px; position: relative;
     }
     .day-cell {
-        background-color: var(--bg-secondary); min-height: 120px; padding: 4px 0;
+        background-color: var(--bg-secondary);
+        min-height: 120px; padding: 4px 0;
         display: flex; flex-direction: column; position: relative;
     }
     .day-cell.other-month { background-color: #0f1012; }
@@ -387,32 +460,57 @@
     .day-cell.today { background-color: rgba(59, 130, 246, 0.03); }
     
     .day-number {
-        margin: 4px 8px; font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); align-self: flex-end;
+        margin: 4px 8px;
+        font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); align-self: flex-end;
     }
     .day-cell.today .day-number {
-        background: var(--accent-blue); color: white; width: 24px; height: 24px;
+        background: var(--accent-blue);
+        color: white; width: 24px; height: 24px;
         border-radius: 50%; display: flex; align-items: center; justify-content: center;
     }
 
     .event-stack { display: flex; flex-direction: column; gap: 2px; width: 100%; margin-top: 2px; }
+    
     .event-bar {
-        height: 22px; font-size: 0.75rem; color: white;
-        display: flex; align-items: center; padding: 0 6px;
+        height: 24px;
+        font-size: 0.75rem; color: white;
+        display: flex; align-items: center; padding: 0 4px;
         white-space: nowrap; overflow: hidden;
-        position: relative; margin: 0 -1px; border-radius: 0;
+        position: relative; margin: 1px -1px;
+        border-radius: 0;
+    }
+    .event-bar.placeholder {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        pointer-events: none;
     }
     .event-bar.start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; margin-left: 4px; }
     .event-bar.end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; margin-right: 4px; }
     
-    .event-title { font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+    .event-content { display: flex; align-items: center; gap: 6px; width: 100%; }
+    
+    .event-icon {
+        width: 16px; height: 16px; object-fit: contain;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+        flex-shrink: 0;
+    }
+
+    .event-title { 
+        font-weight: 600; 
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5); 
+        overflow: hidden; text-overflow: ellipsis; 
+    }
 
     .loading-overlay {
-        position: absolute; inset: 0; background: rgba(0,0,0,0.5);
+        position: absolute;
+        inset: 0; background: rgba(0,0,0,0.5);
         display: flex; align-items: center; justify-content: center; z-index: 10;
         backdrop-filter: blur(2px);
     }
     .spinner {
-        width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3);
+        width: 40px; height: 40px;
+        border: 4px solid rgba(255,255,255,0.3);
         border-top-color: var(--accent-blue); border-radius: 50%;
         animation: spin 1s linear infinite;
     }
@@ -422,5 +520,7 @@
         .calendar-header-card { flex-direction: column; align-items: stretch; }
         .admin-panel { justify-content: center; }
         .day-cell { min-height: 80px; }
+        .event-bar { height: 20px; font-size: 0.7rem; }
+        .event-icon { width: 12px; height: 12px; }
     }
 </style>
