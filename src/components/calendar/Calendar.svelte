@@ -20,27 +20,35 @@
     let clockTime = '';
     let clockInterval;
     let isLoading = false;
-    let selectedEventId = null;
     
+    // --- Interaction State ---
+    let selectedEventId = null; // For "Click to stick" tooltip
+    let expandedDay = null;     // For "+X more" popup
+    
+    // --- Filtering State ---
     let isFilterOpen = false;
     let activeFilters = []; 
     const ALL_EVENT_TYPES = Object.keys(eventConfigs.events);
 
+    // --- Modal State ---
     let modalState = {
         add: false,
         shift: false,
         remove: false
     };
 
+    // --- Reactive Logic ---
     $: activeSeries = getUniqueSeries(events);
     $: year = viewDate.getUTCFullYear();
     $: month = viewDate.getUTCMonth();
     $: monthName = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(viewDate);
     
+    // Filter Logic
     $: filteredEvents = activeFilters.length > 0 
         ? events.filter(e => activeFilters.includes(e.type)) 
         : events;
 
+    // Grid Generation via Utils
     $: calendarCells = window.calendarUtils 
         ? window.calendarUtils.generateGrid(year, month, filteredEvents, eventConfigs, getIconSrc)
         : [];
@@ -57,6 +65,7 @@
         });
         if (window.onAuthSuccess) window.onAuthSuccess = checkAdminStatus;
 
+        // Close dropdowns on outside click (specific to filter container)
         document.addEventListener('click', (e) => {
             if (isFilterOpen && !e.target.closest('.filter-container')) {
                 isFilterOpen = false;
@@ -85,6 +94,7 @@
         isAdmin = user?.is_calendar_admin || false; 
     }
 
+    // Filter Storage
     function loadFilters(userId = null) {
         const user = userId || (window.auth?.getLoggedInUser()?.id);
         const key = user ? `calendar_filters_${user}` : 'calendar_filters_guest';
@@ -146,6 +156,7 @@
         viewDate = new Date(viewDate);
     }
 
+    // Optimistic UI
     async function handleSaveEvent(e) {
         const { preset, troop_type, start } = e.detail;
         const config = eventConfigs.events[preset];
@@ -160,6 +171,7 @@
             count = Math.floor(daysDiff / interval) + 1;
         }
 
+        // 1. Generate Temp Events
         const tempSeriesId = 'temp-' + Date.now();
         let tempEvents = [];
         let currDate = new Date(start);
@@ -178,6 +190,7 @@
             currDate.setUTCDate(currDate.getUTCDate() + interval);
         }
 
+        // 2. Optimistic Update
         const previousEvents = [...events];
         events = [...events, ...tempEvents];
         modalState.add = false; 
@@ -195,11 +208,11 @@
                     repeat_interval: interval
                 })
             });
-            await fetchEvents();
+            await fetchEvents(); // Confirm with real IDs
             window.showAlert(`Generated ${count} events successfully.`);
         } catch (err) {
             console.error("Failed to generate events", err);
-            events = previousEvents; 
+            events = previousEvents; // Revert
             window.showAlert("Failed to create events.", "Error");
         }
     }
@@ -222,6 +235,7 @@
         isLoading = true;
         try {
             const toDelete = events.filter(ev => ev.series_id === seriesId);
+            // Optimistic remove
             const prev = [...events];
             events = events.filter(ev => ev.series_id !== seriesId);
             
@@ -253,7 +267,7 @@
     }
 </script>
 
-<svelte:window on:click={() => selectedEventId = null} />
+<svelte:window on:click={() => { selectedEventId = null; expandedDay = null; }} />
 
 <section class="tool-hero">
     <div class="tool-hero-container">
@@ -265,6 +279,7 @@
 
 <section class="tool-content">
     <div class="tool-container calendar-container">
+        
         <div class="calendar-header-card">
             <div class="filter-container">
                 <button class="nav-btn filter-btn" on:click={() => isFilterOpen = !isFilterOpen} title="Filter Events">
@@ -351,7 +366,7 @@
                                             class:start={event.isStart || event.isRowStart}
                                             class:end={event.isEnd || event.isRowEnd}
                                             class:temp-optimistic={event.isTemp}
-                                            class:selected={selectedEventId === event.id} 
+                                            class:selected={selectedEventId === event.id}
                                             on:click|stopPropagation={() => selectedEventId = (selectedEventId === event.id ? null : event.id)}
                                             on:keydown={(e) => e.key === 'Enter' && (selectedEventId = (selectedEventId === event.id ? null : event.id))}
                                             role="button"
@@ -368,7 +383,12 @@
                                                     </span>
                                                 </div>
                                                 
-                                                <div class="event-tooltip">
+                                                <div 
+                                                    class="event-tooltip" 
+                                                    on:click|stopPropagation 
+                                                    role="tooltip" 
+                                                    on:keydown|stopPropagation
+                                                >
                                                     <div class="tooltip-header">
                                                         {#if event.iconSrc}<img src={event.iconSrc} alt="" />{/if}
                                                         <span>{event.title}</span>
@@ -379,12 +399,12 @@
                                                         
                                                         {#if Array.isArray(event.guideLink)}
                                                             {#each event.guideLink as link}
-                                                                <a href={link.url} target="_blank" class="guide-link">
+                                                                <a href={link.url} target="_blank" class="guide-link" aria-label="Guide for {link.title}">
                                                                     <i class="fab fa-discord"></i> {link.title}
                                                                 </a>
                                                             {/each}
                                                         {:else if event.guideLink}
-                                                            <a href={event.guideLink} target="_blank" class="guide-link">
+                                                            <a href={event.guideLink} target="_blank" class="guide-link" aria-label="Guide for {event.title}">
                                                                 <i class="fab fa-discord"></i> Event Guide
                                                             </a>
                                                         {/if}
@@ -400,11 +420,75 @@
                                 {/each}
 
                                 {#if cell.events.length > 3}
-                                    <div class="more-events">
+                                    <div 
+                                        class="more-events" 
+                                        on:click|stopPropagation={() => expandedDay = cell}
+                                        role="button" 
+                                        tabindex="0"
+                                        on:keydown={(e) => e.key === 'Enter' && (expandedDay = cell)}
+                                    >
                                         +{cell.events.length - 3} more
                                     </div>
                                 {/if}
                             </div>
+
+                            {#if expandedDay === cell}
+                                <div 
+                                    class="day-popup" 
+                                    on:click|stopPropagation 
+                                    role="dialog" 
+                                    aria-modal="true" 
+                                    on:keydown|stopPropagation
+                                >
+                                    <div class="day-popup-header">
+                                        <span class="popup-date">{getMobileDate(cell.dateStr)}</span>
+                                        <button class="popup-close" on:click={() => expandedDay = null} aria-label="Close popup">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="popup-events-list">
+                                        {#each cell.events as event}
+                                            {#if event}
+                                                <div 
+                                                    class="event-bar" 
+                                                    class:selected={selectedEventId === event.id}
+                                                    on:click|stopPropagation={() => selectedEventId = (selectedEventId === event.id ? null : event.id)}
+                                                    on:keydown={(e) => e.key === 'Enter' && (selectedEventId = (selectedEventId === event.id ? null : event.id))}
+                                                    role="button"
+                                                    tabindex="0"
+                                                    style={getEventStyle(event.type, event.colorHex)}
+                                                >
+                                                    <div class="event-content">
+                                                        {#if event.iconSrc}
+                                                            <img src={event.iconSrc} alt="" class="event-icon" />
+                                                        {/if}
+                                                        <span class="event-title">
+                                                            {event.title} {event.troop_type ? `(${event.troop_type})` : ''}
+                                                        </span>
+                                                    </div>
+                                                    <div class="event-tooltip" on:click|stopPropagation role="tooltip" on:keydown|stopPropagation>
+                                                        <div class="tooltip-header">
+                                                            {#if event.iconSrc}<img src={event.iconSrc} alt="" />{/if}
+                                                            <span>{event.title}</span>
+                                                        </div>
+                                                        <div class="tooltip-body">
+                                                            {#if event.troop_type}<p>Troop: {event.troop_type}</p>{/if}
+                                                            <p>Duration: {event.duration} days</p>
+                                                            {#if Array.isArray(event.guideLink)}
+                                                                {#each event.guideLink as link}
+                                                                    <a href={link.url} target="_blank" class="guide-link" aria-label="Guide for {link.title}"><i class="fab fa-discord"></i> {link.title}</a>
+                                                                {/each}
+                                                            {:else if event.guideLink}
+                                                                <a href={event.guideLink} target="_blank" class="guide-link" aria-label="Guide for {event.title}"><i class="fab fa-discord"></i> Event Guide</a>
+                                                            {/if}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {/if}
+                                        {/each}
+                                    </div>
+                                </div>
+                            {/if}
                         </div>
                     {/each}
                 </div>
@@ -431,12 +515,12 @@
                                     <div class="mobile-actions">
                                         {#if Array.isArray(event.guideLink)}
                                             {#each event.guideLink as link}
-                                                <a href={link.url} target="_blank" class="mobile-guide-btn" title={link.title}>
+                                                <a href={link.url} target="_blank" class="mobile-guide-btn" title={link.title} aria-label="Guide for {link.title}">
                                                     <i class="fas fa-book-open"></i>
                                                 </a>
                                             {/each}
                                         {:else if event.guideLink}
-                                            <a href={event.guideLink} target="_blank" class="mobile-guide-btn" aria-label="Event Guide">
+                                            <a href={event.guideLink} target="_blank" class="mobile-guide-btn" aria-label="Guide for {event.title}">
                                                 <i class="fas fa-book-open"></i>
                                             </a>
                                         {/if}
@@ -609,10 +693,8 @@
         margin-bottom: 8px; pointer-events: none;
     }
     .event-bar:hover .event-tooltip,
-    .event-bar.selected .event-tooltip { 
-        display: block; 
-        pointer-events: auto; 
-    }
+    .event-bar.selected .event-tooltip { display: block; pointer-events: auto; }
+    
     .tooltip-header { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; }
     .tooltip-header img { width: 20px; height: 20px; }
     .tooltip-body p { margin: 2px 0; color: var(--text-secondary); font-size: 0.8rem; }
@@ -621,6 +703,21 @@
 
     .more-events { font-size: 0.7rem; color: var(--text-muted); text-align: center; cursor: pointer; padding: 2px; }
     .more-events:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+
+    .day-popup {
+        position: absolute; top: -5px; left: -5px; right: -5px;
+        background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px;
+        padding: 10px; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        min-height: 100%; animation: fadeIn 0.1s ease-out;
+        display: flex; flex-direction: column; gap: 8px;
+    }
+    .day-popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid var(--border-color); }
+    .popup-date { font-weight: bold; color: var(--text-primary); font-size: 0.9rem; }
+    .popup-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 1rem; }
+    .popup-close:hover { color: var(--text-primary); }
+    .popup-events-list { display: flex; flex-direction: column; gap: 4px; }
+    .day-popup .event-bar { margin: 0; border-radius: 4px; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
     .mobile-list-view { display: none; background: var(--bg-secondary); border-radius: 0 0 12px 12px; padding: 10px; }
     .mobile-day-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; padding: 10px; }
