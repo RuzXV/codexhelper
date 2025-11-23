@@ -75,9 +75,9 @@
         const update = () => {
             const now = new Date();
             if (useLocalTime) {
-                const datePart = now.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-                const timePart = now.toLocaleTimeString(undefined, { hour12: false });
-                clockTime = `${datePart}, ${timePart} (Local)`;
+                const datePart = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                const timePart = now.toLocaleTimeString('en-GB', { hour12: false });
+                clockTime = `${datePart}, ${timePart} Local Time`;
             } else {
                 const datePart = now.toLocaleDateString('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'short' });
                 const timePart = now.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false });
@@ -91,9 +91,9 @@
     $: if (useLocalTime !== undefined && clockInterval) {
         const now = new Date();
         if (useLocalTime) {
-            const datePart = now.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-            const timePart = now.toLocaleTimeString(undefined, { hour12: false });
-            clockTime = `${datePart}, ${timePart} (Local)`;
+            const datePart = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+            const timePart = now.toLocaleTimeString('en-GB', { hour12: false });
+            clockTime = `${datePart}, ${timePart} Local Time`;
         } else {
             const datePart = now.toLocaleDateString('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'short' });
             const timePart = now.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false });
@@ -301,9 +301,46 @@
             return dateStr + ' 00:00 UTC';
         }
     }
+
+    function handleKeydown(e) {
+        if (modalState.add || modalState.shift || modalState.remove || e.target.tagName === 'INPUT') return;
+
+        if (e.key === 'ArrowLeft') changeMonth(-1);
+        if (e.key === 'ArrowRight') changeMonth(1);
+        if (e.key === 't') jumpToToday();
+    }
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    function handleTouchStart(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    }
+
+    function handleTouchEnd(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }
+
+    function handleSwipe() {
+        const threshold = 50;
+        if (touchEndX < touchStartX - threshold) changeMonth(1);
+        if (touchEndX > touchStartX + threshold) changeMonth(-1);
+    }
+
 </script>
 
-<svelte:window on:click={() => selectedEventId = null } />
+<svelte:window 
+    on:click={() => selectedEventId = null} 
+    on:keydown={handleKeydown} 
+/>
+
+<section 
+    class="tool-content"
+    on:touchstart={handleTouchStart} 
+    on:touchend={handleTouchEnd}
+>
+</section>
 
 <section class="tool-hero">
     <div class="tool-hero-container">
@@ -682,7 +719,12 @@
         flex-shrink: 0; }
     .filter-item input:checked + .checkmark { background: var(--evt-color); border-color: var(--evt-color); }
 
-    .calendar-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0 0 12px 12px; overflow: hidden; }
+    .calendar-card { 
+        background: var(--bg-secondary); 
+        border: 1px solid var(--border-color); 
+        border-radius: 0 0 12px 12px; 
+        overflow: visible;
+    }
     .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--bg-tertiary); padding: 10px 0; border-top: 1px solid var(--border-color);
         border-bottom: 1px solid var(--border-color); }
     .weekdays div { text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
@@ -704,12 +746,8 @@
         position: relative; 
         border-right: 1px solid var(--border-color);
         border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s ease;
     }
     
-    .day-cell:hover { background-color: rgba(255, 255, 255, 0.03); }
-    .day-cell:hover .day-number { color: white; transform: scale(1.1); transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-
     .day-cell.today { 
         background: linear-gradient(to bottom, rgba(59, 130, 246, 0.1), transparent);
         box-shadow: inset 0 0 0 1px var(--accent-blue);
