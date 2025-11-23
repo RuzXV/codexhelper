@@ -1,3 +1,49 @@
+window.getStorageKey = function(key) {
+    const user = window.auth && window.auth.getLoggedInUser ? window.auth.getLoggedInUser() : null;
+    if (user && user.id) {
+        return `codex-user-${user.id}-${key}`;
+    }
+    return `codex-guest-${key}`;
+};
+
+window.saveUserData = function(key, data) {
+    try {
+        const storageItem = {
+            timestamp: Date.now(),
+            data: data
+        };
+        localStorage.setItem(window.getStorageKey(key), JSON.stringify(storageItem));
+    } catch (e) {
+        console.error("Failed to save user data", e);
+    }
+};
+
+window.loadUserData = function(key) {
+    try {
+        const json = localStorage.getItem(window.getStorageKey(key));
+        if (!json) return null;
+
+        const storageItem = JSON.parse(json);
+        
+        const EXPIRY_TIME = 90 * 24 * 60 * 60 * 1000; 
+
+        if (Date.now() - storageItem.timestamp > EXPIRY_TIME) {
+            console.log("Data expired, clearing:", key);
+            localStorage.removeItem(window.getStorageKey(key));
+            return null;
+        }
+
+        return storageItem.data;
+    } catch (e) {
+        try {
+            const legacyData = localStorage.getItem(window.getStorageKey(key));
+            return legacyData ? JSON.parse(legacyData) : null;
+        } catch (err) {
+            return null;
+        }
+    }
+};
+
 window.debounce = (callback, wait) => {
     let timeoutId = null;
     return (...args) => {

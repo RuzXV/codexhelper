@@ -5,7 +5,6 @@
     import EventModal from './EventModal.svelte';
     import ShiftModal from './ShiftModal.svelte';
     import RemoveModal from './RemoveModal.svelte';
-
     const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', { eager: true });
 
     function getIconSrc(filename) {
@@ -20,32 +19,26 @@
     let clockTime = '';
     let clockInterval;
     let isLoading = false;
-    
     let selectedEventId = null;
     
     let isFilterOpen = false;
     let activeFilters = []; 
     const ALL_EVENT_TYPES = Object.keys(eventConfigs.events);
-
     let modalState = {
         add: false,
         shift: false,
         remove: false
     };
-
     $: activeSeries = getUniqueSeries(events);
     $: year = viewDate.getUTCFullYear();
     $: month = viewDate.getUTCMonth();
     $: monthName = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(viewDate);
-    
     $: filteredEvents = activeFilters.length > 0 
         ? events.filter(e => activeFilters.includes(e.type)) 
         : events;
-
     $: calendarCells = window.calendarUtils 
         ? window.calendarUtils.generateGrid(year, month, filteredEvents, eventConfigs, getIconSrc)
         : [];
-
     onMount(async () => {
         startClock();
         loadFilters();
@@ -64,12 +57,10 @@
             }
         });
     });
-
     onDestroy(() => {
         if (clockInterval) clearInterval(clockInterval);
         window.removeEventListener('auth:loggedIn', checkAdminStatus);
     });
-
     function startClock() {
         const update = () => {
             const now = new Date();
@@ -215,7 +206,8 @@
             });
             await fetchEvents();
         } catch (err) { console.error(err); }
-        finally { isLoading = false; }
+        finally { isLoading = false;
+        }
     }
 
     async function handleRemoveSeries(e) {
@@ -225,26 +217,37 @@
             const toDelete = events.filter(ev => ev.series_id === seriesId);
             const prev = [...events];
             events = events.filter(ev => ev.series_id !== seriesId);
-            
             await Promise.all(toDelete.map(ev => 
                  window.auth.fetchWithAuth(`/api/events/${ev.id}`, { method: 'DELETE' })
             ));
-            
             await fetchEvents();
         } catch (err) { 
-            console.error(err); 
+            console.error(err);
             await fetchEvents(); 
         }
-        finally { isLoading = false; }
+        finally { isLoading = false;
+        }
+    }
+
+    function hexToRgb(hex) {
+        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : { r: 59, g: 130, b: 246 };
     }
 
     function getEventStyle(type, hex) {
-        const baseHex = hex || '#3b82f6';
+        const rgb = hexToRgb(hex || '#3b82f6');
         return `
-            background-color: ${baseHex}; 
-            border-color: ${baseHex};
-            color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            background-color: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35); 
+            --event-color: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1);
         `;
     }
     
@@ -282,6 +285,7 @@
                                 <button class="clear-btn" on:click={clearFilters}>Clear</button>
                             {/if}
                         </div>
+    
                         <div class="filter-list">
                             {#each ALL_EVENT_TYPES as type}
                                 <label class="filter-item">
@@ -494,13 +498,16 @@
         display: flex; justify-content: space-between; align-items: center;
         background: var(--bg-secondary); border: 1px solid var(--border-color);
         border-bottom: none; border-radius: 12px 12px 0 0; padding: 16px 24px;
-        flex-wrap: wrap; gap: 16px; position: relative;
+        flex-wrap: wrap; gap: 16px;
+        position: relative;
     }
     .nav-controls { display: flex; align-items: center; gap: 16px; flex-grow: 1; justify-content: center; }
-    .nav-controls h2 { margin: 0; font-size: 1.5rem; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; text-align: center; }
+    .nav-controls h2 { margin: 0; font-size: 1.5rem; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1px;
+        min-width: 250px; text-align: center; }
     .nav-controls .year { color: var(--text-secondary); font-weight: 400; }
     
-    .nav-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; padding: 8px; transition: color 0.2s; }
+    .nav-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer;
+        padding: 8px; transition: color 0.2s; }
     .nav-btn:hover { color: white; }
 
     .right-controls { display: flex; align-items: center; gap: 12px; }
@@ -518,7 +525,8 @@
         border: 1px solid var(--border-color);
     }
     .admin-btn {
-        width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px; display: flex;
+        align-items: center; justify-content: center;
         border-radius: 6px; font-size: 0.9rem; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
     }
     .admin-btn.add { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
@@ -530,10 +538,13 @@
 
     .filter-container { position: relative; }
     .filter-btn { display: flex; align-items: center; gap: 5px; position: relative; }
-    .filter-badge { background: var(--accent-blue); color: white; font-size: 0.7rem; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; position: absolute; top: 0; right: 0; }
+    .filter-badge { background: var(--accent-blue); color: white; font-size: 0.7rem; border-radius: 50%; width: 16px; height: 16px;
+        display: flex; align-items: center; justify-content: center; position: absolute; top: 0; right: 0;
+    }
     
     .filter-dropdown {
-        position: absolute; top: 100%; left: 0; z-index: 100;
+        position: absolute;
+        top: 100%; left: 0; z-index: 100;
         background: var(--bg-tertiary); border: 1px solid var(--border-color);
         border-radius: 8px; width: 280px;
         padding: 10px;
@@ -541,7 +552,7 @@
     }
     
     .filter-header { 
-        display: flex; 
+        display: flex;
         justify-content: space-between; 
         align-items: center; 
         height: 32px; 
@@ -552,31 +563,45 @@
         box-sizing: border-box;
     }
     
-    .clear-btn { background: none; border: none; color: var(--text-muted); font-size: 0.8rem; cursor: pointer; text-decoration: underline; padding: 0; margin: 0; line-height: 1; }
-    .filter-list { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
+    .clear-btn { background: none; border: none; color: var(--text-muted); font-size: 0.8rem; cursor: pointer;
+        text-decoration: underline; padding: 0; margin: 0; line-height: 1; }
+    .filter-list { max-height: 300px; overflow-y: auto; display: flex;
+        flex-direction: column; gap: 5px; }
     
-    .filter-item { display: flex; align-items: center; gap: 8px; padding: 5px; cursor: pointer; font-size: 0.9rem; color: var(--text-primary); }
+    .filter-item { display: flex; align-items: center; gap: 8px;
+        padding: 5px; cursor: pointer; font-size: 0.9rem; color: var(--text-primary); }
     .filter-item input { display: none; }
     .filter-list-icon { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
-    .checkmark { width: 12px; height: 12px; border-radius: 2px; border: 1px solid var(--text-muted); background: transparent; position: relative; flex-shrink: 0; }
+    .checkmark { width: 12px; height: 12px; border-radius: 2px; border: 1px solid var(--text-muted); background: transparent; position: relative;
+        flex-shrink: 0; }
     .filter-item input:checked + .checkmark { background: var(--evt-color); border-color: var(--evt-color); }
 
     .calendar-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0 0 12px 12px; overflow: hidden; }
-    .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--bg-tertiary); padding: 10px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+    .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--bg-tertiary); padding: 10px 0; border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color); }
     .weekdays div { text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
     
-    .grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--border-color); gap: 1px; }
+    .grid { 
+        display: grid; 
+        grid-template-columns: repeat(7, 1fr); 
+        background: var(--bg-secondary);
+        gap: 0; 
+        border-top: 1px solid var(--border-color);
+        border-left: 1px solid var(--border-color);
+    }
     .day-cell { 
         background-color: var(--bg-secondary); 
-        min-height: 80px; 
+        min-height: 80px;
         padding: 4px 0; 
         display: flex; 
         flex-direction: column; 
         position: relative; 
+        border-right: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
     }
     
     .day-cell.today { 
-        background-color: rgba(59, 130, 246, 0.05); 
+        background-color: rgba(59, 130, 246, 0.05);
         box-shadow: inset 0 0 0 2px var(--accent-blue), inset 0 0 15px rgba(59,130,246,0.2);
         z-index: 2;
     }
@@ -584,7 +609,7 @@
     .day-cell.other-month .day-number { opacity: 0.3; }
     
     .day-number { 
-        margin: 4px 8px; 
+        margin: 4px 8px;
         font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); align-self: flex-end;
         width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
     }
@@ -592,7 +617,8 @@
 
     .day-cell.skeleton-loading { pointer-events: none; }
     .day-cell.skeleton-loading::before {
-        content: ""; position: absolute; inset: 10px; background: rgba(255,255,255,0.05);
+        content: "";
+        position: absolute; inset: 10px; background: rgba(255,255,255,0.05);
         border-radius: 4px; animation: pulse 1.5s infinite;
     }
     @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
@@ -600,12 +626,34 @@
     .event-stack { display: flex; flex-direction: column; gap: 2px; width: 100%; margin-top: 2px; }
     
     .event-bar {
-        height: 24px; font-size: 0.75rem; color: white; display: flex; align-items: center; padding: 0 4px;
-        white-space: nowrap; overflow: visible; position: relative; margin: 1px -1px; border-radius: 0;
+        height: 24px;
+        font-size: 0.75rem; color: white; display: flex; align-items: center; padding: 0 4px;
+        white-space: nowrap; overflow: visible; position: relative; 
+        
+        margin: 1px 0;
+        border-radius: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.4);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        border-left: none;
+        border-right: none;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        
         cursor: pointer;
+        z-index: 10;
     }
-    .event-bar.start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; margin-left: 4px; }
-    .event-bar.end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; margin-right: 4px; }
+    .event-bar.start { 
+        border-top-left-radius: 6px; 
+        border-bottom-left-radius: 6px; 
+        margin-left: 6px;
+        border-left: 1px solid rgba(255, 255, 255, 0.4);
+    }
+    .event-bar.end { 
+        border-top-right-radius: 6px; 
+        border-bottom-right-radius: 6px; 
+        margin-right: 6px; 
+        border-right: 1px solid rgba(255, 255, 255, 0.4);
+    }
     .event-bar.temp-optimistic { opacity: 0.7; filter: grayscale(0.3); }
     
     .event-content { display: flex; align-items: center; gap: 6px; width: 100%; overflow: hidden; }
@@ -613,18 +661,22 @@
     .event-title { font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.5); overflow: hidden; text-overflow: ellipsis; }
 
     .event-tooltip {
-        display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+        display: none; position: absolute; bottom: 100%;
+        left: 50%; transform: translateX(-50%);
         background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px;
-        padding: 10px; min-width: 180px; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        padding: 10px; min-width: 180px; z-index: 50;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         margin-bottom: 8px; pointer-events: none;
     }
     .event-bar:hover .event-tooltip,
     .event-bar.selected .event-tooltip { display: block; pointer-events: auto; }
     
-    .tooltip-header { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; }
+    .tooltip-header { display: flex; align-items: center; gap: 8px;
+        border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; }
     .tooltip-header img { width: 20px; height: 20px; }
     .tooltip-body p { margin: 2px 0; color: var(--text-secondary); font-size: 0.8rem; }
-    .guide-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; color: var(--accent-blue); font-weight: 600; text-decoration: none; font-size: 0.8rem; display: block; }
+    .guide-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; color: var(--accent-blue); font-weight: 600; text-decoration: none;
+        font-size: 0.8rem; display: block; }
     .guide-link:hover { text-decoration: underline; }
 
     .mobile-list-view { display: none; background: var(--bg-secondary); border-radius: 0 0 12px 12px; padding: 10px; }
