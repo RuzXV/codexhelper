@@ -33,8 +33,7 @@ app.use('/api/*', cors({
     origin: [
         'https://codexhelper.com', 
         'https://www.codexhelper.com',
-        'http://localhost:4321',
-        'http://localhost:8788'
+        'http://127.0.0.1:8788'
     ],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,

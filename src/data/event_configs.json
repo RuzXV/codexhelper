@@ -1,93 +1,107 @@
 {
-    "events": {
-      "mge": {
-        "title": "Mightiest Governor",
-        "duration": 6,
-        "has_troop_type": true,
-        "recurrence_interval": 14,
-        "color_hex": "#EAB308",
-        "icon": "mge.webp"
-      },
-      "wof": {
-        "title": "Wheel of Fortune",
-        "duration": 3,
-        "has_troop_type": true,
-        "recurrence_interval": 14,
-        "color_hex": "#A855F7",
-        "icon": "wheel.webp"
-      },
-      "mtg": {
-        "title": "More Than Gems",
-        "duration": 2,
-        "has_troop_type": false,
-        "recurrence_interval": 28,
-        "color_hex": "#3B82F6",
-        "icon": "mtg.webp"
-      },
-      "gk": {
-        "title": "Golden Kingdom",
-        "duration": 4,
-        "has_troop_type": false,
-        "recurrence_interval": 14,
-        "color_hex": "#F59E0B",
-        "icon": "golden_kingdom.webp"
-      },
-      "ceroli": {
-        "title": "Ceroli Crisis",
-        "duration": 3,
-        "has_troop_type": false,
-        "recurrence_interval": 14,
-        "color_hex": "#10B981",
-        "icon": "ceroli.webp"
-      },
-      "rom": {
-        "title": "Realm of Mystique",
-        "duration": 3,
-        "has_troop_type": false,
-        "recurrence_interval": 14,
-        "color_hex": "#6366F1",
-        "icon": "realm_of_mystique.webp"
-      },
-      "esm": {
-        "title": "Esmeralda’s House",
-        "duration": 2,
-        "has_troop_type": false,
-        "recurrence_interval": 14,
-        "color_hex": "#EC4899",
-        "icon": "esmeralda_house.webp"
-      },
-      "arma": {
-        "title": "Armament, Reveal Thyself",
-        "duration": 2,
-        "has_troop_type": false,
-        "recurrence_interval": 14,
-        "color_hex": "#8B5CF6",
-        "icon": "reveal.webp"
-      },
-      "dhal": {
-        "title": "Dhalruk’s Puzzle Box",
-        "duration": 2,
-        "has_troop_type": false,
-        "recurrence_interval": 14,
-        "color_hex": "#14B8A6",
-        "icon": "dhalruk.webp"
-      },
-      "egg_hammer": {
-        "title": "Egg / Hammer Event",
-        "duration": 2,
-        "has_troop_type": false,
-        "recurrence_interval": 14,
-        "color_hex": "#06B6D4",
-        "icon": "egg_hammer.webp"
-      },
-      "goldhead": {
-        "title": "20 Gold Head Event",
-        "duration": 2,
-        "has_troop_type": false,
-        "recurrence_interval": 14,
-        "color_hex": "#EAB308",
-        "icon": "legendary_head.webp"
-      }
+  "events": {
+    "mge": {
+      "title": "Mightiest Governor",
+      "duration": 6,
+      "has_troop_type": true,
+      "recurrence_interval": 14,
+      "color_hex": "#EAB308",
+      "icon": "mge.webp",
+      "guide_link": "https://discord.com/channels/1031515159627300924/1317226253664649237"
     },
-    "troop_types": ["Infantry", "Archer", "Cavalry", "Leadership"]
-  }
+    "wof": {
+      "title": "Wheel of Fortune",
+      "duration": 3,
+      "has_troop_type": true,
+      "recurrence_interval": 14,
+      "color_hex": "#A855F7",
+      "icon": "wheel.webp",
+      "guide_link": "https://discord.com/channels/1031515159627300924/1349815570874368170"
+    },
+    "mtg": {
+      "title": "More Than Gems",
+      "duration": 2,
+      "has_troop_type": false,
+      "recurrence_interval": 28,
+      "color_hex": "#D70040",
+      "icon": "mtg.webp",
+      "guide_link": "https://discord.com/channels/1031515159627300924/1349759035292913785"
+    },
+    "gk": {
+      "title": "Golden Kingdom",
+      "duration": 3,
+      "has_troop_type": false,
+      "recurrence_interval": 14,
+      "color_hex": "#F59E0B",
+      "icon": "golden_kingdom.webp",
+      "guide_link": "https://discord.com/channels/1031515159627300924/1336655065007521882"
+    },
+    "ceroli": {
+      "title": "Ceroli Crisis",
+      "duration": 3,
+      "has_troop_type": false,
+      "recurrence_interval": 14,
+      "color_hex": "#10B981",
+      "icon": "ceroli.webp",
+      "guide_link": "https://discord.com/channels/1031515159627300924/1399348304671801385"
+    },
+    "rom": {
+      "title": "Realm of Mystique",
+      "duration": 2,
+      "has_troop_type": false,
+      "recurrence_interval": 14,
+      "color_hex": "#6366F1",
+      "icon": "realm_of_mystique.webp",
+      "guide_link": "https://discord.com/channels/1031515159627300924/1349788731686780928"
+    },
+    "esm": {
+      "title": "Esmeralda’s House",
+      "duration": 2,
+      "has_troop_type": false,
+      "recurrence_interval": 42,
+      "color_hex": "#EC4899",
+      "icon": "esmeralda_house.webp",
+      "guide_link": "https://discord.com/channels/1031515159627300924/1350105219731554304"
+    },
+    "arma": {
+      "title": "Armament, Reveal Thyself",
+      "duration": 2,
+      "has_troop_type": false,
+      "recurrence_interval": 42,
+      "color_hex": "#8B5CF6",
+      "icon": "reveal.webp",
+      "guide_link": "https://discord.com/channels/1031515159627300924/1336304157220405319"
+    },
+    "dhal": {
+      "title": "Dhalruk’s Puzzle Box",
+      "duration": 2,
+      "has_troop_type": false,
+      "recurrence_interval": 42,
+      "color_hex": "#14B8A6",
+      "icon": "dhalruk.webp",
+      "guide_link": "https://discord.com/channels/1031515159627300924/1379065862228807690"
+    },
+    "egg_hammer": {
+      "title": "Egg / Hammer Event",
+      "duration": 2,
+      "has_troop_type": false,
+      "recurrence_interval": 14,
+      "color_hex": "#06B6D4",
+      "icon": "egg_hammer.webp",
+      "guide_link": [
+        { "title": "Holy Knight's Treasure (Egg)", "url": "https://discord.com/channels/1031515159627300924/1350107254451474498" },
+        { "title": "Hunt for History (Hammer)", "url": "https://discord.com/channels/1031515159627300924/1349781000862826537" }
+      ]
+    },
+    "goldhead": {
+      "title": "20 Gold Head Event",
+      "duration": 2,
+      "has_troop_type": false,
+      "recurrence_interval": 14,
+      "color_hex": "#EAB308",
+      "icon": "legendary_head.webp",
+      "guide_link": null
+    }
+  },
+  "troop_types": ["Infantry", "Archer", "Cavalry", "Leadership"]
+}

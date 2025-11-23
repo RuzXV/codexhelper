@@ -4,9 +4,11 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "local": "concurrently \"npm run dev\" \"npx wrangler pages dev --proxy 4321\" --kill-others --names \"ASTRO,WRANGLER\""
   },
   "dependencies": {
     "@astrojs/svelte": "^7.2.2",
@@ -17,6 +19,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240419.0",
+    "concurrently": "^9.1.2",
     "wrangler": "^4.46.0"
   }
 }

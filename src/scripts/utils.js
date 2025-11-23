@@ -100,21 +100,129 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-window.fitTextToContainer = function(containerElement) {
-    if (!containerElement) return;
-
-    const MAX_FONT_SIZE = 16;
-    const MIN_FONT_SIZE = 8;
-    const STEP = 0.5;
-
-    const elementsToResize = containerElement.querySelectorAll('.stats-group, .special-stat, .no-items-placeholder');
-    if (elementsToResize.length === 0) return;
-
-    elementsToResize.forEach(el => el.style.fontSize = `${MAX_FONT_SIZE}px`);
+window.calendarUtils = {
+    toISODate: (d) => d.toISOString().split('T')[0],
     
-    let currentFontSize = MAX_FONT_SIZE;
-    while (containerElement.scrollHeight > containerElement.clientHeight && currentFontSize > MIN_FONT_SIZE) {
-        currentFontSize -= STEP;
-        elementsToResize.forEach(el => el.style.fontSize = `${currentFontSize}px`);
+    addDays: (dateStr, days) => {
+        const d = new Date(dateStr + 'T00:00:00Z');
+        d.setUTCDate(d.getUTCDate() + days);
+        return d.toISOString().split('T')[0];
+    },
+
+    generateGrid: (y, m, currentEvents, eventConfigs, getIconSrc) => {
+        const daysInMonth = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+        
+        let firstDayIndex = new Date(Date.UTC(y, m, 1)).getUTCDay(); 
+        firstDayIndex = (firstDayIndex + 6) % 7;
+
+        const prevMonthDays = new Date(Date.UTC(y, m, 0)).getUTCDate();
+        const totalCells = 42;
+        const cells = [];
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        for (let i = 0; i < totalCells; i++) {
+            let cellYear = y, cellMonth = m, cellDay;
+            let isOtherMonth = false;
+
+            if (i < firstDayIndex) {
+                isOtherMonth = true;
+                cellDay = prevMonthDays - (firstDayIndex - 1 - i);
+                cellMonth = m - 1;
+                if (cellMonth < 0) { cellMonth = 11; cellYear--; }
+            } else if (i >= firstDayIndex && i < firstDayIndex + daysInMonth) {
+                cellDay = i - firstDayIndex + 1;
+            } else {
+                isOtherMonth = true;
+                cellDay = i - (firstDayIndex + daysInMonth) + 1;
+                cellMonth = m + 1;
+                if (cellMonth > 11) { cellMonth = 0; cellYear++; }
+            }
+
+            const dateStr = `${cellYear}-${String(cellMonth + 1).padStart(2, '0')}-${String(cellDay).padStart(2, '0')}`;
+            const isPast = dateStr < todayStr; 
+
+            cells.push({ 
+                day: cellDay, 
+                dateStr, 
+                isOtherMonth, 
+                isToday: dateStr === todayStr, 
+                isPast,
+                events: [] 
+            });
+        }
+
+        const sortedEvents = [...currentEvents].sort((a, b) => {
+            if (a.start_date !== b.start_date) return a.start_date.localeCompare(b.start_date);
+            if (a.duration !== b.duration) return b.duration - a.duration;
+            return a.title.localeCompare(b.title);
+        });
+
+        let laneFreeDates = []; 
+        const eventLaneMap = new Map();
+
+        sortedEvents.forEach(event => {
+            const eventStart = event.start_date;
+            const eventEnd = window.calendarUtils.addDays(event.start_date, event.duration); 
+            
+            let assignedLane = -1;
+            for (let i = 0; i < laneFreeDates.length; i++) {
+                if (eventStart >= laneFreeDates[i]) {
+                    assignedLane = i;
+                    break;
+                }
+            }
+
+            if (assignedLane === -1) {
+                assignedLane = laneFreeDates.length;
+                laneFreeDates.push(eventEnd);
+            } else {
+                laneFreeDates[assignedLane] = eventEnd;
+            }
+
+            eventLaneMap.set(event.id, assignedLane);
+        });
+
+        cells.forEach(cell => {
+            const dayActiveEvents = currentEvents.filter(e => {
+                const endStr = window.calendarUtils.addDays(e.start_date, e.duration - 1);
+                return cell.dateStr >= e.start_date && cell.dateStr <= endStr;
+            });
+
+            if (dayActiveEvents.length === 0) return;
+
+            const maxLane = dayActiveEvents.length > 0 
+                ? Math.max(...dayActiveEvents.map(e => eventLaneMap.get(e.id))) 
+                : 0;
+            
+            const cellEvents = new Array(maxLane + 1).fill(null);
+
+            dayActiveEvents.forEach(e => {
+                const lane = eventLaneMap.get(e.id);
+                const endStr = window.calendarUtils.addDays(e.start_date, e.duration - 1);
+                
+                const isStart = cell.dateStr === e.start_date;
+                const isEnd = cell.dateStr === endStr;
+                
+                const dayOfWeek = (new Date(cell.dateStr + 'T00:00:00Z').getUTCDay() + 6) % 7;
+                const isRowStart = dayOfWeek === 0;
+                const isRowEnd = dayOfWeek === 6;
+
+                const config = eventConfigs.events[e.type];
+                const iconSrc = config ? getIconSrc(config.icon) : null;
+                const colorHex = config ? config.color_hex : '#3b82f6';
+                const guideLink = config ? config.guide_link : null;
+
+                cellEvents[lane] = { 
+                    ...e, 
+                    isStart, isEnd, isRowStart, isRowEnd,
+                    iconSrc, 
+                    colorHex,
+                    guideLink
+                };
+            });
+
+            cell.events = cellEvents;
+        });
+        return cells;
     }
 };

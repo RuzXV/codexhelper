@@ -19,3 +19,5 @@ pnpm-debug.log*
 *.sw?
 .bat
 .dev.vars
+.wrangler
+wrangler.toml
