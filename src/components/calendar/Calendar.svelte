@@ -397,7 +397,8 @@
             </div>
              
             {#key viewDate} 
-                <div class="grid"> {#each calendarCells as cell}
+                <div class="grid"> 
+                    {#each calendarCells as cell, cIndex}
                         <div class="day-cell" 
                              class:other-month={cell.isOtherMonth} 
                              class:today={cell.isToday} 
@@ -419,7 +420,7 @@
                                             class:dimmed={hoveredSeriesId && hoveredSeriesId !== event.series_id}
                                             class:highlighted={hoveredSeriesId === event.series_id}
                                             
-                                            in:fly={{ y: 10, duration: 300, delay: i * 30 }}
+                                            in:fly={{ y: 10, duration: 300, delay: (cIndex * 10) + (i * 20) }}
                                             
                                             on:mouseenter={() => hoveredSeriesId = event.series_id}
                                             on:mouseleave={() => hoveredSeriesId = null}
@@ -594,12 +595,16 @@
 
     .calendar-header-card {
         display: flex; justify-content: space-between; align-items: center;
-        background: var(--bg-secondary);
+
+        background: linear-gradient(145deg, var(--bg-secondary), #181a1f);
         border: 1px solid var(--border-color);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px 12px 0 0; padding: 16px 24px;
+        border-bottom: 2px solid var(--accent-blue);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        border-radius: 12px 12px 0 0; 
+        padding: 16px 24px;
         flex-wrap: wrap; gap: 16px;
-        position: relative; 
+        position: relative;
+        z-index: 2;
     }
     
     .nav-controls { display: flex; align-items: center; gap: 16px; flex-grow: 1; justify-content: center; }
@@ -736,7 +741,7 @@
         font-size: 0.75rem; color: white; display: flex; align-items: center; padding: 0 4px;
         white-space: nowrap; overflow: visible; position: relative; 
         
-        margin: 1px 0;
+        margin: 1px -1px; 
         border-radius: 0;
         
         border-top: 1px solid rgba(255, 255, 255, 0.4);
@@ -754,7 +759,7 @@
     .event-bar.dimmed { opacity: 0.2; filter: grayscale(1); }
     .event-bar.highlighted { 
         opacity: 1; 
-        filter: brightness(1.3) contrast(1.1);
+        filter: brightness(1.3) contrast(1.1); 
         z-index: 20;
     }
 
@@ -769,12 +774,12 @@
     .event-bar.start { 
         border-top-left-radius: 6px; border-bottom-left-radius: 6px; 
         border-left: 1px solid rgba(255, 255, 255, 0.4);
-        margin-left: 4px;
+        margin-left: 6px;
     }
     .event-bar.end { 
         border-top-right-radius: 6px; border-bottom-right-radius: 6px; 
         border-right: 1px solid rgba(255, 255, 255, 0.4);
-        margin-right: 4px;
+        margin-right: 6px;
     }
     
     .event-bar.temp-optimistic { opacity: 0.7; filter: grayscale(0.3); }
