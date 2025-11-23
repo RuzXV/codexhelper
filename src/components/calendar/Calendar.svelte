@@ -1,10 +1,11 @@
 <script>
     import { onMount, onDestroy } from 'svelte';
-    import { fade, slide } from 'svelte/transition';
+    import { fade, slide, fly } from 'svelte/transition';
     import eventConfigs from '../../data/event_configs.json';
     import EventModal from './EventModal.svelte';
     import ShiftModal from './ShiftModal.svelte';
     import RemoveModal from './RemoveModal.svelte';
+    
     const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', { eager: true });
 
     function getIconSrc(filename) {
@@ -21,6 +22,9 @@
     let isLoading = false;
     let selectedEventId = null;
     
+    let hoveredSeriesId = null;
+    let useLocalTime = false;
+    
     let isFilterOpen = false;
     let activeFilters = []; 
     const ALL_EVENT_TYPES = Object.keys(eventConfigs.events);
@@ -29,16 +33,20 @@
         shift: false,
         remove: false
     };
+
     $: activeSeries = getUniqueSeries(events);
     $: year = viewDate.getUTCFullYear();
     $: month = viewDate.getUTCMonth();
     $: monthName = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(viewDate);
+    
     $: filteredEvents = activeFilters.length > 0 
         ? events.filter(e => activeFilters.includes(e.type)) 
         : events;
+        
     $: calendarCells = window.calendarUtils 
         ? window.calendarUtils.generateGrid(year, month, filteredEvents, eventConfigs, getIconSrc)
         : [];
+
     onMount(async () => {
         startClock();
         loadFilters();
@@ -57,19 +65,40 @@
             }
         });
     });
+
     onDestroy(() => {
         if (clockInterval) clearInterval(clockInterval);
         window.removeEventListener('auth:loggedIn', checkAdminStatus);
     });
+
     function startClock() {
         const update = () => {
             const now = new Date();
-            const datePart = now.toLocaleDateString('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'short' });
-            const timePart = now.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false });
-            clockTime = `${datePart}, ${timePart} UTC`;
+            if (useLocalTime) {
+                const datePart = now.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+                const timePart = now.toLocaleTimeString(undefined, { hour12: false });
+                clockTime = `${datePart}, ${timePart} (Local)`;
+            } else {
+                const datePart = now.toLocaleDateString('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'short' });
+                const timePart = now.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false });
+                clockTime = `${datePart}, ${timePart} UTC`;
+            }
         };
         update();
         clockInterval = setInterval(update, 1000);
+    }
+    
+    $: if (useLocalTime !== undefined && clockInterval) {
+        const now = new Date();
+        if (useLocalTime) {
+            const datePart = now.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+            const timePart = now.toLocaleTimeString(undefined, { hour12: false });
+            clockTime = `${datePart}, ${timePart} (Local)`;
+        } else {
+            const datePart = now.toLocaleDateString('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'short' });
+            const timePart = now.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false });
+            clockTime = `${datePart}, ${timePart} UTC`;
+        }
     }
 
     function checkAdminStatus() {
@@ -252,9 +281,25 @@
         `;
     }
     
-    function getMobileDate(dateStr) {
+    function getDisplayDate(dateStr) {
         const d = new Date(dateStr);
+        if (useLocalTime) {
+            return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+        }
         return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
+    }
+
+    function getEventTimeString(dateStr) {
+        if (!dateStr) return '';
+        if (useLocalTime) {
+            const d = new Date(dateStr + 'T00:00:00Z');
+            return d.toLocaleString(undefined, {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        } else {
+            return dateStr + ' 00:00 UTC';
+        }
     }
 </script>
 
@@ -264,11 +309,28 @@
     <div class="tool-hero-container">
         <div class="section-badge">Community Tools</div>
         <h1>Event Calendar</h1>
-        <div class="utc-clock">{clockTime}</div>
+        
+        <div class="clock-toggle-wrapper">
+            <div class="utc-clock">{clockTime}</div>
+            <button 
+                class="time-toggle-btn" 
+                class:active={useLocalTime}
+                on:click={() => useLocalTime = !useLocalTime}
+                title={useLocalTime ? "Switch to Game Time (UTC)" : "Switch to Local Time"}
+            >
+                <i class="fas" class:fa-globe={!useLocalTime} class:fa-home={useLocalTime}></i>
+                {useLocalTime ? 'Local' : 'UTC'}
+            </button>
+        </div>
     </div>
 </section>
 
 <section class="tool-content">
+    <div class="ambient-glows">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
     <div class="tool-container calendar-container">
         
         <div class="calendar-header-card">
@@ -359,8 +421,16 @@
                                             class:end={event.isEnd || event.isRowEnd}
                                             class:temp-optimistic={event.isTemp}
                                             class:selected={selectedEventId === event.id}
+                                            class:dimmed={hoveredSeriesId && hoveredSeriesId !== event.series_id}
+                                            class:highlighted={hoveredSeriesId === event.series_id}
+                                            
+                                            in:fly={{ y: 10, duration: 300, delay: i * 30 }}
+                                            
+                                            on:mouseenter={() => hoveredSeriesId = event.series_id}
+                                            on:mouseleave={() => hoveredSeriesId = null}
                                             on:click|stopPropagation={() => selectedEventId = (selectedEventId === event.id ? null : event.id)}
                                             on:keydown={(e) => e.key === 'Enter' && (selectedEventId = (selectedEventId === event.id ? null : event.id))}
+                                            
                                             role="button"
                                             tabindex="0"
                                             style={getEventStyle(event.type, event.colorHex)}
@@ -388,6 +458,7 @@
                                                         <span>{event.title}</span>
                                                     </div>
                                                     <div class="tooltip-body">
+                                                        <p class="time-info">Start: {getEventTimeString(event.start_date)}</p>
                                                         {#if event.troop_type}<p>Troop: {event.troop_type}</p>{/if}
                                                         <p>Duration: {event.duration} days</p>
                                                         
@@ -423,7 +494,7 @@
             {#each calendarCells.filter(c => c.events.some(e => e !== null) && !c.isOtherMonth) as cell}
                 <div class="mobile-day-card" class:today-card={cell.isToday}>
                     <div class="mobile-date-header">
-                        {getMobileDate(cell.dateStr)}
+                        {getDisplayDate(cell.dateStr)}
                     </div>
                     <div class="mobile-events">
                         {#each cell.events.filter(e => e !== null) as event}
@@ -434,6 +505,7 @@
                                         {#if event.troop_type}
                                             <span class="mobile-troop-badge">{event.troop_type}</span>
                                         {/if}
+                                        <span class="mobile-time-badge">{getEventTimeString(event.start_date)}</span>
                                     </div>
                                     
                                     <div class="mobile-actions">
@@ -485,23 +557,68 @@
 />
 
 <style>
-    .calendar-container { max-width: 1200px; margin: 0 auto; }
+    .calendar-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
     .tool-hero { padding-bottom: 20px; }
+    
+    .clock-toggle-wrapper {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 4px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        margin-top: 10px;
+    }
+
     .utc-clock {
         font-family: 'Monaco', monospace;
         font-size: 1.1rem; color: var(--accent-blue-bright);
-        background: rgba(0, 0, 0, 0.3); padding: 6px 12px;
-        border-radius: 8px; display: inline-block; margin-top: 10px;
-        border: 1px solid var(--border-color);
+        padding: 6px 12px;
+    }
+
+    .time-toggle-btn {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-secondary);
+        border: 1px solid transparent;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+    .time-toggle-btn:hover { color: white; background: rgba(255, 255, 255, 0.1); }
+    .time-toggle-btn.active {
+        background: var(--accent-blue);
+        color: white;
+        font-weight: 600;
+    }
+
+    .tool-content { position: relative; overflow: hidden; }
+    .ambient-glows { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+    .glow-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: floatOrb 20s infinite alternate ease-in-out; }
+    .orb-1 { width: 400px; height: 400px; background: var(--accent-blue); top: -100px; left: -100px; }
+    .orb-2 { width: 300px; height: 300px; background: #a855f7; bottom: -50px; right: -50px; animation-delay: -10s; }
+    @keyframes floatOrb {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(30px, 50px) scale(1.1); }
     }
 
     .calendar-header-card {
         display: flex; justify-content: space-between; align-items: center;
-        background: var(--bg-secondary); border: 1px solid var(--border-color);
-        border-bottom: none; border-radius: 12px 12px 0 0; padding: 16px 24px;
+        background: rgba(20, 21, 24, 0.85);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px 12px 0 0; padding: 16px 24px;
         flex-wrap: wrap; gap: 16px;
-        position: relative;
+        position: sticky; top: 60px; z-index: 50;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
+    
     .nav-controls { display: flex; align-items: center; gap: 16px; flex-grow: 1; justify-content: center; }
     .nav-controls h2 { margin: 0; font-size: 1.5rem; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1px;
         min-width: 250px; text-align: center; }
@@ -599,11 +716,15 @@
         position: relative; 
         border-right: 1px solid var(--border-color);
         border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s ease;
     }
     
+    .day-cell:hover { background-color: rgba(255, 255, 255, 0.03); }
+    .day-cell:hover .day-number { color: white; transform: scale(1.1); transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
     .day-cell.today { 
-        background-color: rgba(59, 130, 246, 0.05);
-        box-shadow: inset 0 0 0 2px var(--accent-blue), inset 0 0 15px rgba(59,130,246,0.2);
+        background: linear-gradient(to bottom, rgba(59, 130, 246, 0.1), transparent);
+        box-shadow: inset 0 0 0 1px var(--accent-blue);
         z-index: 2;
     }
     .day-cell.other-month { background-color: #0f1012; }
@@ -618,11 +739,12 @@
 
     .day-cell.skeleton-loading { pointer-events: none; }
     .day-cell.skeleton-loading::before {
-        content: "";
-        position: absolute; inset: 10px; background: rgba(255,255,255,0.05);
-        border-radius: 4px; animation: pulse 1.5s infinite;
+        content: ""; position: absolute; inset: 10px; border-radius: 4px;
+        background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 100%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
     }
-    @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
     .event-stack { display: flex; flex-direction: column; gap: 2px; width: 100%; margin-top: 2px; }
     
@@ -631,19 +753,24 @@
         font-size: 0.75rem; color: white; display: flex; align-items: center; padding: 0 4px;
         white-space: nowrap; overflow: visible; position: relative; 
         
-        margin: 1px -1px; 
-        
+        margin: 1px -1px;
         border-radius: 0;
         border-top: 1px solid rgba(255, 255, 255, 0.4);
         border-bottom: 1px solid rgba(255, 255, 255, 0.4);
         border-left: none;
         border-right: none;
-        
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
         
         cursor: pointer;
         z-index: 10;
+        transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .event-bar.dimmed { opacity: 0.2; filter: grayscale(1); }
+    .event-bar.highlighted { 
+        opacity: 1; transform: scale(1.02); z-index: 20; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        border-color: rgba(255,255,255,0.8);
     }
 
     .event-bar.placeholder {
@@ -655,17 +782,12 @@
     }
 
     .event-bar.start { 
-        border-top-left-radius: 6px; 
-        border-bottom-left-radius: 6px; 
-        margin-left: 6px;
-        border-left: 1px solid rgba(255, 255, 255, 0.4);
+        border-top-left-radius: 6px; border-bottom-left-radius: 6px; 
+        margin-left: 6px; border-left: 1px solid rgba(255, 255, 255, 0.4);
     }
-    
     .event-bar.end { 
-        border-top-right-radius: 6px; 
-        border-bottom-right-radius: 6px; 
-        margin-right: 6px;
-        border-right: 1px solid rgba(255, 255, 255, 0.4);
+        border-top-right-radius: 6px; border-bottom-right-radius: 6px; 
+        margin-right: 6px; border-right: 1px solid rgba(255, 255, 255, 0.4);
     }
     
     .event-bar.temp-optimistic { opacity: 0.7; filter: grayscale(0.3); }
@@ -689,6 +811,8 @@
         border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; }
     .tooltip-header img { width: 20px; height: 20px; }
     .tooltip-body p { margin: 2px 0; color: var(--text-secondary); font-size: 0.8rem; }
+    .time-info { color: var(--accent-blue-bright) !important; font-weight: 500; }
+
     .guide-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; color: var(--accent-blue); font-weight: 600; text-decoration: none;
         font-size: 0.8rem; display: block; }
     .guide-link:hover { text-decoration: underline; }
@@ -701,35 +825,20 @@
     .mobile-event-info { display: flex; flex-direction: column; }
     .mobile-event-title { font-weight: 600; color: var(--text-primary); }
     .mobile-troop-badge { font-size: 0.75rem; color: var(--text-muted); }
+    .mobile-time-badge { font-size: 0.7rem; color: var(--accent-blue); margin-top: 2px; }
     .mobile-actions { display: flex; gap: 8px; }
     .mobile-guide-btn { color: var(--accent-blue); padding: 5px; font-size: 1.1rem; }
     .empty-state { padding: 20px; text-align: center; color: var(--text-muted); }
 
+    /* Mobile Flex Wrap Fix */
     @media (max-width: 768px) {
         .calendar-header-card { 
-            flex-direction: row; 
-            flex-wrap: wrap; 
-            align-items: center;
-            padding: 12px;
+            flex-direction: row; flex-wrap: wrap; align-items: center; padding: 12px;
+            top: 55px; /* Adjust sticky for mobile nav height */
         }
-        
-        .nav-controls { 
-            order: 1; 
-            width: 100%; 
-            margin-bottom: 10px;
-        }
-        
-        .filter-container { 
-            order: 2; 
-            align-self: center;
-        }
-        
-        .right-controls { 
-            order: 3; 
-            width: auto; 
-            flex-grow: 1; 
-            justify-content: flex-end; 
-        }
+        .nav-controls { order: 1; width: 100%; margin-bottom: 10px; }
+        .filter-container { order: 2; align-self: center; }
+        .right-controls { order: 3; width: auto; flex-grow: 1; justify-content: flex-end; }
         
         .desktop-view { display: none; }
         .mobile-list-view { display: block; }
