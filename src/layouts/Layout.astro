@@ -1,6 +1,6 @@
 ---
-import Navbar from '../components/Navbar.astro';
-import Footer from '../components/Footer.astro';
+import Navbar from '../components/Navbar.svelte';
+import Footer from '../components/Footer.svelte';
 
 import '../styles/styles.css';
 
@@ -14,6 +14,8 @@ const {
     description = "ROK information done right. Enhance your Rise of Kingdoms experience on Discord today.", 
     bodyClass = "" 
 } = Astro.props;
+
+const currentPath = Astro.url.pathname;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -49,7 +51,7 @@ const {
     <slot name="head-scripts" />
 </head>
 <body class={bodyClass}>
-    <Navbar />
+    <Navbar client:load {currentPath} />
 
     <slot />
 

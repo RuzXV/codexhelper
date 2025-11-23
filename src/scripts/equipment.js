@@ -698,6 +698,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    window.fitTextToContainer = function(container) {
+        if (!container) return;
+        
+        container.style.fontSize = '';
+        
+        if (container.scrollHeight <= container.clientHeight) return;
+
+        let size = 14;
+        const minSize = 9;
+
+        while (container.scrollHeight > container.clientHeight && size > minSize) {
+            size--;
+            container.style.fontSize = `${size}px`;
+        }
+    };
+
     function calculateAndDisplayTotalStats() {
         const container = document.getElementById('total-stats-container');
         if (!container) return;

@@ -1,13 +1,15 @@
----
-import { Image } from 'astro:assets';
-import logo from '../assets/images/global/logo-new.webp';
----
+<script>
+    import logo from '../assets/images/global/logo-new.webp';
+    
+    const currentYear = new Date().getFullYear();
+</script>
+
 <footer class="footer">
     <div class="footer-container">
         <div class="footer-content">
             <div class="footer-brand">
                 <div class="logo">
-                    <Image src={logo} alt="Codex Helper Logo" class="logo-image" width="120" height="120" loading="lazy" quality={100}/>
+                    <img src={logo.src} alt="Codex Helper Logo" class="logo-image" width="120" height="120" loading="lazy" />
                     <span>Codex Helper</span>
                 </div>
                 <p>The ultimate Discord bot for Rise of Kingdoms players and discord servers.</p>
@@ -33,7 +35,7 @@ import logo from '../assets/images/global/logo-new.webp';
             </div>
         </div>
         <div class="footer-bottom">
-            <p>Copyright © {new Date().getFullYear()} The King's Codex - All Rights Reserved.</p>
+            <p>Copyright © {currentYear} The King's Codex - All Rights Reserved.</p>
         </div>
     </div>
 </footer>

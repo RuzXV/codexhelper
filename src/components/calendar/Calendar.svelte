@@ -22,7 +22,6 @@
     let isLoading = false;
     
     let selectedEventId = null;
-    let expandedDay = null;
     
     let isFilterOpen = false;
     let activeFilters = []; 
@@ -255,7 +254,7 @@
     }
 </script>
 
-<svelte:window on:click={() => { selectedEventId = null; expandedDay = null; }} />
+<svelte:window on:click={() => selectedEventId = null } />
 
 <section class="tool-hero">
     <div class="tool-hero-container">
@@ -339,16 +338,15 @@
                 <div class="grid" in:fade={{ duration: 250 }}>
                     {#each calendarCells as cell}
                         <div class="day-cell" 
-                            class:other-month={cell.isOtherMonth} 
-                            class:today={cell.isToday} 
-                            class:past={cell.isPast}
-                            class:skeleton-loading={isLoading && events.length === 0} 
-                            class:has-popup={expandedDay === cell} >
+                             class:other-month={cell.isOtherMonth} 
+                             class:today={cell.isToday} 
+                             class:past={cell.isPast}
+                             class:skeleton-loading={isLoading && events.length === 0} >
                             
                             <span class="day-number">{cell.day}</span>
                             
                             <div class="event-stack">
-                                {#each cell.events.slice(0, 3) as event, i}
+                                {#each cell.events as event, i}
                                     {#if event}
                                         <div 
                                             class="event-bar" 
@@ -409,85 +407,7 @@
                                         <div class="event-bar placeholder"></div>
                                     {/if}
                                 {/each}
-
-                                {#if cell.events.length > 3}
-                                    <div 
-                                        class="more-events" 
-                                        on:click|stopPropagation={() => expandedDay = cell}
-                                        role="button" 
-                                        tabindex="0"
-                                        on:keydown={(e) => e.key === 'Enter' && (expandedDay = cell)}
-                                    >
-                                        +{cell.events.length - 3} more
-                                    </div>
-                                {/if}
                             </div>
-
-                            {#if expandedDay === cell}
-                                <div 
-                                    class="day-popup" 
-                                    on:click|stopPropagation 
-                                    role="dialog" 
-                                    aria-modal="true" 
-                                    tabindex="-1"
-                                    on:keydown|stopPropagation
-                                >
-                                    <div class="day-popup-header">
-                                        <span class="popup-date">{getMobileDate(cell.dateStr)}</span>
-                                        <button class="popup-close" on:click={() => expandedDay = null} aria-label="Close popup">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                    <div class="popup-events-list">
-                                        {#each cell.events as event}
-                                            {#if event}
-                                                <div 
-                                                    class="event-bar" 
-                                                    class:selected={selectedEventId === event.id}
-                                                    on:click|stopPropagation={() => selectedEventId = (selectedEventId === event.id ? null : event.id)}
-                                                    on:keydown={(e) => e.key === 'Enter' && (selectedEventId = (selectedEventId === event.id ? null : event.id))}
-                                                    role="button"
-                                                    tabindex="0"
-                                                    style={getEventStyle(event.type, event.colorHex)}
-                                                >
-                                                    <div class="event-content">
-                                                        {#if event.iconSrc}
-                                                            <img src={event.iconSrc} alt="" class="event-icon" />
-                                                        {/if}
-                                                        <span class="event-title">
-                                                            {event.title} {event.troop_type ? `(${event.troop_type})` : ''}
-                                                        </span>
-                                                    </div>
-                                                    <div 
-                                                        class="event-tooltip" 
-                                                        on:click|stopPropagation 
-                                                        role="dialog" 
-                                                        aria-label="Event details"
-                                                        tabindex="-1"
-                                                        on:keydown|stopPropagation
-                                                    >
-                                                        <div class="tooltip-header">
-                                                            {#if event.iconSrc}<img src={event.iconSrc} alt="" />{/if}
-                                                            <span>{event.title}</span>
-                                                        </div>
-                                                        <div class="tooltip-body">
-                                                            {#if event.troop_type}<p>Troop: {event.troop_type}</p>{/if}
-                                                            <p>Duration: {event.duration} days</p>
-                                                            {#if Array.isArray(event.guideLink)}
-                                                                {#each event.guideLink as link}
-                                                                    <a href={link.url} target="_blank" class="guide-link" aria-label="Guide for {link.title}"><i class="fab fa-discord"></i> {link.title}</a>
-                                                                {/each}
-                                                            {:else if event.guideLink}
-                                                                <a href={event.guideLink} target="_blank" class="guide-link" aria-label="Guide for {event.title}"><i class="fab fa-discord"></i> Event Guide</a>
-                                                            {/if}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {/if}
-                                        {/each}
-                                    </div>
-                                </div>
-                            {/if}
                         </div>
                     {/each}
                 </div>
@@ -641,28 +561,19 @@
     .checkmark { width: 12px; height: 12px; border-radius: 2px; border: 1px solid var(--text-muted); background: transparent; position: relative; flex-shrink: 0; }
     .filter-item input:checked + .checkmark { background: var(--evt-color); border-color: var(--evt-color); }
 
-    .calendar-card { 
-        background: var(--bg-secondary); 
-        border: 1px solid var(--border-color); 
-        border-radius: 0 0 12px 12px; 
-        overflow: visible;
-    }
-    .day-cell:nth-last-child(7) { border-bottom-left-radius: 12px; }
-    .day-cell:last-child { border-bottom-right-radius: 12px; }
-
-    .day-cell.has-popup {
-        z-index: 100;
-    }
-
-    .day-cell:nth-last-child(-n+7) .day-popup {
-        top: auto;
-        bottom: -5px;
-    }
+    .calendar-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0 0 12px 12px; overflow: hidden; }
     .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--bg-tertiary); padding: 10px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
     .weekdays div { text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
     
     .grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--border-color); gap: 1px; }
-    .day-cell { background-color: var(--bg-secondary); min-height: 120px; padding: 4px 0; display: flex; flex-direction: column; position: relative; }
+    .day-cell { 
+        background-color: var(--bg-secondary); 
+        min-height: 80px; 
+        padding: 4px 0; 
+        display: flex; 
+        flex-direction: column; 
+        position: relative; 
+    }
     
     .day-cell.today { 
         background-color: rgba(59, 130, 246, 0.05); 
@@ -707,7 +618,6 @@
         padding: 10px; min-width: 180px; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         margin-bottom: 8px; pointer-events: none;
     }
-
     .event-bar:hover .event-tooltip,
     .event-bar.selected .event-tooltip { display: block; pointer-events: auto; }
     
@@ -716,24 +626,6 @@
     .tooltip-body p { margin: 2px 0; color: var(--text-secondary); font-size: 0.8rem; }
     .guide-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; color: var(--accent-blue); font-weight: 600; text-decoration: none; font-size: 0.8rem; display: block; }
     .guide-link:hover { text-decoration: underline; }
-
-    .more-events { font-size: 0.7rem; color: var(--text-muted); text-align: center; cursor: pointer; padding: 2px; }
-    .more-events:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
-
-    .day-popup {
-        position: absolute; top: -5px; left: -5px; right: -5px;
-        background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px;
-        padding: 10px; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        min-height: 100%; animation: fadeIn 0.1s ease-out;
-        display: flex; flex-direction: column; gap: 8px;
-    }
-    .day-popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid var(--border-color); }
-    .popup-date { font-weight: bold; color: var(--text-primary); font-size: 0.9rem; }
-    .popup-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 1rem; }
-    .popup-close:hover { color: var(--text-primary); }
-    .popup-events-list { display: flex; flex-direction: column; gap: 4px; }
-    .day-popup .event-bar { margin: 0; border-radius: 4px; }
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
     .mobile-list-view { display: none; background: var(--bg-secondary); border-radius: 0 0 12px 12px; padding: 10px; }
     .mobile-day-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; padding: 10px; }
