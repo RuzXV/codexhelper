@@ -630,30 +630,43 @@
         font-size: 0.75rem; color: white; display: flex; align-items: center; padding: 0 4px;
         white-space: nowrap; overflow: visible; position: relative; 
         
-        margin: 1px 0;
+        margin: 1px -1px; 
+        
         border-radius: 0;
         border-top: 1px solid rgba(255, 255, 255, 0.4);
         border-bottom: 1px solid rgba(255, 255, 255, 0.4);
         border-left: none;
         border-right: none;
+        
         backdrop-filter: blur(4px);
         -webkit-backdrop-filter: blur(4px);
         
         cursor: pointer;
         z-index: 10;
     }
+
+    .event-bar.placeholder {
+        background: transparent !important;
+        border: none !important;
+        backdrop-filter: none !important;
+        pointer-events: none;
+        z-index: 0;
+    }
+
     .event-bar.start { 
         border-top-left-radius: 6px; 
         border-bottom-left-radius: 6px; 
         margin-left: 6px;
         border-left: 1px solid rgba(255, 255, 255, 0.4);
     }
+    
     .event-bar.end { 
         border-top-right-radius: 6px; 
         border-bottom-right-radius: 6px; 
-        margin-right: 6px; 
+        margin-right: 6px;
         border-right: 1px solid rgba(255, 255, 255, 0.4);
     }
+    
     .event-bar.temp-optimistic { opacity: 0.7; filter: grayscale(0.3); }
     
     .event-content { display: flex; align-items: center; gap: 6px; width: 100%; overflow: hidden; }
