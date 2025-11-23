@@ -339,10 +339,11 @@
                 <div class="grid" in:fade={{ duration: 250 }}>
                     {#each calendarCells as cell}
                         <div class="day-cell" 
-                             class:other-month={cell.isOtherMonth} 
-                             class:today={cell.isToday} 
-                             class:past={cell.isPast}
-                             class:skeleton-loading={isLoading && events.length === 0} >
+                            class:other-month={cell.isOtherMonth} 
+                            class:today={cell.isToday} 
+                            class:past={cell.isPast}
+                            class:skeleton-loading={isLoading && events.length === 0} 
+                            class:has-popup={expandedDay === cell} >
                             
                             <span class="day-number">{cell.day}</span>
                             
@@ -640,7 +641,23 @@
     .checkmark { width: 12px; height: 12px; border-radius: 2px; border: 1px solid var(--text-muted); background: transparent; position: relative; flex-shrink: 0; }
     .filter-item input:checked + .checkmark { background: var(--evt-color); border-color: var(--evt-color); }
 
-    .calendar-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0 0 12px 12px; overflow: hidden; }
+    .calendar-card { 
+        background: var(--bg-secondary); 
+        border: 1px solid var(--border-color); 
+        border-radius: 0 0 12px 12px; 
+        overflow: visible;
+    }
+    .day-cell:nth-last-child(7) { border-bottom-left-radius: 12px; }
+    .day-cell:last-child { border-bottom-right-radius: 12px; }
+
+    .day-cell.has-popup {
+        z-index: 100;
+    }
+
+    .day-cell:nth-last-child(-n+7) .day-popup {
+        top: auto;
+        bottom: -5px;
+    }
     .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--bg-tertiary); padding: 10px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
     .weekdays div { text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
     
