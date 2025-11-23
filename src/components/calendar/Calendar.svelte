@@ -21,34 +21,28 @@
     let clockInterval;
     let isLoading = false;
     
-    // --- Interaction State ---
-    let selectedEventId = null; // For "Click to stick" tooltip
-    let expandedDay = null;     // For "+X more" popup
+    let selectedEventId = null;
+    let expandedDay = null;
     
-    // --- Filtering State ---
     let isFilterOpen = false;
     let activeFilters = []; 
     const ALL_EVENT_TYPES = Object.keys(eventConfigs.events);
 
-    // --- Modal State ---
     let modalState = {
         add: false,
         shift: false,
         remove: false
     };
 
-    // --- Reactive Logic ---
     $: activeSeries = getUniqueSeries(events);
     $: year = viewDate.getUTCFullYear();
     $: month = viewDate.getUTCMonth();
     $: monthName = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(viewDate);
     
-    // Filter Logic
     $: filteredEvents = activeFilters.length > 0 
         ? events.filter(e => activeFilters.includes(e.type)) 
         : events;
 
-    // Grid Generation via Utils
     $: calendarCells = window.calendarUtils 
         ? window.calendarUtils.generateGrid(year, month, filteredEvents, eventConfigs, getIconSrc)
         : [];
@@ -65,7 +59,6 @@
         });
         if (window.onAuthSuccess) window.onAuthSuccess = checkAdminStatus;
 
-        // Close dropdowns on outside click (specific to filter container)
         document.addEventListener('click', (e) => {
             if (isFilterOpen && !e.target.closest('.filter-container')) {
                 isFilterOpen = false;
@@ -94,7 +87,6 @@
         isAdmin = user?.is_calendar_admin || false; 
     }
 
-    // Filter Storage
     function loadFilters(userId = null) {
         const user = userId || (window.auth?.getLoggedInUser()?.id);
         const key = user ? `calendar_filters_${user}` : 'calendar_filters_guest';
@@ -156,7 +148,6 @@
         viewDate = new Date(viewDate);
     }
 
-    // Optimistic UI
     async function handleSaveEvent(e) {
         const { preset, troop_type, start } = e.detail;
         const config = eventConfigs.events[preset];
@@ -171,7 +162,6 @@
             count = Math.floor(daysDiff / interval) + 1;
         }
 
-        // 1. Generate Temp Events
         const tempSeriesId = 'temp-' + Date.now();
         let tempEvents = [];
         let currDate = new Date(start);
@@ -190,7 +180,6 @@
             currDate.setUTCDate(currDate.getUTCDate() + interval);
         }
 
-        // 2. Optimistic Update
         const previousEvents = [...events];
         events = [...events, ...tempEvents];
         modalState.add = false; 
@@ -208,11 +197,11 @@
                     repeat_interval: interval
                 })
             });
-            await fetchEvents(); // Confirm with real IDs
+            await fetchEvents();
             window.showAlert(`Generated ${count} events successfully.`);
         } catch (err) {
             console.error("Failed to generate events", err);
-            events = previousEvents; // Revert
+            events = previousEvents;
             window.showAlert("Failed to create events.", "Error");
         }
     }
@@ -235,7 +224,6 @@
         isLoading = true;
         try {
             const toDelete = events.filter(ev => ev.series_id === seriesId);
-            // Optimistic remove
             const prev = [...events];
             events = events.filter(ev => ev.series_id !== seriesId);
             
@@ -386,7 +374,9 @@
                                                 <div 
                                                     class="event-tooltip" 
                                                     on:click|stopPropagation 
-                                                    role="tooltip" 
+                                                    role="dialog" 
+                                                    aria-label="Event details"
+                                                    tabindex="-1"
                                                     on:keydown|stopPropagation
                                                 >
                                                     <div class="tooltip-header">
@@ -438,6 +428,7 @@
                                     on:click|stopPropagation 
                                     role="dialog" 
                                     aria-modal="true" 
+                                    tabindex="-1"
                                     on:keydown|stopPropagation
                                 >
                                     <div class="day-popup-header">
@@ -466,7 +457,14 @@
                                                             {event.title} {event.troop_type ? `(${event.troop_type})` : ''}
                                                         </span>
                                                     </div>
-                                                    <div class="event-tooltip" on:click|stopPropagation role="tooltip" on:keydown|stopPropagation>
+                                                    <div 
+                                                        class="event-tooltip" 
+                                                        on:click|stopPropagation 
+                                                        role="dialog" 
+                                                        aria-label="Event details"
+                                                        tabindex="-1"
+                                                        on:keydown|stopPropagation
+                                                    >
                                                         <div class="tooltip-header">
                                                             {#if event.iconSrc}<img src={event.iconSrc} alt="" />{/if}
                                                             <span>{event.title}</span>
@@ -692,6 +690,7 @@
         padding: 10px; min-width: 180px; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         margin-bottom: 8px; pointer-events: none;
     }
+
     .event-bar:hover .event-tooltip,
     .event-bar.selected .event-tooltip { display: block; pointer-events: auto; }
     
