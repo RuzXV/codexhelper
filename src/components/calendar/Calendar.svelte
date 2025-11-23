@@ -246,7 +246,8 @@
     function getEventStyle(type, hex) {
         const rgb = hexToRgb(hex || '#3b82f6');
         return `
-            background-color: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35); 
+            background-color: var(--bg-secondary);
+            background-image: linear-gradient(rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35), rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35));
             --event-color: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1);
         `;
     }
@@ -705,10 +706,30 @@
     .empty-state { padding: 20px; text-align: center; color: var(--text-muted); }
 
     @media (max-width: 768px) {
-        .calendar-header-card { flex-direction: column; align-items: stretch; }
-        .nav-controls { order: 2; }
-        .filter-container { order: 1; align-self: flex-start; }
-        .right-controls { order: 3; justify-content: space-between; width: 100%; }
+        .calendar-header-card { 
+            flex-direction: row; 
+            flex-wrap: wrap; 
+            align-items: center;
+            padding: 12px;
+        }
+        
+        .nav-controls { 
+            order: 1; 
+            width: 100%; 
+            margin-bottom: 10px;
+        }
+        
+        .filter-container { 
+            order: 2; 
+            align-self: center;
+        }
+        
+        .right-controls { 
+            order: 3; 
+            width: auto; 
+            flex-grow: 1; 
+            justify-content: flex-end; 
+        }
         
         .desktop-view { display: none; }
         .mobile-list-view { display: block; }
