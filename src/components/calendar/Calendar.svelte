@@ -22,7 +22,7 @@
     let isLoading = false;
     let selectedEventId = null;
     
-    let hoveredSeriesId = null;
+    let hoveredSeriesId = null; 
     let useLocalTime = false;
     
     let isFilterOpen = false;
@@ -326,11 +326,6 @@
 </section>
 
 <section class="tool-content">
-    <div class="ambient-glows">
-        <div class="glow-orb orb-1"></div>
-        <div class="glow-orb orb-2"></div>
-    </div>
-
     <div class="tool-container calendar-container">
         
         <div class="calendar-header-card">
@@ -402,8 +397,7 @@
             </div>
              
             {#key viewDate} 
-                <div class="grid" in:fade={{ duration: 250 }}>
-                    {#each calendarCells as cell}
+                <div class="grid"> {#each calendarCells as cell}
                         <div class="day-cell" 
                              class:other-month={cell.isOtherMonth} 
                              class:today={cell.isToday} 
@@ -419,6 +413,7 @@
                                             class="event-bar" 
                                             class:start={event.isStart || event.isRowStart}
                                             class:end={event.isEnd || event.isRowEnd}
+                                            class:middle={!event.isStart && !event.isRowStart && !event.isEnd && !event.isRowEnd}
                                             class:temp-optimistic={event.isTemp}
                                             class:selected={selectedEventId === event.id}
                                             class:dimmed={hoveredSeriesId && hoveredSeriesId !== event.series_id}
@@ -597,26 +592,14 @@
         font-weight: 600;
     }
 
-    .tool-content { position: relative; overflow: hidden; }
-    .ambient-glows { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
-    .glow-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: floatOrb 20s infinite alternate ease-in-out; }
-    .orb-1 { width: 400px; height: 400px; background: var(--accent-blue); top: -100px; left: -100px; }
-    .orb-2 { width: 300px; height: 300px; background: #a855f7; bottom: -50px; right: -50px; animation-delay: -10s; }
-    @keyframes floatOrb {
-        0% { transform: translate(0, 0) scale(1); }
-        100% { transform: translate(30px, 50px) scale(1.1); }
-    }
-
     .calendar-header-card {
         display: flex; justify-content: space-between; align-items: center;
-        background: rgba(20, 21, 24, 0.85);
-        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        background: var(--bg-secondary);
         border: 1px solid var(--border-color);
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px 12px 0 0; padding: 16px 24px;
         flex-wrap: wrap; gap: 16px;
-        position: sticky; top: 60px; z-index: 50;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        position: relative; 
     }
     
     .nav-controls { display: flex; align-items: center; gap: 16px; flex-grow: 1; justify-content: center; }
@@ -753,24 +736,26 @@
         font-size: 0.75rem; color: white; display: flex; align-items: center; padding: 0 4px;
         white-space: nowrap; overflow: visible; position: relative; 
         
-        margin: 1px -1px;
+        margin: 1px 0;
         border-radius: 0;
+        
         border-top: 1px solid rgba(255, 255, 255, 0.4);
         border-bottom: 1px solid rgba(255, 255, 255, 0.4);
         border-left: none;
         border-right: none;
+        
         backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
         
         cursor: pointer;
         z-index: 10;
-        transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+        transition: opacity 0.2s, filter 0.2s;
     }
 
     .event-bar.dimmed { opacity: 0.2; filter: grayscale(1); }
     .event-bar.highlighted { 
-        opacity: 1; transform: scale(1.02); z-index: 20; 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        border-color: rgba(255,255,255,0.8);
+        opacity: 1; 
+        filter: brightness(1.3) contrast(1.1);
+        z-index: 20;
     }
 
     .event-bar.placeholder {
@@ -783,11 +768,13 @@
 
     .event-bar.start { 
         border-top-left-radius: 6px; border-bottom-left-radius: 6px; 
-        margin-left: 6px; border-left: 1px solid rgba(255, 255, 255, 0.4);
+        border-left: 1px solid rgba(255, 255, 255, 0.4);
+        margin-left: 4px;
     }
     .event-bar.end { 
         border-top-right-radius: 6px; border-bottom-right-radius: 6px; 
-        margin-right: 6px; border-right: 1px solid rgba(255, 255, 255, 0.4);
+        border-right: 1px solid rgba(255, 255, 255, 0.4);
+        margin-right: 4px;
     }
     
     .event-bar.temp-optimistic { opacity: 0.7; filter: grayscale(0.3); }
@@ -830,11 +817,9 @@
     .mobile-guide-btn { color: var(--accent-blue); padding: 5px; font-size: 1.1rem; }
     .empty-state { padding: 20px; text-align: center; color: var(--text-muted); }
 
-    /* Mobile Flex Wrap Fix */
     @media (max-width: 768px) {
         .calendar-header-card { 
             flex-direction: row; flex-wrap: wrap; align-items: center; padding: 12px;
-            top: 55px; /* Adjust sticky for mobile nav height */
         }
         .nav-controls { order: 1; width: 100%; margin-bottom: 10px; }
         .filter-container { order: 2; align-self: center; }
