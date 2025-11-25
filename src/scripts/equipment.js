@@ -533,6 +533,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
         const slotElement = activeSlotElement;
         const slotKey = slotElement.dataset.slot;
+
+        if (slotKey === 'accessory1' || slotKey === 'accessory2') {
+            const otherSlot = slotKey === 'accessory1' ? 'accessory2' : 'accessory1';
+            if (selectedLoadoutSlots[otherSlot] === itemId) {
+                showAlert("You cannot equip two of the same accessory.", "Unique Item");
+                return;
+            }
+        }
         
         const oldItemId = selectedLoadoutSlots[slotKey];
         if (oldItemId) {
@@ -658,12 +666,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 let statsHtml = '<div class="selected-item-stats">';
                 if (itemData.stats) {
-                    Object.entries(itemData.stats).forEach(([statKey, statValue]) => {
-                        if (statValue > 0) {
-                            const troopType = getTroopTypeFromStat(statKey);
-                            statsHtml += `<div class="stat-pair ${troopType}">${formatStatName(statKey)} <span>+${statValue}%</span></div>`;
-                        }
-                    });
+                    Object.entries(itemData.stats)
+                        .sort(([,a], [,b]) => b - a) 
+                        .forEach(([statKey, statValue]) => {
+                            if (statValue > 0) {
+                                const troopType = getTroopTypeFromStat(statKey);
+                                statsHtml += `<div class="stat-pair ${troopType}">${formatStatName(statKey)} <span>+${statValue}%</span></div>`;
+                            }
+                        });
                 }
                 if (itemData.special_stats && itemData.special_stats.length > 0) {
                      itemData.special_stats.forEach(stat => {
@@ -1158,12 +1168,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
             let statsHtml = '';
             if (itemData.stats) {
-                Object.entries(itemData.stats).forEach(([statKey, statValue]) => {
-                    if (statValue > 0) {
-                        const troopType = getTroopTypeFromStat(statKey);
-                        statsHtml += `<div class="stat-pair ${troopType}">${formatStatName(statKey)} <span>+${statValue}%</span></div>`;
-                    }
-                });
+                Object.entries(itemData.stats)
+                    .sort(([,a], [,b]) => b - a)
+                    .forEach(([statKey, statValue]) => {
+                        if (statValue > 0) {
+                            const troopType = getTroopTypeFromStat(statKey);
+                            statsHtml += `<div class="stat-pair ${troopType}">${formatStatName(statKey)} <span>+${statValue}%</span></div>`;
+                        }
+                    });
             }
             if (itemData.special_stats && itemData.special_stats.length > 0) {
                  itemData.special_stats.forEach(stat => {
@@ -1449,12 +1461,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let statsHtml = '';
         if (itemData.stats) {
-            Object.entries(itemData.stats).forEach(([key, value]) => {
-                if (value > 0) {
-                    const troopType = getTroopTypeFromStat(key);
-                    statsHtml += `<div class="stat-pair ${troopType}">${formatStatName(key)} <span>+${value}%</span></div>`;
-                }
-            });
+            Object.entries(itemData.stats)
+                .sort(([,a], [,b]) => b - a)
+                .forEach(([key, value]) => {
+                    if (value > 0) {
+                        const troopType = getTroopTypeFromStat(key);
+                        statsHtml += `<div class="stat-pair ${troopType}">${formatStatName(key)} <span>+${value}%</span></div>`;
+                    }
+                });
         }
         if(itemData.special_stats) itemData.special_stats.forEach(stat => statsHtml += `<div class="special-stat">${stat}</div>`);
 
@@ -1578,6 +1592,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const slotKey = slotElement.dataset.slot;
         const loadoutIdentifier = slotElement.dataset.loadout;
         const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
+
+        if (slotKey === 'accessory1' || slotKey === 'accessory2') {
+            const otherSlot = slotKey === 'accessory1' ? 'accessory2' : 'accessory1';
+            const otherItem = targetLoadout[otherSlot];
+            
+            if (otherItem && otherItem.id === itemId) {
+                showAlert("You cannot equip two of the same accessory.", "Unique Item");
+                return;
+            }
+        }
     
         targetLoadout[slotKey] = {
             id: itemId,
@@ -1840,25 +1864,53 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
         const groupedStats = {};
-        const statOrder = ['attack', 'defense', 'health', 'base_attack', 'base_defense', 'base_health', 'march_speed'];
+        const groupTotals = {};
 
         allStatKeys.forEach(key => {
             const troopType = getTroopTypeFromStat(key);
-            if (!groupedStats[troopType]) groupedStats[troopType] = [];
+            if (!groupedStats[troopType]) {
+                groupedStats[troopType] = [];
+                groupTotals[troopType] = 0;
+            }
             groupedStats[troopType].push(key);
+            
+            const valA = statsA.stats[key] || 0;
+            const valB = statsB.stats[key] || 0;
+            groupTotals[troopType] += (valA + valB);
         });
         
-        for(const troop in groupedStats) {
+        for (const troop in groupedStats) {
             groupedStats[troop].sort((a, b) => {
-                const suffixA = a.replace(`${troop}_`, '').replace('base_', 'zz_base_');
-                const suffixB = b.replace(`${troop}_`, '').replace('base_', 'zz_base_');
-                return suffixA.localeCompare(suffixB);
+                const isBaseA = a.includes('_base_');
+                const isBaseB = b.includes('_base_');
+                if (isBaseA !== isBaseB) {
+                    return isBaseA ? 1 : -1;
+                }
+
+                const getPriority = (key) => {
+                    if (key.includes('attack')) return 1;
+                    if (key.includes('defense') || key.includes('defence')) return 2;
+                    if (key.includes('health')) return 3;
+
+                    return 4;
+                };
+
+                const priorityA = getPriority(a);
+                const priorityB = getPriority(b);
+
+                if (priorityA !== priorityB) {
+                    return priorityA - priorityB;
+                }
+
+                const totalA = (statsA.stats[a] || 0) + (statsB.stats[a] || 0);
+                const totalB = (statsA.stats[b] || 0) + (statsB.stats[b] || 0);
+                
+                return totalB - totalA;
             });
         }
         
         const sortedTroopTypes = Object.keys(groupedStats).sort((a, b) => {
-            const order = ['infantry', 'cavalry', 'archer', 'siege', 'general'];
-            return order.indexOf(a) - order.indexOf(b);
+            return groupTotals[b] - groupTotals[a];
         });
 
         let mainStatsHtml = '';
@@ -1873,7 +1925,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const suffix = isPercentage ? '%' : '';
                 
                 let deltaHtml = (delta !== 0)
-                    ? `<span class="${delta > 0 ? 'stat-increase' : 'stat-decrease'}"><i class="fas ${delta > 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i> ${delta.toFixed(isPercentage ? 1 : 0).replace('.0', '')}${suffix}</span>`
+                    ? `<span class="${delta > 0 ? 'stat-increase' : 'stat-decrease'}"><i class="fas ${delta > 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i> <span class="delta-number">${delta.toFixed(isPercentage ? 1 : 0).replace('.0', '')}${suffix}</span></span>`
                     : `<span class="stat-no-change">-</span>`;
                 
                 let iconHtml = '';
@@ -2180,13 +2232,14 @@ document.addEventListener('DOMContentLoaded', function() {
             let statsHtml = '<div class="details-item-stats">';
             if (viewMode === 'stats') {
                 if(itemData.stats) {
-                    for(const statKey in itemData.stats) {
-                        const statValue = itemData.stats[statKey];
-                        if(statValue > 0) {
-                            const troopType = getTroopTypeFromStat(statKey);
-                            statsHtml += `<div class="stat-pair ${troopType}"><span>${formatStatName(statKey)}</span> <span>+${statValue.toFixed(1).replace('.0','')}%</span></div>`;
-                        }
-                    }
+                    Object.entries(itemData.stats)
+                        .sort(([,a], [,b]) => b - a)
+                        .forEach(([statKey, statValue]) => {
+                            if(statValue > 0) {
+                                const troopType = getTroopTypeFromStat(statKey);
+                                statsHtml += `<div class="stat-pair ${troopType}"><span>${formatStatName(statKey)}</span> <span>+${statValue.toFixed(1).replace('.0','')}%</span></div>`;
+                            }
+                        });
                 }
                 if(itemData.special_stats) {
                      itemData.special_stats.forEach(stat => {
