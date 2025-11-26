@@ -23,9 +23,23 @@
     }
 
     function renderLoggedInState(container, user) {
-        const avatarUrl = user.avatar
-            ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-            : `https://cdn.discordapp.com/embed/avatars/${parseInt(user.discriminator) % 5}.png`;
+        let avatarUrl;
+
+        if (user.avatar) {
+            avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+        } else {
+            if (user.discriminator === '0' || !user.discriminator) {
+                try {
+                    const index = Number((BigInt(user.id) >> 22n) % 6n);
+                    avatarUrl = `https://cdn.discordapp.com/embed/avatars/${index}.png`;
+                } catch (e) {
+                    avatarUrl = `https://cdn.discordapp.com/embed/avatars/0.png`;
+                }
+            } else {
+                const index = parseInt(user.discriminator) % 5;
+                avatarUrl = `https://cdn.discordapp.com/embed/avatars/${index}.png`;
+            }
+        }
 
         container.innerHTML = `
             <div class="user-profile">

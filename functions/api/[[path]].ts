@@ -442,6 +442,25 @@ app.delete('/api/events/:id', authMiddleware, async (c) => {
     }
 });
 
+app.patch('/api/events/:id', authMiddleware, async (c) => {
+    const user = c.get('user');
+    const { id } = c.req.param();
+    if (!CALENDAR_ADMIN_IDS.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
+
+    try {
+        const body = await c.req.json();
+        const { start_date, title, type, duration } = body;
+        
+        const { success } = await c.env.DB.prepare(
+            `UPDATE events SET start_date = ?, title = ?, type = ?, duration = ? WHERE id = ?`
+        ).bind(start_date, title, type, duration, id).run();
+
+        return success ? c.json({ status: 'success' }) : c.json({ error: 'Event not found' }, 404);
+    } catch (e) {
+        return c.json({ error: 'Internal server error' }, 500);
+    }
+});
+
 app.get('/api/users/settings', authMiddleware, async (c) => {
     const user = c.get('user');
     const result = await c.env.DB.prepare(

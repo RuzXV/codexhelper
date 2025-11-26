@@ -423,11 +423,14 @@
     }
     
     function getDisplayDate(dateStr) {
-        const d = new Date(dateStr);
-        if (useLocalTime) {
-            return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
-        }
-        return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
+        const d = new Date(dateStr + 'T00:00:00Z');
+        
+        return d.toLocaleDateString('en-GB', { 
+            weekday: 'short', 
+            day: 'numeric', 
+            month: 'short', 
+            timeZone: 'UTC' 
+        });
     }
 
     function getEventTimeString(dateStr) {
@@ -627,21 +630,18 @@
                                     {#if event}
                                         <div 
                                             class="event-bar" 
-                                            class:start={event.isStart || event.isRowStart}
-                                            class:end={event.isEnd || event.isRowEnd}
-                                            class:middle={!event.isStart && !event.isRowStart && !event.isEnd && !event.isRowEnd}
+                                            class:start={event.isStart}
+                                            class:row-start={event.isRowStart}  class:end={event.isEnd}             class:row-end={event.isRowEnd}      class:middle={!event.isStart && !event.isRowStart && !event.isEnd && !event.isRowEnd}
                                             class:temp-optimistic={event.isTemp}
                                             class:selected={selectedEventId === event.id}
                                             class:dimmed={hoveredSeriesId && hoveredSeriesId !== event.series_id}
                                             class:highlighted={hoveredSeriesId === event.series_id}
                                             
                                             in:fly={{ y: 10, duration: 300, delay: (cIndex * 10) + (i * 20) }}
-                                            
                                             on:mouseenter={() => hoveredSeriesId = event.series_id}
                                             on:mouseleave={() => hoveredSeriesId = null}
                                             on:click|stopPropagation={() => selectedEventId = (selectedEventId === event.id ? null : event.id)}
                                             on:keydown={(e) => e.key === 'Enter' && (selectedEventId = (selectedEventId === event.id ? null : event.id))}
-                                            
                                             role="button"
                                             tabindex="0"
                                             style={getEventStyle(event.type, event.colorHex)}
@@ -919,8 +919,8 @@
     .weekdays div { text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
     
     .grid { 
-        display: grid; 
-        grid-template-columns: repeat(7, 1fr); 
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr)); 
         background: var(--bg-secondary);
         gap: 0; 
         border-top: 1px solid var(--border-color);
@@ -996,7 +996,7 @@
     .event-bar.highlighted { 
         opacity: 1; 
         filter: brightness(1.3) contrast(1.1); 
-        z-index: 20;
+        z-index: 50;
     }
 
     .event-bar.placeholder {
@@ -1020,9 +1020,29 @@
     
     .event-bar.temp-optimistic { opacity: 0.7; filter: grayscale(0.3); }
     
-    .event-content { display: flex; align-items: center; gap: 6px; width: 100%; overflow: hidden; }
+    .event-content { 
+        display: flex; 
+        align-items: center; 
+        width: 100%; 
+        overflow: visible; 
+        position: relative; 
+        height: 100%;
+    }
     .event-icon { width: 16px; height: 16px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); flex-shrink: 0; }
-    .event-title { font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.5); overflow: hidden; text-overflow: ellipsis; }
+    .event-title { 
+        font-weight: 600; 
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5); 
+        
+        position: absolute;
+        left: 24px;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        width: max-content;
+        pointer-events: none;
+    }
 
     .event-tooltip {
         display: none; position: absolute; bottom: 100%;
@@ -1034,6 +1054,27 @@
     }
     .event-bar:hover .event-tooltip,
     .event-bar.selected .event-tooltip { display: block; pointer-events: auto; }
+    .event-bar.start, 
+    .event-bar.row-start {
+        z-index: 160 !important; 
+    }
+    
+    .event-bar.middle, 
+    .event-bar.end {
+        z-index: 20;
+    }
+    
+    .event-bar.selected,
+    .event-bar.highlighted {
+        z-index: 150 !important;
+    }
+
+    .event-bar.start.highlighted,
+    .event-bar.row-start.highlighted,
+    .event-bar.start.selected,
+    .event-bar.row-start.selected {
+        z-index: 170 !important;
+    }
     
     .tooltip-header { display: flex; align-items: center; gap: 8px;
         border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; }
