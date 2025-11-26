@@ -748,29 +748,32 @@ document.addEventListener('DOMContentLoaded', function() {
         
         EQUIPMENT_SET_DATA.forEach(set => {
             const equippedCount = set.pieces.filter(pieceId => equippedPieceIds.includes(pieceId)).length;
-            let highestBonus = null;
+            
             set.bonuses.forEach(bonus => {
                 if (equippedCount >= bonus.count) {
-                    highestBonus = bonus;
+                    const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
+                    
+                    const statMatch = bonus.description.match(/(Troop|Infantry|Cavalry|Archer|Siege) (Attack|Defense|Health|Defence)[\s\+]+([\d\.]+)%/i);
+        
+                    if (statMatch) {
+                        const scope = statMatch[1].toLowerCase();
+                        const statType = statMatch[2].toLowerCase().replace('defence', 'defense');
+                        const statValue = parseFloat(statMatch[3]);
+                        
+                        if (scope === 'troop') {
+                            troopTypes.forEach(troopType => {
+                                const specificStatKey = `${troopType}_${statType}`;
+                                totalStats[specificStatKey] = (totalStats[specificStatKey] || 0) + statValue;
+                            });
+                        } else {
+                            const specificStatKey = `${scope}_${statType}`;
+                            totalStats[specificStatKey] = (totalStats[specificStatKey] || 0) + statValue;
+                        }
+                    } else {
+                        specialStats.add(bonus.description);
+                    }
                 }
             });
-    
-            if (highestBonus) {
-                const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
-                const statMatch = highestBonus.description.match(/Troop (Attack|Defense|Health|Defence)[\s\+]+([\d\.]+)%/i);
-    
-                if (statMatch) {
-                    const statType = statMatch[1].toLowerCase().replace('defence', 'defense');
-                    const statValue = parseFloat(statMatch[2]);
-                    
-                    troopTypes.forEach(troopType => {
-                        const specificStatKey = `${troopType}_${statType}`;
-                        totalStats[specificStatKey] = (totalStats[specificStatKey] || 0) + statValue;
-                    });
-                } else {
-                    specialStats.add(highestBonus.description);
-                }
-            }
         });
     
         const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
