@@ -699,7 +699,7 @@
 <style>
     .calendar-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
     .tool-hero { 
-        padding-top: 80px;
+        padding-top: 5px;
         padding-bottom: 20px;
     }
     
