@@ -1,12 +1,9 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { slide } from 'svelte/transition';
     import eventConfigs from '../../data/event_configs.json';
-    
     export let isOpen = false;
     export let activeSeries = [];
     const dispatch = createEventDispatcher();
-
     const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', { eager: true });
     function getIconSrc(filename) {
         if (!filename) return null;
@@ -19,7 +16,6 @@
     let selectedSeriesTitle = '';
     let selectedSeriesIcon = null;
     let isDropdownOpen = false;
-
     function toggleDropdown() {
         isDropdownOpen = !isDropdownOpen;
     }
@@ -27,7 +23,6 @@
     function selectSeries(series) {
         selectedSeriesId = series.id;
         selectedSeriesTitle = series.title;
-        
         const config = eventConfigs.events[series.type];
         if (config && config.icon) {
             selectedSeriesIcon = getIconSrc(config.icon);
@@ -104,7 +99,7 @@
                     </div>
 
                     {#if isDropdownOpen}
-                        <div class="select-items" transition:slide={{ duration: 200 }}>
+                        <div class="select-items">
                             {#each activeSeries as series}
                                 <div 
                                     class="select-option" 
@@ -139,18 +134,35 @@
 {/if}
 
 <style>
-    .simple-modal-overlay { position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(5px); }
-    .simple-modal-content { background: var(--bg-secondary); padding: var(--spacing-6); border-radius: var(--radius-lg); border: 1px solid var(--border-color); width: 90%; max-width: 400px; animation: zoomIn 0.2s ease-out forwards; }
-    h3 { margin: 0 0 var(--spacing-6); color: var(--text-primary); font-size: 1.25rem; text-align: center; }
-    .simple-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .simple-modal-overlay { 
+        position: fixed;
+        inset: 0; width: 100%; height: 100%; 
+        background: rgba(0, 0, 0, 0.85); 
+        display: flex; align-items: center; justify-content: center; z-index: 9999;
+    }
+    .simple-modal-content { 
+        background: var(--bg-secondary); padding: var(--spacing-6); 
+        border-radius: var(--radius-lg); border: 1px solid var(--border-color); width: 90%;
+        max-width: 400px; 
+        animation: zoomIn 0.2s ease-out forwards;
+        transform: translateZ(0);
+    }
+    h3 { margin: 0 0 var(--spacing-6); color: var(--text-primary);
+        font-size: 1.25rem; text-align: center; }
+    .simple-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;
+    }
     .form-group { margin-bottom: 15px; text-align: left; }
-    label { display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem; }
-    input { width: 100%; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 1rem; }
+    label { display: block; margin-bottom: 5px;
+        color: var(--text-secondary); font-size: 0.9rem; }
+    input { width: 100%; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-color);
+        border-radius: 6px; color: var(--text-primary); font-size: 1rem; }
 
-    .custom-select-container { position: relative; width: 100%; user-select: none; }
+    .custom-select-container { position: relative; width: 100%; user-select: none;
+    }
     
     .select-selected {
-        display: flex; align-items: center; gap: var(--spacing-3);
+        display: flex;
+        align-items: center; gap: var(--spacing-3);
         background: var(--bg-primary);
         border: 1px solid var(--border-color);
         border-radius: 6px;
@@ -173,8 +185,10 @@
         flex-shrink: 0;
     }
     
-    .select-selected.select-arrow-active { border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
-    .select-selected.select-arrow-active::after { transform: rotate(180deg); }
+    .select-selected.select-arrow-active { border-color: var(--accent-blue);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+    .select-selected.select-arrow-active::after { transform: rotate(180deg);
+    }
 
     .select-items {
         position: absolute;
@@ -185,30 +199,40 @@
         border-radius: 6px;
         max-height: 250px;
         overflow-y: auto;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
 
     .select-option {
-        display: flex; align-items: center; gap: 10px;
+        display: flex;
+        align-items: center; gap: 10px;
         color: var(--text-secondary);
         padding: 10px;
         cursor: pointer;
         transition: background 0.1s;
         font-size: 0.95rem;
     }
-    .select-option:hover { background-color: var(--accent-blue-light); color: var(--text-primary); }
+    .select-option:hover { background-color: var(--accent-blue-light); color: var(--text-primary);
+    }
     
-    .selected-content { display: flex; align-items: center; gap: 10px; width: 100%; overflow: hidden; }
+    .selected-content { display: flex; align-items: center; gap: 10px; width: 100%; overflow: hidden;
+    }
     .placeholder { color: var(--text-muted); }
-    .select-icon { width: 24px; height: 24px; object-fit: contain; flex-shrink: 0; }
-    .series-id { font-size: 0.8em; color: var(--text-muted); }
+    .select-icon { width: 24px; height: 24px; object-fit: contain;
+        flex-shrink: 0; }
+    .series-id { font-size: 0.8em; color: var(--text-muted);
+    }
 
-    .calendar-btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
-    .secondary-btn { background: transparent; color: var(--text-secondary); border-color: var(--border-color); }
+    .calendar-btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid transparent;
+        transition: all 0.2s; }
+    .secondary-btn { background: transparent; color: var(--text-secondary); border-color: var(--border-color);
+    }
     .secondary-btn:hover { color: var(--text-primary); border-color: var(--text-primary); }
-    .primary-btn { background: var(--accent-blue); color: white; }
+    .primary-btn { background: var(--accent-blue); color: white;
+    }
     .primary-btn:hover { background: var(--accent-blue-hover); }
-    .primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .primary-btn:disabled { opacity: 0.5; cursor: not-allowed;
+    }
     
-    @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes zoomIn { from { opacity: 0; transform: scale(0.95);
+    } to { opacity: 1; transform: scale(1); } }
 </style>

@@ -49,10 +49,47 @@
     $: month = viewDate.getUTCMonth();
     $: monthName = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(viewDate);
     
-    $: processedEvents = events.map(e => ({
-        ...e,
-        title: getEventDisplayName(e) 
-    }));
+    $: processedEvents = (() => {
+        const allRotationEvents = events
+            .filter(e => ROTATION_TYPES.includes(e.type))
+            .sort((a, b) => a.start_date.localeCompare(b.start_date));
+
+        return events.map(e => {
+            let displayTitle = e.title;
+            let dynamicIcon = null;
+
+            if (eggRotationSettings && ROTATION_TYPES.includes(e.type)) {
+                
+                const currentIndex = allRotationEvents.findIndex(x => x.id === e.id);
+                const anchorIndex = allRotationEvents.findIndex(x => x.start_date === eggRotationSettings.anchorDate);
+
+                if (currentIndex !== -1 && anchorIndex !== -1) {
+                    const diff = currentIndex - anchorIndex;
+                    
+                    const isHammer = Math.abs(diff) % 2 === 1;
+
+                    if (isHammer) {
+                        displayTitle = "Hunt for History";
+                        dynamicIcon = getIconSrc('hammer.webp');
+                    } else {
+                        const cycleSteps = Math.floor(diff / 2);
+                        let typeIndex = (eggRotationSettings.anchorCycleId + cycleSteps) % 3;
+                        
+                        if (typeIndex < 0) typeIndex = (typeIndex % 3 + 3) % 3;
+
+                        displayTitle = `Holy Knight's Treasure - ${CYCLES[typeIndex]}`;
+                        dynamicIcon = getIconSrc('egg.webp');
+                    }
+                }
+            }
+            
+            return {
+                ...e,
+                title: displayTitle,
+                dynamicIcon: dynamicIcon 
+            };
+        });
+    })();
 
     $: filteredEvents = activeFilters.length > 0 
         ? processedEvents.filter(e => activeFilters.includes(e.type)) 
@@ -385,28 +422,6 @@
         }
     }
 
-    function getEventDisplayName(event) {
-        if (!ROTATION_TYPES.includes(event.type) || !eggRotationSettings) {
-            return event.title;
-        }
-
-        const allRotationEvents = events
-            .filter(e => ROTATION_TYPES.includes(e.type))
-            .sort((a, b) => a.start_date.localeCompare(b.start_date));
-        
-        const currentIndex = allRotationEvents.findIndex(e => e.id === event.id);
-        
-        const anchorIndex = allRotationEvents.findIndex(e => e.start_date === eggRotationSettings.anchorDate);
-        
-        if (currentIndex === -1 || anchorIndex === -1) return event.title;
-
-        const diff = currentIndex - anchorIndex;
-        let typeIndex = (eggRotationSettings.anchorCycleId + diff) % 3;
-        if (typeIndex < 0) typeIndex += 3;
-
-        return `${event.title} - ${CYCLES[typeIndex]}`;
-    }
-
 </script>
 
 <svelte:window 
@@ -553,8 +568,8 @@
                                         >
                                             {#if event.isStart || event.isRowStart}
                                                 <div class="event-content">
-                                                    {#if event.iconSrc}
-                                                        <img src={event.iconSrc} alt="" class="event-icon" />
+                                                    {#if event.dynamicIcon || event.iconSrc}
+                                                        <img src={event.dynamicIcon || event.iconSrc} alt="" class="event-icon" />
                                                     {/if}
                                                     <span class="event-title">
                                                         {event.title} {event.troop_type ? `(${event.troop_type})` : ''}
@@ -570,7 +585,9 @@
                                                     on:keydown|stopPropagation
                                                 >
                                                     <div class="tooltip-header">
-                                                        {#if event.iconSrc}<img src={event.iconSrc} alt="" />{/if}
+                                                        {#if event.dynamicIcon || event.iconSrc}
+                                                            <img src={event.dynamicIcon || event.iconSrc} alt="" />
+                                                        {/if}
                                                         <span>{event.title}</span>
                                                     </div>
                                                     <div class="tooltip-body">

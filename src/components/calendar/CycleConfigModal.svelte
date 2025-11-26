@@ -1,7 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { slide } from 'svelte/transition';
-
     export let isOpen = false;
     export let eggEvents = [];
 
@@ -29,8 +28,18 @@
 
     let selectedEventDate = '';
     let selectedCycleId = 0;
-    
     let isDropdownOpen = false;
+
+    $: formattedOptions = eggEvents.map(event => ({
+        originalDate: event.start_date,
+        displayLabel: new Date(event.start_date).toLocaleDateString(undefined, { 
+            month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' 
+        })
+    }));
+
+    $: selectedDateLabel = selectedEventDate 
+        ? new Date(selectedEventDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }) 
+        : '';
 
     function toggleDropdown() {
         isDropdownOpen = !isDropdownOpen;
@@ -46,6 +55,7 @@
             isDropdownOpen = false;
         }
     }
+
     function handleSave() {
         if (!selectedEventDate) return;
         dispatch('save', {
@@ -53,12 +63,6 @@
             anchorCycleId: selectedCycleId
         });
         dispatch('close');
-    }
-
-    function formatDate(dateStr) {
-        return new Date(dateStr).toLocaleDateString(undefined, { 
-            month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' 
-        });
     }
 </script>
 
@@ -91,7 +95,7 @@
                         tabindex="0"
                     >
                         {#if selectedEventDate}
-                            <span>{formatDate(selectedEventDate)} (Starting Date)</span>
+                            <span>{selectedDateLabel} (Starting Date)</span>
                         {:else}
                             <span class="placeholder">-- Choose a Date --</span>
                         {/if}
@@ -99,15 +103,15 @@
 
                     {#if isDropdownOpen}
                         <div class="select-items" transition:slide={{ duration: 200 }}>
-                            {#each eggEvents as event}
+                            {#each formattedOptions as option}
                                 <div 
                                     class="select-option" 
-                                    on:click={() => selectDate(event.start_date)}
-                                    on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && selectDate(event.start_date)}
+                                    on:click={() => selectDate(option.originalDate)}
+                                    on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && selectDate(option.originalDate)}
                                     role="button"
                                     tabindex="0"
                                 >
-                                    <span>{formatDate(event.start_date)}</span>
+                                    <span>{option.displayLabel}</span>
                                 </div>
                             {/each}
                         </div>
@@ -138,14 +142,18 @@
 
 <style>
     .simple-modal-overlay { 
-        position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+        position: fixed;
+        inset: 0; 
+        background: rgba(0,0,0,0.85);
         display: flex; align-items: center; justify-content: center; 
-        z-index: 9999; backdrop-filter: blur(5px);
+        z-index: 9999; 
     }
     .simple-modal-content { 
         background: var(--bg-secondary); padding: 24px; 
-        border-radius: 12px; border: 1px solid var(--border-color); 
+        border-radius: 12px;
+        border: 1px solid var(--border-color); 
         width: 90%; max-width: 450px; 
+        transform: translateZ(0);
     }
     h3 { margin-top: 0; text-align: center; color: var(--text-primary); }
     .desc { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; text-align: center; }
@@ -171,7 +179,8 @@
     .select-selected::after {
         content: "";
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-        background-position: center; background-repeat: no-repeat; background-size: 1.2em 1.2em;
+        background-position: center; background-repeat: no-repeat;
+        background-size: 1.2em 1.2em;
         width: 1.2em; height: 1.2em;
         transition: transform 0.3s ease; flex-shrink: 0;
     }
@@ -188,7 +197,7 @@
         border-radius: 6px;
         max-height: 250px;
         overflow-y: auto;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
     }
 
     .select-option {
@@ -203,9 +212,10 @@
 
     .cycle-options { display: flex; flex-direction: column; gap: 10px; }
     .radio-label { 
-        display: flex; align-items: center; gap: 10px; padding: 10px; 
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px; 
         background: var(--bg-tertiary); border: 1px solid var(--border-color); 
-        border-radius: 6px; cursor: pointer; transition: all 0.2s; 
+        border-radius: 6px; cursor: pointer; transition: all 0.2s;
     }
     .radio-label:hover { border-color: var(--accent-blue); }
     .radio-label.selected { background: rgba(59, 130, 246, 0.1); border-color: var(--accent-blue); }
