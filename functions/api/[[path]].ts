@@ -332,6 +332,11 @@ app.get('/api/events', async (c) => {
         const { results } = await c.env.DB.prepare(
             'SELECT * FROM events ORDER BY start_date ASC'
         ).all();
+
+        c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        c.header('Pragma', 'no-cache');
+        c.header('Expires', '0');
+
         return c.json(results || []);
     } catch (e) {
         console.error("Failed to fetch events:", e);
@@ -435,6 +440,27 @@ app.delete('/api/events/:id', authMiddleware, async (c) => {
     } catch (e) {
         return c.json({ error: 'Internal server error' }, 500);
     }
+});
+
+app.get('/api/users/settings', authMiddleware, async (c) => {
+    const user = c.get('user');
+    const result = await c.env.DB.prepare(
+        'SELECT settings FROM user_settings WHERE user_id = ?'
+    ).bind(user.id).first();
+    
+    return c.json(result ? JSON.parse(result.settings as string) : {});
+});
+
+app.post('/api/users/settings', authMiddleware, async (c) => {
+    const user = c.get('user');
+    const body = await c.req.json();
+    
+    await c.env.DB.prepare(
+        `INSERT INTO user_settings (user_id, settings) VALUES (?, ?)
+         ON CONFLICT(user_id) DO UPDATE SET settings = excluded.settings`
+    ).bind(user.id, JSON.stringify(body)).run();
+
+    return c.json({ status: 'success' });
 });
 
 export const onRequest = handle(app);

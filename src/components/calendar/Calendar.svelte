@@ -5,6 +5,7 @@
     import EventModal from './EventModal.svelte';
     import ShiftModal from './ShiftModal.svelte';
     import RemoveModal from './RemoveModal.svelte';
+    import CycleConfigModal from './CycleConfigModal.svelte';
     
     const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', { eager: true });
 
@@ -28,41 +29,50 @@
     let isFilterOpen = false;
     let activeFilters = []; 
     const ALL_EVENT_TYPES = Object.keys(eventConfigs.events);
+    let eggRotationSettings = null;
     let modalState = {
         add: false,
         shift: false,
-        remove: false
+        remove: false,
+        cycle: false
     };
+
+    const ROTATION_TYPES = ['holy_knights_treasure', 'hunt_for_history'];
+    const CYCLES = [
+        "Helmet / Pants",
+        "Weapon / Accessory",
+        "Chest / Gloves / Boots"
+    ];
 
     $: activeSeries = getUniqueSeries(events);
     $: year = viewDate.getUTCFullYear();
     $: month = viewDate.getUTCMonth();
     $: monthName = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(viewDate);
     
+    $: processedEvents = events.map(e => ({
+        ...e,
+        title: getEventDisplayName(e) 
+    }));
+
     $: filteredEvents = activeFilters.length > 0 
-        ? events.filter(e => activeFilters.includes(e.type)) 
-        : events;
-        
+        ? processedEvents.filter(e => activeFilters.includes(e.type)) 
+        : processedEvents;
+
     $: calendarCells = window.calendarUtils 
         ? window.calendarUtils.generateGrid(year, month, filteredEvents, eventConfigs, getIconSrc)
         : [];
 
-    onMount(async () => {
+        onMount(async () => {
         startClock();
         loadFilters();
+        loadRotationSettings();
         await fetchEvents();
         checkAdminStatus();
-
+        
         window.addEventListener('auth:loggedIn', (e) => {
             checkAdminStatus();
             loadFilters(e.detail.user.id);
-        });
-        if (window.onAuthSuccess) window.onAuthSuccess = checkAdminStatus;
-
-        document.addEventListener('click', (e) => {
-            if (isFilterOpen && !e.target.closest('.filter-container')) {
-                isFilterOpen = false;
-            }
+            fetchRotationSettingsFromAPI();
         });
     });
 
@@ -140,7 +150,13 @@
     async function fetchEvents() {
         isLoading = true;
         try {
-            const response = await fetch('/api/events');
+            const response = await fetch(`/api/events?t=${Date.now()}`, {
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
+            
             if (response.ok) events = await response.json();
         } catch (e) { console.error("Fetch error", e);
         } finally {
@@ -328,6 +344,61 @@
         if (touchEndX > touchStartX + threshold) changeMonth(-1);
     }
 
+    function loadRotationSettings() {
+        const stored = localStorage.getItem('calendar_egg_rotation');
+        if (stored) {
+            eggRotationSettings = JSON.parse(stored);
+        }
+    }
+
+    async function fetchRotationSettingsFromAPI() {
+        try {
+            const res = await window.auth.fetchWithAuth('/api/users/settings');
+            if (res && res.anchorDate) {
+                eggRotationSettings = res;
+                localStorage.setItem('calendar_egg_rotation', JSON.stringify(res));
+            }
+        } catch (e) { console.error("Failed to load settings", e); }
+    }
+
+    async function handleSaveRotation(e) {
+        const { anchorDate, anchorCycleId } = e.detail;
+        eggRotationSettings = { anchorDate, anchorCycleId };
+        
+        localStorage.setItem('calendar_egg_rotation', JSON.stringify(eggRotationSettings));
+        
+        if (window.auth && window.auth.getLoggedInUser()) {
+            try {
+                await window.auth.fetchWithAuth('/api/users/settings', {
+                    method: 'POST',
+                    body: JSON.stringify(eggRotationSettings)
+                });
+            } catch(err) { console.error(err); }
+        }
+    }
+
+    function getEventDisplayName(event) {
+        if (!ROTATION_TYPES.includes(event.type) || !eggRotationSettings) {
+            return event.title;
+        }
+
+        const allRotationEvents = events
+            .filter(e => ROTATION_TYPES.includes(e.type))
+            .sort((a, b) => a.start_date.localeCompare(b.start_date));
+        
+        const currentIndex = allRotationEvents.findIndex(e => e.id === event.id);
+        
+        const anchorIndex = allRotationEvents.findIndex(e => e.start_date === eggRotationSettings.anchorDate);
+        
+        if (currentIndex === -1 || anchorIndex === -1) return event.title;
+
+        const diff = currentIndex - anchorIndex;
+        let typeIndex = (eggRotationSettings.anchorCycleId + diff) % 3;
+        if (typeIndex < 0) typeIndex += 3;
+
+        return `${event.title} - ${CYCLES[typeIndex]}`;
+    }
+
 </script>
 
 <svelte:window 
@@ -411,6 +482,10 @@
 
             <div class="right-controls">
                 <button class="today-btn" on:click={jumpToToday}>Today</button>
+            
+                <button class="nav-btn" on:click={() => modalState.cycle = true} title="Configure Rotation" style="font-size: 1rem;">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
                 
                 {#if isAdmin}
                     <div class="admin-panel">
@@ -589,6 +664,13 @@
     on:remove={handleRemoveSeries}
 />
 
+<CycleConfigModal
+    isOpen={modalState.cycle}
+    eggEvents={events.filter(e => ROTATION_TYPES.includes(e.type)).sort((a,b) => a.start_date.localeCompare(b.start_date))}
+    on:close={() => modalState.cycle = false}
+    on:save={handleSaveRotation}
+/>
+
 <style>
     .calendar-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
     .tool-hero { padding-bottom: 20px; }
@@ -632,7 +714,6 @@
 
     .calendar-header-card {
         display: flex; justify-content: space-between; align-items: center;
-
         background: linear-gradient(145deg, var(--bg-secondary), #181a1f);
         border: 1px solid var(--border-color);
         border-bottom: 2px solid var(--accent-blue);
@@ -641,7 +722,7 @@
         padding: 16px 24px;
         flex-wrap: wrap; gap: 16px;
         position: relative;
-        z-index: 2;
+        z-index: 50;
     }
     
     .nav-controls { display: flex; align-items: center; gap: 16px; flex-grow: 1; justify-content: center; }
@@ -749,8 +830,8 @@
     }
     
     .day-cell.today { 
-        background: linear-gradient(to bottom, rgba(59, 130, 246, 0.1), transparent);
-        box-shadow: inset 0 0 0 1px var(--accent-blue);
+        background: transparent;
+        box-shadow: none;
         z-index: 2;
     }
     .day-cell.other-month { background-color: #0f1012; }
@@ -761,7 +842,14 @@
         font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); align-self: flex-end;
         width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
     }
-    .day-cell.today .day-number { background: var(--accent-blue); color: white; border-radius: 50%; }
+    .day-cell.today .day-number { 
+        background: var(--accent-blue); 
+        color: white; 
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        transform: scale(1.1);
+        font-weight: 700;
+    }
 
     .day-cell.skeleton-loading { pointer-events: none; }
     .day-cell.skeleton-loading::before {
