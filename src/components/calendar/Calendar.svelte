@@ -229,13 +229,41 @@
     }
 
     async function handleSaveEvent(e) {
-        const { preset, troop_type, start } = e.detail;
+        let { preset, troop_type, start } = e.detail;
         const config = eventConfigs.events[preset];
-        
+        const interval = config.recurrence_interval !== undefined ? config.recurrence_interval : 14;
+
         const currentYear = new Date().getUTCFullYear();
+        const cutoffDate = new Date(Date.UTC(currentYear, 0, 1));
+        
+        let adjustedStart = new Date(start);
+        let backsteps = 0;
+
+        if (interval > 0 && adjustedStart > cutoffDate) {
+            const diffTime = adjustedStart - cutoffDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            backsteps = Math.floor(diffDays / interval);
+
+            if (backsteps > 0) {
+                adjustedStart.setUTCDate(adjustedStart.getUTCDate() - (backsteps * interval));
+                
+                if (troop_type && eventConfigs.troop_types) {
+                    const types = eventConfigs.troop_types;
+                    const currentIndex = types.indexOf(troop_type);
+                    
+                    if (currentIndex !== -1) {
+                        const newIndex = ((currentIndex - backsteps) % types.length + types.length) % types.length;
+                        troop_type = types[newIndex];
+                    }
+                }
+            }
+        }
+        
+        const finalStartDate = adjustedStart.toISOString().split('T')[0];
+
         const limitDate = new Date(Date.UTC(currentYear + 1, 11, 31)).toISOString().split('T')[0];
-        const daysDiff = (new Date(limitDate) - new Date(start)) / (1000 * 60 * 60 * 24);
-        const interval = config.recurrence_interval || 14;
+        const daysDiff = (new Date(limitDate) - new Date(finalStartDate)) / (1000 * 60 * 60 * 24);
         
         let count = 1;
         if (interval > 0) {
@@ -244,15 +272,26 @@
 
         const tempSeriesId = 'temp-' + Date.now();
         let tempEvents = [];
-        let currDate = new Date(start);
+        let currDate = new Date(finalStartDate);
         
+        let currentTroopIdx = -1;
+        if (troop_type && eventConfigs.troop_types) {
+            currentTroopIdx = eventConfigs.troop_types.indexOf(troop_type);
+        }
+
         for(let i=0; i<count; i++) {
+            let instanceTroop = null;
+            if (currentTroopIdx !== -1) {
+                const typeIdx = (currentTroopIdx + i) % eventConfigs.troop_types.length;
+                instanceTroop = eventConfigs.troop_types[typeIdx];
+            }
+
             tempEvents.push({
                 id: `${tempSeriesId}-${i}`,
                 series_id: tempSeriesId,
                 title: config.title,
                 type: preset,
-                troop_type: troop_type || null,
+                troop_type: instanceTroop,
                 start_date: currDate.toISOString().split('T')[0],
                 duration: config.duration,
                 isTemp: true
@@ -271,14 +310,14 @@
                     title: config.title,
                     type: preset,
                     troop_type: troop_type || null,
-                    start: start,
+                    start: finalStartDate,
                     duration: config.duration,
                     repeat_count: count,
                     repeat_interval: interval
                 })
             });
             await fetchEvents();
-            window.showAlert(`Generated ${count} events successfully.`);
+            window.showAlert(`Generated ${count} events starting from ${finalStartDate}.`);
         } catch (err) {
             console.error("Failed to generate events", err);
             events = previousEvents;
@@ -287,16 +326,57 @@
     }
 
     async function handleShiftSeries(e) {
-        const { seriesId, shiftDays } = e.detail;
+        const { seriesId, shiftDays, scope, anchorDate } = e.detail;
         isLoading = true;
+
         try {
-            await window.auth.fetchWithAuth('/api/events/shift', {
-                method: 'POST',
-                body: JSON.stringify({ series_id: seriesId, shift_days: shiftDays })
-            });
+            if (!scope || scope === 'all') {
+                await window.auth.fetchWithAuth('/api/events/shift', {
+                    method: 'POST',
+                    body: JSON.stringify({ series_id: seriesId, shift_days: shiftDays })
+                });
+            } 
+            else {
+                let eventsToUpdate = events.filter(ev => ev.series_id === seriesId);
+
+                if (scope === 'future') {
+                    eventsToUpdate = eventsToUpdate.filter(ev => ev.start_date >= anchorDate);
+                } else if (scope === 'single') {
+                    eventsToUpdate = eventsToUpdate.filter(ev => ev.start_date === anchorDate);
+                }
+
+                if (eventsToUpdate.length === 0) {
+                    window.showAlert("No events found to shift.");
+                    isLoading = false;
+                    return;
+                }
+
+                const updatePromises = eventsToUpdate.map(ev => {
+                    const currentD = new Date(ev.start_date);
+                    currentD.setUTCDate(currentD.getUTCDate() + shiftDays);
+                    const newDate = currentD.toISOString().split('T')[0];
+
+                    return window.auth.fetchWithAuth(`/api/events/${ev.id}`, {
+                        method: 'PATCH',
+                        body: JSON.stringify({
+                            start_date: newDate,
+                            title: ev.title,
+                            type: ev.type,
+                            duration: ev.duration
+                        })
+                    });
+                });
+
+                await Promise.all(updatePromises);
+                window.showAlert(`Successfully shifted ${eventsToUpdate.length} events.`);
+            }
+
             await fetchEvents();
-        } catch (err) { console.error(err); }
-        finally { isLoading = false;
+        } catch (err) { 
+            console.error(err);
+            window.showAlert("Failed to shift events.", "Error");
+        } finally { 
+            isLoading = false;
         }
     }
 
@@ -677,8 +757,8 @@
 
 <ShiftModal
     isOpen={modalState.shift}
-    {activeSeries}
-    on:close={() => modalState.shift = false}
+    activeSeries={activeSeries}
+    events={events}  on:close={() => modalState.shift = false}
     on:shift={handleShiftSeries}
 />
 
