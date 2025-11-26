@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let savedScoresCache = null;
 
     const SPECIAL_INSCRIPTIONS = ["Destructive", "Straight to the Point", "Invincible", "Fearless", "Hunter", "Unstoppable", "Balanced", "Intrepid", "Cocoon", "Inviolable", "Crowned", "Rounded", "Thrasher", "Butterfly Effect", "Steelskin", "Flurry", "Toppler", "Demolisher", "Airtight", "Thundering"];
-    const RARE_INSCRIPTIONS = ["Battle Ready", "Even Keeled", "Unswerving", "Forceful", "Crazed", "Boiling Blood", "Defiant", "Focus Fire", "Self Defense", "Aegis", "Reinforced", "Tenacious", "Pummeler", "Causative", "Determined", "Relentless", "Imploder", "Raider", "Hardheaded", "Rattling"];
+    const RARE_INSCRIPTIONS = ["Battle Ready", "Even-Keeled", "Unswerving", "Forceful", "Crazed", "Boiling Blood", "Defiant", "Focus Fire", "Self Defense", "Aegis", "Reinforced", "Tenacious", "Pummeler", "Causative", "Determined", "Relentless", "Imploder", "Raider", "Hardheaded", "Rattling"];
 
     function initArmamentCalculator() {
         if (isArmamentCalculatorInitialized) return;
