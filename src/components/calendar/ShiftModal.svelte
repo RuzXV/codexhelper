@@ -5,7 +5,7 @@
 
     export let isOpen = false;
     export let activeSeries = [];
-    export let events = []; [cite_start]
+    export let events = [];
 
     const dispatch = createEventDispatcher();
     const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', { eager: true });
