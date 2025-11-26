@@ -530,32 +530,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function generateGradientTags(text, color1, color2, bias = 1, grouping = 10) {
         const cleanText = text.replace(/<[^>]*>/g, "");
-        const len = cleanText.length;
-        if (len === 0) return "";
+        const totalLen = cleanText.length;
         
-        const chunkSize = grouping;
+        if (totalLen === 0) return text;
+        
         const start = hexToRgb(color1);
         const end = hexToRgb(color2);
         let output = '';
-    
-        for (let i = 0; i < len; i += chunkSize) {
-            const chunk = cleanText.substring(i, Math.min(i + chunkSize, len));
-            if (!chunk) continue;
-    
-            const midpointIndex = i + (chunk.length / 2);
-            const linearRatio = len > 1 ? midpointIndex / (len - 1) : 0;
-            const biasedRatio = Math.pow(linearRatio, bias);
-    
-            let r = Math.round(start.r + biasedRatio * (end.r - start.r));
-            let g = Math.round(start.g + biasedRatio * (end.g - start.g));
-            let b = Math.round(start.b + biasedRatio * (end.b - start.b));
+
+        const parts = text.split(/(<[^>]+>)/g);
+        
+        let currentTextIndex = 0;
+
+        parts.forEach(part => {
+            if (part.startsWith('<') && part.endsWith('>')) {
+                output += part;
+            } else if (part.length > 0) {
+                const chunkSize = grouping;
+                
+                for (let i = 0; i < part.length; i += chunkSize) {
+                    const chunk = part.substring(i, Math.min(i + chunkSize, part.length));
+                    
+                    const midpointGlobal = currentTextIndex + (chunk.length / 2);
+                    const linearRatio = totalLen > 1 ? midpointGlobal / (totalLen - 1) : 0;
+                    const biasedRatio = Math.pow(linearRatio, bias);
             
-            r = Math.max(0, Math.min(255, r));
-            g = Math.max(0, Math.min(255, g));
-            b = Math.max(0, Math.min(255, b));
-            
-            output += `<color=${rgbToHex(r, g, b)}>${chunk}</color>`;
-        }
+                    let r = Math.round(start.r + biasedRatio * (end.r - start.r));
+                    let g = Math.round(start.g + biasedRatio * (end.g - start.g));
+                    let b = Math.round(start.b + biasedRatio * (end.b - start.b));
+                    
+                    r = Math.max(0, Math.min(255, r));
+                    g = Math.max(0, Math.min(255, g));
+                    b = Math.max(0, Math.min(255, b));
+                    
+                    output += `<color=${rgbToHex(r, g, b)}>${chunk}</color>`;
+                    
+                    currentTextIndex += chunk.length;
+                }
+            }
+        });
+
         return output;
     }
 
@@ -576,15 +590,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedText = mailInput.value.substring(gradientSelection.start, gradientSelection.end);
     
         if (selectedText) {
-            const cleanSelectedText = selectedText.replace(/<[^>]*>/g, "");
-            const generatedTags = generateGradientTags(cleanSelectedText, startColor, endColor, bias, grouping);
-            const charCost = generatedTags.length - cleanSelectedText.length;
+            const generatedTags = generateGradientTags(selectedText, startColor, endColor, bias, grouping);
+            
+            const charCost = generatedTags.length - selectedText.length;
             gradientCharCounter.textContent = `+${charCost} chars`;
     
             if (isLivePreviewingGradient) {
                 const fullText = mailInput.value;
                 const preSelection = fullText.substring(0, gradientSelection.start);
                 const postSelection = fullText.substring(gradientSelection.end);
+                
                 updatePreview(preSelection + generatedTags + postSelection);
             }
         } else {
