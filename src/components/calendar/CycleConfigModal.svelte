@@ -16,7 +16,8 @@
     $: eventType = (eggEvents && eggEvents.length > 0) ? eggEvents[0].type : null;
     
     $: currentIcon = eventType === 'holy_knights_treasure' ? 'egg.webp' : 
-                     eventType === 'hunt_for_history' ? 'hammer.webp' : null;
+                     eventType === 'hunt_for_history' ? 'hammer.webp' : 
+                     eventType === 'egg_hammer' ? 'egg_hammer.webp' : null;
     
     const dispatch = createEventDispatcher();
     
@@ -66,12 +67,14 @@
 {#if isOpen}
     <div class="simple-modal-overlay" role="button" tabindex="0" on:click|self={() => dispatch('close')} on:keydown|self={(e) => e.key === 'Enter' && dispatch('close')}>
         <div class="simple-modal-content">
-            <h3>Configure Rotation</h3>
             <h3 class="modal-header-with-icon">
                 {#if currentIcon}
                     <img src={getIconSrc(currentIcon)} alt="" class="header-icon" />
                 {/if}
-                Configure {eventType === 'hunt_for_history' ? 'Hammer' : 'Egg'} Rotation
+                Configure {
+                    eventType === 'hunt_for_history' ? 'Hammer' : 
+                    eventType === 'egg_hammer' ? 'Egg / Hammer' : 'Egg'
+                } Rotation
             </h3>
             <p class="desc">Select a specific "Holy Knight's Treasure" event date you know, and tell us which gear rotation it was. We will calculate the rest.</p>
 

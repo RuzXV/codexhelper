@@ -101,6 +101,33 @@
       "color_hex": "#EAB308",
       "icon": "legendary_head.webp",
       "guide_link": null
+    },
+    "ark_battle": {
+      "title": "Ark of Osiris",
+      "duration": 2,
+      "has_troop_type": false,
+      "recurrence_interval": 14,
+      "color_hex": "#D2B48C",
+      "icon": "ark.webp",
+      "guide_link": null
+    },
+    "ark_registration": {
+      "title": "AOO Registration",
+      "duration": 3,
+      "has_troop_type": false,
+      "recurrence_interval": 14,
+      "color_hex": "#D2B48C",
+      "icon": "ark.webp",
+      "guide_link": null
+    },
+    "olympia": {
+      "title": "Champions of Olympia",
+      "duration": 2,
+      "has_troop_type": false,
+      "recurrence_interval": 14,
+      "color_hex": "#C9A25D",
+      "icon": "olympia.webp",
+      "guide_link": null
     }
   },
   "troop_types": ["Infantry", "Archer", "Cavalry", "Leadership"]

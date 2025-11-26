@@ -37,7 +37,7 @@
         cycle: false
     };
 
-    const ROTATION_TYPES = ['holy_knights_treasure', 'hunt_for_history'];
+    const ROTATION_TYPES = ['holy_knights_treasure', 'hunt_for_history', 'egg_hammer'];
     const CYCLES = [
         "Helmet / Pants",
         "Weapon / Accessory",
@@ -80,6 +80,14 @@
         if (clockInterval) clearInterval(clockInterval);
         window.removeEventListener('auth:loggedIn', checkAdminStatus);
     });
+
+    function handleGlobalClick(event) {
+        selectedEventId = null;
+
+        if (isFilterOpen && !event.target.closest('.filter-container')) {
+            isFilterOpen = false;
+        }
+    }
 
     function startClock() {
         const update = () => {
@@ -402,7 +410,7 @@
 </script>
 
 <svelte:window 
-    on:click={() => selectedEventId = null} 
+    on:click={handleGlobalClick} 
     on:keydown={handleKeydown} 
 />
 
@@ -673,7 +681,10 @@
 
 <style>
     .calendar-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
-    .tool-hero { padding-bottom: 20px; }
+    .tool-hero { 
+        padding-top: 80px;
+        padding-bottom: 20px;
+    }
     
     .clock-toggle-wrapper {
         display: inline-flex;
@@ -843,12 +854,14 @@
         width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
     }
     .day-cell.today .day-number { 
-        background: var(--accent-blue); 
-        color: white; 
+        background: linear-gradient(135deg, var(--accent-blue-bright), var(--accent-blue)); 
+        color: white;
         border-radius: 50%;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-        transform: scale(1.1);
-        font-weight: 700;
+        box-shadow: 0 0 0 3px var(--bg-secondary), 0 0 15px var(--accent-blue);
+        transform: scale(1.3);
+        font-weight: 800;
+        position: relative;
+        z-index: 20;
     }
 
     .day-cell.skeleton-loading { pointer-events: none; }
