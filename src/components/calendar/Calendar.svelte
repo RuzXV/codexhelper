@@ -830,7 +830,7 @@
         padding: 16px 24px;
         flex-wrap: wrap; gap: 16px;
         position: relative;
-        z-index: 50;
+        z-index: 200;
     }
     
     .nav-controls { display: flex; align-items: center; gap: 16px; flex-grow: 1; justify-content: center; }
@@ -876,7 +876,7 @@
     
     .filter-dropdown {
         position: absolute;
-        top: 100%; left: 0; z-index: 100;
+        top: 100%; left: 0; z-index: 300;
         background: var(--bg-tertiary); border: 1px solid var(--border-color);
         border-radius: 8px; width: 280px;
         padding: 10px;
