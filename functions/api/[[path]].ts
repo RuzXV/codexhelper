@@ -33,6 +33,24 @@ const CALENDAR_ADMIN_IDS = [
 
 const TROOP_CYCLE = ["Infantry", "Archer", "Cavalry", "Leadership"];
 
+// Configuration for auto-extension logic
+const EVENT_INTERVALS: Record<string, number> = {
+    "mge": 14,
+    "wof": 14,
+    "mtg": 28,
+    "gk": 14,
+    "ceroli": 14,
+    "rom": 14,
+    "esm": 42,
+    "arma": 42,
+    "dhal": 42,
+    "egg_hammer": 14,
+    "goldhead": 14,
+    "ark_battle": 14,
+    "ark_registration": 14,
+    "olympia": 14
+};
+
 const EVENT_COLOR_MAP: Record<string, string> = {
     "mge": "5",             // Yellow (Banana)
     "wof": "3",             // Purple (Grape)
@@ -510,6 +528,111 @@ app.post('/api/internal/update-cache', async (c) => {
 
     await Promise.all(promises);
     return c.json({ success: true });
+});
+
+app.post('/api/internal/extend-events', async (c) => {
+    const secret = c.req.header('X-Internal-Secret');
+    if (secret !== c.env.BOT_SECRET_KEY) {
+        return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    try {
+        const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
+        
+        const today = new Date();
+        const targetYear = today.getUTCFullYear() + 1;
+        const targetDate = new Date(Date.UTC(targetYear, 11, 31));
+
+        const { results } = await c.env.DB.prepare(`
+            SELECT series_id, title, type, troop_type, duration, created_by, MAX(start_date) as last_start_date 
+            FROM events 
+            GROUP BY series_id
+        `).all();
+
+        if (!results || results.length === 0) {
+            return c.json({ message: 'No active event series found.' });
+        }
+
+        let totalCreated = 0;
+        const dbBatch = [];
+        const gcalPromises = [];
+
+        for (const series of results) {
+            const interval = EVENT_INTERVALS[series.type as string];
+
+            if (!interval || interval <= 0 || !series.last_start_date) continue;
+
+            let currentDate = new Date(series.last_start_date as string);
+            
+            let currentTroopIndex = -1;
+            if (series.troop_type && TROOP_CYCLE.includes(series.troop_type as string)) {
+                currentTroopIndex = TROOP_CYCLE.indexOf(series.troop_type as string);
+            }
+
+            let loopSafety = 0;
+            while (currentDate < targetDate && loopSafety < 50) { 
+                loopSafety++;
+                
+                currentDate.setUTCDate(currentDate.getUTCDate() + interval);
+                
+                if (currentDate > targetDate) break;
+
+                const newStartDate = currentDate.toISOString().split('T')[0];
+
+                let nextTroop = null;
+                if (currentTroopIndex !== -1) {
+                    currentTroopIndex = (currentTroopIndex + 1) % TROOP_CYCLE.length;
+                    nextTroop = TROOP_CYCLE[currentTroopIndex];
+                }
+
+                const newEventId = crypto.randomUUID();
+                const colorId = EVENT_COLOR_MAP[series.type as string] || "8";
+                
+                dbBatch.push(c.env.DB.prepare(
+                    `INSERT INTO events (id, series_id, title, type, troop_type, start_date, duration, created_by) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+                ).bind(
+                    newEventId,
+                    series.series_id,
+                    series.title,
+                    series.type,
+                    nextTroop || null,
+                    newStartDate,
+                    series.duration,
+                    series.created_by
+                ));
+
+                gcalPromises.push(gcal.createEvent({
+                    title: series.title as string,
+                    type: series.type,
+                    troop_type: nextTroop || null,
+                    start_date: newStartDate,
+                    duration: series.duration,
+                    colorId: colorId
+                }, newEventId));
+
+                totalCreated++;
+            }
+        }
+
+        if (dbBatch.length > 0) {
+            const chunkSize = 50; 
+            for (let i = 0; i < dbBatch.length; i += chunkSize) {
+                await c.env.DB.batch(dbBatch.slice(i, i + chunkSize));
+            }
+        }
+
+        c.executionCtx.waitUntil(Promise.allSettled(gcalPromises));
+
+        return c.json({ 
+            status: 'success', 
+            message: `Checked ${results.length} series. Generated ${totalCreated} new future events.` 
+        });
+
+    } catch (e) {
+        console.error("Auto-extend error:", e);
+        return c.json({ error: 'Failed to extend events', details: String(e) }, 500);
+    }
 });
 
 app.get('/api/auth/callback', async (c) => {
