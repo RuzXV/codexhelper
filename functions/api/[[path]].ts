@@ -160,32 +160,28 @@ class GoogleCalendarService {
     }
 
     async createEvent(eventData: any, customId: string) {
-        try {
-            const token = await this.getAccessToken();
-            const gcalId = customId.replace(/-/g, '');
-            
-            const gcalBody = {
-                id: gcalId,
-                summary: eventData.title + (eventData.troop_type ? ` (${eventData.troop_type})` : ''),
-                start: { date: eventData.start_date },
-                end: { date: addDays(eventData.start_date, eventData.duration) },
-                description: `Type: ${eventData.type}\nDuration: ${eventData.duration} days`,
-                colorId: eventData.colorId || "8"
-            };
+        const token = await this.getAccessToken();
+        const gcalId = customId.replace(/-/g, '');
+        
+        const gcalBody = {
+            id: gcalId,
+            summary: eventData.title + (eventData.troop_type ? ` (${eventData.troop_type})` : ''),
+            start: { date: eventData.start_date },
+            end: { date: addDays(eventData.start_date, eventData.duration) },
+            description: `Type: ${eventData.type}\nDuration: ${eventData.duration} days`,
+            colorId: eventData.colorId || "8"
+        };
 
-            const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${this.calendarId}/events`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(gcalBody)
-            });
-            
-            if (!res.ok) {
-                const errorText = await res.text();
-                console.error("GCal Create Error", errorText);
-                throw new Error(`GCal Error: ${errorText}`);
-            }
-        } catch (e) {
-            console.error("GCal Create Exception", e);
+        const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${this.calendarId}/events`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(gcalBody)
+        });
+        
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error(`Failed to create event ${eventData.title}:`, errorText);
+            throw new Error(`Google API Error: ${errorText}`); 
         }
     }
 
