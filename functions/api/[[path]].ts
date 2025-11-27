@@ -231,7 +231,7 @@ class GoogleCalendarService {
         }
     }
 
-    async listEvents() {
+    async listEvents(maxResults = 2500) {
         try {
             const token = await this.getAccessToken();
             let events: any[] = [];
@@ -239,7 +239,7 @@ class GoogleCalendarService {
 
             do {
                 const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${this.calendarId}/events`);
-                url.searchParams.append('maxResults', '2500');
+                url.searchParams.append('maxResults', String(maxResults));
                 if (pageToken) url.searchParams.append('pageToken', pageToken);
 
                 const res = await fetch(url.toString(), {
@@ -247,8 +247,9 @@ class GoogleCalendarService {
                 });
                 const data = await res.json() as any;
                 if (data.items) events = events.concat(data.items);
+                
                 pageToken = data.nextPageToken;
-            } while (pageToken);
+            } while (pageToken && events.length < maxResults);
 
             return events;
         } catch (e) {
@@ -725,57 +726,79 @@ app.post('/api/admin/gcal/reset', authMiddleware, async (c) => {
     const user = c.get('user');
     if (!CALENDAR_ADMIN_IDS.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
 
+    const { phase = 'cleanup', offset = 0 } = await c.req.json().catch(() => ({}));
+    
+    const BATCH_SIZE = 20; 
+
     const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
 
     try {
-        const gcalEvents = await gcal.listEvents();
-        
-        for (let i = 0; i < gcalEvents.length; i += 10) {
-            const batch = gcalEvents.slice(i, i + 10);
-            await Promise.all(batch.map(e => gcal.deleteEvent(e.id)));
-        }
-
-        const { results } = await c.env.DB.prepare(
-            "SELECT * FROM events WHERE start_date >= '2024-01-01'"
-        ).all();
-
-        const eventsToCreate = results || [];
-        
-        const BATCH_SIZE = 5;
-        const DELAY_MS = 200;
-
-        console.log(`Starting creation of ${eventsToCreate.length} events...`);
-
-        for (let i = 0; i < eventsToCreate.length; i += BATCH_SIZE) {
-            const batch = eventsToCreate.slice(i, i + BATCH_SIZE);
+        if (phase === 'cleanup') {
+            const gcalEvents = await gcal.listEvents(BATCH_SIZE);
             
-            const batchPromises = batch.map(ev => {
-                const colorId = EVENT_COLOR_MAP[ev.type as string] || "8";
-                return gcal.createEvent({
-                    title: ev.title,
-                    type: ev.type,
-                    troop_type: ev.troop_type,
-                    start_date: ev.start_date,
-                    duration: ev.duration,
-                    colorId: colorId
-                }, ev.id as string);
-            });
+            if (gcalEvents.length > 0) {
+                console.log(`[Batch Cleanup] Deleting ${gcalEvents.length} events...`);
+                await Promise.all(gcalEvents.map(e => gcal.deleteEvent(e.id)));
+                
+                return c.json({ 
+                    status: 'partial', 
+                    phase: 'cleanup', 
+                    offset: 0, 
+                    message: `Deleted batch of ${gcalEvents.length} events.` 
+                });
+            } else {
+                return c.json({ 
+                    status: 'partial', 
+                    phase: 'create', 
+                    offset: 0, 
+                    message: 'Cleanup complete. Switching to creation.' 
+                });
+            }
+        } 
+        
+        if (phase === 'create') {
+            const { results } = await c.env.DB.prepare(
+                `SELECT * FROM events WHERE start_date >= '2024-01-01' LIMIT ? OFFSET ?`
+            ).bind(BATCH_SIZE, offset).all();
 
-            await Promise.all(batchPromises);
-            
-            if (i + BATCH_SIZE < eventsToCreate.length) {
-                await new Promise(resolve => setTimeout(resolve, DELAY_MS));
+            const eventsToCreate = results || [];
+
+            if (eventsToCreate.length > 0) {
+                console.log(`[Batch Create] Creating ${eventsToCreate.length} events (Offset: ${offset})...`);
+                
+                const createPromises = eventsToCreate.map(ev => {
+                    const colorId = EVENT_COLOR_MAP[ev.type as string] || "8";
+                    return gcal.createEvent({
+                        title: ev.title,
+                        type: ev.type,
+                        troop_type: ev.troop_type,
+                        start_date: ev.start_date,
+                        duration: ev.duration,
+                        colorId: colorId
+                    }, ev.id as string);
+                });
+
+                await Promise.all(createPromises);
+
+                return c.json({ 
+                    status: 'partial', 
+                    phase: 'create', 
+                    offset: offset + eventsToCreate.length, 
+                    message: `Created batch of ${eventsToCreate.length} events.` 
+                });
+            } else {
+                return c.json({ 
+                    status: 'complete', 
+                    message: 'Full reset and sync completed successfully.' 
+                });
             }
         }
 
-        return c.json({ 
-            status: 'success', 
-            message: `Reset complete. Deleted ${gcalEvents.length} events, Processed creation for ${eventsToCreate.length} events.` 
-        });
+        return c.json({ error: 'Invalid phase' }, 400);
 
     } catch(e) {
-        console.error("GCal Reset Error", e);
-        return c.json({ error: 'Reset failed', details: String(e) }, 500);
+        console.error("GCal Sync Error", e);
+        return c.json({ error: 'Sync failed', details: String(e) }, 500);
     }
 });
 
