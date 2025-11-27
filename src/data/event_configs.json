@@ -109,7 +109,7 @@
       "recurrence_interval": 14,
       "color_hex": "#D2B48C",
       "icon": "ark.webp",
-      "guide_link": null
+      "guide_link": "https://discord.com/channels/1031515159627300924/1373938028841799712"
     },
     "ark_registration": {
       "title": "AOO Registration",
@@ -118,7 +118,7 @@
       "recurrence_interval": 14,
       "color_hex": "#D2B48C",
       "icon": "ark.webp",
-      "guide_link": null
+      "guide_link": "https://discord.com/channels/1031515159627300924/1314675519765348373"
     },
     "olympia": {
       "title": "Champions of Olympia",
@@ -127,7 +127,7 @@
       "recurrence_interval": 14,
       "color_hex": "#C9A25D",
       "icon": "olympia.webp",
-      "guide_link": null
+      "guide_link": "https://discord.com/channels/1031515159627300924/1364844990659952721"
     }
   },
   "troop_types": ["Infantry", "Archer", "Cavalry", "Leadership"]

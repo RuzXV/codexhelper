@@ -11,13 +11,17 @@ type Bindings = {
     WEBSITE_APP_SECRET: string;
     DB_ENCRYPTION_KEY: string;
     BOT_SECRET_KEY: string;
+    GOOGLE_SERVICE_ACCOUNT_JSON: string;
+    GOOGLE_CALENDAR_ID: string;
 };
+
 type Variables = {
     user: {
         id: string;
         accessToken: string;
     };
 };
+
 const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
 const CALENDAR_ADMIN_IDS = [
@@ -29,13 +33,30 @@ const CALENDAR_ADMIN_IDS = [
 
 const TROOP_CYCLE = ["Infantry", "Archer", "Cavalry", "Leadership"];
 
+const EVENT_COLOR_MAP: Record<string, string> = {
+    "mge": "5",             // Yellow (Banana)
+    "wof": "3",             // Purple (Grape)
+    "mtg": "11",            // Red (Tomato)
+    "gk": "6",              // Orange (Tangerine)
+    "ceroli": "2",          // Green (Sage) - closest to Emerald
+    "rom": "9",             // Blue (Blueberry)
+    "esm": "4",             // Pink (Flamingo)
+    "arma": "3",            // Purple (Grape)
+    "dhal": "7",            // Teal/Cyan (Peacock)
+    "egg_hammer": "7",      // Cyan (Peacock)
+    "goldhead": "5",        // Yellow (Banana)
+    "ark_battle": "6",      // Tan/Orange (Tangerine)
+    "ark_registration": "6",
+    "olympia": "5"          // Gold/Yellow (Banana)
+};
+
 app.use('/api/*', cors({
     origin: [
         'https://codexhelper.com', 
         'https://www.codexhelper.com',
         'http://127.0.0.1:8788'
     ],
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
 }));
 
@@ -44,6 +65,187 @@ function addDays(dateStr: string, days: number): string {
     date.setUTCDate(date.getUTCDate() + days);
     return date.toISOString().split('T')[0];
 }
+
+class GoogleCalendarService {
+    private creds: any;
+    private calendarId: string;
+    private token: string | null = null;
+    private tokenExpiry: number = 0;
+
+    constructor(jsonKey: string, calendarId: string) {
+        try {
+            this.creds = JSON.parse(jsonKey);
+        } catch (e) {
+            console.error("Failed to parse Google Service Account JSON");
+            this.creds = {};
+        }
+        this.calendarId = calendarId;
+    }
+
+    private async getAccessToken(): Promise<string> {
+        if (this.token && Date.now() < this.tokenExpiry) {
+            return this.token;
+        }
+
+        const header = { alg: 'RS256', typ: 'JWT' };
+        const now = Math.floor(Date.now() / 1000);
+        const claim = {
+            iss: this.creds.client_email,
+            scope: 'https://www.googleapis.com/auth/calendar',
+            aud: 'https://oauth2.googleapis.com/token',
+            exp: now + 3600,
+            iat: now,
+        };
+
+        const encodedHeader = this.base64UrlEncode(JSON.stringify(header));
+        const encodedClaim = this.base64UrlEncode(JSON.stringify(claim));
+
+        const key = await this.importPrivateKey(this.creds.private_key);
+        const signature = await crypto.subtle.sign(
+            { name: 'RSASSA-PKCS1-v1_5' },
+            key,
+            new TextEncoder().encode(`${encodedHeader}.${encodedClaim}`)
+        );
+
+        const signedJwt = `${encodedHeader}.${encodedClaim}.${this.base64UrlEncode(signature)}`;
+
+        const response = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                assertion: signedJwt,
+            }),
+        });
+
+        const data = await response.json() as any;
+        this.token = data.access_token;
+        this.tokenExpiry = Date.now() + (data.expires_in * 1000) - 60000;
+        return this.token!;
+    }
+
+    private base64UrlEncode(input: string | ArrayBuffer): string {
+        let base64;
+        if (typeof input === 'string') {
+            base64 = btoa(input);
+        } else {
+            base64 = btoa(String.fromCharCode(...new Uint8Array(input)));
+        }
+        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    private async importPrivateKey(pem: string): Promise<CryptoKey> {
+        const pemHeader = "-----BEGIN PRIVATE KEY-----";
+        const pemFooter = "-----END PRIVATE KEY-----";
+        const pemContents = pem.replace(/\\n/g, '\n'); 
+        
+        const pemBody = pemContents.substring(
+            pemContents.indexOf(pemHeader) + pemHeader.length,
+            pemContents.indexOf(pemFooter)
+        ).replace(/\s/g, '');
+
+        const binaryDerString = atob(pemBody);
+        const binaryDer = new Uint8Array(binaryDerString.length);
+        for (let i = 0; i < binaryDerString.length; i++) {
+            binaryDer[i] = binaryDerString.charCodeAt(i);
+        }
+
+        return crypto.subtle.importKey(
+            'pkcs8',
+            binaryDer.buffer,
+            { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+            false,
+            ['sign']
+        );
+    }
+
+    async createEvent(eventData: any, customId: string) {
+        try {
+            const token = await this.getAccessToken();
+            const gcalId = customId.replace(/-/g, '');
+            
+            const gcalBody = {
+                id: gcalId,
+                summary: eventData.title + (eventData.troop_type ? ` (${eventData.troop_type})` : ''),
+                start: { date: eventData.start_date },
+                end: { date: addDays(eventData.start_date, eventData.duration) },
+                description: `Type: ${eventData.type}\nDuration: ${eventData.duration} days`,
+                colorId: eventData.colorId || "8"
+            };
+
+            const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${this.calendarId}/events`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(gcalBody)
+            });
+            
+            if (!res.ok) console.error("GCal Create Error", await res.text());
+        } catch (e) {
+            console.error("GCal Create Exception", e);
+        }
+    }
+
+    async deleteEvent(customId: string) {
+        try {
+            const token = await this.getAccessToken();
+            const gcalId = customId.replace(/-/g, '');
+            await fetch(`https://www.googleapis.com/calendar/v3/calendars/${this.calendarId}/events/${gcalId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+        } catch (e) {
+            console.error("GCal Delete Exception", e);
+        }
+    }
+
+    async patchEventDate(customId: string, newStartDate: string, duration: number) {
+        try {
+            const token = await this.getAccessToken();
+            const gcalId = customId.replace(/-/g, '');
+            
+            const body = {
+                start: { date: newStartDate },
+                end: { date: addDays(newStartDate, duration) }
+            };
+
+            const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${this.calendarId}/events/${gcalId}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) console.error("GCal Patch Error", await res.text());
+        } catch (e) {
+            console.error("GCal Patch Exception", e);
+        }
+    }
+
+    async listEvents() {
+        try {
+            const token = await this.getAccessToken();
+            let events: any[] = [];
+            let pageToken = '';
+
+            do {
+                const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${this.calendarId}/events`);
+                url.searchParams.append('maxResults', '2500');
+                if (pageToken) url.searchParams.append('pageToken', pageToken);
+
+                const res = await fetch(url.toString(), {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json() as any;
+                if (data.items) events = events.concat(data.items);
+                pageToken = data.nextPageToken;
+            } while (pageToken);
+
+            return events;
+        } catch (e) {
+            console.error("GCal List Exception", e);
+            return [];
+        }
+    }
+}
+
 
 const authMiddleware = async (c: Context, next: Next) => {
     const sessionToken = getCookie(c, 'session_token');
@@ -111,19 +313,15 @@ app.get('/api/users/@me', authMiddleware, async (c) => {
         return c.json({ error: 'Failed to fetch fresh user data from Discord.' }, 500);
     }
     const userData = await userResponse.json() as { id: string; [key: string]: any };
-
     const activePatrons: string[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
     const isActivePatron = activePatrons ? activePatrons.includes(user.id) : false;
-
     const isCalendarAdmin = CALENDAR_ADMIN_IDS.includes(user.id);
 
-    const enrichedUserData = {
+    return c.json({
         ...userData,
         is_active_patron: isActivePatron,
         is_calendar_admin: isCalendarAdmin
-    };
-
-    return c.json(enrichedUserData);
+    });
 });
 
 app.get('/api/templates', authMiddleware, async (c) => {
@@ -275,27 +473,17 @@ app.post('/api/internal/update-cache', async (c) => {
     const { top_servers, bot_stats, active_patrons } = await c.req.json();
     
     const promises = [];
-    if (top_servers) {
-        promises.push(c.env.API_CACHE.put('top_servers', JSON.stringify(top_servers)));
-    }
-    if (bot_stats) {
-        promises.push(c.env.API_CACHE.put('bot_stats', JSON.stringify(bot_stats)));
-    }
-    if (active_patrons) {
-        promises.push(c.env.API_CACHE.put('active_patrons', JSON.stringify(active_patrons)));
-    }
+    if (top_servers) promises.push(c.env.API_CACHE.put('top_servers', JSON.stringify(top_servers)));
+    if (bot_stats) promises.push(c.env.API_CACHE.put('bot_stats', JSON.stringify(bot_stats)));
+    if (active_patrons) promises.push(c.env.API_CACHE.put('active_patrons', JSON.stringify(active_patrons)));
 
     await Promise.all(promises);
-
     return c.json({ success: true });
 });
 
 app.get('/api/auth/callback', async (c) => {
     const code = c.req.query('code');
-    if (!code) {
-        console.error("Auth callback error: Authorization code is missing.");
-        return c.text('Authorization code is missing.', 400);
-    }
+    if (!code) return c.text('Authorization code is missing.', 400);
 
     const url = new URL(c.req.url);
     const origin = url.origin;
@@ -314,30 +502,18 @@ app.get('/api/auth/callback', async (c) => {
         body: tokenData,
     });
 
-    if (!tokenResponse.ok) {
-        const errorBody = await tokenResponse.text();
-        console.error("Failed to get token from Discord. Status:", tokenResponse.status);
-        console.error("Discord Response Body:", errorBody);
-        return c.text('Failed to authenticate with Discord.', 500);
-    }
+    if (!tokenResponse.ok) return c.text('Failed to authenticate with Discord.', 500);
 
-    type TokenResponse = { access_token: string; };
-    const tokenJson = await tokenResponse.json() as TokenResponse;
+    const tokenJson = await tokenResponse.json() as { access_token: string };
     const accessToken = tokenJson.access_token;
 
     const userResponse = await fetch('https://discord.com/api/users/@me', {
         headers: { 'Authorization': `Bearer ${accessToken}` },
     });
 
-    if (!userResponse.ok) {
-        const errorBody = await userResponse.text();
-        console.error("Failed to get user data from Discord. Status:", userResponse.status);
-        console.error("Discord Response Body:", errorBody);
-        return c.text('Failed to fetch user data from Discord.', 500);
-    }
+    if (!userResponse.ok) return c.text('Failed to fetch user data from Discord.', 500);
 
-    type UserResponse = { id: string; };
-    const userData = await userResponse.json() as UserResponse;
+    const userData = await userResponse.json() as { id: string };
     const userId = userData.id;
 
     const sessionToken = crypto.randomUUID().replace(/-/g, '');
@@ -389,10 +565,11 @@ app.post('/api/events', authMiddleware, async (c) => {
         }
 
         const seriesId = crypto.randomUUID();
+        const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
         
         const stmt = c.env.DB.prepare(
-            `INSERT INTO events (series_id, title, type, troop_type, start_date, duration, created_by) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)`
+            `INSERT INTO events (id, series_id, title, type, troop_type, start_date, duration, created_by) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
         );
 
         const batch = [];
@@ -400,19 +577,49 @@ app.post('/api/events', authMiddleware, async (c) => {
         const interval = repeat_interval || 0;
 
         let currentTroopIndex = troop_type ? TROOP_CYCLE.indexOf(troop_type) : -1;
+        
+        const colorId = EVENT_COLOR_MAP[type] || "8";
+
+        const gcalPromises = [];
 
         for (let i = 0; i < count; i++) {
             const currentStart = addDays(start, i * interval);
             let thisTroop = null;
-
             if (currentTroopIndex !== -1) {
                 thisTroop = TROOP_CYCLE[(currentTroopIndex + i) % TROOP_CYCLE.length];
             }
+
+            const eventId = crypto.randomUUID();
             
-            batch.push(stmt.bind(seriesId, title, type, thisTroop || troop_type || null, currentStart, duration, user.id));
+            const eventData = {
+                id: eventId,
+                series_id: seriesId,
+                title, 
+                type, 
+                troop_type: thisTroop || troop_type || null, 
+                start_date: currentStart, 
+                duration,
+                created_by: user.id,
+                colorId: colorId
+            };
+
+            batch.push(stmt.bind(
+                eventData.id,
+                eventData.series_id,
+                eventData.title,
+                eventData.type,
+                eventData.troop_type,
+                eventData.start_date,
+                eventData.duration,
+                eventData.created_by
+            ));
+
+            gcalPromises.push(gcal.createEvent(eventData, eventId));
         }
 
         await c.env.DB.batch(batch);
+
+        c.executionCtx.waitUntil(Promise.all(gcalPromises));
 
         return c.json({ status: 'success', message: `Created ${count} events` }, 201);
     } catch (e) {
@@ -423,25 +630,30 @@ app.post('/api/events', authMiddleware, async (c) => {
 
 app.post('/api/events/shift', authMiddleware, async (c) => {
     const user = c.get('user');
-
-    if (!CALENDAR_ADMIN_IDS.includes(user.id)) {
-        return c.json({ error: 'Unauthorized' }, 403);
-    }
+    if (!CALENDAR_ADMIN_IDS.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
 
     try {
         const { series_id, shift_days } = await c.req.json();
+        if (!series_id || !shift_days) return c.json({ error: 'Missing series_id or shift_days' }, 400);
 
-        if (!series_id || !shift_days) {
-            return c.json({ error: 'Missing series_id or shift_days' }, 400);
-        }
+        const { results } = await c.env.DB.prepare(
+            'SELECT id, start_date, duration FROM events WHERE series_id = ?'
+        ).bind(series_id).all();
+
+        if (!results || results.length === 0) return c.json({ error: 'No events found' }, 404);
 
         const modifier = `${shift_days > 0 ? '+' : ''}${shift_days} days`;
-
-        const { success } = await c.env.DB.prepare(
-            `UPDATE events 
-             SET start_date = date(start_date, ?) 
-             WHERE series_id = ?`
+        await c.env.DB.prepare(
+            `UPDATE events SET start_date = date(start_date, ?) WHERE series_id = ?`
         ).bind(modifier, series_id).run();
+
+        const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
+        const gcalPromises = results.map(ev => {
+            const newStartDate = addDays(ev.start_date as string, shift_days);
+            return gcal.patchEventDate(ev.id as string, newStartDate, ev.duration as number);
+        });
+
+        c.executionCtx.waitUntil(Promise.all(gcalPromises));
 
         return c.json({ status: 'success', message: 'Events shifted' });
     } catch (e) {
@@ -454,18 +666,20 @@ app.delete('/api/events/:id', authMiddleware, async (c) => {
     const user = c.get('user');
     const { id } = c.req.param();
 
-    if (!CALENDAR_ADMIN_IDS.includes(user.id)) {
-        return c.json({ error: 'Unauthorized' }, 403);
-    }
+    if (!CALENDAR_ADMIN_IDS.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
 
     try {
         const { success } = await c.env.DB.prepare(
             `DELETE FROM events WHERE id = ?`
         ).bind(id).run();
 
-        return success 
-            ? c.json({ status: 'success' }) 
-            : c.json({ error: 'Event not found' }, 404);
+        if (success) {
+            const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
+            c.executionCtx.waitUntil(gcal.deleteEvent(id));
+            return c.json({ status: 'success' });
+        } else {
+            return c.json({ error: 'Event not found' }, 404);
+        }
     } catch (e) {
         return c.json({ error: 'Internal server error' }, 500);
     }
@@ -483,10 +697,57 @@ app.patch('/api/events/:id', authMiddleware, async (c) => {
         const { success } = await c.env.DB.prepare(
             `UPDATE events SET start_date = ?, title = ?, type = ?, duration = ? WHERE id = ?`
         ).bind(start_date, title, type, duration, id).run();
+        
+        if (success) {
+             const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
+             c.executionCtx.waitUntil(gcal.patchEventDate(id, start_date, duration));
+        }
 
         return success ? c.json({ status: 'success' }) : c.json({ error: 'Event not found' }, 404);
     } catch (e) {
         return c.json({ error: 'Internal server error' }, 500);
+    }
+});
+
+app.post('/api/admin/gcal/reset', authMiddleware, async (c) => {
+    const user = c.get('user');
+    if (!CALENDAR_ADMIN_IDS.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
+
+    const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
+
+    try {
+        const gcalEvents = await gcal.listEvents();
+        
+        const deletePromises = gcalEvents.map(e => gcal.deleteEvent(e.id)); 
+        await Promise.all(deletePromises);
+
+        const { results } = await c.env.DB.prepare(
+            "SELECT * FROM events WHERE start_date >= '2024-01-01'"
+        ).all();
+
+        const createPromises = (results || []).map(ev => {
+            const colorId = EVENT_COLOR_MAP[ev.type as string] || "8";
+            
+            return gcal.createEvent({
+                title: ev.title,
+                type: ev.type,
+                troop_type: ev.troop_type,
+                start_date: ev.start_date,
+                duration: ev.duration,
+                colorId: colorId
+            }, ev.id as string);
+        });
+
+        await Promise.all(createPromises);
+
+        return c.json({ 
+            status: 'success', 
+            message: `Reset complete. Deleted ${gcalEvents.length} events, Re-created ${(results || []).length} events.` 
+        });
+
+    } catch(e) {
+        console.error("GCal Reset Error", e);
+        return c.json({ error: 'Reset failed', details: String(e) }, 500);
     }
 });
 
