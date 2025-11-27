@@ -179,7 +179,11 @@ class GoogleCalendarService {
                 body: JSON.stringify(gcalBody)
             });
             
-            if (!res.ok) console.error("GCal Create Error", await res.text());
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error("GCal Create Error", errorText);
+                throw new Error(`GCal Error: ${errorText}`);
+            }
         } catch (e) {
             console.error("GCal Create Exception", e);
         }
@@ -718,31 +722,47 @@ app.post('/api/admin/gcal/reset', authMiddleware, async (c) => {
     try {
         const gcalEvents = await gcal.listEvents();
         
-        const deletePromises = gcalEvents.map(e => gcal.deleteEvent(e.id)); 
-        await Promise.all(deletePromises);
+        for (let i = 0; i < gcalEvents.length; i += 10) {
+            const batch = gcalEvents.slice(i, i + 10);
+            await Promise.all(batch.map(e => gcal.deleteEvent(e.id)));
+        }
 
         const { results } = await c.env.DB.prepare(
             "SELECT * FROM events WHERE start_date >= '2024-01-01'"
         ).all();
 
-        const createPromises = (results || []).map(ev => {
-            const colorId = EVENT_COLOR_MAP[ev.type as string] || "8";
-            
-            return gcal.createEvent({
-                title: ev.title,
-                type: ev.type,
-                troop_type: ev.troop_type,
-                start_date: ev.start_date,
-                duration: ev.duration,
-                colorId: colorId
-            }, ev.id as string);
-        });
+        const eventsToCreate = results || [];
+        
+        const BATCH_SIZE = 5;
+        const DELAY_MS = 200;
 
-        await Promise.all(createPromises);
+        console.log(`Starting creation of ${eventsToCreate.length} events...`);
+
+        for (let i = 0; i < eventsToCreate.length; i += BATCH_SIZE) {
+            const batch = eventsToCreate.slice(i, i + BATCH_SIZE);
+            
+            const batchPromises = batch.map(ev => {
+                const colorId = EVENT_COLOR_MAP[ev.type as string] || "8";
+                return gcal.createEvent({
+                    title: ev.title,
+                    type: ev.type,
+                    troop_type: ev.troop_type,
+                    start_date: ev.start_date,
+                    duration: ev.duration,
+                    colorId: colorId
+                }, ev.id as string);
+            });
+
+            await Promise.all(batchPromises);
+            
+            if (i + BATCH_SIZE < eventsToCreate.length) {
+                await new Promise(resolve => setTimeout(resolve, DELAY_MS));
+            }
+        }
 
         return c.json({ 
             status: 'success', 
-            message: `Reset complete. Deleted ${gcalEvents.length} events, Re-created ${(results || []).length} events.` 
+            message: `Reset complete. Deleted ${gcalEvents.length} events, Processed creation for ${eventsToCreate.length} events.` 
         });
 
     } catch(e) {
