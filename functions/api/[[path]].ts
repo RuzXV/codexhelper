@@ -161,7 +161,7 @@ class GoogleCalendarService {
 
     async createEvent(eventData: any, customId: string) {
         const token = await this.getAccessToken();
-        const gcalId = customId.replace(/-/g, '');
+        const gcalId = String(customId).replace(/-/g, '');
         
         const gcalBody = {
             id: gcalId,
@@ -188,7 +188,7 @@ class GoogleCalendarService {
     async deleteEvent(customId: string) {
         try {
             const token = await this.getAccessToken();
-            const gcalId = customId.replace(/-/g, '');
+            const gcalId = String(customId).replace(/-/g, '');
             await fetch(`https://www.googleapis.com/calendar/v3/calendars/${this.calendarId}/events/${gcalId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -201,7 +201,7 @@ class GoogleCalendarService {
     async patchEventDate(customId: string, newStartDate: string, duration: number) {
         try {
             const token = await this.getAccessToken();
-            const gcalId = customId.replace(/-/g, '');
+            const gcalId = String(customId).replace(/-/g, '');
             
             const body = {
                 start: { date: newStartDate },
