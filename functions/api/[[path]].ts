@@ -204,6 +204,35 @@ app.post('/api/bot/templates/update-loaded/:templateId', botAuthMiddleware, asyn
     return c.json({ status: 'success' });
 });
 
+app.get('/api/bot/events/upcoming', botAuthMiddleware, async (c) => {
+    try {
+        const { results } = await c.env.DB.prepare(
+            `SELECT * FROM events 
+             WHERE start_date >= date('now', '-2 days') 
+             ORDER BY start_date ASC`
+        ).all();
+
+        return c.json(results || []);
+    } catch (e) {
+        console.error("Failed to fetch upcoming events for bot:", e);
+        return c.json({ error: 'Failed to fetch events' }, 500);
+    }
+});
+
+app.get('/api/bot/settings/:userId', botAuthMiddleware, async (c) => {
+    const { userId } = c.req.param();
+    try {
+        const result = await c.env.DB.prepare(
+            'SELECT settings FROM user_settings WHERE user_id = ?'
+        ).bind(userId).first();
+
+        return c.json(result ? JSON.parse(result.settings as string) : {});
+    } catch (e) {
+        console.error("Failed to fetch user settings for bot:", e);
+        return c.json({ error: 'Failed to fetch settings' }, 500);
+    }
+});
+
 app.get('/api/scores', authMiddleware, async (c) => {
     const user = c.get('user');
     const { results } = await c.env.DB.prepare(
@@ -321,7 +350,7 @@ app.get('/api/auth/callback', async (c) => {
         'INSERT INTO user_sessions (session_token, user_id, discord_access_token, expiry_date) VALUES (?, ?, ?, ?)'
     ).bind(sessionToken, userId, encryptedAccessToken, expiryDate).run();
 
-    const cookieOptions = `Max-Age=${SESSION_DURATION_SECONDS}; Path=/; HttpOnly; Secure; SameSite=Lax`;
+    const cookieOptions = `Max-Age=${SESSION_DURATION_SECONDS}; Path=/; HttpOnly; Secure; SameSite=Lax; Path=/`;
     c.header('Set-Cookie', `session_token=${sessionToken}; ${cookieOptions}`);
     
     return c.redirect('/');
