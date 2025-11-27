@@ -746,7 +746,7 @@ app.post('/api/admin/gcal/reset', authMiddleware, async (c) => {
 
     const { phase = 'cleanup', offset = 0 } = await c.req.json().catch(() => ({}));
     
-    const BATCH_SIZE = 20; 
+    const BATCH_SIZE = 5;
 
     const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
 
