@@ -181,7 +181,8 @@ class GoogleCalendarService {
             start: { date: eventData.start_date },
             end: { date: addDays(eventData.start_date, eventData.duration) },
             description: `Type: ${eventData.type}\nDuration: ${eventData.duration} days`,
-            colorId: eventData.colorId || "8"
+            colorId: eventData.colorId || "8",
+            status: 'confirmed'
         };
 
         const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${this.calendarId}/events`, {
@@ -190,10 +191,27 @@ class GoogleCalendarService {
             body: JSON.stringify(gcalBody)
         });
         
+        if (res.status === 409) {
+            console.warn(`Event ${gcalId} exists (likely in trash). Overwriting...`);
+            
+            const updateRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${this.calendarId}/events/${gcalId}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(gcalBody)
+            });
+
+            if (!updateRes.ok) {
+                const errorText = await updateRes.text();
+                console.error(`Failed to restore/update event ${eventData.title}:`, errorText);
+                throw new Error(`Google API Update Error: ${errorText}`);
+            }
+            return;
+        }
+
         if (!res.ok) {
             const errorText = await res.text();
             console.error(`Failed to create event ${eventData.title}:`, errorText);
-            throw new Error(`Google API Error: ${errorText}`); 
+            throw new Error(`Google API Create Error: ${errorText}`); 
         }
     }
 
