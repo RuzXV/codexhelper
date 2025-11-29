@@ -33,7 +33,6 @@ const CALENDAR_ADMIN_IDS = [
 
 const TROOP_CYCLE = ["Infantry", "Archer", "Cavalry", "Leadership"];
 
-// Configuration for auto-extension logic
 const EVENT_INTERVALS: Record<string, number> = {
     "mge": 14,
     "wof": 14,
