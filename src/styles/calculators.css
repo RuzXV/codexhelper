@@ -74,7 +74,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-a
 
 .rarity-selector, .building-selector { display: grid; gap: var(--spacing-3); }
 .rarity-selector { grid-template-columns: 1fr 1fr; }
-.building-selector { grid-template-columns: repeat(3, 1fr); }
+.building-selector { 
+    display: grid; 
+    gap: var(--spacing-3); 
+    grid-template-columns: repeat(3, minmax(0, 1fr)); 
+}
 .rarity-selector label, .building-selector label { position: relative; cursor: pointer; }
 .rarity-selector input, .building-selector input { position: absolute; opacity: 0; width: 0; height: 0; }
 .rarity-btn, .building-btn { display: flex; align-items: center; justify-content: center; gap: var(--spacing-2); padding: var(--spacing-2); border-radius: var(--radius-md); border: 1px solid rgba(255, 255, 255, 0.15); background-color: var(--bg-tertiary); font-weight: 600; color: white; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); position: relative; overflow: hidden; transition: all 0.2s ease-in-out; flex-direction: column; height: 100%; font-size: var(--font-size-xs); }
@@ -227,29 +231,66 @@ input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-a
 }
 
 @media (max-width: 768px) {
-    .carousel-track { align-items: flex-start; }
-    .carousel-slide { flex: 0 0 100%; transform: none; opacity: 1; filter: none; padding: 0 var(--spacing-12); pointer-events: auto; }
-    .carousel-arrow { display: block; top: 40%; font-size: 2rem; }
-    .carousel-arrow.prev { left: 2px; }
-    .carousel-arrow.next { right: 2px; }
-    .calculator-island { min-height: auto; }
+    .carousel-arrow { display: none !important; }
+
+    .carousel-slide { 
+        flex: 0 0 100%; 
+        transform: none; 
+        opacity: 1; 
+        filter: none; 
+        pointer-events: auto;
+        box-sizing: border-box;
+        padding: 0 10px; 
+    }
+
+    .calculator-island {
+        width: 100% !important; 
+        margin: 0 auto;
+        min-height: auto;
+        padding: var(--spacing-4); 
+    }
+
+    .building-selector { 
+        grid-template-columns: repeat(3, minmax(0, 1fr)); 
+    }
+    
+    .calculator-main-title { 
+        font-size: 1.25rem; 
+        line-height: 1.2; 
+        white-space: nowrap; 
+        gap: 8px; 
+    }
+    .calculator-main-title img { height: 24px; }
+
     .quick-access-nav { overflow-x: auto; justify-content: flex-start; }
+    
     .exp-tome-grid {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-2);
     }
     .exp-tome-grid .exp-tome-item:nth-child(n) { grid-column: auto; }
     .exp-tome-grid .exp-tome-item:last-child { grid-column: auto; }
-    .form-group-toggle .toggle-label {
-        font-size: var(--font-size-sm);
-        white-space: nowrap;
-    }
-    .vip-token-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+
+    .form-group-toggle .toggle-label { font-size: var(--font-size-sm); white-space: nowrap; }
+    .vip-token-grid { grid-template-columns: repeat(2, 1fr); }
+    
+    .label-with-toggle { flex-wrap: wrap; gap: 8px; }
+
+    .hoh-return-btn { font-size: 13px; padding: 6px 2px; }
+    .hoh-return-sublabel { font-size: 13px; white-space: nowrap; }
 }
 
 @media (max-width: 480px) {
-    .calculator-main-title { font-size: var(--font-size-2xl); line-height: 1.2; }
+    .calculator-main-title { 
+        font-size: 1.25rem;
+        line-height: 1.2; 
+        white-space: nowrap;
+        gap: 8px;
+    }
+    .calculator-main-title img {
+        height: 24px;
+    }
     .tool-hero p { font-size: var(--font-size-sm); line-height: 1.5; }
     .quick-access-btn span { display: none; }
     .exp-tome-grid {
@@ -268,13 +309,14 @@ input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-a
     }
     .hoh-grid { grid-template-columns: repeat(2, 1fr); }
     .building-btn span {
-        font-size: 11px;
+        font-size: 10px;
         white-space: nowrap;
+        overflow: hidden;
     }
     .building-btn {
         min-height: 65px;
+        padding: 4px;
     }
-    
     #building-cost-result .cost-line span {
         font-size: var(--font-size-sm);
     }

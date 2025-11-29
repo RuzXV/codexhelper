@@ -38,6 +38,31 @@ document.addEventListener('DOMContentLoaded', () => {
         migrationDateInputJs.addEventListener('click', openDatePicker);
     }
 
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const minSwipeDistance = 50;
+
+    container.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    container.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+        const distance = touchEndX - touchStartX;
+
+        if (distance < -minSwipeDistance) {
+            if (currentIndex < slides.length - 1) moveToSlide(currentIndex + 1);
+        }
+        
+        if (distance > minSwipeDistance) {
+            if (currentIndex > 0) moveToSlide(currentIndex - 1);
+        }
+    }
+
     window.getPreLoginState = function() {
         const state = {};
         const allInputs = document.querySelectorAll('.calculator-island input, .calculator-island select');
