@@ -113,19 +113,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const moveToSlide = (targetIndex, animate = true) => {
         if (!slides.length || !slides[targetIndex]) return;
 
-        let newTransform;
-        const isMobile = window.innerWidth <= 768;
+        const containerWidth = container.clientWidth;
+        const targetSlide = slides[targetIndex];
+        
+        const slideWidth = targetSlide.offsetWidth;
+        const targetLeft = targetSlide.offsetLeft;
 
-        if (isMobile) {
-            const slideWidth = slides[0].getBoundingClientRect().width;
-            newTransform = -(targetIndex * slideWidth);
-        } else {
-            const containerWidth = container.clientWidth;
-            const targetSlide = slides[targetIndex];
-            const slideWidth = targetSlide.clientWidth;
-            const targetLeft = targetSlide.offsetLeft;
-            newTransform = -(targetLeft - (containerWidth / 2) + (slideWidth / 2));
-        }
+        const newTransform = -(targetLeft - (containerWidth / 2) + (slideWidth / 2));
         
         track.style.transition = animate ? 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
         track.style.transform = `translateX(${newTransform}px)`;
