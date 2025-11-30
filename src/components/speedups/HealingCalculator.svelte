@@ -6,7 +6,6 @@
     const BASE_TIME_T5 = 4.0;
 
     const KP_PER_UNIT = { t4: 10, t5: 20 };
-
     const RESOURCES = {
         t4: {
             infantry: { food: 120, wood: 120, stone: 0, gold: 8 },
@@ -22,12 +21,14 @@
         }
     };
 
-    let isT5 = true;
     let healingSpeed = 90;
     let resourceBuff = 10;
-    const HELP_COUNT = 30; 
+    const HELP_COUNT = 30;
 
-    let counts = { infantry: '', cavalry: '', archer: '', siege: '' };
+    let counts = {
+        t4: { infantry: '', cavalry: '', archer: '', siege: '' },
+        t5: { infantry: '', cavalry: '', archer: '', siege: '' }
+    };
     
     let tradeRatio = null;
     const RATIO_OPTIONS = [
@@ -39,18 +40,15 @@
 
     let finalTimeStr = null;
     let totalRes = { food: 0, wood: 0, stone: 0, gold: 0 };
-    
     let totalUnits = 0;
     let expectedKills = 0;
     let expectedKP = 0;
 
     let hasResult = false;
     let resultAnimationTrigger = false;
-
     let activeTooltip = null; 
 
-    $: activeTier = isT5 ? 't5' : 't4';
-    $: calculateHealing(counts, healingSpeed, resourceBuff, isT5, tradeRatio);
+    $: calculateHealing(counts, healingSpeed, resourceBuff, tradeRatio);
 
     function autoFontSize(node, value) {
         const update = () => {
@@ -83,25 +81,31 @@
         let currentRes = { food: 0, wood: 0, stone: 0, gold: 0 };
         let hasInput = false;
         let unitSum = 0;
+        
+        let t4Sum = 0;
+        let t5Sum = 0;
 
-        const baseTimePerUnit = isT5 ? BASE_TIME_T5 : BASE_TIME_T4;
-        const resTable = isT5 ? RESOURCES.t5 : RESOURCES.t4;
-        const kpValue = isT5 ? KP_PER_UNIT.t5 : KP_PER_UNIT.t4;
+        ['t4', 't5'].forEach(tier => {
+            const baseTimePerUnit = tier === 't5' ? BASE_TIME_T5 : BASE_TIME_T4;
+            const resTable = RESOURCES[tier];
 
-        Object.entries(counts).forEach(([type, val]) => {
-            const count = parseInt(val.replace(/,/g, '') || '0');
-            if (count > 0) {
-                hasInput = true;
-                unitSum += count;
-                
-                totalBaseSeconds += (baseTimePerUnit * count) / speedMultiplier;
+            Object.entries(counts[tier]).forEach(([type, val]) => {
+                const count = parseInt(val.replace(/,/g, '') || '0');
+                if (count > 0) {
+                    hasInput = true;
+                    unitSum += count;
+                    if (tier === 't4') t4Sum += count;
+                    if (tier === 't5') t5Sum += count;
+                    
+                    totalBaseSeconds += (baseTimePerUnit * count) / speedMultiplier;
 
-                const unitCost = resTable[type];
-                currentRes.food += unitCost.food * count * costMultiplier;
-                currentRes.wood += unitCost.wood * count * costMultiplier;
-                currentRes.stone += unitCost.stone * count * costMultiplier;
-                currentRes.gold += unitCost.gold * count * costMultiplier;
-            }
+                    const unitCost = resTable[type];
+                    currentRes.food += unitCost.food * count * costMultiplier;
+                    currentRes.wood += unitCost.wood * count * costMultiplier;
+                    currentRes.stone += unitCost.stone * count * costMultiplier;
+                    currentRes.gold += unitCost.gold * count * costMultiplier;
+                }
+            });
         });
 
         if (hasInput) {
@@ -116,7 +120,7 @@
 
             const finalSeconds = Math.floor(tempSeconds);
             finalTimeStr = formatTime(finalSeconds);
-            
+
             totalRes = {
                 food: Math.ceil(currentRes.food),
                 wood: Math.ceil(currentRes.wood),
@@ -125,9 +129,17 @@
             };
 
             totalUnits = unitSum;
+            
             if (tradeRatio !== null) {
-                expectedKills = Math.floor(totalUnits * tradeRatio);
-                expectedKP = Math.floor(totalUnits * kpValue * tradeRatio);
+                const projectedT4Kills = t4Sum * tradeRatio;
+                const projectedT5Kills = t5Sum * tradeRatio;
+                
+                expectedKills = Math.floor(projectedT4Kills + projectedT5Kills);
+                
+                expectedKP = Math.floor(
+                    (projectedT4Kills * KP_PER_UNIT.t4) + 
+                    (projectedT5Kills * KP_PER_UNIT.t5)
+                );
             } else {
                 expectedKills = 0;
                 expectedKP = 0;
@@ -173,14 +185,14 @@
         return num.toLocaleString();
     }
 
-    function handleInput(e, obj, key) {
+    function handleInput(e, tier, key) {
         let value = e.target.value.replace(/,/g, '').replace(/\D/g, '');
         if (value) {
-            obj[key] = parseInt(value).toLocaleString();
+            counts[tier][key] = parseInt(value).toLocaleString();
         } else {
-            obj[key] = '';
+            counts[tier][key] = '';
         }
-        if (obj === counts) counts = counts;
+        counts = counts;
     }
 
     function toggleTooltip(type) { 
@@ -244,37 +256,54 @@
         </div>
     </div>
 
-    <div class="form-group header-group">
-        <span class="label-text">Expected Units Healed</span>
-        <div class="label-with-toggle">
-            <label for="tier-toggle-heal" class="toggle-switch">
-                <input type="checkbox" id="tier-toggle-heal" bind:checked={isT5}>
-                <span class="toggle-slider" data-on="T5" data-off="T4"></span>
-            </label>
+    <div class="form-group">
+        <span class="label-text-small">Tier 4 Healed</span>
+        <div class="troop-grid t4-group">
+            <div class="troop-item">
+                <label for="t4-inf">Infantry</label>
+                <img src={images['t4_inf.webp']} alt="Infantry" />
+                <input id="t4-inf" type="text" placeholder="0" value={counts.t4.infantry} on:input={(e) => handleInput(e, 't4', 'infantry')} use:autoFontSize={counts.t4.infantry}>
+            </div>
+            <div class="troop-item">
+                <label for="t4-cav">Cavalry</label>
+                <img src={images['t4_cav.webp']} alt="Cavalry" />
+                <input id="t4-cav" type="text" placeholder="0" value={counts.t4.cavalry} on:input={(e) => handleInput(e, 't4', 'cavalry')} use:autoFontSize={counts.t4.cavalry}>
+            </div>
+            <div class="troop-item">
+                <label for="t4-arch">Archer</label>
+                <img src={images['t4_arch.webp']} alt="Archer" />
+                <input id="t4-arch" type="text" placeholder="0" value={counts.t4.archer} on:input={(e) => handleInput(e, 't4', 'archer')} use:autoFontSize={counts.t4.archer}>
+            </div>
+            <div class="troop-item">
+                <label for="t4-siege">Siege</label>
+                <img src={images['t4_siege.webp']} alt="Siege" />
+                <input id="t4-siege" type="text" placeholder="0" value={counts.t4.siege} on:input={(e) => handleInput(e, 't4', 'siege')} use:autoFontSize={counts.t4.siege}>
+            </div>
         </div>
     </div>
 
-    <div class="form-group" style="margin-top: -10px;">
-        <div class="troop-grid" class:t5-group={isT5} class:t4-group={!isT5}>
+    <div class="form-group" style="margin-top: 10px;">
+        <span class="label-text-small">Tier 5 Healed</span>
+        <div class="troop-grid t5-group">
             <div class="troop-item">
-                <label for="inf-in">Infantry</label>
-                <img src={images[`${activeTier}_inf.webp`]} alt="Infantry" />
-                <input id="inf-in" type="text" placeholder="0" value={counts.infantry} on:input={(e) => handleInput(e, counts, 'infantry')} use:autoFontSize={counts.infantry}>
+                <label for="t5-inf">Infantry</label>
+                <img src={images['t5_inf.webp']} alt="Infantry" />
+                <input id="t5-inf" type="text" placeholder="0" value={counts.t5.infantry} on:input={(e) => handleInput(e, 't5', 'infantry')} use:autoFontSize={counts.t5.infantry}>
             </div>
             <div class="troop-item">
-                <label for="cav-in">Cavalry</label>
-                <img src={images[`${activeTier}_cav.webp`]} alt="Cavalry" />
-                <input id="cav-in" type="text" placeholder="0" value={counts.cavalry} on:input={(e) => handleInput(e, counts, 'cavalry')} use:autoFontSize={counts.cavalry}>
+                <label for="t5-cav">Cavalry</label>
+                <img src={images['t5_cav.webp']} alt="Cavalry" />
+                <input id="t5-cav" type="text" placeholder="0" value={counts.t5.cavalry} on:input={(e) => handleInput(e, 't5', 'cavalry')} use:autoFontSize={counts.t5.cavalry}>
             </div>
             <div class="troop-item">
-                <label for="arch-in">Archer</label>
-                <img src={images[`${activeTier}_arch.webp`]} alt="Archer" />
-                <input id="arch-in" type="text" placeholder="0" value={counts.archer} on:input={(e) => handleInput(e, counts, 'archer')} use:autoFontSize={counts.archer}>
+                <label for="t5-arch">Archer</label>
+                <img src={images['t5_arch.webp']} alt="Archer" />
+                <input id="t5-arch" type="text" placeholder="0" value={counts.t5.archer} on:input={(e) => handleInput(e, 't5', 'archer')} use:autoFontSize={counts.t5.archer}>
             </div>
             <div class="troop-item">
-                <label for="siege-in">Siege</label>
-                <img src={images[`${activeTier}_siege.webp`]} alt="Siege" />
-                <input id="siege-in" type="text" placeholder="0" value={counts.siege} on:input={(e) => handleInput(e, counts, 'siege')} use:autoFontSize={counts.siege}>
+                <label for="t5-siege">Siege</label>
+                <img src={images['t5_siege.webp']} alt="Siege" />
+                <input id="t5-siege" type="text" placeholder="0" value={counts.t5.siege} on:input={(e) => handleInput(e, 't5', 'siege')} use:autoFontSize={counts.t5.siege}>
             </div>
         </div>
     </div>
@@ -322,7 +351,7 @@
                 <div class="result-divider"></div>
                 <div class="stats-row">
                     <div class="stat-item">
-                        <img src={images[`${isT5 ? 't5' : 't4'}_inf.webp`]} alt="Troops" style="transform: scale(1.2);" />
+                        <img src={images['t5_inf.webp']} alt="Troops" style="transform: scale(1.2);" />
                         <div class="stat-info">
                             <span class="stat-label">Total Kills</span>
                             <span class="stat-value" style="color: var(--accent-blue-bright);">{expectedKills.toLocaleString()}</span>
@@ -353,12 +382,17 @@
         margin-bottom: 20px;
     }
     .header-group.compact { 
+        display: flex;
         margin-bottom: 5px; 
-        justify-content: flex-start; 
+        justify-content: flex-start;
         gap: 1px;
         align-items: center; 
     }
-    .header-group label { font-size: 0.8rem; white-space: nowrap; margin-bottom: 0; }
+    .header-group label { 
+        font-size: 0.95rem;
+        white-space: nowrap; 
+        margin-bottom: 0; 
+    }
 
     .healing-time-display {
         display: flex;
@@ -400,7 +434,15 @@
     }
 
     .label-text { display: block; font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-2); }
-    .header-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-2); }
+    .label-text-small { 
+        display: block; 
+        font-weight: 500; 
+        font-size: 1rem;
+        color: var(--text-secondary); 
+        margin-bottom: 5px; 
+        margin-left: 5px;
+    }
+    
     .tooltip-wrapper { position: relative; display: flex; align-items: center; }
     .info-btn { background: none; border: none; color: var(--text-secondary); font-size: 1rem; cursor: pointer; padding: 0; display: flex; align-items: center; }
     
@@ -434,17 +476,17 @@
 
     .troop-grid { 
         display: grid; 
-        grid-template-columns: repeat(4, 1fr); 
+        grid-template-columns: repeat(4, 1fr);
         gap: 4px; 
         position: relative; 
         padding: 4px; 
         border-radius: var(--radius-lg); 
-        margin-bottom: 5px; 
+        margin-bottom: 5px;
     }
     .troop-grid::after { 
         content: ''; 
         position: absolute; 
-        inset: 0; 
+        inset: 0;
         border-radius: inherit; 
         z-index: 0; 
         opacity: 0.35; 
@@ -454,7 +496,12 @@
     .troop-grid.t5-group::after { background-image: radial-gradient(circle, #f28d00 0%, #d55800 100%); }
 
     .troop-item { background: var(--bg-tertiary); border: 1px solid var(--border-hover); border-radius: var(--radius-md); padding: var(--spacing-2); display: flex; flex-direction: column; align-items: center; gap: var(--spacing-2); position: relative; z-index: 1; }
-    .troop-item label { font-size: 0.75rem; margin: 0; color: var(--text-secondary); font-weight: 500; }
+    .troop-item label { 
+        font-size: 0.95rem;
+        margin: 0; 
+        color: var(--text-secondary); 
+        font-weight: 500; 
+    }
     .troop-item img { width: 48px; height: 48px; object-fit: contain; }
     .troop-item input { width: 100%; text-align: center; padding: 4px; font-size: 1rem; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); }
     .troop-item input:focus { border-color: var(--accent-blue); outline: none; }
@@ -467,65 +514,22 @@
     .calc-result.result-success::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid transparent; animation: glow-border 1.2s ease-out; }
     @keyframes glow-border { 0% { border-color: transparent; box-shadow: 0 0 0 0 transparent; } 25% { border-color: var(--accent-green); box-shadow: 0 0 15px 0 var(--accent-green); } 100% { border-color: transparent; box-shadow: 0 0 15px 0 transparent; } }
 
-    .label-with-toggle { display: flex; align-items: center; }
-    
-    .toggle-switch { position: relative; width: 50px; height: 26px; display: inline-block; cursor: pointer; margin: 0; }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { 
-        position: absolute; 
-        top: 0; left: 0; right: 0; bottom: 0; 
-        background-image: radial-gradient(circle, #ca62e6 0%, #8113a7 100%);
-        border: 1px solid rgba(255,255,255,0.2); 
-        border-radius: 26px; 
-        transition: .4s; 
-        display: flex; 
-        align-items: center; 
-        padding: 0; 
-    }
-    .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 2px; background-color: white; border-radius: 50%; transition: .4s; z-index: 2; }
-    
-    .toggle-slider::after { 
-        content: attr(data-off); 
-        color: rgba(255,255,255,0.5); 
-        position: absolute;
-        right: 8px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        transition: 0.3s;
-    }
-    
-    input:checked + .toggle-slider::after { 
-        content: attr(data-on); 
-        right: auto;
-        left: 8px;
-        color: white; 
-    }
-    
-    input:checked + .toggle-slider::before { 
-        transform: translateX(24px); 
-    }
-    
-    input:checked + .toggle-slider { 
-        background-image: radial-gradient(circle, #f28d00 0%, #d55800 100%); 
-        border-color: rgba(255, 255, 255, 0.7); 
-    }
-
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
         .troop-grid { 
-            grid-template-columns: repeat(2, 1fr); 
+            grid-template-columns: repeat(2, 1fr);
         }
         .buff-inputs-grid { 
-            grid-template-columns: 1fr; 
+            grid-template-columns: 1fr;
         }
         .ratio-selector { 
-            grid-template-columns: repeat(2, 1fr); 
+            grid-template-columns: repeat(2, 1fr);
         }
 
         .res-grid { 
             gap: 10px;
         }
         .res-grid .cost-line { 
-            font-size: 0.9rem; 
+            font-size: 0.9rem;
         }
         .res-grid .cost-line img {
             height: 20px;
