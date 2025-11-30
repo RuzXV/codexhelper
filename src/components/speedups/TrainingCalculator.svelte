@@ -147,7 +147,7 @@
 
         categories.forEach(cat => {
             Object.entries(troopInputs[cat.key]).forEach(([type, val]) => {
-                const count = parseInt(val.replace(/,/g, '') || '0');
+                const count = parseInt(val.replace(/\D/g, '') || '0');
                 if (count > 0) {
                     hasInput = true;
                     totalSeconds += (cat.baseTime / speedMultiplier) * count;
@@ -307,13 +307,13 @@
         if (num >= 1000000000) return parseFloat((num / 1000000000).toFixed(2)) + 'B';
         if (num >= 1000000) return parseFloat((num / 1000000).toFixed(1)) + 'M';
         if (num >= 1000) return parseFloat((num / 1000).toFixed(1)) + 'k';
-        return num.toLocaleString();
+        return num.toLocaleString('en-US');
     }
 
     function handleInput(e, category, type) {
         let value = e.target.value.replace(/,/g, '').replace(/\D/g, '');
         if (value) {
-            troopInputs[category][type] = parseInt(value).toLocaleString();
+            troopInputs[category][type] = parseInt(value).toLocaleString('en-US');
         } else {
             troopInputs[category][type] = '';
         }
@@ -322,13 +322,13 @@
 
     function handleSingleInput(e, setFunc) {
         let value = e.target.value.replace(/,/g, '').replace(/\D/g, '');
-        let formatted = value ? parseInt(value).toLocaleString() : '';
+        let formatted = value ? parseInt(value).toLocaleString('en-US') : '';
         setFunc(formatted);
     }
     
     function handleSpeedupInput(e, key) {
         let value = e.target.value.replace(/,/g, '').replace(/\D/g, '');
-        speedupTime[key] = value ? parseInt(value).toLocaleString() : '';
+        speedupTime[key] = value ? parseInt(value).toLocaleString('en-US') : '';
     }
 
     function toggleTooltip() { showTooltip = !showTooltip; }
@@ -526,6 +526,10 @@
                     <div class="mix-thumb" style="left: {sliderThumb1}%;"></div>
                     <div class="mix-thumb" style="left: {sliderThumb2}%;"></div>
                 </div>
+
+                <div class="slider-instruction">
+                    Drag the sliders on either end towards the middle to adjust your T4/T5/Upgrade split
+                </div>
             </div>
 
             <div class="dynamic-input-container">
@@ -673,7 +677,6 @@
     .tooltip-img.square { aspect-ratio: 1/1; object-fit: cover; }
     .tooltip-img.wide { height: auto; }
 
-    /* Troop Grid Styles */
     .troop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; position: relative; padding: 4px; border-radius: var(--radius-lg); margin-bottom: 5px; }
     .troop-grid::after { content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: 0; opacity: 0.35; pointer-events: none; }
     .troop-grid.t4-group::after { background-image: radial-gradient(circle, #ca62e6 0%, #8113a7 100%); }
@@ -695,19 +698,16 @@
     .res-grid .cost-line img { height: 24px; }
     .calc-result { min-height: 140px; position: relative; }
     
-    /* MGE Input Styles */
     .mge-input-row { display: flex; align-items: center; gap: 10px; }
     .standalone-input { flex: 1; border: 1px solid var(--border-hover); background: var(--bg-primary); border-radius: var(--radius-sm); padding: 8px; font-size: 1rem; color: var(--text-primary); text-align: center; }
     .standalone-input:focus { border-color: var(--accent-blue); outline: none; }
     .mge-text-label { color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; }
 
-    /* Toggle Styles */
     .toggle-switch { width: 36px; height: 20px; }
     .toggle-slider { border-radius: 20px; }
     .toggle-slider:before { height: 14px; width: 14px; left: 3px; bottom: 2px; }
     .toggle-switch input:checked + .toggle-slider:before { transform: translateX(16px); }
 
-    /* Mix Slider Styles */
     .mix-control-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
     .mix-readout { font-weight: 600; font-size: 0.85rem; }
     
@@ -715,13 +715,13 @@
         position: relative;
         height: 24px;
         background: var(--bg-primary);
-        border-radius: 0px;
-        overflow: hidden;
+        overflow: visible; 
         cursor: pointer;
         border: 1px solid var(--border-hover);
         touch-action: none;
         user-select: none;
         -webkit-user-select: none;
+        border-radius: 2px; 
     }
 
     .mix-segment {
@@ -731,12 +731,26 @@
 
     .mix-thumb {
         position: absolute;
-        top: 0; bottom: 0;
-        width: 4px;
+        top: -6px; 
+        bottom: -6px;
+        width: 16px;
         background: white;
+        border-radius: 8px;
         transform: translateX(-50%);
-        box-shadow: 0 0 5px rgba(0,0,0,0.5);
-        z-index: 10;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        border: 2px solid var(--bg-tertiary);
+        z-index: 20;
+        transition: transform 0.1s ease;
+    }
+
+    .mix-thumb:hover {
+        transform: translateX(-50%) scale(1.1);
+        background: var(--accent-blue-light);
+        cursor: grab;
+    }
+
+    .mix-thumb:active {
+        cursor: grabbing;
     }
     
     .mix-thumb::after {
@@ -744,6 +758,14 @@
         position: absolute;
         top: -15px; bottom: -15px;
         left: -15px; right: -15px;
+    }
+
+    .slider-instruction {
+        font-size: 0.75rem;
+        font-style: italic;
+        color: var(--text-secondary);
+        margin-top: 8px;
+        text-align: center;
     }
 
     @media (max-width: 600px) {
