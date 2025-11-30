@@ -444,7 +444,20 @@
     }
     
     .tooltip-wrapper { position: relative; display: flex; align-items: center; }
-    .info-btn { background: none; border: none; color: var(--text-secondary); font-size: 1rem; cursor: pointer; padding: 0; display: flex; align-items: center; }
+    .info-btn { 
+        background: transparent !important; 
+        border: none !important; 
+        color: var(--text-secondary); 
+        font-size: 1rem; 
+        cursor: pointer; 
+        padding: 0; 
+        display: flex;
+        align-items: center; 
+        min-height: auto !important;
+        min-width: auto !important;
+        width: auto !important;
+        height: auto !important;
+    }
     
     .tooltip-container { position: absolute; left: 0; top: 100%; margin-top: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 15px; border-radius: var(--radius-md); width: 250px; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,0.6); text-align: left; }
     .tooltip-container h4 { margin: 0 0 10px 0; color: var(--text-primary); font-size: 0.9rem; }
@@ -464,6 +477,7 @@
         flex-direction: column;
         align-items: center;
         transition: all 0.2s;
+        min-height: auto; 
     }
     .ratio-btn:hover { border-color: var(--accent-blue); background: var(--bg-tertiary); }
     .ratio-btn.active {
@@ -502,8 +516,21 @@
         color: var(--text-secondary); 
         font-weight: 500; 
     }
-    .troop-item img { width: 48px; height: 48px; object-fit: contain; }
-    .troop-item input { width: 100%; text-align: center; padding: 4px; font-size: 1rem; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); }
+    .troop-item img { 
+        width: 48px !important; 
+        height: 48px !important; 
+        object-fit: contain; 
+    }
+    .troop-item input { 
+        width: 100%; 
+        text-align: center; 
+        padding: 4px; 
+        font-size: 1rem; 
+        background-color: var(--bg-primary) !important;
+        border: 1px solid var(--border-color); 
+        border-radius: var(--radius-sm); 
+        color: var(--text-primary); 
+    }
     .troop-item input:focus { border-color: var(--accent-blue); outline: none; }
     
     .res-grid { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; }
@@ -514,46 +541,18 @@
     .calc-result.result-success::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid transparent; animation: glow-border 1.2s ease-out; }
     @keyframes glow-border { 0% { border-color: transparent; box-shadow: 0 0 0 0 transparent; } 25% { border-color: var(--accent-green); box-shadow: 0 0 15px 0 var(--accent-green); } 100% { border-color: transparent; box-shadow: 0 0 15px 0 transparent; } }
 
-    @media (max-width: 600px) {
-        .troop-grid { 
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .buff-inputs-grid { 
-            grid-template-columns: 1fr;
-        }
-        .ratio-selector { 
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .res-grid { 
-            gap: 10px;
-        }
-        .res-grid .cost-line { 
-            font-size: 0.9rem;
-        }
-        .res-grid .cost-line img {
-            height: 20px;
-        }
-
-        .time-row.main {
-            font-size: 1.1rem;
-        }
-        .time-row.main img {
-            height: 28px;
-        }
-
-        .stats-row {
-            gap: 5px;
-        }
-        .stat-item {
-            gap: 8px;
-        }
-        .stat-item img {
-            width: 28px;
-            height: 28px;
-        }
-        .stat-value {
-            font-size: 1rem;
-        }
+    @media (max-width: 768px) {
+        .troop-grid { grid-template-columns: repeat(2, 1fr); }
+        .buff-inputs-grid { grid-template-columns: 1fr; }
+        .ratio-selector { grid-template-columns: repeat(2, 1fr); }
+        .res-grid { gap: 10px; }
+        .res-grid .cost-line { font-size: 0.9rem; }
+        .res-grid .cost-line img { height: 20px; }
+        .time-row.main { font-size: 1.1rem; }
+        .time-row.main img { height: 28px; }
+        .stats-row { gap: 5px; }
+        .stat-item { gap: 8px; }
+        .stat-item img { width: 28px; height: 28px; }
+        .stat-value { font-size: 1rem; }
     }
 </style>
