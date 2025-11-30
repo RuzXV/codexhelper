@@ -514,7 +514,7 @@
     .calc-result.result-success::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid transparent; animation: glow-border 1.2s ease-out; }
     @keyframes glow-border { 0% { border-color: transparent; box-shadow: 0 0 0 0 transparent; } 25% { border-color: var(--accent-green); box-shadow: 0 0 15px 0 var(--accent-green); } 100% { border-color: transparent; box-shadow: 0 0 15px 0 transparent; } }
 
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
         .troop-grid { 
             grid-template-columns: repeat(2, 1fr);
         }
