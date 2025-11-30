@@ -1,0 +1,52 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SpeedupsHub from '../../components/speedups/SpeedupsHub.svelte';
+import '../../styles/calculators.css';
+
+const allImages = import.meta.glob([
+    '../../assets/images/calculators/**/*.{webp,png,jpg}',
+    '../../assets/images/training/**/*.{webp,png,jpg}'
+], { eager: true });
+
+const imageMap: { [key: string]: string } = {};
+
+for (const path in allImages) {
+    const filename = path.split('/').pop();
+    if (filename) {
+        const mod = allImages[path] as any;
+        imageMap[filename] = mod.default.src;
+    }
+}
+---
+
+<Layout title="Training Calculator" bodyClass="has-sub-nav">
+    <main class="tool-page-wrapper">
+        <section class="tool-hero">
+            <div class="tool-hero-container">
+                <div class="section-badge">Community Tools</div>
+                
+                <h1 class="calculator-main-title">
+                   <img src={imageMap['universal_speedup.webp']} alt="" style="height: 40px; margin-right: 10px;" />
+                    Speedup Calculators
+                </h1>
+                
+                <p>Calculate the exact amount of speedups needed to hit your training and healing goals.</p>
+            
+            </div>
+        </section>
+
+        <section class="tool-content">
+            <div class="tool-container">
+                <SpeedupsHub client:load images={imageMap} />
+            </div>
+        </section>
+    </main>
+</Layout>
+
+<style>
+    .tool-container {
+        display: flex;
+        justify-content: center;
+        padding-bottom: 50px;
+    }
+</style>

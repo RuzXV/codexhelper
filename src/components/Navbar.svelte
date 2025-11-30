@@ -79,9 +79,10 @@
     {#if isToolsPage}
         <div class="sub-navbar" style="opacity: 1; transform: translateY(0);">
             <div class="sub-nav-container">
-                <a href="/tools/mail/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/mail')}>Alliance Mail Generator</a>
-                <a href="/tools/calculators/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/calculators')}>General Calculators</a>
-                <a href="/tools/equipment/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/equipment')}>Equipment Calculators</a>
+                <a href="/tools/mail/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/mail')}>Mail Generator</a>
+                <a href="/tools/calculators/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/calculators')}>General Tools</a>
+                <a href="/tools/equipment/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/equipment')}>Equipment</a>
+                <a href="/tools/speedups/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/training')}>Speedups</a>
                 <a href="/tools/davor_toolkit/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/davor_toolkit')}>Davor's Toolkit</a>
                 <a href="/tools/calendar/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/calendar')}>Event Calendar</a>
             </div>
