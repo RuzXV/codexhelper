@@ -471,7 +471,17 @@
     
     .toggle-switch { position: relative; width: 50px; height: 26px; display: inline-block; cursor: pointer; margin: 0; }
     .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 26px; transition: .4s; display: flex; align-items: center; padding: 0; }
+    .toggle-slider { 
+        position: absolute; 
+        top: 0; left: 0; right: 0; bottom: 0; 
+        background-image: radial-gradient(circle, #ca62e6 0%, #8113a7 100%);
+        border: 1px solid rgba(255,255,255,0.2); 
+        border-radius: 26px; 
+        transition: .4s; 
+        display: flex; 
+        align-items: center; 
+        padding: 0; 
+    }
     .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 2px; background-color: white; border-radius: 50%; transition: .4s; z-index: 2; }
     
     .toggle-slider::after { 
@@ -501,8 +511,45 @@
     }
 
     @media (max-width: 600px) {
-        .troop-grid { grid-template-columns: repeat(2, 1fr); }
-        .buff-inputs-grid { grid-template-columns: 1fr; }
-        .ratio-selector { grid-template-columns: repeat(2, 1fr); }
+        .troop-grid { 
+            grid-template-columns: repeat(2, 1fr); 
+        }
+        .buff-inputs-grid { 
+            grid-template-columns: 1fr; 
+        }
+        .ratio-selector { 
+            grid-template-columns: repeat(2, 1fr); 
+        }
+
+        .res-grid { 
+            gap: 10px;
+        }
+        .res-grid .cost-line { 
+            font-size: 0.9rem; 
+        }
+        .res-grid .cost-line img {
+            height: 20px;
+        }
+
+        .time-row.main {
+            font-size: 1.1rem;
+        }
+        .time-row.main img {
+            height: 28px;
+        }
+
+        .stats-row {
+            gap: 5px;
+        }
+        .stat-item {
+            gap: 8px;
+        }
+        .stat-item img {
+            width: 28px;
+            height: 28px;
+        }
+        .stat-value {
+            font-size: 1rem;
+        }
     }
 </style>
