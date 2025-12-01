@@ -10,6 +10,12 @@
     import patreonLogo from '../assets/images/navi/patreon.webp';
     import subscribedIcon from '../assets/images/navi/subscribed.webp';
 
+    import mailIcon from '../assets/images/navi/mail.webp';
+    import equipmentIcon from '../assets/images/navi/equipment.webp';
+    import speedupsIcon from '../assets/images/navi/speedups.webp';
+    import davorIcon from '../assets/images/navi/davor_icon.webp';
+    import calendarIcon from '../assets/images/navi/calendar.webp';
+
     $: isToolsPage = currentPath.startsWith('/tools');
 
     let isPatron = false;
@@ -79,12 +85,35 @@
     {#if isToolsPage}
         <div class="sub-navbar" style="opacity: 1; transform: translateY(0);">
             <div class="sub-nav-container">
-                <a href="/tools/mail/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/mail')}>Mail Generator</a>
-                <a href="/tools/calculators/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/calculators')}>General Tools</a>
-                <a href="/tools/equipment/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/equipment')}>Equipment</a>
-                <a href="/tools/speedups/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/training')}>Speedups</a>
-                <a href="/tools/davor_toolkit/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/davor_toolkit')}>Davor's Toolkit</a>
-                <a href="/tools/calendar/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/calendar')}>Event Calendar</a>
+                <a href="/tools/mail/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/mail')}>
+                    <img src={mailIcon.src} alt="Mail" class="sub-nav-icon" width="24" height="24"/>
+                    <span class="sub-nav-text">Mail Generator</span>
+                </a>
+                
+                <a href="/tools/calculators/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/calculators')}>
+                    <img src={toolsIcon.src} alt="General" class="sub-nav-icon" width="24" height="24"/>
+                    <span class="sub-nav-text">General Tools</span>
+                </a>
+
+                <a href="/tools/equipment/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/equipment')}>
+                    <img src={equipmentIcon.src} alt="Equipment" class="sub-nav-icon" width="24" height="24"/>
+                    <span class="sub-nav-text">Equipment</span>
+                </a>
+            
+                <a href="/tools/speedups/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/training')}>
+                    <img src={speedupsIcon.src} alt="Speedups" class="sub-nav-icon" width="24" height="24"/>
+                    <span class="sub-nav-text">Speedups</span>
+                </a>
+
+                <a href="/tools/davor_toolkit/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/davor_toolkit')}>
+                    <img src={davorIcon.src} alt="Davor" class="sub-nav-icon" width="24" height="24"/>
+                    <span class="sub-nav-text">Davor's Toolkit</span>
+                </a>
+
+                <a href="/tools/calendar/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/calendar')}>
+                    <img src={calendarIcon.src} alt="Calendar" class="sub-nav-icon" width="24" height="24"/>
+                    <span class="sub-nav-text">Event Calendar</span>
+                </a>
             </div>
         </div>
     {/if}
@@ -116,5 +145,51 @@
     .subscribed-btn .subscribed-icon {
         height: 28px;
         width: auto;
+    }
+
+    .sub-nav-container {
+        display: flex;
+        justify-content: center;
+        gap: var(--spacing-4, 20px);
+        width: 100%;
+        padding: 0 var(--spacing-2);
+    }
+
+    .sub-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        color: inherit;
+        transition: opacity 0.2s;
+    }
+
+    .sub-nav-link:hover {
+        opacity: 0.8;
+    }
+
+    .sub-nav-icon {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        .sub-nav-text {
+            display: none;
+        }
+
+        .sub-nav-link {
+            justify-content: center;
+        }
+        
+        .sub-nav-container {
+            gap: var(--spacing-5, 25px); 
+        }
+
+        .sub-nav-icon {
+            width: 28px;
+            height: 28px;
+        }
     }
 </style>

@@ -366,7 +366,7 @@
         </div>
 
         <div class="form-group" style="margin-top: -10px; margin-bottom: 25px;">
-            <input type="number" id="train-speed" placeholder="Example: 55" bind:value={trainingSpeed}>
+            <input type="number" id="train-speed" placeholder="Example: 95" bind:value={trainingSpeed}>
         </div>
 
         {#if activeTab === 'troops'}
@@ -559,16 +559,26 @@
                         {#if totalRes.stone > 0} <div class="cost-line"><img src={images['stone.webp']} alt="Stone"/> <span>{formatNumber(totalRes.stone)}</span></div> {/if}
                         {#if totalRes.gold > 0} <div class="cost-line"><img src={images['gold.webp']} alt="Gold"/> <span>{formatNumber(totalRes.gold)}</span></div> {/if}
                     </div>
-                {:else}
-                    <div class="cost-line" style="font-size: 1.2rem; margin-bottom: 5px;">
+                    {:else}
+                    <div class="cost-line" style="font-size: 1.2rem; margin-bottom: 5px; flex-direction: column; align-items: center; gap: 2px;">
                         {#if activeTab === 'mge'}
-                            <img src={images['training_speedup.webp']} alt="Clock" style="height: 32px;"/>
-                            <span>Requires: <strong style="color: var(--accent-blue-bright);">{resultTime}</strong></span>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <img src={images['training_speedup.webp']} alt="Clock" style="height: 32px;"/>
+                                <span>Requires: <strong style="color: var(--accent-blue-bright);">{resultTime}</strong></span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                                ({troopBreakdown.t4.toLocaleString()} T4 / {troopBreakdown.t5.toLocaleString()} T5 / {troopBreakdown.upgrade.toLocaleString()} Upgrades)
+                            </div>
                         {/if}
                     </div>
 
                     {#if activeTab !== 'mge'}
                         <div class="cost-line" style="font-size: 1.1rem;">
+                            <img 
+                                src={images[(mixRatio.t5 > 0 || mixRatio.upgrade > 0) ? 'troop_t5.webp' : 'troop_t4.webp']} 
+                                alt="Troop" 
+                                style="height: 28px; margin-right: 8px;"
+                            />
                             <span>Total Troops: <strong style="color: var(--accent-blue-bright);">{maxTroops.toLocaleString()}</strong></span>
                         </div>
                         <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: -5px;">
@@ -604,13 +614,7 @@
                     </div>
                 </div>
                 
-                {#if activeTab === 'mge'}
-                     <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px; text-align: center;">
-                        ({troopBreakdown.t4.toLocaleString()} T4 / {troopBreakdown.t5.toLocaleString()} T5 / {troopBreakdown.upgrade.toLocaleString()} Upgrades)
-                    </div>
-                {/if}
-
-            {:else}
+                {:else}
                 <div style="opacity: 0;">&nbsp;</div>
             {/if}
         </div>
@@ -648,8 +652,8 @@
     .tooltip-img.square { aspect-ratio: 1/1; object-fit: cover; }
     .tooltip-img.wide { height: auto; }
 
-    .form-group.collapse-group { margin-bottom: 4px !important; }
-    .label-with-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .form-group.collapse-group { margin-bottom: 12px !important; }
+    .label-with-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; padding-bottom: 5px;}
     .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out; opacity: 0; }
     .collapsible-content.is-open { max-height: 500px; opacity: 1; }
 
@@ -702,7 +706,7 @@
 
     .mix-thumb:hover {
         transform: translateX(-50%) scale(1.1);
-        background: var(--accent-blue-light);
+        background: white;
         cursor: grab;
     }
 

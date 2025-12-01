@@ -198,9 +198,9 @@
     }
 
     .speedups-hub :global(.stat-item) {
-        background: rgba(20, 21, 24, 0.5);
+        background: var(--bg-card);
         border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
         padding: 15px;
         flex: 1;
         display: flex;
