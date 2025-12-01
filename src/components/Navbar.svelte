@@ -150,15 +150,17 @@
 
     .sub-nav-container {
         display: flex;
-        justify-content: center;
-        gap: var(--spacing-4, 20px);
+        justify-content: space-between; 
+        gap: var(--spacing-2, 10px); 
         width: 100%;
-        padding: 0 var(--spacing-2);
+        padding: 0 2rem;
     }
 
     .sub-nav-link {
         display: flex;
         align-items: center;
+        justify-content: center;
+        flex: 1;
         gap: 8px;
         text-decoration: none;
         color: inherit;
@@ -181,11 +183,14 @@
         }
 
         .sub-nav-link {
+            flex: 0 1 auto; 
             justify-content: center;
         }
         
         .sub-nav-container {
-            gap: var(--spacing-5, 25px); 
+            justify-content: center;
+            gap: var(--spacing-5, 25px);
+            padding: 0 var(--spacing-2); 
         }
 
         .sub-nav-icon {

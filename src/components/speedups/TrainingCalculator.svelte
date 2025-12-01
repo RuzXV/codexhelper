@@ -93,6 +93,15 @@
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         let percentage = ((clientX - rect.left) / rect.width) * 100;
 
+        if (maxTroops > 0) {
+            const batchSize = 1000;
+            const stepPercent = (batchSize / maxTroops) * 100;
+            
+            if (stepPercent > 0 && stepPercent <= 100) {
+                percentage = Math.round(percentage / stepPercent) * stepPercent;
+            }
+        }
+
         if (percentage < 1.5) percentage = 0;
         if (percentage > 98.5) percentage = 100;
         percentage = Math.max(0, Math.min(100, percentage));
