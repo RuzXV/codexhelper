@@ -1,61 +1,99 @@
 <script>
     export let images = {};
     let healingSpeed = 90;
-    let resourceBuff = 10;
+    
+    // Simple placeholder data to test rendering
+    let counts = {
+        t4: { infantry: '', cavalry: '', archer: '', siege: '' }
+    };
+
+    function handleInput(e, type) {
+        // Minimal logic for visual test
+    }
 </script>
 
 <div class="island-content">
-    <div class="buff-inputs-grid">
-        <div class="form-group">
-            <label for="heal-speed">Healing Speed (%)</label>
-            <input type="number" id="heal-speed" placeholder="90" bind:value={healingSpeed}>
-        </div>
+    <div class="form-group" style="margin-bottom: 20px;">
+        <label for="heal-speed">Healing Speed (%)</label>
+        <input type="number" id="heal-speed" bind:value={healingSpeed}>
+    </div>
 
-        <div class="form-group">
-            <label for="res-buff">Cost Reduction (%)</label>
-            <input type="number" id="res-buff" placeholder="10" bind:value={resourceBuff}>
+    <div class="form-group">
+        <span class="label-text-small">Tier 4 Healed</span>
+        <div class="troop-grid t4-group">
+            <div class="troop-item">
+                <label>Infantry</label>
+                <div class="img-placeholder">IMG</div> 
+                <input type="text" placeholder="0" />
+            </div>
+            <div class="troop-item">
+                <label>Cavalry</label>
+                <div class="img-placeholder">IMG</div>
+                <input type="text" placeholder="0" />
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* BASIC LAYOUT - If this loads, the CSS connection is working */
-    .island-content {
-        padding: 10px;
+    /* Phase 1 Styles */
+    .island-content { padding: 10px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    label { color: #9ca3af; font-size: 0.9rem; }
+    input { 
+        width: 100%; background: #0f1115; border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 6px; padding: 8px; color: white; text-align: center;
     }
 
-    .buff-inputs-grid {
+    /* Phase 2 Styles - The tricky parts */
+    .label-text-small {
+        display: block;
+        color: #9ca3af;
+        margin-bottom: 5px;
+    }
+
+    .troop-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-        margin-bottom: 20px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+        position: relative;
+        padding: 4px;
+        border-radius: 12px;
+        /* Using safe syntax for now */
+        background: #1a1d21; 
     }
 
-    .form-group {
+    /* THE GRADIENT - Common breaking point */
+    .troop-grid::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        opacity: 0.35;
+        /* Verified safe syntax */
+        background-image: radial-gradient(circle, #ca62e6 0%, #8113a7 100%);
+    }
+
+    .troop-item {
+        background: #1f2937; /* var(--bg-tertiary) */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 10px;
         display: flex;
         flex-direction: column;
+        align-items: center;
         gap: 8px;
+        position: relative;
+        z-index: 1;
     }
 
-    label {
-        color: #9ca3af; /* var(--text-secondary) */
-        font-size: 0.9rem;
-        font-weight: 500;
+    .img-placeholder {
+        width: 32px; height: 32px; background: #333; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; font-size: 8px;
     }
 
-    input {
-        width: 100%;
-        background: #0f1115; /* var(--bg-primary) */
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 6px;
-        padding: 8px;
-        color: white;
-        text-align: center;
-        font-size: 1rem;
-    }
-
-    input:focus {
-        border-color: #3b82f6;
-        outline: none;
+    @media (max-width: 600px) {
+        .troop-grid { grid-template-columns: repeat(2, 1fr); }
     }
 </style>
