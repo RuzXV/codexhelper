@@ -721,8 +721,8 @@ app.post('/api/events', authMiddleware, async (c) => {
         const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
         
         const stmt = c.env.DB.prepare(
-            `INSERT INTO events (id, series_id, title, type, troop_type, start_date, duration, created_by) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+            `INSERT INTO events (series_id, title, type, troop_type, start_date, duration, created_by) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)`
         );
 
         const batch = [];
@@ -757,7 +757,6 @@ app.post('/api/events', authMiddleware, async (c) => {
             };
 
             batch.push(stmt.bind(
-                eventData.id,
                 eventData.series_id,
                 eventData.title,
                 eventData.type,
