@@ -506,7 +506,7 @@
                     <div class="mix-thumb" style="left: {sliderThumb2}%;"></div>
                 </div>
 
-                <div class="slider-instruction">
+                <div class="instruction-text">
                     Drag the sliders on either end towards the middle to adjust your T4/T5/Upgrade split
                 </div>
             </div>
@@ -635,13 +635,7 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
     .result-divider { width: 100%; height: 1px; background: rgba(255,255,255,0.1); margin: 10px 0; }
-    .stats-row { display: flex; justify-content: space-around; width: 100%; gap: 10px; }
-    .stat-item { display: flex; align-items: center; gap: 8px; }
-    .stat-item img { width: 32px; height: 32px; object-fit: contain; }
-    .stat-info { display: flex; flex-direction: column; text-align: left; }
-    .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
-    .stat-value { font-size: 1.1rem; font-weight: 700; color: white; }
-
+    
     .header-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-2); }
     .header-group label { margin-bottom: 0; }
     .tooltip-wrapper { position: relative; }
@@ -721,13 +715,5 @@
         position: absolute;
         top: -15px; bottom: -15px;
         left: -15px; right: -15px;
-    }
-
-    .slider-instruction {
-        font-size: 0.75rem;
-        font-style: italic;
-        color: var(--text-secondary);
-        margin-top: 8px;
-        text-align: center;
     }
 </style>

@@ -876,7 +876,7 @@
     
     .filter-dropdown {
         position: absolute;
-        top: 100%; left: 0; z-index: 300;
+        top: 100%; left: 0; z-index: 1001;
         background: var(--bg-tertiary); border: 1px solid var(--border-color);
         border-radius: 8px; width: 280px;
         padding: 10px;
@@ -940,7 +940,7 @@
     .day-cell.today { 
         background: transparent;
         box-shadow: none;
-        z-index: 30;
+        z-index: auto;
     }
     .day-cell.other-month { background-color: #0f1012; }
     .day-cell.other-month .day-number { opacity: 0.3; }
@@ -1066,14 +1066,14 @@
     
     .event-bar.selected,
     .event-bar.highlighted {
-        z-index: 150 !important;
+        z-index: 500 !important;
     }
 
     .event-bar.start.highlighted,
     .event-bar.row-start.highlighted,
     .event-bar.start.selected,
     .event-bar.row-start.selected {
-        z-index: 170 !important;
+        z-index: 520 !important;
     }
     
     .tooltip-header { display: flex; align-items: center; gap: 8px;

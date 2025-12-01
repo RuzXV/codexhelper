@@ -257,7 +257,7 @@
 
       
         <div class="form-group">
-            <span class="label-text-small">Tier 4 Healed</span>
+            <span class="label-text">Tier 4 Healed</span>
             <div class="troop-grid t4-group">
                 <div class="troop-item">
                     <label for="t4-inf">Infantry</label>
@@ -284,7 +284,7 @@
 
         <div class="form-group" style="margin-top: 10px;">
          
-            <span class="label-text-small">Tier 5 Healed</span>
+            <span class="label-text">Tier 5 Healed</span>
             <div class="troop-grid t5-group">
                 <div class="troop-item">
                     <label for="t5-inf">Infantry</label>
@@ -326,7 +326,7 @@
         </div>
 
         {#if hasResult}
-            <div class="result-disclaimer">
+            <div class="instruction-text">
                 Speedup cost assumes maximum helps (30) on all troops healed.
             </div>
         {/if}
@@ -387,33 +387,7 @@
     .time-row.main { font-size: 1.3rem; margin-bottom: 4px; }
     .time-row.main img { height: 32px; }
 
-    .result-disclaimer {
-        font-size: 0.75rem;
-        font-style: italic;
-        color: var(--text-secondary);
-        margin-bottom: 6px;
-        text-align: center;
-        width: 100%;
-    }
-
     .result-divider { width: 100%; height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0; }
-    
-    .stats-row { display: flex; justify-content: space-around; width: 100%; gap: 10px; }
-    .stat-item { display: flex; align-items: center; gap: 12px; }
-    .stat-item img { width: 36px; height: 36px; object-fit: contain; }
-    .stat-info { display: flex; flex-direction: column; text-align: left; }
-    .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
-    .stat-value { font-size: 1.1rem; font-weight: 700; color: white; }
-
-    .label-text { display: block; font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-2); }
-    .label-text-small { 
-        display: block;
-        font-weight: 500; 
-        font-size: 1rem;
-        color: var(--text-secondary); 
-        margin-bottom: 5px; 
-        margin-left: 5px;
-    }
     
     @media (max-width: 600px) {
         .time-row.main {
@@ -421,19 +395,6 @@
         }
         .time-row.main img {
             height: 28px;
-        }
-        .stats-row {
-            gap: 5px;
-        }
-        .stat-item {
-            gap: 8px;
-        }
-        .stat-item img {
-            width: 28px;
-            height: 28px;
-        }
-        .stat-value {
-            font-size: 1rem;
         }
     }
 </style>
