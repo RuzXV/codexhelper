@@ -31,7 +31,7 @@ const CALENDAR_ADMIN_IDS = [
     '545152090910228492'
 ];
 
-const TROOP_CYCLE = ["Infantry", "Archer", "Cavalry", "Leadership"];
+const TROOP_CYCLE = ["Infantry", "Archer", "Leadership", "Cavalry"];
 
 const EVENT_INTERVALS: Record<string, number> = {
     "mge": 14,

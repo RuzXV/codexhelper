@@ -130,5 +130,5 @@
       "guide_link": "https://discord.com/channels/1031515159627300924/1364844990659952721"
     }
   },
-  "troop_types": ["Infantry", "Archer", "Cavalry", "Leadership"]
+  "troop_types": ["Infantry", "Archer", "Leadership", "Cavalry"]
 }
