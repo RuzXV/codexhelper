@@ -513,47 +513,5 @@
     .calc-result { min-height: 140px; position: relative; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-color); }
     .calc-result.result-success::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid transparent; animation: glow-border 1.2s ease-out; }
     @keyframes glow-border { 0% { border-color: transparent; box-shadow: 0 0 0 0 transparent; } 25% { border-color: var(--accent-green); box-shadow: 0 0 15px 0 var(--accent-green); } 100% { border-color: transparent; box-shadow: 0 0 15px 0 transparent; } }
-
-    @media (max-width: 600px) {
-        .troop-grid { 
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .buff-inputs-grid { 
-            grid-template-columns: 1fr;
-        }
-        .ratio-selector { 
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .res-grid { 
-            gap: 10px;
-        }
-        .res-grid .cost-line { 
-            font-size: 0.9rem;
-        }
-        .res-grid .cost-line img {
-            height: 20px;
-        }
-
-        .time-row.main {
-            font-size: 1.1rem;
-        }
-        .time-row.main img {
-            height: 28px;
-        }
-
-        .stats-row {
-            gap: 5px;
-        }
-        .stat-item {
-            gap: 8px;
-        }
-        .stat-item img {
-            width: 28px;
-            height: 28px;
-        }
-        .stat-value {
-            font-size: 1rem;
-        }
-    }
+    
 </style>
