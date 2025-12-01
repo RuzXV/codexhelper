@@ -210,167 +210,169 @@
 
 <svelte:window on:click={closeTooltip} />
 
-<div class="island-content">
-    
-    <div class="buff-inputs-grid">
-        <div class="form-group">
-            <div class="header-group compact">
-                <div class="tooltip-wrapper">
-                    <button class="info-btn" on:click|stopPropagation={() => toggleTooltip('speed')} aria-label="Help" type="button">
-                        <i class="fas fa-question-circle"></i>
-                    </button>
-                    {#if activeTooltip === 'speed'}
-                        <div class="tooltip-container" on:click|stopPropagation on:keydown|stopPropagation role="button" tabindex="0">
-                            <h4>Finding Healing Speed</h4>
-                            <p>1. Tap City Hall -> Stats</p>
-                            <img src={images['buff_showcase1.webp']} alt="Step 1" class="tooltip-img square" />
-                            <p>2. Scroll to "Healing Speed"</p>
-                            <img src={images['buff_healing_speed.webp']} alt="Step 2" class="tooltip-img wide" />
-                        </div>
-                    {/if}
+<div class="calculator-island">
+    <div class="island-content">
+        
+        <div class="buff-inputs-grid">
+            <div class="form-group">
+                <div class="header-group compact">
+                    <div class="tooltip-wrapper">
+                        <button class="info-btn" on:click|stopPropagation={() => toggleTooltip('speed')} aria-label="Help" type="button">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                        {#if activeTooltip === 'speed'}
+                            <div class="tooltip-container" on:click|stopPropagation on:keydown|stopPropagation role="button" tabindex="0">
+                                <h4>Finding Healing Speed</h4>
+                                <p>1. Tap City Hall -> Stats</p>
+                                <img src={images['buff_showcase1.webp']} alt="Step 1" class="tooltip-img square" />
+                                <p>2. Scroll to "Healing Speed"</p>
+                                <img src={images['buff_healing_speed.webp']} alt="Step 2" class="tooltip-img wide" />
+                            </div>
+                        {/if}
+                    </div>
+                    <label for="heal-speed">Healing Speed (%)</label>
                 </div>
-                <label for="heal-speed">Healing Speed (%)</label>
+                <input type="number" id="heal-speed" placeholder="90" bind:value={healingSpeed}>
             </div>
-            <input type="number" id="heal-speed" placeholder="90" bind:value={healingSpeed}>
+
+            <div class="form-group">
+                <div class="header-group compact">
+                    <div class="tooltip-wrapper">
+                        <button class="info-btn" on:click|stopPropagation={() => toggleTooltip('cost')} aria-label="Help" type="button">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                        {#if activeTooltip === 'cost'}
+                            <div class="tooltip-container" on:click|stopPropagation on:keydown|stopPropagation role="button" tabindex="0">
+                                <h4>Finding Cost Reduction</h4>
+                                <p>1. Tap City Hall -> Stats</p>
+                                <img src={images['buff_showcase1.webp']} alt="Step 1" class="tooltip-img square" />
+                                <p>2. Scroll to "Healing Resource Cost"</p>
+                                <img src={images['buff_healing_cost.webp']} alt="Step 2" class="tooltip-img wide" />
+                            </div>
+                        {/if}
+                    </div>
+                    <label for="res-buff">Resource Cost Reduction (%)</label>
+                </div>
+                <input type="number" id="res-buff" placeholder="10" bind:value={resourceBuff}>
+            </div>
         </div>
 
         <div class="form-group">
-            <div class="header-group compact">
-                <div class="tooltip-wrapper">
-                    <button class="info-btn" on:click|stopPropagation={() => toggleTooltip('cost')} aria-label="Help" type="button">
-                        <i class="fas fa-question-circle"></i>
-                    </button>
-                    {#if activeTooltip === 'cost'}
-                        <div class="tooltip-container" on:click|stopPropagation on:keydown|stopPropagation role="button" tabindex="0">
-                            <h4>Finding Cost Reduction</h4>
-                            <p>1. Tap City Hall -> Stats</p>
-                            <img src={images['buff_showcase1.webp']} alt="Step 1" class="tooltip-img square" />
-                            <p>2. Scroll to "Healing Resource Cost"</p>
-                            <img src={images['buff_healing_cost.webp']} alt="Step 2" class="tooltip-img wide" />
-                        </div>
-                    {/if}
+            <span class="label-text-small">Tier 4 Healed</span>
+            <div class="troop-grid t4-group">
+                <div class="troop-item">
+                    <label for="t4-inf">Infantry</label>
+                    <img src={images['t4_inf.webp']} alt="Infantry" />
+                    <input id="t4-inf" type="text" placeholder="0" value={counts.t4.infantry} on:input={(e) => handleInput(e, 't4', 'infantry')} use:autoFontSize={counts.t4.infantry}>
                 </div>
-                <label for="res-buff">Resource Cost Reduction (%)</label>
+                <div class="troop-item">
+                    <label for="t4-cav">Cavalry</label>
+                    <img src={images['t4_cav.webp']} alt="Cavalry" />
+                    <input id="t4-cav" type="text" placeholder="0" value={counts.t4.cavalry} on:input={(e) => handleInput(e, 't4', 'cavalry')} use:autoFontSize={counts.t4.cavalry}>
+                </div>
+                <div class="troop-item">
+                    <label for="t4-arch">Archer</label>
+                    <img src={images['t4_arch.webp']} alt="Archer" />
+                    <input id="t4-arch" type="text" placeholder="0" value={counts.t4.archer} on:input={(e) => handleInput(e, 't4', 'archer')} use:autoFontSize={counts.t4.archer}>
+                </div>
+                <div class="troop-item">
+                    <label for="t4-siege">Siege</label>
+                    <img src={images['t4_siege.webp']} alt="Siege" />
+                    <input id="t4-siege" type="text" placeholder="0" value={counts.t4.siege} on:input={(e) => handleInput(e, 't4', 'siege')} use:autoFontSize={counts.t4.siege}>
+                </div>
             </div>
-            <input type="number" id="res-buff" placeholder="10" bind:value={resourceBuff}>
         </div>
-    </div>
 
-    <div class="form-group">
-        <span class="label-text-small">Tier 4 Healed</span>
-        <div class="troop-grid t4-group">
-            <div class="troop-item">
-                <label for="t4-inf">Infantry</label>
-                <img src={images['t4_inf.webp']} alt="Infantry" />
-                <input id="t4-inf" type="text" placeholder="0" value={counts.t4.infantry} on:input={(e) => handleInput(e, 't4', 'infantry')} use:autoFontSize={counts.t4.infantry}>
-            </div>
-            <div class="troop-item">
-                <label for="t4-cav">Cavalry</label>
-                <img src={images['t4_cav.webp']} alt="Cavalry" />
-                <input id="t4-cav" type="text" placeholder="0" value={counts.t4.cavalry} on:input={(e) => handleInput(e, 't4', 'cavalry')} use:autoFontSize={counts.t4.cavalry}>
-            </div>
-            <div class="troop-item">
-                <label for="t4-arch">Archer</label>
-                <img src={images['t4_arch.webp']} alt="Archer" />
-                <input id="t4-arch" type="text" placeholder="0" value={counts.t4.archer} on:input={(e) => handleInput(e, 't4', 'archer')} use:autoFontSize={counts.t4.archer}>
-            </div>
-            <div class="troop-item">
-                <label for="t4-siege">Siege</label>
-                <img src={images['t4_siege.webp']} alt="Siege" />
-                <input id="t4-siege" type="text" placeholder="0" value={counts.t4.siege} on:input={(e) => handleInput(e, 't4', 'siege')} use:autoFontSize={counts.t4.siege}>
+        <div class="form-group" style="margin-top: 10px;">
+            <span class="label-text-small">Tier 5 Healed</span>
+            <div class="troop-grid t5-group">
+                <div class="troop-item">
+                    <label for="t5-inf">Infantry</label>
+                    <img src={images['t5_inf.webp']} alt="Infantry" />
+                    <input id="t5-inf" type="text" placeholder="0" value={counts.t5.infantry} on:input={(e) => handleInput(e, 't5', 'infantry')} use:autoFontSize={counts.t5.infantry}>
+                </div>
+                <div class="troop-item">
+                    <label for="t5-cav">Cavalry</label>
+                    <img src={images['t5_cav.webp']} alt="Cavalry" />
+                    <input id="t5-cav" type="text" placeholder="0" value={counts.t5.cavalry} on:input={(e) => handleInput(e, 't5', 'cavalry')} use:autoFontSize={counts.t5.cavalry}>
+                </div>
+                <div class="troop-item">
+                    <label for="t5-arch">Archer</label>
+                    <img src={images['t5_arch.webp']} alt="Archer" />
+                    <input id="t5-arch" type="text" placeholder="0" value={counts.t5.archer} on:input={(e) => handleInput(e, 't5', 'archer')} use:autoFontSize={counts.t5.archer}>
+                </div>
+                <div class="troop-item">
+                    <label for="t5-siege">Siege</label>
+                    <img src={images['t5_siege.webp']} alt="Siege" />
+                    <input id="t5-siege" type="text" placeholder="0" value={counts.t5.siege} on:input={(e) => handleInput(e, 't5', 'siege')} use:autoFontSize={counts.t5.siege}>
+                </div>
             </div>
         </div>
-    </div>
+        
+        <div class="form-group" style="margin-top: 20px; margin-bottom: 20px;">
+            <span class="label-text" style="font-size: 0.85rem; margin-bottom: 8px;">Expected KP Trade Ratio (Optional)</span>
+            <div class="ratio-selector">
+                {#each RATIO_OPTIONS as option}
+                    <button 
+                        class="ratio-btn" 
+                        class:active={tradeRatio === option.value}
+                        on:click={() => tradeRatio = tradeRatio === option.value ? null : option.value}
+                    >
+                        <span class="ratio-val">{option.ratioLabel}</span>
+                        <span class="ratio-lbl">{option.label}</span>
+                    </button>
+                {/each}
+            </div>
+        </div>
 
-    <div class="form-group" style="margin-top: 10px;">
-        <span class="label-text-small">Tier 5 Healed</span>
-        <div class="troop-grid t5-group">
-            <div class="troop-item">
-                <label for="t5-inf">Infantry</label>
-                <img src={images['t5_inf.webp']} alt="Infantry" />
-                <input id="t5-inf" type="text" placeholder="0" value={counts.t5.infantry} on:input={(e) => handleInput(e, 't5', 'infantry')} use:autoFontSize={counts.t5.infantry}>
-            </div>
-            <div class="troop-item">
-                <label for="t5-cav">Cavalry</label>
-                <img src={images['t5_cav.webp']} alt="Cavalry" />
-                <input id="t5-cav" type="text" placeholder="0" value={counts.t5.cavalry} on:input={(e) => handleInput(e, 't5', 'cavalry')} use:autoFontSize={counts.t5.cavalry}>
-            </div>
-            <div class="troop-item">
-                <label for="t5-arch">Archer</label>
-                <img src={images['t5_arch.webp']} alt="Archer" />
-                <input id="t5-arch" type="text" placeholder="0" value={counts.t5.archer} on:input={(e) => handleInput(e, 't5', 'archer')} use:autoFontSize={counts.t5.archer}>
-            </div>
-            <div class="troop-item">
-                <label for="t5-siege">Siege</label>
-                <img src={images['t5_siege.webp']} alt="Siege" />
-                <input id="t5-siege" type="text" placeholder="0" value={counts.t5.siege} on:input={(e) => handleInput(e, 't5', 'siege')} use:autoFontSize={counts.t5.siege}>
-            </div>
-        </div>
-    </div>
-    
-    <div class="form-group" style="margin-top: 20px; margin-bottom: 20px;">
-        <span class="label-text" style="font-size: 0.85rem; margin-bottom: 8px;">Expected KP Trade Ratio (Optional)</span>
-        <div class="ratio-selector">
-            {#each RATIO_OPTIONS as option}
-                <button 
-                    class="ratio-btn" 
-                    class:active={tradeRatio === option.value}
-                    on:click={() => tradeRatio = tradeRatio === option.value ? null : option.value}
-                >
-                    <span class="ratio-val">{option.ratioLabel}</span>
-                    <span class="ratio-lbl">{option.label}</span>
-                </button>
-            {/each}
-        </div>
-    </div>
-
-    {#if hasResult}
-        <div class="result-disclaimer">
-            Speedup cost assumes maximum helps (30) on all troops healed.
-        </div>
-    {/if}
-
-    <div class="calc-result" class:result-success={hasResult && resultAnimationTrigger} class:has-value={hasResult} style="flex-direction: column; gap: 10px; padding: 20px;">
         {#if hasResult}
-            <div class="healing-time-display">
-                <div class="time-row main">
-                    <img src={images['healing_speedup.webp']} alt="Clock" on:error={(e) => e.target.src = images['training_speedup.webp']}/>
-                    <span class="label">Total:</span>
-                    <strong style="color: var(--accent-blue-bright);">{finalTimeStr}</strong>
-                </div>
+            <div class="result-disclaimer">
+                Speedup cost assumes maximum helps (30) on all troops healed.
             </div>
-
-            <div class="res-grid">
-                {#if totalRes.food > 0} <div class="cost-line"><img src={images['food.webp']} alt="Food"/> <span>{formatNumber(totalRes.food)}</span></div> {/if}
-                {#if totalRes.wood > 0} <div class="cost-line"><img src={images['wood.webp']} alt="Wood"/> <span>{formatNumber(totalRes.wood)}</span></div> {/if}
-                {#if totalRes.stone > 0} <div class="cost-line"><img src={images['stone.webp']} alt="Stone"/> <span>{formatNumber(totalRes.stone)}</span></div> {/if}
-                {#if totalRes.gold > 0} <div class="cost-line"><img src={images['gold.webp']} alt="Gold"/> <span>{formatNumber(totalRes.gold)}</span></div> {/if}
-            </div>
-
-            {#if tradeRatio !== null && expectedKills > 0}
-                <div class="result-divider"></div>
-                <div class="stats-row">
-                    <div class="stat-item">
-                        <img src={images['t5_inf.webp']} alt="Troops" style="transform: scale(1.2);" />
-                        <div class="stat-info">
-                            <span class="stat-label">Total Kills</span>
-                            <span class="stat-value" style="color: var(--accent-blue-bright);">{expectedKills.toLocaleString()}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <img src={images['kills_icon.webp']} alt="Killpoints" />
-                        <div class="stat-info">
-                            <span class="stat-label" style="font-size: 0.65rem; white-space: nowrap;">Killpoints Expected</span>
-                            <span class="stat-value" style="color: var(--accent-blue-bright);">{expectedKP.toLocaleString()}</span>
-                        </div>
-                    </div>
-                </div>
-            {/if}
-
-        {:else}
-            <div style="opacity: 0;">&nbsp;</div>
         {/if}
+
+        <div class="calc-result" class:result-success={hasResult && resultAnimationTrigger} class:has-value={hasResult} style="flex-direction: column; gap: 10px; padding: 20px;">
+            {#if hasResult}
+                <div class="healing-time-display">
+                    <div class="time-row main">
+                        <img src={images['healing_speedup.webp']} alt="Clock" on:error={(e) => e.target.src = images['training_speedup.webp']}/>
+                        <span class="label">Total:</span>
+                        <strong style="color: var(--accent-blue-bright);">{finalTimeStr}</strong>
+                    </div>
+                </div>
+
+                <div class="res-grid">
+                    {#if totalRes.food > 0} <div class="cost-line"><img src={images['food.webp']} alt="Food"/> <span>{formatNumber(totalRes.food)}</span></div> {/if}
+                    {#if totalRes.wood > 0} <div class="cost-line"><img src={images['wood.webp']} alt="Wood"/> <span>{formatNumber(totalRes.wood)}</span></div> {/if}
+                    {#if totalRes.stone > 0} <div class="cost-line"><img src={images['stone.webp']} alt="Stone"/> <span>{formatNumber(totalRes.stone)}</span></div> {/if}
+                    {#if totalRes.gold > 0} <div class="cost-line"><img src={images['gold.webp']} alt="Gold"/> <span>{formatNumber(totalRes.gold)}</span></div> {/if}
+                </div>
+
+                {#if tradeRatio !== null && expectedKills > 0}
+                    <div class="result-divider"></div>
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <img src={images['t5_inf.webp']} alt="Troops" style="transform: scale(1.2);" />
+                            <div class="stat-info">
+                                <span class="stat-label">Total Kills</span>
+                                <span class="stat-value" style="color: var(--accent-blue-bright);">{expectedKills.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <img src={images['kills_icon.webp']} alt="Killpoints" />
+                            <div class="stat-info">
+                                <span class="stat-label" style="font-size: 0.65rem; white-space: nowrap;">Killpoints Expected</span>
+                                <span class="stat-value" style="color: var(--accent-blue-bright);">{expectedKP.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
+
+            {:else}
+                <div style="opacity: 0;">&nbsp;</div>
+            {/if}
+        </div>
     </div>
 </div>
 
@@ -511,7 +513,53 @@
     .res-grid .cost-line img { height: 24px; }
     
     .calc-result { min-height: 140px; position: relative; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-color); }
-    .calc-result.result-success::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid transparent; animation: glow-border 1.2s ease-out; }
-    @keyframes glow-border { 0% { border-color: transparent; box-shadow: 0 0 0 0 transparent; } 25% { border-color: var(--accent-green); box-shadow: 0 0 15px 0 var(--accent-green); } 100% { border-color: transparent; box-shadow: 0 0 15px 0 transparent; } }
-    
+    .calc-result.result-success::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid transparent; animation: glow-border-heal 1.2s ease-out; }
+    @keyframes glow-border-heal {
+        0% { border-color: transparent; box-shadow: 0 0 0 0 transparent; }
+        25% { border-color: var(--accent-green); box-shadow: 0 0 15px 0 var(--accent-green); }
+        100% { border-color: transparent; box-shadow: 0 0 15px 0 transparent; }
+    }
+
+    @media (max-width: 600px) {
+        .troop-grid { 
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .buff-inputs-grid { 
+            grid-template-columns: 1fr;
+        }
+        .ratio-selector { 
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .res-grid { 
+            gap: 10px;
+        }
+        .res-grid .cost-line { 
+            font-size: 0.9rem;
+        }
+        .res-grid .cost-line img {
+            height: 20px;
+        }
+
+        .time-row.main {
+            font-size: 1.1rem;
+        }
+        .time-row.main img {
+            height: 28px;
+        }
+
+        .stats-row {
+            gap: 5px;
+        }
+        .stat-item {
+            gap: 8px;
+        }
+        .stat-item img {
+            width: 28px;
+            height: 28px;
+        }
+        .stat-value {
+            font-size: 1rem;
+        }
+    }
 </style>
