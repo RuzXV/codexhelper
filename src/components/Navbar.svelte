@@ -100,7 +100,7 @@
                     <span class="sub-nav-text">Equipment</span>
                 </a>
             
-                <a href="/tools/speedups/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/training')}>
+                <a href="/tools/speedups/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/speedups')}>
                     <img src={speedupsIcon.src} alt="Speedups" class="sub-nav-icon" width="24" height="24"/>
                     <span class="sub-nav-text">Speedups</span>
                 </a>
