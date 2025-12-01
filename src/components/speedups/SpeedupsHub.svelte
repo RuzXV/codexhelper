@@ -1,6 +1,6 @@
 <script>
     import TrainingCalculator from './TrainingCalculator.svelte';
-    import HealingCalculator from './HealingCalculator.svelte';
+    import HealingCalculator from './HealingCalc.svelte';
     
     export let images = {};
     let activeTool = 'training';
