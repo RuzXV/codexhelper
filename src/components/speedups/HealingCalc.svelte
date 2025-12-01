@@ -1,15 +1,10 @@
 <script>
     export let images = {};
     let healingSpeed = 90;
-    
-    // Simple placeholder data to test rendering
     let counts = {
         t4: { infantry: '', cavalry: '', archer: '', siege: '' }
     };
-
-    function handleInput(e, type) {
-        // Minimal logic for visual test
-    }
+    function handleInput(e, type) {}
 </script>
 
 <div class="island-content">
@@ -36,7 +31,7 @@
 </div>
 
 <style>
-    /* Phase 1 Styles */
+    /* --- Phase 1 Styles (Keep these) --- */
     .island-content { padding: 10px; }
     .form-group { display: flex; flex-direction: column; gap: 8px; }
     label { color: #9ca3af; font-size: 0.9rem; }
@@ -45,7 +40,7 @@
         border-radius: 6px; padding: 8px; color: white; text-align: center;
     }
 
-    /* Phase 2 Styles - The tricky parts */
+    /* --- Phase 2.1 Styles (Sanitized) --- */
     .label-text-small {
         display: block;
         color: #9ca3af;
@@ -59,24 +54,26 @@
         position: relative;
         padding: 4px;
         border-radius: 12px;
-        /* Using safe syntax for now */
         background: #1a1d21; 
     }
 
-    /* THE GRADIENT - Common breaking point */
+    /* THE FIX: Using explicit positioning instead of 'inset' */
     .troop-grid::after {
-        content: '';
         position: absolute;
-        inset: 0;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        content: ''; /* Moved content here */
         border-radius: inherit;
         pointer-events: none;
         opacity: 0.35;
-        /* Verified safe syntax */
-        background-image: radial-gradient(circle, #ca62e6 0%, #8113a7 100%);
+        /* THE FIX: Flat color instead of gradient for now */
+        background: #ca62e6;
     }
 
     .troop-item {
-        background: #1f2937; /* var(--bg-tertiary) */
+        background: #1f2937;
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
         padding: 10px;
@@ -90,7 +87,7 @@
 
     .img-placeholder {
         width: 32px; height: 32px; background: #333; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center; font-size: 8px;
+        display: flex; align-items: center; justify-content: center; font-size: 8px; color: #fff;
     }
 
     @media (max-width: 600px) {
