@@ -29,11 +29,11 @@
     <div class="calculator-island">
         {#if activeTool === 'training'}
             <div class="tool-view fade-in">
-                <TrainingCalculator {images} embedded={true} /> 
+                <TrainingCalculator {images} /> 
             </div>
         {:else}
             <div class="tool-view fade-in">
-                <HealingCalculator {images} embedded={true} />
+                <HealingCalculator {images} />
             </div>
         {/if}
     </div>
