@@ -940,7 +940,7 @@
     .day-cell.today { 
         background: transparent;
         box-shadow: none;
-        z-index: 2;
+        z-index: 30;
     }
     .day-cell.other-month { background-color: #0f1012; }
     .day-cell.other-month .day-number { opacity: 0.3; }

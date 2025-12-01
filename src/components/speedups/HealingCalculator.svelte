@@ -446,7 +446,7 @@
     .tooltip-wrapper { position: relative; display: flex; align-items: center; }
     .info-btn { background: none; border: none; color: var(--text-secondary); font-size: 1rem; cursor: pointer; padding: 0; display: flex; align-items: center; }
     
-    .tooltip-container { position: absolute; left: 0; top: 100%; margin-top: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 15px; border-radius: var(--radius-md); width: 250px; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,0.6); text-align: left; }
+    .tooltip-container { position: absolute; left: 0; top: 100%; margin-top: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 15px; border-radius: var(--radius-md); width: 250px; z-index: 200; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); text-align: left; }
     .tooltip-container h4 { margin: 0 0 10px 0; color: var(--text-primary); font-size: 0.9rem; }
     .tooltip-container p { font-size: 0.8rem; color: var(--text-secondary); margin: 5px 0; }
     .tooltip-img { width: 100%; border-radius: 4px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); }
@@ -514,7 +514,7 @@
     .calc-result.result-success::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid transparent; animation: glow-border 1.2s ease-out; }
     @keyframes glow-border { 0% { border-color: transparent; box-shadow: 0 0 0 0 transparent; } 25% { border-color: var(--accent-green); box-shadow: 0 0 15px 0 var(--accent-green); } 100% { border-color: transparent; box-shadow: 0 0 15px 0 transparent; } }
 
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
         .troop-grid { 
             grid-template-columns: repeat(2, 1fr);
         }
