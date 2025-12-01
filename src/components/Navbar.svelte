@@ -10,6 +10,7 @@
     import patreonLogo from '../assets/images/navi/patreon.webp';
     import subscribedIcon from '../assets/images/navi/subscribed.webp';
 
+    import generalIcon from '../assets/images/navi/general.webp';
     import mailIcon from '../assets/images/navi/mail.webp';
     import equipmentIcon from '../assets/images/navi/equipment.webp';
     import speedupsIcon from '../assets/images/navi/speedups.webp';
@@ -91,7 +92,7 @@
                 </a>
                 
                 <a href="/tools/calculators/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/calculators')}>
-                    <img src={toolsIcon.src} alt="General" class="sub-nav-icon" width="24" height="24"/>
+                    <img src={generalIcon.src} alt="General" class="sub-nav-icon" width="24" height="24"/>
                     <span class="sub-nav-text">General Tools</span>
                 </a>
 
