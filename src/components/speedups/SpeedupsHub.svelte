@@ -88,12 +88,12 @@
     }
 
     .calculator-island { 
-        background: rgba(20, 21, 24, 0.65); 
+        background: rgba(20, 21, 24, 0.65);
         border: 1px solid rgba(255, 255, 255, 0.1); 
         border-radius: var(--radius-lg); 
         padding: var(--spacing-6); 
         width: 100%; 
-        position: relative; 
+        position: relative;
     }
 
     :global(.speedups-hub .calculator-island .calculator-island) {
@@ -123,5 +123,113 @@
         .calculator-island {
             padding: var(--spacing-4);
         }
+    }
+
+    .speedups-hub :global(.troop-grid) { 
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 4px; 
+        position: relative; 
+        padding: 4px; 
+        border-radius: var(--radius-lg); 
+        margin-bottom: 5px; 
+    }
+
+    .speedups-hub :global(.troop-grid::after) { 
+        content: ''; 
+        position: absolute; 
+        inset: 0; 
+        border-radius: inherit; 
+        z-index: 0; 
+        opacity: 0.35; 
+        pointer-events: none; 
+    }
+    .speedups-hub :global(.troop-grid.t4-group::after) { background-image: radial-gradient(circle, #ca62e6 0%, #8113a7 100%); }
+    .speedups-hub :global(.troop-grid.t5-group::after) { background-image: radial-gradient(circle, #f28d00 0%, #d55800 100%); }
+    .speedups-hub :global(.troop-grid.upgrade-group::after) { background: linear-gradient(135deg, #ca62e6 0%, #8113a7 45%, #f28d00 55%, #d55800 100%); opacity: 0.25; }
+
+    .speedups-hub :global(.troop-item) { 
+        background: var(--bg-tertiary); 
+        border: 1px solid var(--border-hover); 
+        border-radius: var(--radius-md); 
+        padding: var(--spacing-2); 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        gap: var(--spacing-2); 
+        position: relative; 
+        z-index: 1; 
+    }
+    .speedups-hub :global(.troop-item label) { 
+        font-size: 0.75rem; 
+        margin: 0; 
+        font-weight: 500; 
+        color: var(--text-secondary); 
+    }
+    .speedups-hub :global(.troop-item img) { 
+        width: 32px; 
+        height: 32px; 
+        object-fit: contain; 
+    }
+    .speedups-hub :global(.troop-item input) { 
+        width: 100%; 
+        text-align: center; 
+        padding: 4px; 
+        font-size: 1rem; 
+        border: 1px solid var(--border-color); 
+        background: var(--bg-primary); 
+        border-radius: var(--radius-sm); 
+        color: white; 
+    }
+    .speedups-hub :global(.troop-item input:focus) { 
+        border-color: var(--accent-blue); 
+        outline: none; 
+    }
+
+    .speedups-hub :global(.res-grid) { 
+        display: flex; 
+        gap: 15px; 
+        flex-wrap: wrap; 
+        justify-content: center; 
+        width: 100%; 
+    }
+    .speedups-hub :global(.res-grid .cost-line) { 
+        display: flex; 
+        align-items: center; 
+        gap: 5px; 
+        font-size: 1rem; 
+        color: white; 
+    }
+    .speedups-hub :global(.res-grid .cost-line img) { 
+        height: 24px; 
+    }
+
+    .speedups-hub :global(.calc-result) { 
+        min-height: 140px; 
+        position: relative; 
+        background: var(--bg-secondary); 
+        border-radius: var(--radius-md); 
+        border: 1px solid var(--border-color); 
+    }
+    .speedups-hub :global(.calc-result.result-success::after) { 
+        content: ''; 
+        position: absolute; 
+        inset: 0; 
+        border-radius: inherit; 
+        border: 2px solid transparent; 
+        animation: global-glow-border 1.2s ease-out; 
+    }
+
+    @keyframes global-glow-border { 
+        0% { border-color: transparent; box-shadow: 0 0 0 0 transparent; } 
+        25% { border-color: var(--accent-green); box-shadow: 0 0 15px 0 var(--accent-green); } 
+        100% { border-color: transparent; box-shadow: 0 0 15px 0 transparent; } 
+    }
+
+    @media (max-width: 600px) {
+        .speedups-hub :global(.troop-grid) { grid-template-columns: repeat(2, 1fr); }
+        .speedups-hub :global(.res-grid) { gap: 10px; }
+        .speedups-hub :global(.res-grid .cost-line) { font-size: 0.9rem; }
+        .speedups-hub :global(.res-grid .cost-line img) { height: 20px; }
     }
 </style>

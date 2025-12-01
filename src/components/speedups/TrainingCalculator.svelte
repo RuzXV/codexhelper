@@ -8,7 +8,6 @@
 
     const POWER_PER_UNIT = { t4: 4, t5: 10, upgrade: 6 };
     const MGE_POINTS_PER_UNIT = { t4: 40, t5: 100, upgrade: 60 };
-    
     const RESOURCES = {
         t4: {
             infantry: { food: 300, wood: 300, stone: 0, gold: 20 },
@@ -29,26 +28,22 @@
             siege:    { food: 300, wood: 300, stone: 250, gold: 380 }
         }
     };
-
     let activeTab = 'troops';
     let trainingSpeed = '';
 
     let sliderThumb1 = 0;
     let sliderThumb2 = 100;
     let activeThumb = null;
-    
     $: mixRatio = {
         t4: sliderThumb1 / 100,
         t5: (sliderThumb2 - sliderThumb1) / 100,
         upgrade: (100 - sliderThumb2) / 100
     };
-
     let troopInputs = {
         t4: { infantry: '', cavalry: '', archer: '', siege: '' },
         t5: { infantry: '', cavalry: '', archer: '', siege: '' },
         upgrade: { infantry: '', cavalry: '', archer: '', siege: '' }
     };
-    
     let sectionOpen = { t4: true, t5: true, upgrade: true };
     let speedupTime = { d: '', h: '', m: '' };
     let targetMgePoints = '';
@@ -60,7 +55,6 @@
     let maxTroops = 0;
     
     let troopBreakdown = { t4: 0, t5: 0, upgrade: 0 };
-
     let showTooltip = false;
     let hasResult = false;
     let resultAnimationTrigger = false;
@@ -102,10 +96,8 @@
         if (percentage < 1.5) percentage = 0;
         if (percentage > 98.5) percentage = 100;
         percentage = Math.max(0, Math.min(100, percentage));
-
         if (e.type === 'mousedown' || e.type === 'touchstart') {
             const overlap = Math.abs(sliderThumb1 - sliderThumb2) < 0.1;
-            
             if (overlap) {
                 activeThumb = 0;
             } else {
@@ -144,7 +136,6 @@
             { key: 't5', baseTime: BASE_TIME_T5, res: RESOURCES.t5, power: POWER_PER_UNIT.t5, mge: MGE_POINTS_PER_UNIT.t5 },
             { key: 'upgrade', baseTime: BASE_TIME_UPGRADE, res: RESOURCES.upgrade, power: POWER_PER_UNIT.upgrade, mge: MGE_POINTS_PER_UNIT.upgrade }
         ];
-
         categories.forEach(cat => {
             Object.entries(troopInputs[cat.key]).forEach(([type, val]) => {
                 const count = parseInt(val.replace(/\D/g, '') || '0');
@@ -163,7 +154,6 @@
                 }
             });
         });
-
         if (hasInput) {
             resultTime = formatTime(totalSeconds);
             totalRes = currentRes;
@@ -184,7 +174,6 @@
         const hours = parseInt(speedupTime.h.replace(/,/g, '') || '0');
         const minutes = parseInt(speedupTime.m.replace(/,/g, '') || '0');
         const totalInputSeconds = (days * 86400) + (hours * 3600) + (minutes * 60);
-
         if (totalInputSeconds <= 0) {
             resetResults();
             return;
@@ -193,16 +182,12 @@
         const avgTime = (mixRatio.t4 * BASE_TIME_T4) + 
                         (mixRatio.t5 * BASE_TIME_T5) + 
                         (mixRatio.upgrade * BASE_TIME_UPGRADE);
-        
         const calculatedTotalTroops = Math.floor( (totalInputSeconds * speedMultiplier) / avgTime );
-
         if (calculatedTotalTroops > 0) {
             maxTroops = calculatedTotalTroops;
-            
             troopBreakdown.t4 = Math.floor(maxTroops * mixRatio.t4);
             troopBreakdown.t5 = Math.floor(maxTroops * mixRatio.t5);
             troopBreakdown.upgrade = Math.floor(maxTroops * mixRatio.upgrade);
-            
             const remainder = maxTroops - (troopBreakdown.t4 + troopBreakdown.t5 + troopBreakdown.upgrade);
             if (remainder > 0) {
                 if (mixRatio.upgrade > 0) troopBreakdown.upgrade += remainder;
@@ -213,11 +198,9 @@
             totalPower = (troopBreakdown.t4 * POWER_PER_UNIT.t4) + 
                          (troopBreakdown.t5 * POWER_PER_UNIT.t5) + 
                          (troopBreakdown.upgrade * POWER_PER_UNIT.upgrade);
-
             totalMge = (troopBreakdown.t4 * MGE_POINTS_PER_UNIT.t4) + 
                        (troopBreakdown.t5 * MGE_POINTS_PER_UNIT.t5) + 
                        (troopBreakdown.upgrade * MGE_POINTS_PER_UNIT.upgrade);
-
             hasResult = true;
             triggerAnimation();
         } else {
@@ -229,7 +212,6 @@
         const speed = parseFloat(trainingSpeed || '0');
         const speedMultiplier = 1 + (speed / 100);
         const target = parseInt(targetMgePoints.replace(/,/g, '') || '0');
-
         if (target <= 0) {
             resetResults();
             return;
@@ -238,22 +220,18 @@
         const avgPoints = (mixRatio.t4 * MGE_POINTS_PER_UNIT.t4) + 
                           (mixRatio.t5 * MGE_POINTS_PER_UNIT.t5) + 
                           (mixRatio.upgrade * MGE_POINTS_PER_UNIT.upgrade);
-
         const calculatedTotalTroops = Math.ceil(target / avgPoints);
         
         const avgTime = (mixRatio.t4 * BASE_TIME_T4) + 
                         (mixRatio.t5 * BASE_TIME_T5) + 
                         (mixRatio.upgrade * BASE_TIME_UPGRADE);
-        
         const totalSeconds = (avgTime / speedMultiplier) * calculatedTotalTroops;
 
         if (calculatedTotalTroops > 0) {
             maxTroops = calculatedTotalTroops;
-
             troopBreakdown.t4 = Math.floor(maxTroops * mixRatio.t4);
             troopBreakdown.t5 = Math.floor(maxTroops * mixRatio.t5);
             troopBreakdown.upgrade = Math.floor(maxTroops * mixRatio.upgrade);
-
             const remainder = maxTroops - (troopBreakdown.t4 + troopBreakdown.t5 + troopBreakdown.upgrade);
             if (remainder > 0) {
                 if (mixRatio.upgrade > 0) troopBreakdown.upgrade += remainder;
@@ -264,11 +242,9 @@
             totalPower = (troopBreakdown.t4 * POWER_PER_UNIT.t4) + 
                          (troopBreakdown.t5 * POWER_PER_UNIT.t5) + 
                          (troopBreakdown.upgrade * POWER_PER_UNIT.upgrade);
-            
             totalMge = (troopBreakdown.t4 * MGE_POINTS_PER_UNIT.t4) + 
                        (troopBreakdown.t5 * MGE_POINTS_PER_UNIT.t5) + 
                        (troopBreakdown.upgrade * MGE_POINTS_PER_UNIT.upgrade);
-            
             resultTime = formatTime(totalSeconds);
             hasResult = true;
             triggerAnimation();
@@ -331,8 +307,10 @@
         speedupTime[key] = value ? parseInt(value).toLocaleString('en-US') : '';
     }
 
-    function toggleTooltip() { showTooltip = !showTooltip; }
-    function closeTooltip() { showTooltip = false; }
+    function toggleTooltip() { showTooltip = !showTooltip;
+    }
+    function closeTooltip() { showTooltip = false;
+    }
     
     function switchTab(tab) {
         activeTab = tab;
@@ -342,294 +320,301 @@
 
 <svelte:window on:click={closeTooltip} />
 
-<div class="generator-tabs">
-    <button 
-        class="generator-tab-btn" 
-        class:active={activeTab === 'troops'} 
-        on:click={() => switchTab('troops')}
-    >
-        Per Troops
-    </button>
-    <button 
-        class="generator-tab-btn" 
-        class:active={activeTab === 'speedups'} 
-        on:click={() => switchTab('speedups')}
-    >
-        Per Speedups
-    </button>
-    <button 
-        class="generator-tab-btn" 
-        class:active={activeTab === 'mge'} 
-        on:click={() => switchTab('mge')}
-    >
-        Per MGE Points
-    </button>
-</div>
+<div class="calculator-island">
+    <div class="island-content">
+        
+        <div class="generator-tabs">
+            <button 
+                class="generator-tab-btn" 
+                class:active={activeTab === 'troops'} 
+                on:click={() => switchTab('troops')}
+            >
+                Per Troops
+            </button>
+            <button 
+                class="generator-tab-btn" 
+                class:active={activeTab === 'speedups'} 
+                on:click={() => switchTab('speedups')}
+            >
+                Per Speedups
+            </button>
+            <button 
+                class="generator-tab-btn" 
+                class:active={activeTab === 'mge'} 
+                on:click={() => switchTab('mge')}
+            >
+                Per MGE Points
+            </button>
+        </div>
 
-<div class="form-group header-group">
-    <label for="train-speed">Training Speed (%)</label>
-    <div class="tooltip-wrapper">
-        <button class="info-btn" on:click|stopPropagation={toggleTooltip} aria-label="Help" type="button">
-            <i class="fas fa-question-circle"></i>
-        </button>
-        {#if showTooltip}
-            <div class="tooltip-container" on:click|stopPropagation on:keydown|stopPropagation role="button" tabindex="0">
-                <h4>Finding Training Speed</h4>
-                <p>1. Tap City Hall -> Stats</p>
-                <img src={images['buff_showcase1.webp']} alt="Step 1" class="tooltip-img square" />
-                <p>2. Scroll to "Training Speed"</p>
-                <img src={images['buff_showcase2.webp']} alt="Step 2" class="tooltip-img wide" />
+        <div class="form-group header-group">
+            <label for="train-speed">Training Speed (%)</label>
+            <div class="tooltip-wrapper">
+                <button class="info-btn" on:click|stopPropagation={toggleTooltip} aria-label="Help" type="button">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+                {#if showTooltip}
+                    <div class="tooltip-container" on:click|stopPropagation on:keydown|stopPropagation role="button" tabindex="0">
+                        <h4>Finding Training Speed</h4>
+                        <p>1. Tap City Hall -> Stats</p>
+                        <img src={images['buff_showcase1.webp']} alt="Step 1" class="tooltip-img square" />
+                        <p>2. Scroll to "Training Speed"</p>
+                        <img src={images['buff_showcase2.webp']} alt="Step 2" class="tooltip-img wide" />
+                    </div>
+                {/if}
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: -10px; margin-bottom: 25px;">
+            <input type="number" id="train-speed" placeholder="Example: 55" bind:value={trainingSpeed}>
+        </div>
+
+        {#if activeTab === 'troops'}
+            <div class="form-group collapse-group">
+                <div class="label-with-toggle">
+                    <span class="label-text">Train T4</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" bind:checked={sectionOpen.t4}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="collapsible-content" class:is-open={sectionOpen.t4}>
+                    <div class="troop-grid t4-group">
+                        <div class="troop-item">
+                            <label for="t4-inf">Infantry</label>
+                            <img src={images['t4_inf.webp']} alt="Infantry" />
+                            <input id="t4-inf" type="text" placeholder="0" value={troopInputs.t4.infantry} on:input={(e) => handleInput(e, 't4', 'infantry')} use:autoFontSize={troopInputs.t4.infantry}>
+                        </div>
+                        <div class="troop-item">
+                            <label for="t4-cav">Cavalry</label>
+                            <img src={images['t4_cav.webp']} alt="Cavalry" />
+                            <input id="t4-cav" type="text" placeholder="0" value={troopInputs.t4.cavalry} on:input={(e) => handleInput(e, 't4', 'cavalry')} use:autoFontSize={troopInputs.t4.cavalry}>
+                        </div>
+                        <div class="troop-item">
+                            <label for="t4-arch">Archer</label>
+                            <img src={images['t4_arch.webp']} alt="Archer" />
+                            <input id="t4-arch" type="text" placeholder="0" value={troopInputs.t4.archer} on:input={(e) => handleInput(e, 't4', 'archer')} use:autoFontSize={troopInputs.t4.archer}>
+                        </div>
+                        <div class="troop-item">
+                            <label for="t4-siege">Siege</label>
+                            <img src={images['t4_siege.webp']} alt="Siege" />
+                            <input id="t4-siege" type="text" placeholder="0" value={troopInputs.t4.siege} on:input={(e) => handleInput(e, 't4', 'siege')} use:autoFontSize={troopInputs.t4.siege}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group collapse-group">
+                <div class="label-with-toggle">
+                    <span class="label-text">Train T5</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" bind:checked={sectionOpen.t5}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="collapsible-content" class:is-open={sectionOpen.t5}>
+                    <div class="troop-grid t5-group">
+                        
+<div class="troop-item">
+                            <label for="t5-inf">Infantry</label>
+                            <img src={images['t5_inf.webp']} alt="Infantry" />
+                            <input id="t5-inf" type="text" placeholder="0" value={troopInputs.t5.infantry} on:input={(e) => handleInput(e, 't5', 'infantry')} use:autoFontSize={troopInputs.t5.infantry}>
+                        </div>
+                        <div class="troop-item">
+                            <label for="t5-cav">Cavalry</label>
+                            <img src={images['t5_cav.webp']} alt="Cavalry" />
+                            <input id="t5-cav" type="text" placeholder="0" value={troopInputs.t5.cavalry} on:input={(e) => handleInput(e, 't5', 'cavalry')} use:autoFontSize={troopInputs.t5.cavalry}>
+                        </div>
+                        <div class="troop-item">
+                            <label for="t5-arch">Archer</label>
+                            <img src={images['t5_arch.webp']} alt="Archer" />
+                            <input id="t5-arch" type="text" placeholder="0" value={troopInputs.t5.archer} on:input={(e) => handleInput(e, 't5', 'archer')} use:autoFontSize={troopInputs.t5.archer}>
+                        </div>
+                        <div class="troop-item">
+                            <label for="t5-siege">Siege</label>
+                            <img src={images['t5_siege.webp']} alt="Siege" />
+                            <input id="t5-siege" type="text" placeholder="0" value={troopInputs.t5.siege} on:input={(e) => handleInput(e, 't5', 'siege')} use:autoFontSize={troopInputs.t5.siege}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group collapse-group">
+                <div class="label-with-toggle">
+                    <span class="label-text">Upgrade T4 -> T5</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" bind:checked={sectionOpen.upgrade}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="collapsible-content" class:is-open={sectionOpen.upgrade}>
+                    <div class="troop-grid upgrade-group">
+                        <div class="troop-item">
+                            <label for="upg-inf">Infantry</label>
+                            <img src={images['t5_inf.webp']} alt="Infantry" />
+                            <input id="upg-inf" type="text" placeholder="0" value={troopInputs.upgrade.infantry} on:input={(e) => handleInput(e, 'upgrade', 'infantry')} use:autoFontSize={troopInputs.upgrade.infantry}>
+                        </div>
+                        <div class="troop-item">
+                            <label for="upg-cav">Cavalry</label>
+                            <img src={images['t5_cav.webp']} alt="Cavalry" />
+                            <input id="upg-cav" type="text" placeholder="0" value={troopInputs.upgrade.cavalry} on:input={(e) => handleInput(e, 'upgrade', 'cavalry')} use:autoFontSize={troopInputs.upgrade.cavalry}>
+                        </div>
+                        <div class="troop-item">
+                            <label for="upg-arch">Archer</label>
+                            <img src={images['t5_arch.webp']} alt="Archer" />
+                            <input id="upg-arch" type="text" placeholder="0" value={troopInputs.upgrade.archer} on:input={(e) => handleInput(e, 'upgrade', 'archer')} use:autoFontSize={troopInputs.upgrade.archer}>
+                        </div>
+                        <div class="troop-item">
+                            <label for="upg-siege">Siege</label>
+                            <img src={images['t5_siege.webp']} alt="Siege" />
+                            <input id="upg-siege" type="text" placeholder="0" value={troopInputs.upgrade.siege} on:input={(e) => handleInput(e, 'upgrade', 'siege')} use:autoFontSize={troopInputs.upgrade.siege}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {:else}
+            <div class="form-group">
+                <div class="mix-control-header">
+                    <span class="label-text">Training Mix</span>
+                    <span class="mix-readout">
+                        <span style="color: #ca62e6">{Math.round(mixRatio.t4 * 100)}% T4</span> / 
+                        <span style="color: #f28d00">{Math.round(mixRatio.t5 * 100)}% T5</span> / 
+                        <span style="color: #4ade80">{Math.round(mixRatio.upgrade * 100)}% Upgrade</span>
+                    </span>
+                </div>
+
+                <div 
+                    class="mix-slider-track" 
+                    bind:this={sliderNode}
+                    role="slider"
+                    tabindex="0"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow={sliderThumb1}
+                    aria-label="Troop Mix Slider"
+                    on:mousedown|preventDefault={handleSliderInteract} 
+                    on:mousemove={(e) => e.buttons === 1 && handleSliderInteract(e)}
+                    on:touchstart|preventDefault={(e) => handleSliderInteract(e)}
+                    on:touchmove|preventDefault={(e) => handleSliderInteract(e)}
+                >
+                    <div class="mix-segment" style="left: 0%; width: {sliderThumb1}%; background: #ca62e6;"></div>
+                    <div class="mix-segment" style="left: {sliderThumb1}%; width: {sliderThumb2 - sliderThumb1}%; background: #f28d00;"></div>
+                    <div class="mix-segment" style="left: {sliderThumb2}%; width: {100 - sliderThumb2}%; background: linear-gradient(90deg, #4ade80, #22c55e);"></div>
+
+                    <div class="mix-thumb" style="left: {sliderThumb1}%;"></div>
+                    <div class="mix-thumb" style="left: {sliderThumb2}%;"></div>
+                </div>
+
+                <div class="slider-instruction">
+                    Drag the sliders on either end towards the middle to adjust your T4/T5/Upgrade split
+                </div>
+            </div>
+
+            <div class="dynamic-input-container">
+                {#if activeTab === 'speedups'}
+                    <div class="form-group fade-in-panel">
+                        <span class="label-text">Total Speedups Available</span>
+                        <div class="time-input-row">
+                            <div class="time-input-group"><input type="text" placeholder="0" value={speedupTime.d} on:input={(e) => handleSpeedupInput(e, 'd')}><span>Days</span></div>
+                            <div class="time-input-group"><input type="text" placeholder="0" value={speedupTime.h} on:input={(e) => handleSpeedupInput(e, 'h')}><span>Hours</span></div>
+                            <div class="time-input-group"><input type="text" placeholder="0" value={speedupTime.m} on:input={(e) => handleSpeedupInput(e, 'm')}><span>Mins</span></div>
+                        </div>
+                    </div>
+                {:else if activeTab === 'mge'}
+                    <div class="form-group fade-in-panel">
+                        <span class="label-text">Desired Training Stage MGE Points</span>
+                        
+<div class="mge-input-row">
+                            <input 
+                                type="text" 
+                                class="standalone-input" 
+                                placeholder="Example: 50,000,000" 
+                                value={targetMgePoints} 
+                                on:input={(e) => handleSingleInput(e, (v) => targetMgePoints = v)}
+                            >
+                            <span class="mge-text-label">points</span>
+                        </div>
+                    </div>
+                {/if}
             </div>
         {/if}
-    </div>
-</div>
-
-<div class="form-group" style="margin-top: -10px; margin-bottom: 25px;">
-    <input type="number" id="train-speed" placeholder="Example: 55" bind:value={trainingSpeed}>
-</div>
-
-{#if activeTab === 'troops'}
-    <div class="form-group collapse-group">
-        <div class="label-with-toggle">
-            <span class="label-text">Train T4</span>
-            <label class="toggle-switch">
-                <input type="checkbox" bind:checked={sectionOpen.t4}>
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
-        <div class="collapsible-content" class:is-open={sectionOpen.t4}>
-            <div class="troop-grid t4-group">
-                <div class="troop-item">
-                    <label for="t4-inf">Infantry</label>
-                    <img src={images['t4_inf.webp']} alt="Infantry" />
-                    <input id="t4-inf" type="text" placeholder="0" value={troopInputs.t4.infantry} on:input={(e) => handleInput(e, 't4', 'infantry')} use:autoFontSize={troopInputs.t4.infantry}>
-                </div>
-                <div class="troop-item">
-                    <label for="t4-cav">Cavalry</label>
-                    <img src={images['t4_cav.webp']} alt="Cavalry" />
-                    <input id="t4-cav" type="text" placeholder="0" value={troopInputs.t4.cavalry} on:input={(e) => handleInput(e, 't4', 'cavalry')} use:autoFontSize={troopInputs.t4.cavalry}>
-                </div>
-                <div class="troop-item">
-                    <label for="t4-arch">Archer</label>
-                    <img src={images['t4_arch.webp']} alt="Archer" />
-                    <input id="t4-arch" type="text" placeholder="0" value={troopInputs.t4.archer} on:input={(e) => handleInput(e, 't4', 'archer')} use:autoFontSize={troopInputs.t4.archer}>
-                </div>
-                <div class="troop-item">
-                    <label for="t4-siege">Siege</label>
-                    <img src={images['t4_siege.webp']} alt="Siege" />
-                    <input id="t4-siege" type="text" placeholder="0" value={troopInputs.t4.siege} on:input={(e) => handleInput(e, 't4', 'siege')} use:autoFontSize={troopInputs.t4.siege}>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group collapse-group">
-        <div class="label-with-toggle">
-            <span class="label-text">Train T5</span>
-            <label class="toggle-switch">
-                <input type="checkbox" bind:checked={sectionOpen.t5}>
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
-        <div class="collapsible-content" class:is-open={sectionOpen.t5}>
-            <div class="troop-grid t5-group">
-                <div class="troop-item">
-                    <label for="t5-inf">Infantry</label>
-                    <img src={images['t5_inf.webp']} alt="Infantry" />
-                    <input id="t5-inf" type="text" placeholder="0" value={troopInputs.t5.infantry} on:input={(e) => handleInput(e, 't5', 'infantry')} use:autoFontSize={troopInputs.t5.infantry}>
-                </div>
-                <div class="troop-item">
-                    <label for="t5-cav">Cavalry</label>
-                    <img src={images['t5_cav.webp']} alt="Cavalry" />
-                    <input id="t5-cav" type="text" placeholder="0" value={troopInputs.t5.cavalry} on:input={(e) => handleInput(e, 't5', 'cavalry')} use:autoFontSize={troopInputs.t5.cavalry}>
-                </div>
-                <div class="troop-item">
-                    <label for="t5-arch">Archer</label>
-                    <img src={images['t5_arch.webp']} alt="Archer" />
-                    <input id="t5-arch" type="text" placeholder="0" value={troopInputs.t5.archer} on:input={(e) => handleInput(e, 't5', 'archer')} use:autoFontSize={troopInputs.t5.archer}>
-                </div>
-                <div class="troop-item">
-                    <label for="t5-siege">Siege</label>
-                    <img src={images['t5_siege.webp']} alt="Siege" />
-                    <input id="t5-siege" type="text" placeholder="0" value={troopInputs.t5.siege} on:input={(e) => handleInput(e, 't5', 'siege')} use:autoFontSize={troopInputs.t5.siege}>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group collapse-group">
-        <div class="label-with-toggle">
-            <span class="label-text">Upgrade T4 -> T5</span>
-            <label class="toggle-switch">
-                <input type="checkbox" bind:checked={sectionOpen.upgrade}>
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
-        <div class="collapsible-content" class:is-open={sectionOpen.upgrade}>
-            <div class="troop-grid upgrade-group">
-                <div class="troop-item">
-                    <label for="upg-inf">Infantry</label>
-                    <img src={images['t5_inf.webp']} alt="Infantry" />
-                    <input id="upg-inf" type="text" placeholder="0" value={troopInputs.upgrade.infantry} on:input={(e) => handleInput(e, 'upgrade', 'infantry')} use:autoFontSize={troopInputs.upgrade.infantry}>
-                </div>
-                <div class="troop-item">
-                    <label for="upg-cav">Cavalry</label>
-                    <img src={images['t5_cav.webp']} alt="Cavalry" />
-                    <input id="upg-cav" type="text" placeholder="0" value={troopInputs.upgrade.cavalry} on:input={(e) => handleInput(e, 'upgrade', 'cavalry')} use:autoFontSize={troopInputs.upgrade.cavalry}>
-                </div>
-                <div class="troop-item">
-                    <label for="upg-arch">Archer</label>
-                    <img src={images['t5_arch.webp']} alt="Archer" />
-                    <input id="upg-arch" type="text" placeholder="0" value={troopInputs.upgrade.archer} on:input={(e) => handleInput(e, 'upgrade', 'archer')} use:autoFontSize={troopInputs.upgrade.archer}>
-                </div>
-                <div class="troop-item">
-                    <label for="upg-siege">Siege</label>
-                    <img src={images['t5_siege.webp']} alt="Siege" />
-                    <input id="upg-siege" type="text" placeholder="0" value={troopInputs.upgrade.siege} on:input={(e) => handleInput(e, 'upgrade', 'siege')} use:autoFontSize={troopInputs.upgrade.siege}>
-                </div>
-            </div>
-        </div>
-    </div>
-
-{:else}
-    <div class="form-group">
-        <div class="mix-control-header">
-            <span class="label-text">Training Mix</span>
-            <span class="mix-readout">
-                <span style="color: #ca62e6">{Math.round(mixRatio.t4 * 100)}% T4</span> / 
-                <span style="color: #f28d00">{Math.round(mixRatio.t5 * 100)}% T5</span> / 
-                <span style="color: #4ade80">{Math.round(mixRatio.upgrade * 100)}% Upgrade</span>
-            </span>
-        </div>
 
         <div 
-            class="mix-slider-track" 
-            bind:this={sliderNode}
-            role="slider"
-            tabindex="0"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            aria-valuenow={sliderThumb1}
-            aria-label="Troop Mix Slider"
-            on:mousedown|preventDefault={handleSliderInteract} 
-            on:mousemove={(e) => e.buttons === 1 && handleSliderInteract(e)}
-            on:touchstart|preventDefault={(e) => handleSliderInteract(e)}
-            on:touchmove|preventDefault={(e) => handleSliderInteract(e)}
+            class="calc-result" 
+            class:result-success={hasResult && resultAnimationTrigger}
+            class:has-value={hasResult} 
+            style="flex-direction: column; gap: 10px; padding: 20px; justify-content: center;"
         >
-            <div class="mix-segment" style="left: 0%; width: {sliderThumb1}%; background: #ca62e6;"></div>
-            <div class="mix-segment" style="left: {sliderThumb1}%; width: {sliderThumb2 - sliderThumb1}%; background: #f28d00;"></div>
-            <div class="mix-segment" style="left: {sliderThumb2}%; width: {100 - sliderThumb2}%; background: linear-gradient(90deg, #4ade80, #22c55e);"></div>
-
-            <div class="mix-thumb" style="left: {sliderThumb1}%;"></div>
-            <div class="mix-thumb" style="left: {sliderThumb2}%;"></div>
-        </div>
-
-        <div class="slider-instruction">
-            Drag the sliders on either end towards the middle to adjust your T4/T5/Upgrade split
-        </div>
-    </div>
-
-    <div class="dynamic-input-container">
-        {#if activeTab === 'speedups'}
-            <div class="form-group fade-in-panel">
-                <span class="label-text">Total Speedups Available</span>
-                <div class="time-input-row">
-                    <div class="time-input-group"><input type="text" placeholder="0" value={speedupTime.d} on:input={(e) => handleSpeedupInput(e, 'd')}><span>Days</span></div>
-                    <div class="time-input-group"><input type="text" placeholder="0" value={speedupTime.h} on:input={(e) => handleSpeedupInput(e, 'h')}><span>Hours</span></div>
-                    <div class="time-input-group"><input type="text" placeholder="0" value={speedupTime.m} on:input={(e) => handleSpeedupInput(e, 'm')}><span>Mins</span></div>
-                </div>
-            </div>
-        {:else if activeTab === 'mge'}
-            <div class="form-group fade-in-panel">
-                <span class="label-text">Desired Training Stage MGE Points</span>
-                <div class="mge-input-row">
-                    <input 
-                        type="text" 
-                        class="standalone-input" 
-                        placeholder="Example: 50,000,000" 
-                        value={targetMgePoints} 
-                        on:input={(e) => handleSingleInput(e, (v) => targetMgePoints = v)}
-                    >
-                    <span class="mge-text-label">points</span>
-                </div>
-            </div>
-        {/if}
-    </div>
-{/if}
-
-<div 
-    class="calc-result" 
-    class:result-success={hasResult && resultAnimationTrigger}
-    class:has-value={hasResult} 
-    style="flex-direction: column; gap: 10px; padding: 20px; justify-content: center;"
->
-    {#if hasResult}
-        {#if activeTab === 'troops'}
-            <div class="cost-line" style="font-size: 1.2rem; margin-bottom: 5px;">
-                <img src={images['training_speedup.webp']} alt="Clock" style="height: 32px;"/>
-                <span>Time: <strong style="color: var(--accent-blue-bright);">{resultTime}</strong></span>
-            </div>
-            
-            <div class="res-grid">
-                {#if totalRes.food > 0} <div class="cost-line"><img src={images['food.webp']} alt="Food"/> <span>{formatNumber(totalRes.food)}</span></div> {/if}
-                {#if totalRes.wood > 0} <div class="cost-line"><img src={images['wood.webp']} alt="Wood"/> <span>{formatNumber(totalRes.wood)}</span></div> {/if}
-                {#if totalRes.stone > 0} <div class="cost-line"><img src={images['stone.webp']} alt="Stone"/> <span>{formatNumber(totalRes.stone)}</span></div> {/if}
-                {#if totalRes.gold > 0} <div class="cost-line"><img src={images['gold.webp']} alt="Gold"/> <span>{formatNumber(totalRes.gold)}</span></div> {/if}
-            </div>
-        {:else}
-            <div class="cost-line" style="font-size: 1.2rem; margin-bottom: 5px;">
-                {#if activeTab === 'mge'}
-                    <img src={images['training_speedup.webp']} alt="Clock" style="height: 32px;"/>
-                    <span>Requires: <strong style="color: var(--accent-blue-bright);">{resultTime}</strong></span>
-                {/if}
-            </div>
-
-            {#if activeTab !== 'mge'}
-                <div class="cost-line" style="font-size: 1.1rem;">
-                    <span>Total Troops: <strong style="color: var(--accent-blue-bright);">{maxTroops.toLocaleString()}</strong></span>
-                </div>
-                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: -5px;">
-                    ({troopBreakdown.t4.toLocaleString()} T4 / {troopBreakdown.t5.toLocaleString()} T5 / {troopBreakdown.upgrade.toLocaleString()} Upgrades)
-                </div>
-            {/if}
-        {/if}
-
-        <div class="result-divider"></div>
-        <div class="stats-row">
-            <div class="stat-item">
-                <img src={images['power_icon.webp']} alt="Power" />
-                <div class="stat-info">
-                    <span class="stat-label">Power Gained</span>
-                    <span class="stat-value" style="color: var(--accent-blue-bright);">{totalPower.toLocaleString()}</span>
-                </div>
-            </div>
-            
-            <div class="stat-item">
-                {#if activeTab === 'mge'}
-                    <img src={images['troop_t5.webp']} alt="Troops" />
-                    <div class="stat-info">
-                        <span class="stat-label">Total Troops</span>
-                        <span class="stat-value" style="color: var(--accent-blue-bright);">{maxTroops.toLocaleString()}</span>
+            {#if hasResult}
+                {#if activeTab === 'troops'}
+                    <div class="cost-line" style="font-size: 1.2rem; margin-bottom: 5px;">
+                        <img src={images['training_speedup.webp']} alt="Clock" style="height: 32px;"/>
+                        <span>Time: <strong style="color: var(--accent-blue-bright);">{resultTime}</strong></span>
+                    </div>
+                    
+                    <div class="res-grid">
+                        {#if totalRes.food > 0} <div class="cost-line"><img src={images['food.webp']} alt="Food"/> <span>{formatNumber(totalRes.food)}</span></div> {/if}
+                        {#if totalRes.wood > 0} <div class="cost-line"><img src={images['wood.webp']} alt="Wood"/> <span>{formatNumber(totalRes.wood)}</span></div> {/if}
+                        {#if totalRes.stone > 0} <div class="cost-line"><img src={images['stone.webp']} alt="Stone"/> <span>{formatNumber(totalRes.stone)}</span></div> {/if}
+                        {#if totalRes.gold > 0} <div class="cost-line"><img src={images['gold.webp']} alt="Gold"/> <span>{formatNumber(totalRes.gold)}</span></div> {/if}
                     </div>
                 {:else}
-                    <img src={images['mge.webp']} alt="MGE" on:error={() => (event.target.style.display = 'none')}/>
-                    <div class="stat-info">
-                        <span class="stat-label">MGE Points</span>
-                        <span class="stat-value" style="color: var(--accent-blue-bright);">{totalMge.toLocaleString()}</span>
+                    <div class="cost-line" style="font-size: 1.2rem; margin-bottom: 5px;">
+                        {#if activeTab === 'mge'}
+                            <img src={images['training_speedup.webp']} alt="Clock" style="height: 32px;"/>
+                            <span>Requires: <strong style="color: var(--accent-blue-bright);">{resultTime}</strong></span>
+                        {/if}
+                    </div>
+
+                    {#if activeTab !== 'mge'}
+                        <div class="cost-line" style="font-size: 1.1rem;">
+                            <span>Total Troops: <strong style="color: var(--accent-blue-bright);">{maxTroops.toLocaleString()}</strong></span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: -5px;">
+                            ({troopBreakdown.t4.toLocaleString()} T4 / {troopBreakdown.t5.toLocaleString()} T5 / {troopBreakdown.upgrade.toLocaleString()} Upgrades)
+                        </div>
+                    {/if}
+                {/if}
+
+                <div class="result-divider"></div>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <img src={images['power_icon.webp']} alt="Power" />
+                        <div class="stat-info">
+                            <span class="stat-label">Power Gained</span>
+                            <span class="stat-value" style="color: var(--accent-blue-bright);">{totalPower.toLocaleString()}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        {#if activeTab === 'mge'}
+                            <img src={images['troop_t5.webp']} alt="Troops" />
+                            <div class="stat-info">
+                                <span class="stat-label">Total Troops</span>
+                                <span class="stat-value" style="color: var(--accent-blue-bright);">{maxTroops.toLocaleString()}</span>
+                            </div>
+                        {:else}
+                            <img src={images['mge.webp']} alt="MGE" on:error={() => (event.target.style.display = 'none')}/>
+                            <div class="stat-info">
+                                <span class="stat-label">MGE Points</span>
+                                <span class="stat-value" style="color: var(--accent-blue-bright);">{totalMge.toLocaleString()}</span>
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+                
+                {#if activeTab === 'mge'}
+                     <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px; text-align: center;">
+                        ({troopBreakdown.t4.toLocaleString()} T4 / {troopBreakdown.t5.toLocaleString()} T5 / {troopBreakdown.upgrade.toLocaleString()} Upgrades)
                     </div>
                 {/if}
-            </div>
-        </div>
-        
-        {#if activeTab === 'mge'}
-                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px; text-align: center;">
-                ({troopBreakdown.t4.toLocaleString()} T4 / {troopBreakdown.t5.toLocaleString()} T5 / {troopBreakdown.upgrade.toLocaleString()} Upgrades)
-            </div>
-        {/if}
 
-    {:else}
-        <div style="opacity: 0;">&nbsp;</div>
-    {/if}
+            {:else}
+                <div style="opacity: 0;">&nbsp;</div>
+            {/if}
+        </div>
+    </div>
 </div>
 
 <style>
@@ -657,9 +642,6 @@
     .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
     .stat-value { font-size: 1.1rem; font-weight: 700; color: white; }
 
-    .calc-result.result-success::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid transparent; animation: glow-border 1.2s ease-out; }
-    @keyframes glow-border { 0% { border-color: transparent; box-shadow: 0 0 0 0 transparent; } 25% { border-color: var(--accent-green); box-shadow: 0 0 15px 0 var(--accent-green); } 100% { border-color: transparent; box-shadow: 0 0 15px 0 transparent; } }
-
     .header-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-2); }
     .header-group label { margin-bottom: 0; }
     .tooltip-wrapper { position: relative; }
@@ -672,25 +654,11 @@
     .tooltip-img.square { aspect-ratio: 1/1; object-fit: cover; }
     .tooltip-img.wide { height: auto; }
 
-    .troop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; position: relative; padding: 4px; border-radius: var(--radius-lg); margin-bottom: 5px; }
-    .troop-grid::after { content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: 0; opacity: 0.35; pointer-events: none; }
-    .troop-grid.t4-group::after { background-image: radial-gradient(circle, #ca62e6 0%, #8113a7 100%); }
-    .troop-grid.t5-group::after { background-image: radial-gradient(circle, #f28d00 0%, #d55800 100%); }
-    .troop-grid.upgrade-group::after { background: linear-gradient(135deg, #ca62e6 0%, #8113a7 45%, #f28d00 55%, #d55800 100%); opacity: 0.25; }
-
-    .troop-item { background: var(--bg-tertiary); border: 1px solid var(--border-hover); border-radius: var(--radius-md); padding: var(--spacing-2); display: flex; flex-direction: column; align-items: center; gap: var(--spacing-2); position: relative; z-index: 1; }
-    .troop-item label { font-size: 0.75rem; margin: 0; font-weight: 500; color: var(--text-secondary); }
-    .troop-item img { width: 32px; height: 32px; object-fit: contain; }
-    .troop-item input { width: 100%; text-align: center; padding: 4px; font-size: 1rem; border: 1px solid var(--border-color); background: var(--bg-primary); border-radius: var(--radius-sm); color: white; }
-    .troop-item input:focus { border-color: var(--accent-blue); outline: none; }
-
     .form-group.collapse-group { margin-bottom: 4px !important; }
     .label-with-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
     .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out; opacity: 0; }
     .collapsible-content.is-open { max-height: 500px; opacity: 1; }
 
-    .res-grid { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; }
-    .res-grid .cost-line img { height: 24px; }
     .calc-result { min-height: 140px; position: relative; }
     
     .mge-input-row { display: flex; align-items: center; gap: 10px; }
@@ -716,7 +684,7 @@
         touch-action: none;
         user-select: none;
         -webkit-user-select: none;
-        border-radius: 2px; 
+        border-radius: 2px;
     }
 
     .mix-segment {
@@ -761,11 +729,5 @@
         color: var(--text-secondary);
         margin-top: 8px;
         text-align: center;
-    }
-
-    @media (max-width: 600px) {
-        .troop-grid { grid-template-columns: repeat(2, 1fr); }
-        .res-grid { gap: 10px; }
-        .res-grid .cost-line { font-size: 0.9rem; }
     }
 </style>
