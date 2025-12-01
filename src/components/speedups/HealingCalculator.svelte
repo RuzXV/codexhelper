@@ -376,25 +376,6 @@
 </div>
 
 <style>
-    .buff-inputs-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-    .header-group.compact { 
-        display: flex;
-        margin-bottom: 5px; 
-        justify-content: flex-start;
-        gap: 1px;
-        align-items: center; 
-    }
-    .header-group label { 
-        font-size: 0.95rem;
-        white-space: nowrap; 
-        margin-bottom: 0; 
-    }
-
     .healing-time-display {
         display: flex;
         flex-direction: column;
@@ -424,16 +405,6 @@
     .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
     .stat-value { font-size: 1.1rem; font-weight: 700; color: white; }
 
-    .buff-inputs-grid input {
-        width: 100%;
-        background: var(--bg-primary);
-        border: 1px solid var(--border-hover);
-        border-radius: var(--radius-sm);
-        padding: 8px;
-        color: var(--text-primary);
-        text-align: center;
-    }
-
     .label-text { display: block; font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-2); }
     .label-text-small { 
         display: block;
@@ -444,52 +415,13 @@
         margin-left: 5px;
     }
     
-    .tooltip-wrapper { position: relative; display: flex; align-items: center; }
-    .info-btn { background: none; border: none; color: var(--text-secondary); font-size: 1rem; cursor: pointer; padding: 0; display: flex; align-items: center; }
-    
-    .tooltip-container { position: absolute; left: 0; top: 100%; margin-top: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 15px; border-radius: var(--radius-md); width: 250px; z-index: 200; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); text-align: left; }
-    .tooltip-container h4 { margin: 0 0 10px 0; color: var(--text-primary); font-size: 0.9rem; }
-    .tooltip-container p { font-size: 0.8rem; color: var(--text-secondary); margin: 5px 0; }
-    .tooltip-img { width: 100%; border-radius: 4px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); }
-    .tooltip-img.square { aspect-ratio: 1/1; object-fit: cover; }
-    .tooltip-img.wide { height: auto; }
-
-    .ratio-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .ratio-btn {
-        background: var(--bg-primary);
-        border: 1px solid var(--border-hover);
-        border-radius: var(--radius-sm);
-        padding: 8px 4px;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        transition: all 0.2s;
-    }
-    .ratio-btn:hover { border-color: var(--accent-blue); background: var(--bg-tertiary); }
-    .ratio-btn.active {
-        background: var(--accent-blue-light);
-        border-color: var(--accent-blue);
-    }
-    .ratio-val { font-weight: 700; color: white; font-size: 0.9rem; }
-    .ratio-lbl { font-size: 0.65rem; color: var(--text-secondary); margin-top: 2px; text-align: center; white-space: nowrap; }
-    .ratio-btn.active .ratio-val, .ratio-btn.active .ratio-lbl { color: white; }
-
     @media (max-width: 600px) {
-        .buff-inputs-grid { 
-            grid-template-columns: 1fr;
-        }
-        .ratio-selector { 
-            grid-template-columns: repeat(2, 1fr);
-        }
-
         .time-row.main {
             font-size: 1.1rem;
         }
         .time-row.main img {
             height: 28px;
         }
-
         .stats-row {
             gap: 5px;
         }

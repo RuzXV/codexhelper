@@ -220,6 +220,120 @@
         animation: global-glow-border 1.2s ease-out; 
     }
 
+    .speedups-hub :global(.tooltip-wrapper) { 
+        position: relative; 
+        display: flex; 
+        align-items: center; 
+    }
+    .speedups-hub :global(.info-btn) { 
+        background: none; 
+        border: none; 
+        color: var(--text-secondary); 
+        font-size: 1rem; 
+        cursor: pointer; 
+        padding: 0; 
+        display: flex; 
+        align-items: center; 
+        transition: color 0.2s; 
+    }
+    .speedups-hub :global(.info-btn:hover) { 
+        color: var(--accent-blue); 
+    }
+    
+    .speedups-hub :global(.tooltip-container) { 
+        position: absolute; 
+        left: 0; 
+        top: 100%; 
+        margin-top: 10px; 
+        background: var(--bg-tertiary); 
+        border: 1px solid var(--border-color); 
+        padding: 15px; 
+        border-radius: var(--radius-md); 
+        width: 250px; 
+        z-index: 200; 
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); 
+        text-align: left; 
+    }
+    .speedups-hub :global(.tooltip-container h4) { 
+        margin: 0 0 10px 0; 
+        color: var(--text-primary); 
+        font-size: 0.9rem; 
+    }
+    .speedups-hub :global(.tooltip-container p) { 
+        font-size: 0.8rem; 
+        color: var(--text-secondary); 
+        margin: 5px 0; 
+    }
+    .speedups-hub :global(.tooltip-img) { 
+        width: 100%; 
+        border-radius: 4px; 
+        margin-bottom: 10px; 
+        border: 1px solid rgba(255,255,255,0.1); 
+    }
+    .speedups-hub :global(.tooltip-img.square) { aspect-ratio: 1/1; object-fit: cover; }
+    .speedups-hub :global(.tooltip-img.wide) { height: auto; }
+
+    .speedups-hub :global(.header-group) { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: var(--spacing-2); 
+    }
+    .speedups-hub :global(.header-group.compact) { 
+        justify-content: flex-start; 
+        gap: 5px; 
+    }
+    .speedups-hub :global(.header-group label) { 
+        margin-bottom: 0; 
+        font-size: 0.95rem; 
+        white-space: nowrap; 
+    }
+
+    .speedups-hub :global(.buff-inputs-grid) {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .speedups-hub :global(.buff-inputs-grid input) {
+        width: 100%;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-hover);
+        border-radius: var(--radius-sm);
+        padding: 8px;
+        color: var(--text-primary);
+        text-align: center;
+    }
+
+    .speedups-hub :global(.ratio-selector) { 
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 8px; 
+    }
+    .speedups-hub :global(.ratio-btn) {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-hover);
+        border-radius: var(--radius-sm);
+        padding: 8px 4px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.2s;
+    }
+    .speedups-hub :global(.ratio-btn:hover) { 
+        border-color: var(--accent-blue); 
+        background: var(--bg-tertiary); 
+    }
+    .speedups-hub :global(.ratio-btn.active) {
+        background: var(--accent-blue-light);
+        border-color: var(--accent-blue);
+    }
+    .speedups-hub :global(.ratio-val) { font-weight: 700; color: white; font-size: 0.9rem; }
+    .speedups-hub :global(.ratio-lbl) { font-size: 0.65rem; color: var(--text-secondary); margin-top: 2px; text-align: center; white-space: nowrap; }
+    .speedups-hub :global(.ratio-btn.active .ratio-val), 
+    .speedups-hub :global(.ratio-btn.active .ratio-lbl) { color: white; }
+
     @keyframes global-glow-border { 
         0% { border-color: transparent; box-shadow: 0 0 0 0 transparent; } 
         25% { border-color: var(--accent-green); box-shadow: 0 0 15px 0 var(--accent-green); } 
@@ -231,5 +345,7 @@
         .speedups-hub :global(.res-grid) { gap: 10px; }
         .speedups-hub :global(.res-grid .cost-line) { font-size: 0.9rem; }
         .speedups-hub :global(.res-grid .cost-line img) { height: 20px; }
+        .speedups-hub :global(.buff-inputs-grid) { grid-template-columns: 1fr; }
+        .speedups-hub :global(.ratio-selector) { grid-template-columns: repeat(2, 1fr); }
     }
 </style>
