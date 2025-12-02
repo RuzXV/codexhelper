@@ -89,26 +89,21 @@
     let sliderNode;
     function handleSliderInteract(e) {
         if (!sliderNode) return;
+
         const rect = sliderNode.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         let percentage = ((clientX - rect.left) / rect.width) * 100;
 
-        if (maxTroops > 0) {
-            const batchSize = 1000;
-            const stepPercent = (batchSize / maxTroops) * 100;
-            
-            if (stepPercent > 0 && stepPercent <= 100) {
-                percentage = Math.round(percentage / stepPercent) * stepPercent;
-            }
-        }
-
         if (percentage < 1.5) percentage = 0;
         if (percentage > 98.5) percentage = 100;
+
         percentage = Math.max(0, Math.min(100, percentage));
+
         if (e.type === 'mousedown' || e.type === 'touchstart') {
-            const overlap = Math.abs(sliderThumb1 - sliderThumb2) < 0.1;
+            const overlap = Math.abs(sliderThumb1 - sliderThumb2) < 2; 
+            
             if (overlap) {
-                activeThumb = 0;
+                activeThumb = 0; 
             } else {
                 const dist1 = Math.abs(percentage - sliderThumb1);
                 const dist2 = Math.abs(percentage - sliderThumb2);
@@ -183,6 +178,7 @@
         const hours = parseInt(speedupTime.h.replace(/,/g, '') || '0');
         const minutes = parseInt(speedupTime.m.replace(/,/g, '') || '0');
         const totalInputSeconds = (days * 86400) + (hours * 3600) + (minutes * 60);
+        
         if (totalInputSeconds <= 0) {
             resetResults();
             return;
@@ -191,25 +187,33 @@
         const avgTime = (mixRatio.t4 * BASE_TIME_T4) + 
                         (mixRatio.t5 * BASE_TIME_T5) + 
                         (mixRatio.upgrade * BASE_TIME_UPGRADE);
-        const calculatedTotalTroops = Math.floor( (totalInputSeconds * speedMultiplier) / avgTime );
+        
+        let calculatedTotalTroops = Math.floor( (totalInputSeconds * speedMultiplier) / avgTime );
+
         if (calculatedTotalTroops > 0) {
-            maxTroops = calculatedTotalTroops;
-            troopBreakdown.t4 = Math.floor(maxTroops * mixRatio.t4);
-            troopBreakdown.t5 = Math.floor(maxTroops * mixRatio.t5);
-            troopBreakdown.upgrade = Math.floor(maxTroops * mixRatio.upgrade);
-            const remainder = maxTroops - (troopBreakdown.t4 + troopBreakdown.t5 + troopBreakdown.upgrade);
-            if (remainder > 0) {
-                if (mixRatio.upgrade > 0) troopBreakdown.upgrade += remainder;
-                else if (mixRatio.t5 > 0) troopBreakdown.t5 += remainder;
-                else troopBreakdown.t4 += remainder;
+            const BATCH_SIZE = 1000;
+            
+            if (calculatedTotalTroops >= BATCH_SIZE) {
+                troopBreakdown.t4 = Math.floor((calculatedTotalTroops * mixRatio.t4) / BATCH_SIZE) * BATCH_SIZE;
+                troopBreakdown.t5 = Math.floor((calculatedTotalTroops * mixRatio.t5) / BATCH_SIZE) * BATCH_SIZE;
+                troopBreakdown.upgrade = Math.floor((calculatedTotalTroops * mixRatio.upgrade) / BATCH_SIZE) * BATCH_SIZE;
+                
+                maxTroops = troopBreakdown.t4 + troopBreakdown.t5 + troopBreakdown.upgrade;
+            } else {
+                maxTroops = calculatedTotalTroops;
+                troopBreakdown.t4 = Math.floor(maxTroops * mixRatio.t4);
+                troopBreakdown.t5 = Math.floor(maxTroops * mixRatio.t5);
+                troopBreakdown.upgrade = Math.floor(maxTroops * mixRatio.upgrade);
             }
 
             totalPower = (troopBreakdown.t4 * POWER_PER_UNIT.t4) + 
                          (troopBreakdown.t5 * POWER_PER_UNIT.t5) + 
                          (troopBreakdown.upgrade * POWER_PER_UNIT.upgrade);
+            
             totalMge = (troopBreakdown.t4 * MGE_POINTS_PER_UNIT.t4) + 
                        (troopBreakdown.t5 * MGE_POINTS_PER_UNIT.t5) + 
                        (troopBreakdown.upgrade * MGE_POINTS_PER_UNIT.upgrade);
+            
             hasResult = true;
             triggerAnimation();
         } else {
@@ -221,6 +225,7 @@
         const speed = parseFloat(trainingSpeed || '0');
         const speedMultiplier = 1 + (speed / 100);
         const target = parseInt(targetMgePoints.replace(/,/g, '') || '0');
+        
         if (target <= 0) {
             resetResults();
             return;
@@ -229,31 +234,39 @@
         const avgPoints = (mixRatio.t4 * MGE_POINTS_PER_UNIT.t4) + 
                           (mixRatio.t5 * MGE_POINTS_PER_UNIT.t5) + 
                           (mixRatio.upgrade * MGE_POINTS_PER_UNIT.upgrade);
-        const calculatedTotalTroops = Math.ceil(target / avgPoints);
+        
+        let calculatedTotalTroops = Math.ceil(target / avgPoints);
         
         const avgTime = (mixRatio.t4 * BASE_TIME_T4) + 
                         (mixRatio.t5 * BASE_TIME_T5) + 
                         (mixRatio.upgrade * BASE_TIME_UPGRADE);
-        const totalSeconds = (avgTime / speedMultiplier) * calculatedTotalTroops;
-
+        
         if (calculatedTotalTroops > 0) {
-            maxTroops = calculatedTotalTroops;
-            troopBreakdown.t4 = Math.floor(maxTroops * mixRatio.t4);
-            troopBreakdown.t5 = Math.floor(maxTroops * mixRatio.t5);
-            troopBreakdown.upgrade = Math.floor(maxTroops * mixRatio.upgrade);
-            const remainder = maxTroops - (troopBreakdown.t4 + troopBreakdown.t5 + troopBreakdown.upgrade);
-            if (remainder > 0) {
-                if (mixRatio.upgrade > 0) troopBreakdown.upgrade += remainder;
-                else if (mixRatio.t5 > 0) troopBreakdown.t5 += remainder;
-                else troopBreakdown.t4 += remainder;
+            const BATCH_SIZE = 1000;
+
+            if (calculatedTotalTroops >= BATCH_SIZE) {
+                troopBreakdown.t4 = Math.floor((calculatedTotalTroops * mixRatio.t4) / BATCH_SIZE) * BATCH_SIZE;
+                troopBreakdown.t5 = Math.floor((calculatedTotalTroops * mixRatio.t5) / BATCH_SIZE) * BATCH_SIZE;
+                troopBreakdown.upgrade = Math.floor((calculatedTotalTroops * mixRatio.upgrade) / BATCH_SIZE) * BATCH_SIZE;
+
+                maxTroops = troopBreakdown.t4 + troopBreakdown.t5 + troopBreakdown.upgrade;
+            } else {
+                maxTroops = calculatedTotalTroops;
+                troopBreakdown.t4 = Math.floor(maxTroops * mixRatio.t4);
+                troopBreakdown.t5 = Math.floor(maxTroops * mixRatio.t5);
+                troopBreakdown.upgrade = Math.floor(maxTroops * mixRatio.upgrade);
             }
+
+            const totalSeconds = (avgTime / speedMultiplier) * maxTroops;
 
             totalPower = (troopBreakdown.t4 * POWER_PER_UNIT.t4) + 
                          (troopBreakdown.t5 * POWER_PER_UNIT.t5) + 
                          (troopBreakdown.upgrade * POWER_PER_UNIT.upgrade);
+            
             totalMge = (troopBreakdown.t4 * MGE_POINTS_PER_UNIT.t4) + 
                        (troopBreakdown.t5 * MGE_POINTS_PER_UNIT.t5) + 
                        (troopBreakdown.upgrade * MGE_POINTS_PER_UNIT.upgrade);
+            
             resultTime = formatTime(totalSeconds);
             hasResult = true;
             triggerAnimation();
