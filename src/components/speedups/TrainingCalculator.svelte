@@ -8,6 +8,8 @@
 
     const POWER_PER_UNIT = { t4: 4, t5: 10, upgrade: 6 };
     const MGE_POINTS_PER_UNIT = { t4: 40, t5: 100, upgrade: 60 };
+    const PREKVK_POINTS_PER_UNIT = { t4: 8, t5: 20, upgrade: 12 };
+
     const RESOURCES = {
         t4: {
             infantry: { food: 300, wood: 300, stone: 0, gold: 20 },
@@ -28,6 +30,7 @@
             siege:    { food: 300, wood: 300, stone: 250, gold: 380 }
         }
     };
+
     let activeTab = 'troops';
     let trainingSpeed = '';
 
@@ -39,29 +42,41 @@
         t5: (sliderThumb2 - sliderThumb1) / 100,
         upgrade: (100 - sliderThumb2) / 100
     };
+
     let troopInputs = {
         t4: { infantry: '', cavalry: '', archer: '', siege: '' },
         t5: { infantry: '', cavalry: '', archer: '', siege: '' },
         upgrade: { infantry: '', cavalry: '', archer: '', siege: '' }
     };
+
     let sectionOpen = { t4: true, t5: true, upgrade: true };
+    let reserveSectionOpen = true;
     let speedupTime = { d: '', h: '', m: '' };
     let targetMgePoints = '';
+
+    let reserveSelection = { tier: 't5', size: 50000 }; 
+    let reserveTargetDate = '';
+    let reserveResultStr = null;
 
     let resultTime = null;
     let totalRes = { food: 0, wood: 0, stone: 0, gold: 0 };
     let totalPower = 0;
     let totalMge = 0;
+    let totalPreKvkPoints = 0;
     let maxTroops = 0;
     
     let troopBreakdown = { t4: 0, t5: 0, upgrade: 0 };
+
     let showTooltip = false;
     let hasResult = false;
     let resultAnimationTrigger = false;
+    
+    let dateInputRef;
 
     $: if (activeTab === 'troops') calculateAllTroops(troopInputs, trainingSpeed);
     $: if (activeTab === 'speedups') calculateSpeedups(speedupTime, trainingSpeed, sliderThumb1, sliderThumb2);
     $: if (activeTab === 'mge') calculateMge(targetMgePoints, trainingSpeed, sliderThumb1, sliderThumb2);
+    $: if (activeTab === 'prekvk') calculatePreKvk(speedupTime, trainingSpeed, sliderThumb1, sliderThumb2, reserveSelection, reserveTargetDate);
 
     function autoFontSize(node, value) {
         const update = () => {
@@ -89,7 +104,6 @@
     let sliderNode;
     function handleSliderInteract(e) {
         if (!sliderNode) return;
-
         const rect = sliderNode.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         let percentage = ((clientX - rect.left) / rect.width) * 100;
@@ -100,10 +114,9 @@
         percentage = Math.max(0, Math.min(100, percentage));
 
         if (e.type === 'mousedown' || e.type === 'touchstart') {
-            const overlap = Math.abs(sliderThumb1 - sliderThumb2) < 2; 
-            
+            const overlap = Math.abs(sliderThumb1 - sliderThumb2) < 2;
             if (overlap) {
-                activeThumb = 0; 
+                activeThumb = 0;
             } else {
                 const dist1 = Math.abs(percentage - sliderThumb1);
                 const dist2 = Math.abs(percentage - sliderThumb2);
@@ -125,6 +138,20 @@
         }
     }
 
+    function setReserveSelection(tier, size) {
+        reserveSelection = { tier, size };
+    }
+
+    function openDatePicker() {
+        if (dateInputRef) {
+            try {
+                dateInputRef.showPicker();
+            } catch (e) {
+                dateInputRef.focus();
+            }
+        }
+    }
+
     function calculateAllTroops() {
         const speed = parseFloat(trainingSpeed || '0');
         const speedMultiplier = 1 + (speed / 100);
@@ -140,13 +167,13 @@
             { key: 't5', baseTime: BASE_TIME_T5, res: RESOURCES.t5, power: POWER_PER_UNIT.t5, mge: MGE_POINTS_PER_UNIT.t5 },
             { key: 'upgrade', baseTime: BASE_TIME_UPGRADE, res: RESOURCES.upgrade, power: POWER_PER_UNIT.upgrade, mge: MGE_POINTS_PER_UNIT.upgrade }
         ];
+
         categories.forEach(cat => {
             Object.entries(troopInputs[cat.key]).forEach(([type, val]) => {
                 const count = parseInt(val.replace(/\D/g, '') || '0');
                 if (count > 0) {
                     hasInput = true;
                     totalSeconds += (cat.baseTime / speedMultiplier) * count;
-                    
                     const unitCost = cat.res[type];
                     currentRes.food += unitCost.food * count;
                     currentRes.wood += unitCost.wood * count;
@@ -158,6 +185,7 @@
                 }
             });
         });
+
         if (hasInput) {
             resultTime = formatTime(totalSeconds);
             totalRes = currentRes;
@@ -178,7 +206,7 @@
         const hours = parseInt(speedupTime.h.replace(/,/g, '') || '0');
         const minutes = parseInt(speedupTime.m.replace(/,/g, '') || '0');
         const totalInputSeconds = (days * 86400) + (hours * 3600) + (minutes * 60);
-        
+
         if (totalInputSeconds <= 0) {
             resetResults();
             return;
@@ -187,24 +215,11 @@
         const avgTime = (mixRatio.t4 * BASE_TIME_T4) + 
                         (mixRatio.t5 * BASE_TIME_T5) + 
                         (mixRatio.upgrade * BASE_TIME_UPGRADE);
-        
+
         let calculatedTotalTroops = Math.floor( (totalInputSeconds * speedMultiplier) / avgTime );
 
         if (calculatedTotalTroops > 0) {
-            const BATCH_SIZE = 1000;
-            
-            if (calculatedTotalTroops >= BATCH_SIZE) {
-                troopBreakdown.t4 = Math.floor((calculatedTotalTroops * mixRatio.t4) / BATCH_SIZE) * BATCH_SIZE;
-                troopBreakdown.t5 = Math.floor((calculatedTotalTroops * mixRatio.t5) / BATCH_SIZE) * BATCH_SIZE;
-                troopBreakdown.upgrade = Math.floor((calculatedTotalTroops * mixRatio.upgrade) / BATCH_SIZE) * BATCH_SIZE;
-                
-                maxTroops = troopBreakdown.t4 + troopBreakdown.t5 + troopBreakdown.upgrade;
-            } else {
-                maxTroops = calculatedTotalTroops;
-                troopBreakdown.t4 = Math.floor(maxTroops * mixRatio.t4);
-                troopBreakdown.t5 = Math.floor(maxTroops * mixRatio.t5);
-                troopBreakdown.upgrade = Math.floor(maxTroops * mixRatio.upgrade);
-            }
+            distributeTroops(calculatedTotalTroops);
 
             totalPower = (troopBreakdown.t4 * POWER_PER_UNIT.t4) + 
                          (troopBreakdown.t5 * POWER_PER_UNIT.t5) + 
@@ -225,7 +240,7 @@
         const speed = parseFloat(trainingSpeed || '0');
         const speedMultiplier = 1 + (speed / 100);
         const target = parseInt(targetMgePoints.replace(/,/g, '') || '0');
-        
+
         if (target <= 0) {
             resetResults();
             return;
@@ -234,31 +249,18 @@
         const avgPoints = (mixRatio.t4 * MGE_POINTS_PER_UNIT.t4) + 
                           (mixRatio.t5 * MGE_POINTS_PER_UNIT.t5) + 
                           (mixRatio.upgrade * MGE_POINTS_PER_UNIT.upgrade);
-        
+
         let calculatedTotalTroops = Math.ceil(target / avgPoints);
         
         const avgTime = (mixRatio.t4 * BASE_TIME_T4) + 
                         (mixRatio.t5 * BASE_TIME_T5) + 
                         (mixRatio.upgrade * BASE_TIME_UPGRADE);
-        
+
         if (calculatedTotalTroops > 0) {
-            const BATCH_SIZE = 1000;
-
-            if (calculatedTotalTroops >= BATCH_SIZE) {
-                troopBreakdown.t4 = Math.floor((calculatedTotalTroops * mixRatio.t4) / BATCH_SIZE) * BATCH_SIZE;
-                troopBreakdown.t5 = Math.floor((calculatedTotalTroops * mixRatio.t5) / BATCH_SIZE) * BATCH_SIZE;
-                troopBreakdown.upgrade = Math.floor((calculatedTotalTroops * mixRatio.upgrade) / BATCH_SIZE) * BATCH_SIZE;
-
-                maxTroops = troopBreakdown.t4 + troopBreakdown.t5 + troopBreakdown.upgrade;
-            } else {
-                maxTroops = calculatedTotalTroops;
-                troopBreakdown.t4 = Math.floor(maxTroops * mixRatio.t4);
-                troopBreakdown.t5 = Math.floor(maxTroops * mixRatio.t5);
-                troopBreakdown.upgrade = Math.floor(maxTroops * mixRatio.upgrade);
-            }
+            distributeTroops(calculatedTotalTroops);
 
             const totalSeconds = (avgTime / speedMultiplier) * maxTroops;
-
+            
             totalPower = (troopBreakdown.t4 * POWER_PER_UNIT.t4) + 
                          (troopBreakdown.t5 * POWER_PER_UNIT.t5) + 
                          (troopBreakdown.upgrade * POWER_PER_UNIT.upgrade);
@@ -266,12 +268,88 @@
             totalMge = (troopBreakdown.t4 * MGE_POINTS_PER_UNIT.t4) + 
                        (troopBreakdown.t5 * MGE_POINTS_PER_UNIT.t5) + 
                        (troopBreakdown.upgrade * MGE_POINTS_PER_UNIT.upgrade);
-            
+
             resultTime = formatTime(totalSeconds);
             hasResult = true;
             triggerAnimation();
         } else {
             resetResults();
+        }
+    }
+
+    function calculatePreKvk() {
+        const speed = parseFloat(trainingSpeed || '0');
+        const speedMultiplier = 1 + (speed / 100);
+
+        reserveResultStr = null;
+        if (reserveTargetDate) {
+            const baseTime = reserveSelection.tier === 't5' ? BASE_TIME_T5 : BASE_TIME_T4;
+            const troopCount = reserveSelection.size + 2000; 
+            const totalSecondsNeeded = (baseTime * troopCount) / speedMultiplier;
+            
+            const [year, month, day] = reserveTargetDate.split('-').map(Number);
+            const targetDateObj = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+            
+            if (!isNaN(targetDateObj.getTime())) {
+                const startTimestamp = targetDateObj.getTime() - (totalSecondsNeeded * 1000);
+                const startDate = new Date(startTimestamp);
+                
+                const utcYear = startDate.getUTCFullYear();
+                const utcMonth = String(startDate.getUTCMonth() + 1).padStart(2, '0');
+                const utcDay = String(startDate.getUTCDate()).padStart(2, '0');
+                const utcHours = String(startDate.getUTCHours()).padStart(2, '0');
+                const utcMinutes = String(startDate.getUTCMinutes()).padStart(2, '0');
+                
+                reserveResultStr = `Start your reserves on <strong>${utcDay}/${utcMonth}/${utcYear} at ${utcHours}:${utcMinutes} UTC</strong>`;
+            }
+        }
+
+        const days = parseInt(speedupTime.d.replace(/,/g, '') || '0');
+        const hours = parseInt(speedupTime.h.replace(/,/g, '') || '0');
+        const minutes = parseInt(speedupTime.m.replace(/,/g, '') || '0');
+        const totalInputSeconds = (days * 86400) + (hours * 3600) + (minutes * 60);
+
+        if (totalInputSeconds > 0) {
+            const avgTime = (mixRatio.t4 * BASE_TIME_T4) + 
+                            (mixRatio.t5 * BASE_TIME_T5) + 
+                            (mixRatio.upgrade * BASE_TIME_UPGRADE);
+
+            let calculatedTotalTroops = Math.floor( (totalInputSeconds * speedMultiplier) / avgTime );
+            
+            if (calculatedTotalTroops > 0) {
+                distributeTroops(calculatedTotalTroops);
+                
+                totalPreKvkPoints = (troopBreakdown.t4 * PREKVK_POINTS_PER_UNIT.t4) + 
+                                    (troopBreakdown.t5 * PREKVK_POINTS_PER_UNIT.t5) + 
+                                    (troopBreakdown.upgrade * PREKVK_POINTS_PER_UNIT.upgrade);
+                
+                totalPower = (troopBreakdown.t4 * POWER_PER_UNIT.t4) + 
+                             (troopBreakdown.t5 * POWER_PER_UNIT.t5) + 
+                             (troopBreakdown.upgrade * POWER_PER_UNIT.upgrade);
+                
+                hasResult = true;
+                triggerAnimation();
+            }
+        } else if (reserveResultStr) {
+            hasResult = true;
+            triggerAnimation();
+        } else {
+            resetResults();
+        }
+    }
+
+    function distributeTroops(total) {
+        const BATCH_SIZE = 1000;
+        if (total >= BATCH_SIZE) {
+            troopBreakdown.t4 = Math.floor((total * mixRatio.t4) / BATCH_SIZE) * BATCH_SIZE;
+            troopBreakdown.t5 = Math.floor((total * mixRatio.t5) / BATCH_SIZE) * BATCH_SIZE;
+            troopBreakdown.upgrade = Math.floor((total * mixRatio.upgrade) / BATCH_SIZE) * BATCH_SIZE;
+            maxTroops = troopBreakdown.t4 + troopBreakdown.t5 + troopBreakdown.upgrade;
+        } else {
+            maxTroops = total;
+            troopBreakdown.t4 = Math.floor(maxTroops * mixRatio.t4);
+            troopBreakdown.t5 = Math.floor(maxTroops * mixRatio.t5);
+            troopBreakdown.upgrade = Math.floor(maxTroops * mixRatio.upgrade);
         }
     }
 
@@ -282,6 +360,8 @@
         totalRes = { food: 0, wood: 0, stone: 0, gold: 0 };
         totalPower = 0;
         totalMge = 0;
+        totalPreKvkPoints = 0;
+        reserveResultStr = null;
         hasResult = false;
         resultAnimationTrigger = false;
     }
@@ -329,10 +409,8 @@
         speedupTime[key] = value ? parseInt(value).toLocaleString('en-US') : '';
     }
 
-    function toggleTooltip() { showTooltip = !showTooltip;
-    }
-    function closeTooltip() { showTooltip = false;
-    }
+    function toggleTooltip() { showTooltip = !showTooltip; }
+    function closeTooltip() { showTooltip = false; }
     
     function switchTab(tab) {
         activeTab = tab;
@@ -351,21 +429,28 @@
                 class:active={activeTab === 'troops'} 
                 on:click={() => switchTab('troops')}
             >
-                Per Troops
+                Troops
             </button>
             <button 
                 class="generator-tab-btn" 
                 class:active={activeTab === 'speedups'} 
                 on:click={() => switchTab('speedups')}
             >
-                Per Speedups
+                Speedups
             </button>
             <button 
                 class="generator-tab-btn" 
                 class:active={activeTab === 'mge'} 
                 on:click={() => switchTab('mge')}
             >
-                Per MGE Points
+                MGE Points
+            </button>
+             <button 
+                class="generator-tab-btn" 
+                class:active={activeTab === 'prekvk'} 
+                on:click={() => switchTab('prekvk')}
+            >
+                Pre-KvK
             </button>
         </div>
 
@@ -436,8 +521,7 @@
                 </div>
                 <div class="collapsible-content" class:is-open={sectionOpen.t5}>
                     <div class="troop-grid t5-group">
-                        
-<div class="troop-item">
+                        <div class="troop-item">
                             <label for="t5-inf">Infantry</label>
                             <img src={images['t5_inf.webp']} alt="Infantry" />
                             <input id="t5-inf" type="text" placeholder="0" value={troopInputs.t5.infantry} on:input={(e) => handleInput(e, 't5', 'infantry')} use:autoFontSize={troopInputs.t5.infantry}>
@@ -534,7 +618,103 @@
             </div>
 
             <div class="dynamic-input-container">
-                {#if activeTab === 'speedups'}
+                {#if activeTab === 'prekvk'}
+                    <div class="form-group fade-in-panel">
+                        
+                        <span class="label-text">Points from Speedups</span>
+                         <div class="time-input-row" style="margin-bottom: 20px;">
+                            <div class="time-input-group"><input type="text" placeholder="0" value={speedupTime.d} on:input={(e) => handleSpeedupInput(e, 'd')}><span>Days</span></div>
+                            <div class="time-input-group"><input type="text" placeholder="0" value={speedupTime.h} on:input={(e) => handleSpeedupInput(e, 'h')}><span>Hours</span></div>
+                            <div class="time-input-group"><input type="text" placeholder="0" value={speedupTime.m} on:input={(e) => handleSpeedupInput(e, 'm')}><span>Mins</span></div>
+                        </div>
+
+                        <div class="collapse-group" style="margin-bottom: {reserveSectionOpen ? '0' : '-40px'}; transition: margin-bottom 0.3s ease;">
+                            <div class="label-with-toggle">
+                                <span class="label-text">When to start your reserves?</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" bind:checked={reserveSectionOpen}>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="collapsible-content" class:is-open={reserveSectionOpen}>
+                                <div class="reserve-container">
+                                    
+                                    <div class="reserve-grid">
+                                        <button 
+                                            class="reserve-btn t4" 
+                                            class:active={reserveSelection.tier === 't4' && reserveSelection.size === 20000}
+                                            on:click={() => setReserveSelection('t4', 20000)}
+                                        >
+                                            <div class="reserve-icon-wrapper">
+                                                <img src={images['20k_reserve.webp']} alt="20k" on:error={(e) => e.target.src = images['training_speedup.webp']}/>
+                                                <div class="reserve-badge t4">T4</div>
+                                            </div>
+                                            <span>20k</span>
+                                        </button>
+                                        
+                                        <button 
+                                            class="reserve-btn t4" 
+                                            class:active={reserveSelection.tier === 't4' && reserveSelection.size === 50000}
+                                            on:click={() => setReserveSelection('t4', 50000)}
+                                        >
+                                            <div class="reserve-icon-wrapper">
+                                                <img src={images['50k_reserve.webp']} alt="50k" on:error={(e) => e.target.src = images['training_speedup.webp']}/>
+                                                <div class="reserve-badge t4">T4</div>
+                                            </div>
+                                            <span>50k</span>
+                                        </button>
+
+                                        <button 
+                                            class="reserve-btn t5" 
+                                            class:active={reserveSelection.tier === 't5' && reserveSelection.size === 20000}
+                                            on:click={() => setReserveSelection('t5', 20000)}
+                                        >
+                                            <div class="reserve-icon-wrapper">
+                                                <img src={images['20k_reserve.webp']} alt="20k" on:error={(e) => e.target.src = images['training_speedup.webp']}/>
+                                                <div class="reserve-badge t5">T5</div>
+                                            </div>
+                                            <span>20k</span>
+                                        </button>
+
+                                        <button 
+                                            class="reserve-btn t5" 
+                                            class:active={reserveSelection.tier === 't5' && reserveSelection.size === 50000}
+                                            on:click={() => setReserveSelection('t5', 50000)}
+                                        >
+                                            <div class="reserve-icon-wrapper">
+                                                <img src={images['50k_reserve.webp']} alt="50k" on:error={(e) => e.target.src = images['training_speedup.webp']}/>
+                                                <div class="reserve-badge t5">T5</div>
+                                            </div>
+                                            <span>50k</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="date-trigger">
+                                        <label for="kvk-date">Training Stage Date (00:00 UTC)</label>
+                                        <button 
+                                            class="input-fake-wrapper" 
+                                            type="button" 
+                                            on:click={openDatePicker} 
+                                            on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && openDatePicker()}
+                                            aria-label="Open date picker"
+                                        >
+                                            <input 
+                                                type="date" 
+                                                id="kvk-date" 
+                                                bind:value={reserveTargetDate}
+                                                bind:this={dateInputRef}
+                                            >
+                                            <i class="fas fa-calendar-alt calendar-icon"></i>
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+
+                {:else if activeTab === 'speedups'}
                     <div class="form-group fade-in-panel">
                         <span class="label-text">Total Speedups Available</span>
                         <div class="time-input-row">
@@ -546,8 +726,7 @@
                 {:else if activeTab === 'mge'}
                     <div class="form-group fade-in-panel">
                         <span class="label-text">Desired Training Stage MGE Points</span>
-                        
-<div class="mge-input-row">
+                        <div class="mge-input-row">
                             <input 
                                 type="text" 
                                 class="standalone-input" 
@@ -569,7 +748,38 @@
             style="flex-direction: column; gap: 10px; padding: 20px; justify-content: center;"
         >
             {#if hasResult}
-                {#if activeTab === 'troops'}
+                
+                {#if activeTab === 'prekvk'}
+                    {#if reserveResultStr}
+                         <div style="text-align: center; margin-bottom: 10px; line-height: 1.4;">
+                            <span style="color: white; font-size: 1rem;"><img src={images['reserve_icon.webp']} alt="" style="height: 36px; vertical-align: middle; margin-right: 8px;"/>{@html reserveResultStr}</span>
+                        </div>
+                    {/if}
+                    
+                    {#if totalPreKvkPoints > 0}
+                         {#if reserveResultStr}<div class="result-divider"></div>{/if}
+                         <div class="stats-row">
+                            <div class="stat-item">
+                                <img src={images['prekvk_icon.webp']} alt="Pre-KvK" on:error={(e) => e.target.src = images['power_icon.webp']}/>
+                                <div class="stat-info">
+                                    <span class="stat-label">Pre-KvK Points</span>
+                                    <span class="stat-value" style="color: var(--accent-blue-bright);">{totalPreKvkPoints.toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <img src={images['troop_t5.webp']} alt="Troops" />
+                                <div class="stat-info">
+                                    <span class="stat-label">Total Troops</span>
+                                    <span class="stat-value" style="color: var(--accent-blue-bright);">{maxTroops.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                         <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">
+                            ({troopBreakdown.t4.toLocaleString()} T4 / {troopBreakdown.t5.toLocaleString()} T5 / {troopBreakdown.upgrade.toLocaleString()} Upgrades)
+                        </div>
+                    {/if}
+
+                {:else if activeTab === 'troops'}
                     <div class="cost-line" style="font-size: 1.2rem; margin-bottom: 5px;">
                         <img src={images['training_speedup.webp']} alt="Clock" style="height: 32px;"/>
                         <span>Time: <strong style="color: var(--accent-blue-bright);">{resultTime}</strong></span>
@@ -581,7 +791,26 @@
                         {#if totalRes.stone > 0} <div class="cost-line"><img src={images['stone.webp']} alt="Stone"/> <span>{formatNumber(totalRes.stone)}</span></div> {/if}
                         {#if totalRes.gold > 0} <div class="cost-line"><img src={images['gold.webp']} alt="Gold"/> <span>{formatNumber(totalRes.gold)}</span></div> {/if}
                     </div>
-                    {:else}
+                    
+                    <div class="result-divider"></div>
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <img src={images['power_icon.webp']} alt="Power" />
+                            <div class="stat-info">
+                                <span class="stat-label">Power Gained</span>
+                                <span class="stat-value" style="color: var(--accent-blue-bright);">{totalPower.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <img src={images['mge.webp']} alt="MGE" on:error={() => (event.target.style.display = 'none')}/>
+                            <div class="stat-info">
+                                <span class="stat-label">MGE Points</span>
+                                <span class="stat-value" style="color: var(--accent-blue-bright);">{totalMge.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                {:else}
                     <div class="cost-line" style="font-size: 1.2rem; margin-bottom: 5px; flex-direction: column; align-items: center; gap: 2px;">
                         {#if activeTab === 'mge'}
                             <div style="display: flex; align-items: center; gap: 5px;">
@@ -607,36 +836,36 @@
                             ({troopBreakdown.t4.toLocaleString()} T4 / {troopBreakdown.t5.toLocaleString()} T5 / {troopBreakdown.upgrade.toLocaleString()} Upgrades)
                         </div>
                     {/if}
-                {/if}
 
-                <div class="result-divider"></div>
-                <div class="stats-row">
-                    <div class="stat-item">
-                        <img src={images['power_icon.webp']} alt="Power" />
-                        <div class="stat-info">
-                            <span class="stat-label">Power Gained</span>
-                            <span class="stat-value" style="color: var(--accent-blue-bright);">{totalPower.toLocaleString()}</span>
+                    <div class="result-divider"></div>
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <img src={images['power_icon.webp']} alt="Power" />
+                            <div class="stat-info">
+                                <span class="stat-label">Power Gained</span>
+                                <span class="stat-value" style="color: var(--accent-blue-bright);">{totalPower.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            {#if activeTab === 'mge'}
+                                <img src={images['troop_t5.webp']} alt="Troops" />
+                                <div class="stat-info">
+                                    <span class="stat-label">Total Troops</span>
+                                    <span class="stat-value" style="color: var(--accent-blue-bright);">{maxTroops.toLocaleString()}</span>
+                                </div>
+                            {:else}
+                                <img src={images['mge.webp']} alt="MGE" on:error={() => (event.target.style.display = 'none')}/>
+                                <div class="stat-info">
+                                    <span class="stat-label">MGE Points</span>
+                                    <span class="stat-value" style="color: var(--accent-blue-bright);">{totalMge.toLocaleString()}</span>
+                                </div>
+                            {/if}
                         </div>
                     </div>
-                    
-                    <div class="stat-item">
-                        {#if activeTab === 'mge'}
-                            <img src={images['troop_t5.webp']} alt="Troops" />
-                            <div class="stat-info">
-                                <span class="stat-label">Total Troops</span>
-                                <span class="stat-value" style="color: var(--accent-blue-bright);">{maxTroops.toLocaleString()}</span>
-                            </div>
-                        {:else}
-                            <img src={images['mge.webp']} alt="MGE" on:error={() => (event.target.style.display = 'none')}/>
-                            <div class="stat-info">
-                                <span class="stat-label">MGE Points</span>
-                                <span class="stat-value" style="color: var(--accent-blue-bright);">{totalMge.toLocaleString()}</span>
-                            </div>
-                        {/if}
-                    </div>
-                </div>
+                {/if}
                 
-                {:else}
+            {:else}
                 <div style="opacity: 0;">&nbsp;</div>
             {/if}
         </div>
@@ -707,10 +936,7 @@
         border-radius: 2px;
     }
 
-    .mix-segment {
-        position: absolute;
-        top: 0; bottom: 0;
-    }
+    .mix-segment { position: absolute; top: 0; bottom: 0; }
 
     .mix-thumb {
         position: absolute;
@@ -726,20 +952,124 @@
         transition: transform 0.1s ease;
     }
 
-    .mix-thumb:hover {
-        transform: translateX(-50%) scale(1.1);
-        background: white;
-        cursor: grab;
-    }
+    .mix-thumb:hover { transform: translateX(-50%) scale(1.1); background: white; cursor: grab; }
+    .mix-thumb:active { cursor: grabbing; }
+    .mix-thumb::after { content: ''; position: absolute; top: -15px; bottom: -15px; left: -15px; right: -15px; }
 
-    .mix-thumb:active {
-        cursor: grabbing;
+    .reserve-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 5px;
+        background: var(--bg-card);
+        padding: 10px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
     }
     
-    .mix-thumb::after {
-        content: '';
+    .reserve-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .reserve-btn {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-hover);
+        border-radius: var(--radius-sm);
+        padding: 8px 4px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .reserve-btn:hover {
+        border-color: var(--text-secondary);
+        transform: translateY(-2px);
+    }
+
+    .reserve-icon-wrapper {
+        position: relative;
+    }
+    .reserve-icon-wrapper img {
+        height: 32px;
+        width: auto;
+    }
+    
+    .reserve-badge {
         position: absolute;
-        top: -15px; bottom: -15px;
-        left: -15px; right: -15px;
+        bottom: -2px;
+        right: -5px;
+        font-size: 9px;
+        font-weight: 700;
+        padding: 1px 3px;
+        border-radius: 3px;
+        color: white;
+        text-shadow: 0 1px 2px black;
+    }
+    .reserve-badge.t4 { background: #ca62e6; }
+    .reserve-badge.t5 { background: #f28d00; }
+
+    .reserve-btn span {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        z-index: 1;
+    }
+
+    .reserve-btn.t4.active {
+        border-color: #ca62e6;
+        background-image: radial-gradient(circle at center, rgba(202, 98, 230, 0.2) 0%, rgba(129, 19, 167, 0.4) 100%);
+    }
+    .reserve-btn.t4.active span { color: white; }
+    
+    .reserve-btn.t5.active {
+        border-color: #f28d00;
+        background-image: radial-gradient(circle at center, rgba(242, 141, 0, 0.2) 0%, rgba(213, 88, 0, 0.4) 100%);
+    }
+    .reserve-btn.t5.active span { color: white; }
+
+    .date-trigger {
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .date-trigger label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+    }
+    .input-fake-wrapper {
+        position: relative;
+        width: 100%;
+    }
+    .input-fake-wrapper input {
+        width: 100%;
+        padding: 10px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-hover);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        cursor: pointer;
+    }
+    .input-fake-wrapper .calendar-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+        .reserve-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 </style>
