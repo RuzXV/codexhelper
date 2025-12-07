@@ -6,7 +6,6 @@
     import ShiftModal from './ShiftModal.svelte';
     import RemoveModal from './RemoveModal.svelte';
     import CycleConfigModal from './CycleConfigModal.svelte';
-    
     const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', { eager: true });
 
     function getIconSrc(filename) {
@@ -27,7 +26,7 @@
     let useLocalTime = false;
     
     let isFilterOpen = false;
-    let activeFilters = []; 
+    let activeFilters = [];
     const ALL_EVENT_TYPES = Object.keys(eventConfigs.events);
     let eggRotationSettings = null;
     let modalState = {
@@ -36,19 +35,16 @@
         remove: false,
         cycle: false
     };
-
     const ROTATION_TYPES = ['holy_knights_treasure', 'hunt_for_history', 'egg_hammer'];
     const CYCLES = [
         "Helmet / Pants",
         "Weapon / Accessory",
         "Chest / Gloves / Boots"
     ];
-
     $: activeSeries = getUniqueSeries(events);
     $: year = viewDate.getUTCFullYear();
     $: month = viewDate.getUTCMonth();
     $: monthName = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(viewDate);
-    
     $: processedEvents = (() => {
         const allRotationEvents = events
             .filter(e => ROTATION_TYPES.includes(e.type))
@@ -76,7 +72,6 @@
                         let typeIndex = (eggRotationSettings.anchorCycleId + cycleSteps) % 3;
                         
                         if (typeIndex < 0) typeIndex = (typeIndex % 3 + 3) % 3;
-
                         displayTitle = `Holy Knight's Treasure - ${CYCLES[typeIndex]}`;
                         dynamicIcon = getIconSrc('egg.webp');
                     }
@@ -90,16 +85,13 @@
             };
         });
     })();
-
     $: filteredEvents = activeFilters.length > 0 
         ? processedEvents.filter(e => activeFilters.includes(e.type)) 
         : processedEvents;
-
     $: calendarCells = window.calendarUtils 
         ? window.calendarUtils.generateGrid(year, month, filteredEvents, eventConfigs, getIconSrc)
         : [];
-
-        onMount(async () => {
+    onMount(async () => {
         startClock();
         loadFilters();
         loadRotationSettings();
@@ -112,15 +104,12 @@
             fetchRotationSettingsFromAPI();
         });
     });
-
     onDestroy(() => {
         if (clockInterval) clearInterval(clockInterval);
         window.removeEventListener('auth:loggedIn', checkAdminStatus);
     });
-
     function handleGlobalClick(event) {
         selectedEventId = null;
-
         if (isFilterOpen && !event.target.closest('.filter-container')) {
             isFilterOpen = false;
         }
@@ -238,16 +227,13 @@
         
         let adjustedStart = new Date(start);
         let backsteps = 0;
-
         if (interval > 0 && adjustedStart > cutoffDate) {
             const diffTime = adjustedStart - cutoffDate;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             
             backsteps = Math.floor(diffDays / interval);
-
             if (backsteps > 0) {
                 adjustedStart.setUTCDate(adjustedStart.getUTCDate() - (backsteps * interval));
-                
                 if (troop_type && eventConfigs.troop_types) {
                     const types = eventConfigs.troop_types;
                     const currentIndex = types.indexOf(troop_type);
@@ -261,10 +247,8 @@
         }
         
         const finalStartDate = adjustedStart.toISOString().split('T')[0];
-
         const limitDate = new Date(Date.UTC(currentYear + 1, 11, 31)).toISOString().split('T')[0];
         const daysDiff = (new Date(limitDate) - new Date(finalStartDate)) / (1000 * 60 * 60 * 24);
-        
         let count = 1;
         if (interval > 0) {
             count = Math.floor(daysDiff / interval) + 1;
@@ -338,7 +322,6 @@
             } 
             else {
                 let eventsToUpdate = events.filter(ev => ev.series_id === seriesId);
-
                 if (scope === 'future') {
                     eventsToUpdate = eventsToUpdate.filter(ev => ev.start_date >= anchorDate);
                 } else if (scope === 'single') {
@@ -366,7 +349,6 @@
                         })
                     });
                 });
-
                 await Promise.all(updatePromises);
                 window.showAlert(`Successfully shifted ${eventsToUpdate.length} events.`);
             }
@@ -404,7 +386,6 @@
         hex = hex.replace(shorthandRegex, function(m, r, g, b) {
             return r + r + g + g + b + b;
         });
-
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
             r: parseInt(result[1], 16),
@@ -424,7 +405,6 @@
     
     function getDisplayDate(dateStr) {
         const d = new Date(dateStr + 'T00:00:00Z');
-        
         return d.toLocaleDateString('en-GB', { 
             weekday: 'short', 
             day: 'numeric', 
@@ -448,7 +428,6 @@
 
     function handleKeydown(e) {
         if (modalState.add || modalState.shift || modalState.remove || e.target.tagName === 'INPUT') return;
-
         if (e.key === 'ArrowLeft') changeMonth(-1);
         if (e.key === 'ArrowRight') changeMonth(1);
         if (e.key === 't') jumpToToday();
@@ -456,7 +435,6 @@
 
     let touchStartX = 0;
     let touchEndX = 0;
-
     function handleTouchStart(e) {
         touchStartX = e.changedTouches[0].screenX;
     }
@@ -486,7 +464,8 @@
                 eggRotationSettings = res;
                 localStorage.setItem('calendar_egg_rotation', JSON.stringify(res));
             }
-        } catch (e) { console.error("Failed to load settings", e); }
+        } catch (e) { console.error("Failed to load settings", e);
+        }
     }
 
     async function handleSaveRotation(e) {
@@ -523,19 +502,6 @@
     <div class="tool-hero-container">
         <div class="section-badge">Community Tools</div>
         <h1>Event Calendar</h1>
-        
-        <div class="clock-toggle-wrapper">
-            <div class="utc-clock">{clockTime}</div>
-            <button 
-                class="time-toggle-btn" 
-                class:active={useLocalTime}
-                on:click={() => useLocalTime = !useLocalTime}
-                title={useLocalTime ? "Switch to Game Time (UTC)" : "Switch to Local Time"}
-            >
-                <i class="fas" class:fa-globe={!useLocalTime} class:fa-home={useLocalTime}></i>
-                {useLocalTime ? 'Local' : 'UTC'}
-            </button>
-        </div>
     </div>
 </section>
 
@@ -543,37 +509,18 @@
     <div class="tool-container calendar-container">
         
         <div class="calendar-header-card">
-            <div class="filter-container">
-                <button class="nav-btn filter-btn" on:click={() => isFilterOpen = !isFilterOpen} title="Filter Events">
-                    <i class="fas fa-filter"></i>
-                    {#if activeFilters.length > 0}<span class="filter-badge">{activeFilters.length}</span>{/if}
+            
+            <div class="clock-toggle-wrapper">
+                <div class="utc-clock">{clockTime}</div>
+                <button 
+                    class="time-toggle-btn" 
+                    class:active={useLocalTime}
+                    on:click={() => useLocalTime = !useLocalTime}
+                    title={useLocalTime ? "Switch to Game Time (UTC)" : "Switch to Local Time"}
+                >
+                    <i class="fas" class:fa-globe={!useLocalTime} class:fa-home={useLocalTime}></i>
+                    {useLocalTime ? 'Local' : 'UTC'}
                 </button>
-                
-                {#if isFilterOpen}
-                    <div class="filter-dropdown" transition:slide={{duration: 200}}>
-                        <div class="filter-header">
-                            <span>Filter Events</span>
-                            {#if activeFilters.length > 0}
-                                <button class="clear-btn" on:click={clearFilters}>Clear</button>
-                            {/if}
-                        </div>
-    
-                        <div class="filter-list">
-                            {#each ALL_EVENT_TYPES as type}
-                                <label class="filter-item">
-                                    <input type="checkbox" 
-                                           checked={activeFilters.includes(type)}
-                                           on:change={() => toggleFilter(type)}>
-                                    <span class="checkmark" style="--evt-color: {eventConfigs.events[type].color_hex}"></span>
-                                    {#if eventConfigs.events[type].icon}
-                                        <img src={getIconSrc(eventConfigs.events[type].icon)} alt="" class="filter-list-icon" />
-                                    {/if}
-                                    {eventConfigs.events[type].title}
-                                </label>
-                            {/each}
-                        </div>
-                    </div>
-                {/if}
             </div>
 
             <div class="nav-controls">
@@ -587,12 +534,45 @@
             </div>
 
             <div class="right-controls">
+                <div class="filter-container">
+                    <button class="nav-btn filter-btn" on:click={() => isFilterOpen = !isFilterOpen} title="Filter Events">
+                        <i class="fas fa-filter"></i>
+                        {#if activeFilters.length > 0}<span class="filter-badge">{activeFilters.length}</span>{/if}
+                    </button>
+                    
+                    {#if isFilterOpen}
+                        <div class="filter-dropdown" transition:slide={{duration: 200}}>
+                            <div class="filter-header">
+                                <span>Filter Events</span>
+                                {#if activeFilters.length > 0}
+                                    <button class="clear-btn" on:click={clearFilters}>Clear</button>
+                                {/if}
+                            </div>
+        
+                            <div class="filter-list">
+                                {#each ALL_EVENT_TYPES as type}
+                                    <label class="filter-item">
+                                        <input type="checkbox" 
+                                            checked={activeFilters.includes(type)}
+                                            on:change={() => toggleFilter(type)}>
+                                        <span class="checkmark" style="--evt-color: {eventConfigs.events[type].color_hex}"></span>
+                                        {#if eventConfigs.events[type].icon}
+                                            <img src={getIconSrc(eventConfigs.events[type].icon)} alt="" class="filter-list-icon" />
+                                        {/if}
+                                        {eventConfigs.events[type].title}
+                                    </label>
+                                {/each}
+                            </div>
+                        </div>
+                    {/if}
+                </div>
+
                 <button class="today-btn" on:click={jumpToToday}>Today</button>
             
                 <button class="nav-btn" on:click={() => modalState.cycle = true} title="Configure Rotation" style="font-size: 1rem;">
                     <i class="fas fa-sync-alt"></i>
                 </button>
-                
+            
                 {#if isAdmin}
                     <div class="admin-panel">
                         <button class="admin-btn add" on:click={() => modalState.add = true} aria-label="Add">
@@ -631,12 +611,12 @@
                                         <div 
                                             class="event-bar" 
                                             class:start={event.isStart}
-                                            class:row-start={event.isRowStart}  class:end={event.isEnd}             class:row-end={event.isRowEnd}      class:middle={!event.isStart && !event.isRowStart && !event.isEnd && !event.isRowEnd}
+                                            class:row-start={event.isRowStart}  class:end={event.isEnd}            
+                                            class:row-end={event.isRowEnd}      class:middle={!event.isStart && !event.isRowStart && !event.isEnd && !event.isRowEnd}
                                             class:temp-optimistic={event.isTemp}
                                             class:selected={selectedEventId === event.id}
                                             class:dimmed={hoveredSeriesId && hoveredSeriesId !== event.series_id}
                                             class:highlighted={hoveredSeriesId === event.series_id}
-                                            
                                             in:fly={{ y: 10, duration: 300, delay: (cIndex * 10) + (i * 20) }}
                                             on:mouseenter={() => hoveredSeriesId = event.series_id}
                                             on:mouseleave={() => hoveredSeriesId = null}
@@ -740,7 +720,7 @@
                     </div>
                 </div>
             {/each}
-             {#if calendarCells.filter(c => c.events.some(e => e !== null) && !c.isOtherMonth).length === 0}
+            {#if calendarCells.filter(c => c.events.some(e => e !== null) && !c.isOtherMonth).length === 0}
                 <div class="empty-state">No events found for this month.</div>
             {/if}
         </div>
@@ -780,7 +760,7 @@
     .calendar-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
     .tool-hero { 
         padding-top: 5px;
-        padding-bottom: 20px;
+        padding-bottom: 0;
     }
     
     .clock-toggle-wrapper {
@@ -791,12 +771,12 @@
         padding: 4px;
         border-radius: 10px;
         border: 1px solid var(--border-color);
-        margin-top: 10px;
     }
 
     .utc-clock {
         font-family: 'Monaco', monospace;
-        font-size: 1.1rem; color: var(--accent-blue-bright);
+        font-size: 0.95rem;
+        color: var(--accent-blue-bright);
         padding: 6px 12px;
     }
 
@@ -813,7 +793,8 @@
         gap: 6px;
         transition: all 0.2s;
     }
-    .time-toggle-btn:hover { color: white; background: rgba(255, 255, 255, 0.1); }
+    .time-toggle-btn:hover { color: white; background: rgba(255, 255, 255, 0.1);
+    }
     .time-toggle-btn.active {
         background: var(--accent-blue);
         color: white;
@@ -833,23 +814,38 @@
         z-index: 200;
     }
     
-    .nav-controls { display: flex; align-items: center; gap: 16px; flex-grow: 1; justify-content: center; }
+    .nav-controls { 
+        display: flex; 
+        align-items: center; 
+        gap: 16px; 
+        justify-content: center;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+    }
+    
     .nav-controls h2 { margin: 0; font-size: 1.5rem; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1px;
-        min-width: 250px; text-align: center; }
-    .nav-controls .year { color: var(--text-secondary); font-weight: 400; }
+    min-width: 250px; text-align: center; }
+    .nav-controls .year { color: var(--text-secondary); font-weight: 400;
+    }
     
     .nav-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer;
-        padding: 8px; transition: color 0.2s; }
-    .nav-btn:hover { color: white; }
+    padding: 8px; transition: color 0.2s; }
+    .nav-btn:hover { color: white;
+    }
 
-    .right-controls { display: flex; align-items: center; gap: 12px; }
+    .right-controls { display: flex; align-items: center; gap: 12px;
+    }
     .today-btn {
         background: var(--bg-tertiary); color: var(--text-primary);
         border: 1px solid var(--border-color); padding: 6px 12px;
         border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem;
         transition: all 0.2s;
     }
-    .today-btn:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+    .today-btn:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue);
+    }
 
     .admin-panel {
         display: flex; align-items: center; gap: 8px;
@@ -861,22 +857,30 @@
         align-items: center; justify-content: center;
         border-radius: 6px; font-size: 0.9rem; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
     }
-    .admin-btn.add { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
-    .admin-btn.add:hover { background: var(--accent-blue); color: white; }
-    .admin-btn.shift { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
-    .admin-btn.shift:hover { background: rgba(255, 255, 255, 0.2); }
-    .admin-btn.remove { background: rgba(239, 68, 68, 0.1); color: #fca5a5; }
-    .admin-btn.remove:hover { background: rgba(239, 68, 68, 0.8); color: white; }
+    .admin-btn.add { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);
+    }
+    .admin-btn.add:hover { background: var(--accent-blue); color: white;
+    }
+    .admin-btn.shift { background: rgba(255, 255, 255, 0.1); color: var(--text-primary);
+    }
+    .admin-btn.shift:hover { background: rgba(255, 255, 255, 0.2);
+    }
+    .admin-btn.remove { background: rgba(239, 68, 68, 0.1); color: #fca5a5;
+    }
+    .admin-btn.remove:hover { background: rgba(239, 68, 68, 0.8); color: white;
+    }
 
     .filter-container { position: relative; }
-    .filter-btn { display: flex; align-items: center; gap: 5px; position: relative; }
+    .filter-btn { display: flex; align-items: center; gap: 5px;
+    position: relative; }
     .filter-badge { background: var(--accent-blue); color: white; font-size: 0.7rem; border-radius: 50%; width: 16px; height: 16px;
-        display: flex; align-items: center; justify-content: center; position: absolute; top: 0; right: 0;
+    display: flex; align-items: center; justify-content: center; position: absolute; top: 0; right: 0;
     }
     
     .filter-dropdown {
         position: absolute;
-        top: 100%; left: 0; z-index: 1001;
+        top: 100%; right: 0;
+        z-index: 1001;
         background: var(--bg-tertiary); border: 1px solid var(--border-color);
         border-radius: 8px; width: 280px;
         padding: 10px;
@@ -896,27 +900,32 @@
     }
     
     .clear-btn { background: none; border: none; color: var(--text-muted); font-size: 0.8rem; cursor: pointer;
-        text-decoration: underline; padding: 0; margin: 0; line-height: 1; }
+    text-decoration: underline; padding: 0; margin: 0; line-height: 1; }
     .filter-list { max-height: 300px; overflow-y: auto; display: flex;
-        flex-direction: column; gap: 5px; }
+    flex-direction: column; gap: 5px; }
     
     .filter-item { display: flex; align-items: center; gap: 8px;
-        padding: 5px; cursor: pointer; font-size: 0.9rem; color: var(--text-primary); }
-    .filter-item input { display: none; }
-    .filter-list-icon { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
+    padding: 5px; cursor: pointer; font-size: 0.9rem; color: var(--text-primary); }
+    .filter-item input { display: none;
+    }
+    .filter-list-icon { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0;
+    }
     .checkmark { width: 12px; height: 12px; border-radius: 2px; border: 1px solid var(--text-muted); background: transparent; position: relative;
-        flex-shrink: 0; }
-    .filter-item input:checked + .checkmark { background: var(--evt-color); border-color: var(--evt-color); }
+    flex-shrink: 0; }
+    .filter-item input:checked + .checkmark { background: var(--evt-color); border-color: var(--evt-color);
+    }
 
     .calendar-card { 
         background: var(--bg-secondary); 
-        border: 1px solid var(--border-color); 
+        border: 1px solid var(--border-color);
         border-radius: 0 0 12px 12px; 
         overflow: visible;
     }
-    .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--bg-tertiary); padding: 10px 0; border-top: 1px solid var(--border-color);
+    .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--bg-tertiary);
+    padding: 10px 0; border-top: 1px solid var(--border-color);
         border-bottom: 1px solid var(--border-color); }
-    .weekdays div { text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+    .weekdays div { text-align: center;
+    color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
     
     .grid { 
         display: grid;
@@ -942,7 +951,8 @@
         box-shadow: none;
         z-index: auto;
     }
-    .day-cell.other-month { background-color: #0f1012; }
+    .day-cell.other-month { background-color: #0f1012;
+    }
     .day-cell.other-month .day-number { opacity: 0.3; }
     
     .day-number { 
@@ -951,7 +961,7 @@
         width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
     }
     .day-cell.today .day-number { 
-        background: linear-gradient(135deg, var(--accent-blue-bright), var(--accent-blue)); 
+        background: linear-gradient(135deg, var(--accent-blue-bright), var(--accent-blue));
         color: white;
         border-radius: 50%;
         box-shadow: 0 0 0 3px var(--bg-secondary), 0 0 15px var(--accent-blue);
@@ -961,30 +971,33 @@
         z-index: 20;
     }
 
-    .day-cell.skeleton-loading { pointer-events: none; }
+    .day-cell.skeleton-loading { pointer-events: none;
+    }
     .day-cell.skeleton-loading::before {
-        content: ""; position: absolute; inset: 10px; border-radius: 4px;
+        content: ""; position: absolute; inset: 10px;
+        border-radius: 4px;
         background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 100%);
         background-size: 200% 100%;
         animation: shimmer 1.5s infinite linear;
     }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0;
+    } }
 
-    .event-stack { display: flex; flex-direction: column; gap: 2px; width: 100%; margin-top: 2px; }
+    .event-stack { display: flex; flex-direction: column; gap: 2px; width: 100%; margin-top: 2px;
+    }
     
     .event-bar {
         height: 24px;
         font-size: 0.75rem; color: white; display: flex; align-items: center; padding: 0 4px;
         white-space: nowrap; overflow: visible; position: relative; 
         
-        margin: 1px -1px; 
+        margin: 1px -1px;
         border-radius: 0;
         
         border-top: 1px solid rgba(255, 255, 255, 0.4);
         border-bottom: 1px solid rgba(255, 255, 255, 0.4);
         border-left: none;
         border-right: none;
-        
         backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
         
         cursor: pointer;
@@ -992,10 +1005,11 @@
         transition: opacity 0.2s, filter 0.2s;
     }
 
-    .event-bar.dimmed { opacity: 0.2; filter: grayscale(1); }
+    .event-bar.dimmed { opacity: 0.2; filter: grayscale(1);
+    }
     .event-bar.highlighted { 
         opacity: 1; 
-        filter: brightness(1.3) contrast(1.1); 
+        filter: brightness(1.3) contrast(1.1);
         z-index: 50;
     }
 
@@ -1008,29 +1022,32 @@
     }
 
     .event-bar.start { 
-        border-top-left-radius: 6px; border-bottom-left-radius: 6px; 
+        border-top-left-radius: 6px; border-bottom-left-radius: 6px;
         border-left: 1px solid rgba(255, 255, 255, 0.4);
         margin-left: 6px;
     }
     .event-bar.end { 
-        border-top-right-radius: 6px; border-bottom-right-radius: 6px; 
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px; 
         border-right: 1px solid rgba(255, 255, 255, 0.4);
         margin-right: 6px;
     }
     
-    .event-bar.temp-optimistic { opacity: 0.7; filter: grayscale(0.3); }
+    .event-bar.temp-optimistic { opacity: 0.7; filter: grayscale(0.3);
+    }
     
     .event-content { 
-        display: flex; 
+        display: flex;
         align-items: center; 
         width: 100%; 
         overflow: visible; 
         position: relative; 
         height: 100%;
     }
-    .event-icon { width: 16px; height: 16px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); flex-shrink: 0; }
+    .event-icon { width: 16px; height: 16px;
+    object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); flex-shrink: 0; }
     .event-title { 
-        font-weight: 600; 
+        font-weight: 600;
         text-shadow: 0 1px 2px rgba(0,0,0,0.5); 
         
         position: absolute;
@@ -1045,18 +1062,21 @@
     }
 
     .event-tooltip {
-        display: none; position: absolute; bottom: 100%;
+        display: none;
+        position: absolute; bottom: 100%;
         left: 50%; transform: translateX(-50%);
         background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px;
-        padding: 10px; min-width: 180px; z-index: 50;
+        padding: 10px; min-width: 180px;
+        z-index: 50;
         box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         margin-bottom: 8px; pointer-events: none;
     }
     .event-bar:hover .event-tooltip,
-    .event-bar.selected .event-tooltip { display: block; pointer-events: auto; }
+    .event-bar.selected .event-tooltip { display: block; pointer-events: auto;
+    }
     .event-bar.start, 
     .event-bar.row-start {
-        z-index: 160 !important; 
+        z-index: 160 !important;
     }
     
     .event-bar.middle, 
@@ -1077,37 +1097,60 @@
     }
     
     .tooltip-header { display: flex; align-items: center; gap: 8px;
-        border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; }
-    .tooltip-header img { width: 20px; height: 20px; }
-    .tooltip-body p { margin: 2px 0; color: var(--text-secondary); font-size: 0.8rem; }
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; }
+    .tooltip-header img { width: 20px; height: 20px;
+    }
+    .tooltip-body p { margin: 2px 0; color: var(--text-secondary); font-size: 0.8rem;
+    }
     .time-info { color: var(--accent-blue-bright) !important; font-weight: 500; }
 
-    .guide-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; color: var(--accent-blue); font-weight: 600; text-decoration: none;
-        font-size: 0.8rem; display: block; }
+    .guide-link { display: inline-flex;
+    align-items: center; gap: 5px; margin-top: 5px; color: var(--accent-blue); font-weight: 600; text-decoration: none;
+        font-size: 0.8rem; display: block;
+    }
     .guide-link:hover { text-decoration: underline; }
 
-    .mobile-list-view { display: none; background: var(--bg-secondary); border-radius: 0 0 12px 12px; padding: 10px; }
-    .mobile-day-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; padding: 10px; }
-    .mobile-day-card.today-card { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.03); }
-    .mobile-date-header { font-weight: bold; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 10px; }
-    .mobile-event-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-tertiary); padding: 8px 12px; margin-bottom: 5px; border-radius: 4px; }
+    .mobile-list-view { display: none; background: var(--bg-secondary);
+    border-radius: 0 0 12px 12px; padding: 10px; }
+    .mobile-day-card { background: var(--bg-primary); border: 1px solid var(--border-color);
+    border-radius: 8px; margin-bottom: 10px; padding: 10px; }
+    .mobile-day-card.today-card { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.03);
+    }
+    .mobile-date-header { font-weight: bold; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 10px;
+    }
+    .mobile-event-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-tertiary); padding: 8px 12px; margin-bottom: 5px;
+    border-radius: 4px; }
     .mobile-event-info { display: flex; flex-direction: column; }
-    .mobile-event-title { font-weight: 600; color: var(--text-primary); }
+    .mobile-event-title { font-weight: 600;
+    color: var(--text-primary); }
     .mobile-troop-badge { font-size: 0.75rem; color: var(--text-muted); }
-    .mobile-time-badge { font-size: 0.7rem; color: var(--accent-blue); margin-top: 2px; }
-    .mobile-actions { display: flex; gap: 8px; }
+    .mobile-time-badge { font-size: 0.7rem;
+    color: var(--accent-blue); margin-top: 2px; }
+    .mobile-actions { display: flex; gap: 8px;
+    }
     .mobile-guide-btn { color: var(--accent-blue); padding: 5px; font-size: 1.1rem; }
-    .empty-state { padding: 20px; text-align: center; color: var(--text-muted); }
+    .empty-state { padding: 20px;
+    text-align: center; color: var(--text-muted); }
 
     @media (max-width: 768px) {
         .calendar-header-card { 
-            flex-direction: row; flex-wrap: wrap; align-items: center; padding: 12px;
+            flex-direction: row;
+            flex-wrap: wrap; align-items: center; padding: 12px;
         }
-        .nav-controls { order: 1; width: 100%; margin-bottom: 10px; }
-        .filter-container { order: 2; align-self: center; }
-        .right-controls { order: 3; width: auto; flex-grow: 1; justify-content: flex-end; }
+        .nav-controls { 
+            order: 1; 
+            width: 100%;
+            margin-bottom: 10px;
+            position: static;
+            transform: none;
+        }
+        .clock-toggle-wrapper { order: 2; width: auto; flex-grow: 1; }
+        .right-controls { order: 3; width: auto; justify-content: flex-end;
+        }
         
-        .desktop-view { display: none; }
+        .desktop-view { display: none;
+        }
         .mobile-list-view { display: block; }
     }
 </style>
