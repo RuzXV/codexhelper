@@ -150,8 +150,8 @@
 
     .sub-nav-container {
         display: flex;
-        justify-content: space-between; 
-        gap: var(--spacing-2, 10px); 
+        justify-content: space-evenly; 
+        align-items: center;
         width: 100%;
         padding: 0 2rem;
     }
@@ -160,11 +160,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        flex: 1;
+        flex: 0 1 auto; 
         gap: 8px;
         text-decoration: none;
         color: inherit;
         transition: opacity 0.2s;
+        padding: 0 10px; 
     }
 
     .sub-nav-link:hover {
