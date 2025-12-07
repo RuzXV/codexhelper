@@ -183,13 +183,13 @@
 
     .santa-hat {
         position: absolute;
-        top: -15px;
-        left: -5px;
-        width: 45px;
+        left: 7px; 
+        top: -5px; 
+        transform: rotate(-5deg);
+        width: 30px;
         height: auto;
         z-index: 10;
         pointer-events: none;
-        transform: rotate(-10deg);
     }
 
     @media (max-width: 768px) {
