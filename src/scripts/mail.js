@@ -438,6 +438,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let html = '';
         let lastIndex = 0;
+        const renderStack = [];
         
         tagRegex.lastIndex = 0;
         while ((match = tagRegex.exec(text)) !== null) {
@@ -455,21 +456,44 @@ document.addEventListener('DOMContentLoaded', function() {
             }
     
             if (isClosing) {
-                if (tagName === 'b') html += '</strong>';
-                else if (tagName === 'i') html += '</em>';
-                else html += '</span>';
+                const state = renderStack.pop();
+                
+                if (state && state.status === 'invalid') {
+                    html += `<span class="error-underline">${escapeHtml(fullTag)}</span>`;
+                } else if (state && state.status === 'ignored') {
+                } else {
+                    if (tagName === 'b') html += '</strong>';
+                    else if (tagName === 'i') html += '</em>';
+                    else html += '</span>';
+                }
             } else {
-                if (tagName === 'b') html += '<strong>';
-                else if (tagName === 'i') html += '<em>';
+                if (tagName === 'b') {
+                    html += '<strong>';
+                    renderStack.push({ status: 'valid' });
+                }
+                else if (tagName === 'i') {
+                    html += '<em>';
+                    renderStack.push({ status: 'valid' });
+                }
                 else if (tagName === 'size' && tagValue) {
                     const scaledSize = Math.max(parseFloat(tagValue) * 0.55, 1);
                     html += `<span style="font-size: ${scaledSize}px;">`;
+                    renderStack.push({ status: 'valid' });
                 } else if (tagName === 'color' && tagValue) {
                     let finalColor = tagValue.replace(/"/g, '').replace(/=/g, '');
+                    
                     if (!finalColor.startsWith('#') && /^[a-fA-F0-9]{6}$/.test(finalColor)) {
-                        finalColor = '#' + finalColor;
+                        html += `<span class="error-underline">${escapeHtml(fullTag)}</span>`;
+                        renderStack.push({ status: 'invalid' });
+                    } else {
+                        if (!finalColor.startsWith('#') && /^[a-fA-F0-9]{6}$/.test(finalColor)) {
+                            finalColor = '#' + finalColor;
+                        }
+                        html += `<span style="color: ${finalColor};">`;
+                        renderStack.push({ status: 'valid' });
                     }
-                    html += `<span style="color: ${finalColor};">`;
+                } else {
+                    renderStack.push({ status: 'ignored' });
                 }
             }
         }
