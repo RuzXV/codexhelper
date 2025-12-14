@@ -7,6 +7,7 @@ import { encryptFernetToken, decryptFernetToken } from '../crypto';
 type Bindings = {
     DB: D1Database;
     API_CACHE: KVNamespace;
+    BOT_DATA: KVNamespace;
     WEBSITE_APP_ID: string;
     WEBSITE_APP_SECRET: string;
     DB_ENCRYPTION_KEY: string;
@@ -66,6 +67,11 @@ const EVENT_COLOR_MAP: Record<string, string> = {
     "ark_registration": "6",
     "olympia": "5"          // Gold/Yellow (Banana)
 };
+
+const MASTER_ADMIN_IDS = [
+    '285201373266575361', 
+    '388515288666210313'
+];
 
 app.use('/api/*', cors({
     origin: [
@@ -329,6 +335,14 @@ const botAuthMiddleware = async (c: Context, next: Next) => {
     const secret = c.req.header('X-Internal-Secret');
     if (secret !== c.env.BOT_SECRET_KEY) {
         return c.json({ error: 'Unauthorized: Invalid secret key' }, 401);
+    }
+    await next();
+};
+
+const masterAdminMiddleware = async (c: Context, next: Next) => {
+    const user = c.get('user');
+    if (!user || !MASTER_ADMIN_IDS.includes(user.id)) {
+        return c.json({ error: 'Unauthorized: Master Admin access required' }, 403);
     }
     await next();
 };
@@ -960,6 +974,38 @@ app.post('/api/users/settings', authMiddleware, async (c) => {
     ).bind(user.id, JSON.stringify(body)).run();
 
     return c.json({ status: 'success' });
+});
+
+app.get('/api/data/:key', async (c) => {
+    const key = c.req.param('key');
+    const secret = c.req.header('X-Internal-Secret');
+    const user = c.get('user');
+
+    const isBot = secret === c.env.BOT_SECRET_KEY;
+    const isAdmin = user && MASTER_ADMIN_IDS.includes(user.id);
+
+    if (!isBot && !isAdmin) {
+        const sessionToken = getCookie(c, 'session_token');
+        if (sessionToken) {
+             const session = await c.env.DB.prepare('SELECT user_id FROM user_sessions WHERE session_token = ?').bind(sessionToken).first();
+             if (session && MASTER_ADMIN_IDS.includes(session.user_id as string)) {
+             } else {
+                 return c.json({ error: 'Unauthorized' }, 401);
+             }
+        } else {
+             return c.json({ error: 'Unauthorized' }, 401);
+        }
+    }
+
+    const data = await c.env.BOT_DATA.get(key, 'json');
+    return c.json(data || {}); 
+});
+
+app.post('/api/admin/data/:key', authMiddleware, masterAdminMiddleware, async (c) => {
+    const key = c.req.param('key');
+    const body = await c.req.json();
+    await c.env.BOT_DATA.put(key, JSON.stringify(body));
+    return c.json({ status: 'success', message: `Updated ${key}` });
 });
 
 export const onRequest = handle(app);

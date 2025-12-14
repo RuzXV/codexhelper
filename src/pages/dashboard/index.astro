@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DashboardMain from '../../components/dashboard/DashboardMain.svelte';
+---
+
+<Layout title="Codex Admin Dashboard">
+    <div class="dashboard-wrapper">
+        <DashboardMain client:only="svelte" />
+    </div>
+</Layout>
+
+<style>
+    .dashboard-wrapper {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+</style>
