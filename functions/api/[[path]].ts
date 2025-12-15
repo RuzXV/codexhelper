@@ -1001,10 +1001,28 @@ app.get('/api/data/:key', async (c) => {
     return c.json(data || {}); 
 });
 
+app.post('/api/bot/seed/:key', botAuthMiddleware, async (c) => {
+    const key = c.req.param('key');
+    const body = await c.req.json();
+    
+    await c.env.BOT_DATA.put(key, JSON.stringify(body));
+    
+    return c.json({ status: 'success', message: `Seeded ${key}` });
+});
+
+app.get('/api/data/version', async (c) => {
+    const version = await c.env.BOT_DATA.get('data_version');
+    return c.json({ version: version || "0" });
+});
+
 app.post('/api/admin/data/:key', authMiddleware, masterAdminMiddleware, async (c) => {
     const key = c.req.param('key');
     const body = await c.req.json();
+
     await c.env.BOT_DATA.put(key, JSON.stringify(body));
+
+    await c.env.BOT_DATA.put('data_version', Date.now().toString());
+
     return c.json({ status: 'success', message: `Updated ${key}` });
 });
 

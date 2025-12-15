@@ -41,18 +41,92 @@
             }
         }
 
+        const isSubscribed = user.is_active_patron;
+        let dropdownContent = '';
+
+        if (isSubscribed) {
+            dropdownContent = `
+                <a href="/dashboard" class="dropdown-item">
+                    <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                </a>
+                <div class="dropdown-item logout-trigger">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </div>
+            `;
+        } else {
+            dropdownContent = `
+                <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="dropdown-item">
+                    <i class="fab fa-patreon" style="color: #FF424D;"></i> <span>Subscribe</span>
+                </a>
+                <div class="dropdown-item logout-trigger">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </div>
+            `;
+        }
+
         container.innerHTML = `
-            <div class="user-profile">
-                <img src="${avatarUrl}" alt="Profile Picture" class="profile-pic">
-                <span class="username">${user.display_name || user.global_name || user.username}</span>
-                <button class="logout-btn" title="Logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
+            <div class="user-profile relative-container" style="position: relative; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 5px 12px 5px 5px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
+                <img src="${avatarUrl}" alt="Profile" class="profile-pic" style="width: 32px; height: 32px; border-radius: 50%;">
+                <span class="username" style="font-weight: 600; font-size: 0.9rem;">${user.display_name || user.global_name || user.username}</span>
+                <i class="fas fa-chevron-down dropdown-arrow" style="font-size: 0.8rem; opacity: 0.7; transition: transform 0.2s;"></i>
+                
+                <div class="user-dropdown hidden" style="position: absolute; top: 115%; right: 0; background: #1a1b1e; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; min-width: 160px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 1000; display: none;">
+                    ${dropdownContent}
+                </div>
             </div>
         `;
-        container.querySelector('.logout-btn').addEventListener('click', logout);
+
+        const profileContainer = container.querySelector('.user-profile');
+        const dropdown = container.querySelector('.user-dropdown');
+        const arrow = container.querySelector('.dropdown-arrow');
+        const logoutBtn = container.querySelector('.logout-trigger');
+
+        profileContainer.addEventListener('click', (e) => {
+            if (e.target.closest('.dropdown-item') && !e.target.closest('.logout-trigger')) return;
+            
+            e.stopPropagation();
+            const isHidden = dropdown.style.display === 'none';
+            dropdown.style.display = isHidden ? 'block' : 'none';
+            arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        });
+
+        logoutBtn.addEventListener('click', logout);
+
+        document.addEventListener('click', (e) => {
+            if (!profileContainer.contains(e.target)) {
+                dropdown.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        });
         
         document.dispatchEvent(new CustomEvent('auth:loggedIn', { detail: { user } }));
+        
+        if (!document.getElementById('auth-dropdown-styles')) {
+            const style = document.createElement('style');
+            style.id = 'auth-dropdown-styles';
+            style.textContent = `
+                .dropdown-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 12px 16px;
+                    color: #ccc;
+                    text-decoration: none;
+                    transition: background 0.2s;
+                    cursor: pointer;
+                    font-size: 0.9rem;
+                }
+                .dropdown-item:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                    color: white;
+                }
+                .dropdown-item i {
+                    width: 20px;
+                    text-align: center;
+                }
+            `;
+            document.head.appendChild(style);
+        }
     }
 
     function cacheUser(user) {
