@@ -259,15 +259,18 @@
     
     .diff-old, .diff-new { font-size: 0.85rem; color: #dcddde;
     }
+
     .diff-old pre, .diff-new pre { 
         margin: 0;
-        white-space: pre-wrap; word-break: break-word; font-family: monospace; 
-        background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px;
-        color: #b9bbbe;
+        white-space: pre-wrap; 
+        word-break: break-word; 
+        font-family: monospace; 
+        background: rgba(0,0,0,0.2); 
+        padding: 6px; 
+        border-radius: 4px;
+        
+        color: #ffffff;  
     }
-    
-    .diff-old pre { color: #ff9999; }
-    .diff-new pre { color: #99ff99; }
 
     .tag-new { color: #4ade80; font-style: italic; opacity: 0.8; }
     .tag-deleted { color: #ef4444; font-style: italic; opacity: 0.8; }
