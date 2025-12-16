@@ -17,6 +17,8 @@
     const BULLET_STRING = `<:bullet_point3:${BULLET_ID}>`;
     const BULLET_IMG_URL = `https://cdn.discordapp.com/emojis/${BULLET_ID}.png`;
 
+    const SEPARATOR = '\u3021';
+
     let title = "";
     let imageUrl = "";
     let color = "#00c6ff";
@@ -49,7 +51,7 @@
         
         let text = "";
         if (c1) text += `${c1.name} <:${c1.key}:${c1.emoji}>`;
-        if (c2) text += ` | ${c2.name} <:${c2.key}:${c2.emoji}>`;
+        if (c2) text += ` ${SEPARATOR} ${c2.name} <:${c2.key}:${c2.emoji}>`;
         
         return text || "Empty Row";
     }
@@ -79,8 +81,8 @@
                         .map(c => c.key);
 
                     if (foundKeys.length === 0) {
-                        const cleanLine = line.replace(/^<:[^:]+:\d+>/, '').replace(/^[•\-\*]/, '').trim();
-                        const parts = cleanLine.includes('|') ? cleanLine.split('|') : [cleanLine];
+                        const cleanLine = line.replace(BULLET_STRING, '').trim();
+                        const parts = cleanLine.includes(SEPARATOR) ? cleanLine.split(SEPARATOR) : cleanLine.split('|');
                         
                         parts.forEach(p => {
                             const pTrim = p.trim().toLowerCase();

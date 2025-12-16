@@ -1009,6 +1009,7 @@ app.get('/api/data/:key', async (c) => {
 
 app.get('/api/data/version', async (c) => {
     const version = await c.env.BOT_DATA.get('data_version');
+    c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     return c.json({ version: version || "0" });
 });
 

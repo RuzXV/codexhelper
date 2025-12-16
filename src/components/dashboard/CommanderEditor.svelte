@@ -10,7 +10,7 @@
     export let user;
 
     let hasUnsavedChanges = false;
-    let saveState = 'idle'; // 'idle', 'saving', 'success'
+    let saveState = 'idle';
 
     function markDirty() {
         hasUnsavedChanges = true;
@@ -27,7 +27,6 @@
     }
     
     function handleKeyEnter(event, callback) {
-        // FIXED: Removed "|| event.key === ' '" to prevent spacebar closing modal
         if (event.key === 'Enter') {
             event.preventDefault();
             callback(event);
