@@ -982,6 +982,13 @@ app.post('/api/users/settings', authMiddleware, async (c) => {
     return c.json({ status: 'success' });
 });
 
+app.get('/api/data/version', async (c) => {
+    const version = await c.env.BOT_DATA.get('data_version');
+    c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    
+    return c.json({ version: version || "0" });
+});
+
 app.get('/api/data/:key', async (c) => {
     const key = c.req.param('key');
     const secret = c.req.header('X-Internal-Secret');
@@ -1005,13 +1012,6 @@ app.get('/api/data/:key', async (c) => {
 
     const data = await c.env.BOT_DATA.get(key, 'json');
     return c.json(data || {}); 
-});
-
-app.get('/api/data/version', async (c) => {
-    const version = await c.env.BOT_DATA.get('data_version');
-    c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-    
-    return c.json({ version: version || "0" });
 });
 
 app.post('/api/admin/data/:key', authMiddleware, masterAdminMiddleware, async (c) => {
