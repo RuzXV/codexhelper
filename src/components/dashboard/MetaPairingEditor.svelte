@@ -1,0 +1,440 @@
+<script>
+    import { createEventDispatcher, onMount } from 'svelte';
+
+    export let metaId;
+    export let metaData;
+    export let user;
+    export let emojiData;
+
+    const dispatch = createEventDispatcher();
+    const AUTHOR_ICON = "https://i.postimg.cc/Jn4zn7sy/Kings-Codex-Logo-No-URL-No-Glow.png";
+    const AUTHOR_NAME = "The King's Codex";
+    
+    const BOT_ICON = "https://cdn.discordapp.com/avatars/1289603576104091679/aaa1f4a186484a62377665c086a40f24.webp?size=80";
+    const BOT_NAME = "Codex Helper";
+
+    const BULLET_ID = "1366755663056867389";
+    const BULLET_STRING = `<:bullet_point3:${BULLET_ID}>`;
+    const BULLET_IMG_URL = `https://cdn.discordapp.com/emojis/${BULLET_ID}.png`;
+
+    let title = "";
+    let imageUrl = "";
+    let color = "#00c6ff";
+    let fields = [];
+    
+    let openDropdownId = null;
+
+    $: sortedCommanders = (emojiData?.commanders || []).sort((a,b) => a.name.localeCompare(b.name));
+    $: userAvatar = user?.avatar 
+        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
+        : "https://cdn.discordapp.com/embed/avatars/0.png";
+    $: userName = user?.display_name || user?.username || "User";
+
+    function portal(node) {
+        let owner = document.body;
+        owner.appendChild(node);
+        return {
+            destroy() { if (node.parentNode) node.parentNode.removeChild(node); }
+        };
+    }
+
+    function formatRowString(row) {
+        const c1 = sortedCommanders.find(c => c.key === row.cmd1);
+        const c2 = sortedCommanders.find(c => c.key === row.cmd2);
+        
+        let text = "";
+        if (c1) text += `${c1.name} <:${c1.key}:${c1.emoji}>`;
+        if (c2) text += ` | ${c2.name} <:${c2.key}:${c2.emoji}>`;
+        
+        return text || "Empty Row";
+    }
+
+    function formatDiscordText(text) {
+        if (!text) return "";
+        return text
+            .replace(/<:([^:]+):(\d+)>/g, '<img src="https://cdn.discordapp.com/emojis/$2.png" class="emoji-preview" alt="$1">')
+            .replace(/\n/g, '<br>');
+    }
+
+    onMount(() => {
+        title = metaData.title || "";
+        imageUrl = metaData.image?.url || "";
+        color = metaData.color || "#00c6ff";
+
+        if (metaData.fields) {
+            fields = metaData.fields.map(f => ({
+                id: Math.random().toString(36),
+                name: f.name.replace(/`/g, '').trim(),
+                rows: (Array.isArray(f.value) ? f.value : f.value.split('\n')).map(line => {
+                    // --- ROBUST PARSING FIX START ---
+                    
+                    // 1. Scan the line for ANY valid commander Emojis (ignores bullets/separators)
+                    const allEmojiIds = [...line.matchAll(/:(\d+)>/g)].map(m => m[1]);
+                    
+                    let foundKeys = allEmojiIds
+                        .map(id => sortedCommanders.find(c => c.emoji === id))
+                        .filter(c => c) // filter out undefined (e.g. bullets)
+                        .map(c => c.key);
+
+                    // 2. Fallback: If no emojis found, try matching by Name (handles text-only legacy data)
+                    if (foundKeys.length === 0) {
+                        // Remove potential bullet junk from start
+                        const cleanLine = line.replace(/^<:[^:]+:\d+>/, '').replace(/^[•\-\*]/, '').trim();
+                        // Split by pipe or just take the whole line
+                        const parts = cleanLine.includes('|') ? cleanLine.split('|') : [cleanLine];
+                        
+                        parts.forEach(p => {
+                            const pTrim = p.trim().toLowerCase();
+                            if(!pTrim) return;
+                            const match = sortedCommanders.find(c => c.name.toLowerCase() === pTrim);
+                            if (match) foundKeys.push(match.key);
+                        });
+                    }
+
+                    return {
+                        id: Math.random(),
+                        cmd1: foundKeys[0] || null,
+                        cmd2: foundKeys[1] || null
+                    };
+                    // --- ROBUST PARSING FIX END ---
+                })
+            }));
+        } else {
+            fields = [{ id: '1', name: 'Lane Pairings', rows: [{ id: 1, cmd1: null, cmd2: null }] }];
+        }
+    });
+
+    function addField() {
+        fields = [...fields, { id: Math.random().toString(36), name: "New Category", rows: [{ id: Date.now(), cmd1: null, cmd2: null }] }];
+    }
+
+    function removeField(idx) {
+        fields = fields.filter((_, i) => i !== idx);
+    }
+
+    function addRow(fieldIdx) {
+        fields[fieldIdx].rows = [...fields[fieldIdx].rows, { id: Date.now(), cmd1: null, cmd2: null }];
+    }
+
+    function removeRow(fieldIdx, rowIdx) {
+        fields[fieldIdx].rows = fields[fieldIdx].rows.filter((_, i) => i !== rowIdx);
+    }
+
+    function save() {
+        const newData = {
+            ...metaData,
+            title,
+            color,
+            image: { url: imageUrl },
+            author: { name: AUTHOR_NAME, icon_url: AUTHOR_ICON },
+            fields: fields.map(f => ({
+                name: `\` ${f.name} \``, 
+                value: f.rows.map(row => `${BULLET_STRING} ${formatRowString(row)}`), 
+                inline: false
+            }))
+        };
+        dispatch('save', { id: metaId, data: newData });
+    }
+
+    function close() {
+        dispatch('close');
+    }
+
+    function handleKeydown(e) {
+        if (e.key === 'Escape') close();
+    }
+
+    function toggleDropdown(id, event) {
+        event.stopPropagation();
+        openDropdownId = openDropdownId === id ? null : id;
+    }
+    
+    function handleWindowClick() { openDropdownId = null; }
+    
+    function handleEnter(event, callback) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            callback(event);
+        }
+    }
+
+    function getCmdIcon(key) {
+        const c = sortedCommanders.find(e => e.key === key);
+        return c ? `https://cdn.discordapp.com/emojis/${c.emoji}.png` : null;
+    }
+    function getCmdName(key) {
+        const c = sortedCommanders.find(e => e.key === key);
+        return c ? c.name : 'Select...';
+    }
+</script>
+
+<svelte:window on:click={handleWindowClick} />
+
+<div 
+    class="editor-overlay" 
+    use:portal 
+    role="button" 
+    tabindex="0" 
+    on:click|self={close} 
+    on:keydown={handleKeydown}
+>
+    <div class="editor-modal" role="dialog" aria-modal="true">
+        <div class="editor-header">
+            <h2>Edit Meta Lineup: {title || "New"}</h2>
+            <button class="close-btn" aria-label="Close Editor" on:click={close}><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="editor-body">
+            <div class="form-column">
+                <div class="section-box">
+                    <h3>Header Info</h3>
+                    <label class="form-group">
+                        <span class="label-text">Title</span>
+                        <input type="text" bind:value={title} />
+                    </label>
+                    <label class="form-group">
+                        <span class="label-text">Image URL</span>
+                        <input type="text" bind:value={imageUrl} />
+                    </label>
+                </div>
+
+                <div class="section-box" style="flex: 1;">
+                    <h3>Pairing Groups</h3>
+                    {#each fields as field, fIdx (field.id)}
+                        <div class="pairing-group">
+                            <div class="group-header">
+                                <input type="text" class="group-title-input" bind:value={field.name} aria-label="Category Name" placeholder="Category Name" />
+                                <button class="btn-icon danger" aria-label="Delete Category" on:click={() => removeField(fIdx)}><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div class="rows-container">
+                                {#each field.rows as row, rIdx}
+                                    <div class="pairing-row">
+                                        <div class="bullet-wrapper">
+                                            <img src={BULLET_IMG_URL} class="bullet-icon-static" alt="•">
+                                        </div>
+                                        
+                                        <div class="custom-select">
+                                            <div class="select-trigger" role="button" tabindex="0"
+                                                 on:click={(e) => toggleDropdown(`f${fIdx}r${rIdx}c1`, e)}
+                                                 on:keydown={(e) => handleEnter(e, () => toggleDropdown(`f${fIdx}r${rIdx}c1`, e))}>
+                                                
+                                                {#if row.cmd1}
+                                                    <div class="trigger-content">
+                                                        <img src={getCmdIcon(row.cmd1)} alt="" class="select-icon">
+                                                        <span>{getCmdName(row.cmd1)}</span>
+                                                    </div>
+                                                {:else}
+                                                    <span class="placeholder">Select...</span>
+                                                {/if}
+                                            </div>
+
+                                            {#if openDropdownId === `f${fIdx}r${rIdx}c1`}
+                                                <div class="select-options">
+                                                    {#each sortedCommanders as c}
+                                                        <div class="option" role="button" tabindex="0"
+                                                             on:click|stopPropagation={() => { row.cmd1 = c.key; openDropdownId = null; }}
+                                                             on:keydown|stopPropagation={(e) => handleEnter(e, () => { row.cmd1 = c.key; openDropdownId = null; })}>
+                                                            <img src={`https://cdn.discordapp.com/emojis/${c.emoji}.png`} alt="" class="select-icon"> {c.name}
+                                                        </div>
+                                                    {/each}
+                                                </div>
+                                            {/if}
+                                        </div>
+
+                                        <span class="sep">|</span>
+
+                                        <div class="custom-select">
+                                            <div class="select-trigger" role="button" tabindex="0"
+                                                 on:click={(e) => toggleDropdown(`f${fIdx}r${rIdx}c2`, e)}
+                                                 on:keydown={(e) => handleEnter(e, () => toggleDropdown(`f${fIdx}r${rIdx}c2`, e))}>
+                                                
+                                                {#if row.cmd2}
+                                                    <div class="trigger-content">
+                                                        <img src={getCmdIcon(row.cmd2)} alt="" class="select-icon">
+                                                        <span>{getCmdName(row.cmd2)}</span>
+                                                    </div>
+                                                {:else}
+                                                    <span class="placeholder">Select...</span>
+                                                {/if}
+                                            </div>
+
+                                            {#if openDropdownId === `f${fIdx}r${rIdx}c2`}
+                                                <div class="select-options">
+                                                    {#each sortedCommanders as c}
+                                                        <div class="option" role="button" tabindex="0"
+                                                             on:click|stopPropagation={() => { row.cmd2 = c.key; openDropdownId = null; }}
+                                                             on:keydown|stopPropagation={(e) => handleEnter(e, () => { row.cmd2 = c.key; openDropdownId = null; })}>
+                                                            <img src={`https://cdn.discordapp.com/emojis/${c.emoji}.png`} alt="" class="select-icon"> {c.name}
+                                                        </div>
+                                                    {/each}
+                                                </div>
+                                            {/if}
+                                        </div>
+
+                                        <button class="btn-icon" aria-label="Delete Row" on:click={() => removeRow(fIdx, rIdx)}><i class="fas fa-minus"></i></button>
+                                    </div>
+                                {/each}
+                                <button class="add-btn-modern" on:click={() => addRow(fIdx)}>+ Add Row</button>
+                            </div>
+                        </div>
+                    {/each}
+                    <button class="add-btn-modern group-add" on:click={addField}>+ Add Category</button>
+                </div>
+            </div>
+
+            <div class="preview-column">
+                <h3>Preview</h3>
+                <div class="discord-preview">
+                    
+                    <div class="interaction-header">
+                        <img src={userAvatar} alt="User" class="user-avatar-mini">
+                        <span class="username">{userName}</span>
+                        <span class="command-text">used <span class="command-name">/meta</span></span>
+                    </div>
+
+                    <div class="message-header">
+                        <img src={BOT_ICON} alt="Bot" class="bot-avatar">
+                        <div class="header-info">
+                            <span class="bot-name">{BOT_NAME}</span>
+                            <span class="bot-tag"><span class="bot-tag-check">✔</span>APP</span>
+                            <span class="timestamp">Today at 10:30 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="preview-embed" style="border-left-color: {color}">
+                        <div class="preview-author">
+                            <img src={AUTHOR_ICON} alt="" /> {AUTHOR_NAME}
+                        </div>
+                        <div class="preview-title">{title}</div>
+                        
+                        <div class="preview-fields">
+                            {#each fields as field}
+                                <div class="preview-field">
+                                    <div class="preview-field-name"><code> {field.name} </code></div>
+                                    <div class="preview-field-value">
+                                        {#each field.rows as row}
+                                            <div class="preview-row">
+                                                {@html formatDiscordText(BULLET_STRING + ' ' + formatRowString(row))}
+                                            </div>
+                                        {/each}
+                                    </div>
+                                </div>
+                            {/each}
+                        </div>
+
+                        {#if imageUrl}
+                            <img src={imageUrl} class="preview-image" alt="meta" />
+                        {/if}
+                    </div>
+                </div>
+                <div class="actions-footer">
+                    <button class="btn-cancel" on:click={close}>Cancel</button>
+                    <button class="btn-save" on:click={save}><i class="fas fa-save"></i> Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .editor-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; outline: none; }
+    .editor-modal { background: var(--bg-secondary); width: 95%; max-width: 1200px; height: 90vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border-color); }
+    .editor-header { padding: 15px 20px; background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    .editor-header h2 { margin: 0; color: var(--text-primary); font-size: 1.2rem; }
+    .close-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; }
+    
+    .editor-body { display: flex; flex: 1; overflow: hidden; }
+    .form-column { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; min-width: 500px; }
+    .preview-column { flex: 0 0 550px; background: #313338; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #000; }
+    
+    .section-box { background: var(--bg-primary); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; }
+    .section-box h3 { margin: 0; font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group .label-text { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
+    input[type="text"] { background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-primary); width: 100%; }
+
+    .discord-preview { 
+        flex: 1; 
+        padding: 20px;
+        padding-right: 30px;
+        overflow-y: auto; 
+        overflow-x: hidden;
+        font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+    }
+
+    .interaction-header { 
+        display: flex; align-items: center; font-size: 0.85rem; color: #949ba4; 
+        margin-bottom: 4px; gap: 8px; position: relative; 
+        left: 18px; 
+        margin-top: -4px; 
+    }
+    .interaction-header::before { 
+        content: ""; position: absolute; top: 14px; left: -11px; width: 22px; height: 12px; 
+        border-top: 2px solid #4e5058; border-left: 2px solid #4e5058; border-top-left-radius: 6px; margin-top: -3px; 
+    }
+    .user-avatar-mini { width: 16px; height: 16px; border-radius: 50%; }
+    .username { font-weight: 600; color: #f2f3f5; cursor: pointer; }
+    .username:hover { text-decoration: underline; }
+    .command-text { margin-left: 2px; }
+    .command-name { color: #5865f2; background: rgba(88, 101, 242, 0.1); font-weight: 500; padding: 0 2px; border-radius: 3px; cursor: pointer; }
+    .command-name:hover { background: #5865f2; color: #fff; }
+
+    .message-header { display: flex; align-items: center; margin-bottom: 4px; }
+    .bot-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; cursor: pointer; }
+    .bot-avatar:hover { opacity: 0.8; }
+    .header-info { display: flex; align-items: center; }
+    .bot-name { font-weight: 500; color: #f2f3f5; margin-right: 4px; cursor: pointer; font-size: 1rem; }
+    .bot-name:hover { text-decoration: underline; }
+    .bot-tag { background: #5865f2; color: #fff; font-size: 0.625rem; padding: 0 4px; border-radius: 3px; margin-right: 8px; line-height: 1.3; display: flex; align-items: center; height: 15px; vertical-align: middle; margin-top: 1px; }
+    .bot-tag-check { font-size: 0.6rem; margin-right: 2px; }
+    .timestamp { font-size: 0.75rem; color: #949ba4; margin-left: 4px; }
+
+    .preview-embed { 
+        background: #2b2d31; 
+        border-left: 4px solid; 
+        padding: 12px; 
+        border-radius: 4px; 
+        margin-left: 52px; 
+        margin-top: -2px; 
+    }
+    
+    .preview-author { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 600; color: #f2f3f5; margin-bottom: 4px; }
+    .preview-author img { width: 24px; height: 24px; border-radius: 50%; }
+    .preview-title { font-size: 1rem; font-weight: 700; color: #f2f3f5; margin-bottom: 8px; }
+    .preview-fields { display: flex; flex-direction: column; gap: 10px; }
+    .preview-field-name code { background-color: #1e1f22; padding: 2px 4px; border-radius: 3px; font-family: monospace; font-weight: 600; color: #dbdee1; font-size: 0.875rem; }
+    .preview-field-value { font-size: 0.875rem; color: #dcddde; margin-top: 4px; }
+    :global(.emoji-preview) { width: 1.2em; height: 1.2em; vertical-align: -0.2em; object-fit: contain; }
+    .preview-image { max-width: 100%; border-radius: 4px; margin-top: 12px; }
+
+    .pairing-group { background: rgba(0,0,0,0.1); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 10px; }
+    .group-header { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .group-title-input { flex: 1; font-weight: bold; background: transparent; border: none; border-bottom: 1px dashed var(--border-color); border-radius: 0; padding-left: 0; }
+    
+    .pairing-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; background: var(--bg-primary); padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); }
+    .bullet-wrapper { display: flex; align-items: center; justify-content: center; width: 24px; }
+    .bullet-icon-static { width: 18px; height: 18px; opacity: 0.5; filter: grayscale(100%); }
+    
+    .custom-select { position: relative; flex: 1; min-width: 0; }
+    .select-trigger { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 4px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; }
+    .select-trigger:focus { border-color: var(--accent-blue); outline: none; }
+    .select-options { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); margin-top: 4px; }
+    .option { display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; }
+    .option:hover, .option:focus { background: var(--accent-blue-light); color: white; outline: none; }
+    .select-icon { width: 20px; height: 20px; object-fit: contain; }
+    .trigger-content { display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; }
+    .placeholder { color: var(--text-muted); font-size: 0.85rem; }
+    .sep { color: var(--text-secondary); opacity: 0.5; margin: 0 5px; }
+
+    .add-btn-modern { width: 100%; background: var(--bg-tertiary); border: 1px dashed var(--border-color); color: var(--text-secondary); padding: 8px; border-radius: 4px; cursor: pointer; }
+    .add-btn-modern:hover { color: var(--accent-blue); border-color: var(--accent-blue); }
+    .group-add { margin-top: 10px; }
+    
+    .btn-icon { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; }
+    .btn-icon:hover { color: #ef4444; }
+
+    .actions-footer { margin-top: auto; padding-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-save { background: var(--accent-green); color: #000; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; display: flex; gap: 8px; align-items: center;}
+    .btn-cancel { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+</style>

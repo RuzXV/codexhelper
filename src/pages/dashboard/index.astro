@@ -1,18 +1,15 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import DashboardMain from '../../components/dashboard/DashboardMain.svelte';
+import DashboardComponent from '../../components/dashboard/Dashboard.svelte';
 ---
 
-<Layout title="Codex Admin Dashboard">
-    <div class="dashboard-wrapper">
-        <DashboardMain client:only="svelte" />
-    </div>
+<Layout title="Dashboard - Codex Helper" bodyClass="dashboard-page">
+    <DashboardComponent client:only="svelte" />
+    
+    <script>
+        import "../../scripts/auth.js";
+        
+        document.addEventListener('DOMContentLoaded', () => {
+        });
+    </script>
 </Layout>
-
-<style>
-    .dashboard-wrapper {
-        padding: 2rem;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-</style>

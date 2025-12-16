@@ -19,6 +19,7 @@ type Bindings = {
 type Variables = {
     user: {
         id: string;
+        username: string;
         accessToken: string;
     };
 };
@@ -30,6 +31,11 @@ const CALENDAR_ADMIN_IDS = [
     '1121488445836103820',
     '593329463245144084',
     '545152090910228492'
+];
+
+const MASTER_ADMIN_IDS = [
+    '285201373266575361', 
+    '388515288666210313'
 ];
 
 const TROOP_CYCLE = ["Infantry", "Archer", "Leadership", "Cavalry"];
@@ -56,7 +62,7 @@ const EVENT_COLOR_MAP: Record<string, string> = {
     "wof": "3",             // Purple (Grape)
     "mtg": "11",            // Red (Tomato)
     "gk": "6",              // Orange (Tangerine)
-    "ceroli": "2",          // Green (Sage) - closest to Emerald
+    "ceroli": "2",          // Green (Sage)
     "rom": "9",             // Blue (Blueberry)
     "esm": "4",             // Pink (Flamingo)
     "arma": "3",            // Purple (Grape)
@@ -67,11 +73,6 @@ const EVENT_COLOR_MAP: Record<string, string> = {
     "ark_registration": "6",
     "olympia": "5"          // Gold/Yellow (Banana)
 };
-
-const MASTER_ADMIN_IDS = [
-    '285201373266575361', 
-    '388515288666210313'
-];
 
 app.use('/api/*', cors({
     origin: [
@@ -374,15 +375,20 @@ app.get('/api/users/@me', authMiddleware, async (c) => {
     if (!userResponse.ok) {
         return c.json({ error: 'Failed to fetch fresh user data from Discord.' }, 500);
     }
-    const userData = await userResponse.json() as { id: string; [key: string]: any };
+    const userData = await userResponse.json() as { id: string; username: string; [key: string]: any };
     const activePatrons: string[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
     const isActivePatron = activePatrons ? activePatrons.includes(user.id) : false;
     const isCalendarAdmin = CALENDAR_ADMIN_IDS.includes(user.id);
+    const isMasterAdmin = MASTER_ADMIN_IDS.includes(user.id);
+
+    user.username = userData.username;
+    c.set('user', user);
 
     return c.json({
         ...userData,
         is_active_patron: isActivePatron,
-        is_calendar_admin: isCalendarAdmin
+        is_calendar_admin: isCalendarAdmin,
+        is_master_admin: isMasterAdmin
     });
 });
 
@@ -1001,15 +1007,6 @@ app.get('/api/data/:key', async (c) => {
     return c.json(data || {}); 
 });
 
-app.post('/api/bot/seed/:key', botAuthMiddleware, async (c) => {
-    const key = c.req.param('key');
-    const body = await c.req.json();
-    
-    await c.env.BOT_DATA.put(key, JSON.stringify(body));
-    
-    return c.json({ status: 'success', message: `Seeded ${key}` });
-});
-
 app.get('/api/data/version', async (c) => {
     const version = await c.env.BOT_DATA.get('data_version');
     return c.json({ version: version || "0" });
@@ -1017,13 +1014,46 @@ app.get('/api/data/version', async (c) => {
 
 app.post('/api/admin/data/:key', authMiddleware, masterAdminMiddleware, async (c) => {
     const key = c.req.param('key');
-    const body = await c.req.json();
+    const rawBody = await c.req.json();
+    
+    let bodyData = rawBody;
+    let details = `Modified data for key: ${key}`;
 
-    await c.env.BOT_DATA.put(key, JSON.stringify(body));
+    if (rawBody && typeof rawBody === 'object' && 'data' in rawBody && 'logDetails' in rawBody) {
+        bodyData = rawBody.data;
+        details = rawBody.logDetails;
+    }
 
+    let username = "Unknown Admin";
+    try {
+        const userRes = await fetch('https://discord.com/api/users/@me', {
+            headers: { 'Authorization': `Bearer ${c.get('user').accessToken}` }
+        });
+        const uData = await userRes.json() as any;
+        username = uData.username || uData.global_name || c.get('user').id;
+    } catch(e) {}
+
+    await c.env.BOT_DATA.put(key, JSON.stringify(bodyData));
     await c.env.BOT_DATA.put('data_version', Date.now().toString());
 
+    const logEntry = {
+        timestamp: Date.now(),
+        user: username,
+        action: `Updated ${key}`,
+        details: details
+    };
+
+    let logs: any[] = await c.env.BOT_DATA.get('system_changelog', 'json') || [];
+    logs.unshift(logEntry);
+    if (logs.length > 200) logs = logs.slice(0, 200); 
+    await c.env.BOT_DATA.put('system_changelog', JSON.stringify(logs));
+
     return c.json({ status: 'success', message: `Updated ${key}` });
+});
+
+app.get('/api/admin/logs', authMiddleware, masterAdminMiddleware, async (c) => {
+    const logs = await c.env.BOT_DATA.get('system_changelog', 'json');
+    return c.json(logs || []);
 });
 
 export const onRequest = handle(app);

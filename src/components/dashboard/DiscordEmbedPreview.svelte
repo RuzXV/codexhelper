@@ -1,228 +1,254 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
-    export let embedData = {};
-    export let components = [];
+    export let displayName;
+    export let embedColor;
+    export let imageUrl;
+    export let pairingGroups;
+    export let isMainTemplate;
+    export let emojiData;
+    export let user;
+    export let suffixLabel = "";
     
-    const dispatch = createEventDispatcher();
+    const AUTHOR_ICON = "https://i.postimg.cc/Jn4zn7sy/Kings-Codex-Logo-No-URL-No-Glow.png";
+    const AUTHOR_NAME = "The King's Codex";
+    const BOT_ICON = "https://cdn.discordapp.com/avatars/1289603576104091679/aaa1f4a186484a62377665c086a40f24.webp?size=80";
+    const BOT_NAME = "Codex Helper";
+    const MAIN_FOOTER = "Check out talents & gear recommendations by clicking the buttons below!";
 
-    function intToHex(intColor) {
-        if (!intColor && intColor !== 0) return '#202225';
-        return '#' + intColor.toString(16).padStart(6, '0');
+    $: allEmojis = Array.isArray(emojiData) 
+        ? emojiData 
+        : [
+            ...(emojiData.commanders || []), 
+            ...(emojiData.utility || []),
+            ...(emojiData.accessories || []),
+            ...(emojiData.formations || []),
+            ...(emojiData.buttons || [])
+          ];
+
+    $: userAvatar = getUserAvatar(user);
+    $: userName = user ? (user.display_name || user.global_name || user.username) : "User";
+
+    function getUserAvatar(user) {
+        if (!user) return "https://cdn.discordapp.com/embed/avatars/0.png";
+        if (user.avatar) return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+        const index = user.discriminator && user.discriminator !== '0' 
+            ? parseInt(user.discriminator) % 5 
+            : Number((BigInt(user.id) >> 22n) % 6n);
+        return `https://cdn.discordapp.com/embed/avatars/${index}.png`;
     }
 
-    function processMarkdown(text) {
-        if (!text) return '';
-        let processed = text
-            .replace(/</g, '&lt;').replace(/>/g, '&gt;')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/__(.*?)__/g, '<u>$1</u>')
-            .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
-            .replace(/\n/g, '<br>');
-        
-        processed = processed.replace(/&lt;:(\w+):(\d+)&gt;/g, (match, name, id) => {
-            return `<img src="https://cdn.discordapp.com/emojis/${id}.png" class="emoji" alt="${name}">`;
-        });
-        
-        return processed;
+    function getEmojiUrl(emojiId) {
+        return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
     }
 
-    function handleButtonClick(customId) {
-        if (!customId) return;
-        dispatch('action', { customId });
+    function formatRowHtml(row) {
+        const bulletEntry = allEmojis.find(e => e.key === 'bullet_point');
+        const bulletHtml = bulletEntry 
+            ? `<img src="${getEmojiUrl(bulletEntry.emoji)}" class="emoji bullet">` 
+            : '•';
+        
+        if (row.type === 'custom' && row.customText && row.customText.includes('<img')) {
+             return `<div class="embed-line">${bulletHtml}<span class="content-text">${row.customText}</span></div>`;
+        }
+
+        if (row.type === 'custom') {
+            return `<div class="embed-line">${bulletHtml}<span class="content-text">${row.customText}</span></div>`;
+        }
+
+        let html = `<div class="embed-line">${bulletHtml}`;
+        if (row.cmd1) {
+            const c1 = allEmojis.find(e => e.key === row.cmd1);
+            if (c1) html += `<span class="content-text">${c1.name}</span> <img src="${getEmojiUrl(c1.emoji)}" class="emoji inline">`;
+            else html += `<span class="content-text">Unknown</span>`;
+        }
+
+        if (row.cmd2) {
+            const c2 = allEmojis.find(e => e.key === row.cmd2);
+            if (c2) html += `<span class="separator">|</span><span class="content-text">${c2.name}</span> <img src="${getEmojiUrl(c2.emoji)}" class="emoji inline">`;
+        }
+
+        html += `</div>`;
+        return html;
     }
 </script>
 
-<div class="discord-message-group">
-    <div class="message-header">
-        <img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Bot" class="bot-avatar">
-        <span class="bot-username">Codex Keeper</span>
-        <span class="bot-tag">BOT</span>
-        <span class="timestamp">Today at 12:00 PM</span>
+<div class="discord-container">
+    <div class="interaction-header">
+        <img src={userAvatar} alt="User" class="user-avatar-mini">
+        <span class="username">{userName}</span>
+        <span class="command-text">used <span class="command-name">/commander</span></span>
     </div>
 
-    <div class="message-content">
-        {#if embedData}
-            <div class="discord-embed" style="border-left-color: {intToHex(embedData.color)};">
-                <div class="embed-grid">
-                    <div class="embed-content-col">
-                        {#if embedData.author}
-                            <div class="embed-author">
-                                {#if embedData.author.icon_url}
-                                    <img src={embedData.author.icon_url} alt="" class="author-icon">
-                                {/if}
-                                <span>{embedData.author.name}</span>
-                            </div>
-                        {/if}
+    <div class="message-header">
+        <img src={BOT_ICON} alt="Bot" class="bot-avatar">
+        <div class="header-info">
+            <span class="bot-name">{BOT_NAME}</span>
+            <span class="bot-tag"><span class="bot-tag-check">✔</span>APP</span>
+            <span class="timestamp">Today at 10:30 AM</span>
+        </div>
+    </div>
 
-                        {#if embedData.title}
-                            <div class="embed-title">{embedData.title}</div>
-                        {/if}
+    <div class="embed-wrapper" style="border-left-color: {embedColor};">
+        <div class="embed-grid">
+            
+            {#if isMainTemplate}
+                <div class="embed-author">
+                    <img src={AUTHOR_ICON} alt="Author" class="author-icon">
+                    <span>{AUTHOR_NAME}</span>
+                </div>
+            {/if}
 
-                        {#if embedData.description}
-                            <div class="embed-description">{@html processMarkdown(embedData.description)}</div>
-                        {/if}
+            {#if displayName}
+                <div class="embed-title">
+                    {displayName}{!isMainTemplate && suffixLabel ? ' ' + suffixLabel : ''}
+                </div>
+            {/if}
 
-                        {#if embedData.fields}
-                            <div class="embed-fields">
-                                {#each embedData.fields as field}
-                                    <div class="embed-field" class:inline={field.inline}>
-                                        <div class="field-name">{@html processMarkdown(field.name)}</div>
-                                        <div class="field-value">{@html processMarkdown(field.value)}</div>
-                                    </div>
+            {#if pairingGroups && pairingGroups.length > 0}
+                <div class="embed-fields">
+                    {#each pairingGroups as group}
+                        <div class="embed-field">
+                            <div class="field-name"><code>{group.title}</code></div>
+                            <div class="field-value">
+                                {#each group.rows as row}
+                                    {@html formatRowHtml(row)}
                                 {/each}
                             </div>
-                        {/if}
-                    </div>
-
-                    {#if embedData.thumbnail}
-                        <img src={embedData.thumbnail.url} alt="Thumbnail" class="embed-thumbnail">
-                    {/if}
+                        </div>
+                    {/each}
                 </div>
+            {/if}
 
-                {#if embedData.image}
-                    <img src={embedData.image.url} alt="Main Image" class="embed-image">
-                {/if}
+            {#if imageUrl}
+                <div class="embed-image">
+                    <img src={imageUrl} alt="Embed Content" />
+                </div>
+            {/if}
 
-                {#if embedData.footer}
-                    <div class="embed-footer">
-                        {#if embedData.footer.icon_url}
-                            <img src={embedData.footer.icon_url} alt="" class="footer-icon">
-                        {/if}
-                        <span>{embedData.footer.text}</span>
-                    </div>
-                {/if}
-            </div>
-        {/if}
+            {#if isMainTemplate}
+                <div class="embed-footer">
+                    <img src={AUTHOR_ICON} alt="Footer Icon" class="footer-icon">
+                    <span>{MAIN_FOOTER}</span>
+                </div>
+            {/if}
+        </div>
+    </div>
 
-        {#if components && components.length > 0}
-            <div class="action-rows">
-                {#each components as row}
-                    <div class="action-row">
-                        {#each row.components as btn}
-                            {#if btn.type === 2} <button 
-                                    class="discord-btn style-{btn.style}" 
-                                    on:click={() => handleButtonClick(btn.custom_id)}
-                                    disabled={!btn.custom_id && !btn.url}
-                                >
-                                    {#if btn.emoji}
-                                        <img src={`https://cdn.discordapp.com/emojis/${btn.emoji.id}.png`} alt="" class="btn-emoji">
-                                    {/if}
-                                    {#if btn.label}{btn.label}{/if}
-                                    {#if btn.style === 5}
-                                        <i class="fas fa-external-link-alt link-icon"></i>
-                                    {/if}
-                                </button>
-                            {/if}
-                        {/each}
-                    </div>
-                {/each}
+    <div class="component-row">
+        {#if isMainTemplate}
+            <div class="discord-btn">
+                <img src="https://cdn.discordapp.com/emojis/1315897850579910688.png" alt="Field" class="btn-emoji">
+                Field
             </div>
         {/if}
     </div>
 </div>
 
 <style>
-    .discord-message-group {
-        font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        background: #313338;
-        padding: 1rem;
+    .discord-container {
+        font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        padding: 16px;
+        background-color: #313338;
+        color: #dcddde;
         border-radius: 8px;
-        color: #dbdee1;
-        max-width: 600px;
-        margin: 0 auto;
-        border: 1px solid #1e1f22;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
-    .message-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .bot-avatar { width: 40px; height: 40px; border-radius: 50%; }
-    .bot-username { font-weight: 500; color: #f2f3f5; font-size: 16px; }
-    .bot-tag { background: #5865f2; color: white; font-size: 10px; padding: 2px 4px; border-radius: 4px; font-weight: 500; line-height: 1.1; margin-top: 1px;}
-    .timestamp { font-size: 12px; color: #949ba4; margin-left: 4px; }
+    .interaction-header { display: flex; align-items: center; font-size: 0.85rem; color: #949ba4; margin-bottom: 2px; gap: 5px; position: relative; left: 16px; }
+    
+    .interaction-header::before { 
+        content: "";
+        position: absolute; 
+        top: 14px; 
+        left: -11px;
+        width: 24px; 
+        height: 12px; 
+        border-top: 2px solid #4e5058; 
+        border-left: 2px solid #4e5058; 
+        border-top-left-radius: 6px;
+        margin-top: -3px; 
+    }
 
-    .message-content { padding-left: 48px; }
+    .user-avatar-mini { width: 16px; height: 16px; border-radius: 50%; }
+    .username { font-weight: 600; color: #f2f3f5; cursor: pointer; }
+    .command-text { margin-left: 2px; }
+    .command-name { color: #5865f2; background: rgba(88, 101, 242, 0.1); font-weight: 500; padding: 0 2px; border-radius: 3px; cursor: pointer; }
+    .command-name:hover { background: #5865f2; color: #fff; }
 
-    .discord-embed {
+    .message-header { display: flex; align-items: center; margin-top: 4px; margin-bottom: 4px; position: relative; }
+    .bot-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; cursor: pointer; }
+    .bot-avatar:hover { opacity: 0.8; }
+    .header-info { display: flex; align-items: center; }
+    .bot-name { font-weight: 500; color: #f2f3f5; margin-right: 4px; cursor: pointer; font-size: 1rem; }
+    .bot-name:hover { text-decoration: underline; }
+    
+    .bot-tag { background: #5865f2; color: #fff; font-size: 0.625rem; padding: 0 4px; border-radius: 3px; margin-right: 8px; line-height: 1.3; display: flex; align-items: center; height: 15px; vertical-align: middle; margin-top: 1px;}
+    .bot-tag-check { font-size: 0.6rem; margin-right: 2px; }
+    .timestamp { font-size: 0.75rem; color: #949ba4; margin-left: 4px; }
+
+    .embed-wrapper { 
+        border-left-style: solid; 
+        border-left-width: 4px; 
         background: #2b2d31;
-        border-left: 4px solid #202225;
-        border-radius: 4px;
-        padding: 12px 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        max-width: 520px;
+        border-radius: 4px; 
+        padding: 12px 16px; 
+        max-width: 520px; 
+        display: flex; 
+        margin-left: 52px;
+        margin-top: -6px;
     }
+    .embed-grid { width: 100%; display: flex; flex-direction: column; gap: 6px; }
 
-    .embed-grid { display: flex; gap: 16px; }
-    .embed-content-col { flex: 1; min-width: 0; }
-
-    .embed-author { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: white; margin-bottom: 8px; }
+    .embed-author { display: flex; align-items: center; font-size: 0.875rem; font-weight: 600; color: #f2f3f5; gap: 8px; margin-bottom: 2px; }
     .author-icon { width: 24px; height: 24px; border-radius: 50%; }
 
-    .embed-title { font-size: 16px; font-weight: 600; color: white; margin-bottom: 8px; }
-    .embed-description { font-size: 14px; color: #dbdee1; line-height: 1.375; white-space: pre-wrap; }
+    .embed-title { font-size: 1rem; font-weight: 700; color: #f2f3f5; margin-bottom: 2px; line-height: 1.375rem; }
 
-    .embed-fields { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .embed-field { min-width: 100%; }
-    .embed-field.inline { min-width: fit-content; flex-basis: 30%; }
-    .field-name { font-weight: 600; color: white; font-size: 14px; margin-bottom: 2px; }
-    .field-value { font-size: 14px; color: #dbdee1; white-space: pre-wrap; line-height: 1.375; }
-
-    .embed-thumbnail { max-width: 80px; max-height: 80px; border-radius: 4px; object-fit: contain; }
-    .embed-image { width: 100%; max-height: 300px; border-radius: 4px; object-fit: cover; margin-top: 8px; }
-
-    .embed-footer { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #949ba4; margin-top: 8px; }
-    .footer-icon { width: 20px; height: 20px; border-radius: 50%; }
-
-    .action-rows { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
-    .action-row { display: flex; flex-wrap: wrap; gap: 8px; }
-
-    .discord-btn {
-        height: 32px;
-        min-width: 60px;
-        padding: 2px 16px;
-        border-radius: 3px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        border: none;
-        transition: background-color 0.17s ease;
-        color: white;
-    }
-    .discord-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-emoji { width: 1.2em; height: 1.2em; }
-
-    .style-1 { background-color: #5865f2; }
-    .style-1:hover { background-color: #4752c4; }
+    .embed-fields { display: flex; flex-direction: column; gap: 8px; }
+    .embed-field { margin-bottom: 0; }
     
-    .style-2 { background-color: #4e5058; }
-    .style-2:hover { background-color: #6d6f78; }
-
-    .style-3 { background-color: #248046; }
-    .style-3:hover { background-color: #1a6334; }
-
-    .style-4 { background-color: #da373c; }
-    .style-4:hover { background-color: #a1282c; }
-
-    .style-5 { background-color: #4e5058; }
-    .style-5:hover { background-color: #6d6f78; }
-    .link-icon { font-size: 12px; }
-
-    :global(.inline-code) {
-        background: #1e1f22;
+    .field-name { 
+        font-weight: 700;
+        font-size: 0.875rem; 
+        color: #f2f3f5; 
+        margin-bottom: 4px; 
+    }
+    .field-name code {
+        background-color: #1e1f22;
         padding: 2px 4px;
         border-radius: 3px;
         font-family: monospace;
-        font-size: 0.9em;
+        font-weight: 600;
+        color: #dbdee1;
     }
-    :global(.emoji) {
-        width: 1.3em;
-        height: 1.3em;
-        vertical-align: bottom;
+
+    .field-value { font-size: 0.875rem; color: #dcddde; line-height: 1.375rem; white-space: pre-wrap; font-weight: 400; }
+
+    :global(.embed-line) { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+    :global(.emoji) { width: 1.35em; height: 1.35em; vertical-align: text-bottom; object-fit: contain; }
+    :global(.emoji.bullet) { width: 1.1em; height: 1.1em; margin-right: 0; }
+    :global(.separator) { font-weight: bold; margin: 0 4px; color: #dcddde; }
+    :global(.content-text) { display: inline-block; color: #dcddde; }
+
+    .embed-image { margin-top: 12px; border-radius: 4px; overflow: hidden; }
+    .embed-image img { max-width: 100%; display: block; }
+    
+    .embed-footer { font-size: 0.75rem; color: #dcddde; display: flex; align-items: center; margin-top: 8px; gap: 6px; font-weight: 500; }
+    .footer-icon { width: 20px; height: 20px; border-radius: 50%; }
+
+    .component-row { margin-left: 52px; margin-top: 8px; display: flex; gap: 8px; }
+    .discord-btn { 
+        background-color: #43464d; 
+        color: #f2f3f5;
+        padding: 4px 16px; 
+        border-radius: 3px; 
+        font-size: 0.875rem; 
+        font-weight: 500; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+        cursor: not-allowed; 
+        height: 32px;
+        transition: background-color 0.17s ease;
     }
+    .discord-btn:hover { background-color: #4f545c; }
+    .btn-emoji { width: 18px; height: 18px; }
 </style>

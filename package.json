@@ -14,6 +14,7 @@
     "@astrojs/svelte": "^7.2.2",
     "astro": "^5.15.3",
     "hono": "^4.2.8",
+    "node-fetch": "^3.3.2",
     "svelte": "^5.43.14",
     "typescript": "^5.9.3"
   },

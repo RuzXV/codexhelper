@@ -125,6 +125,21 @@
         pointer-events: none;
     }
 
+    #auth-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 100%;
+    }
+
+    :global(#auth-container button), 
+    :global(#auth-container a) {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start !important; 
+        text-align: left !important;
+    }
+
     @media (max-width: 768px) {
         .sub-nav-text {
             display: none;
