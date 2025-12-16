@@ -48,9 +48,38 @@
     }
 
     function prettyVal(val) {
-        if (val === undefined) return 'undefined';
+        if (val === undefined) return '';
         if (typeof val === 'object') return JSON.stringify(val, null, 2);
-        return val.toString();
+        return String(val);
+    }
+
+    function getDiffHtml(oldVal, newVal) {
+        const s1 = prettyVal(oldVal);
+        const s2 = prettyVal(newVal);
+
+        if (s1 === s2) return { left: s1, right: s2 };
+
+        let start = 0;
+        while (start < s1.length && start < s2.length && s1[start] === s2[start]) {
+            start++;
+        }
+
+        let end1 = s1.length - 1;
+        let end2 = s2.length - 1;
+        while (end1 >= start && end2 >= start && s1[end1] === s2[end2]) {
+            end1--;
+            end2--;
+        }
+
+        const prefix = s1.substring(0, start);
+        const suffix = s1.substring(end1 + 1);
+        const mid1 = s1.substring(start, end1 + 1);
+        const mid2 = s2.substring(start, end2 + 1);
+
+        const left = mid1 ? `${prefix}<span class="diff-red">${mid1}</span>${suffix}` : s1;
+        const right = mid2 ? `${prefix}<span class="diff-green">${mid2}</span>${suffix}` : s2;
+
+        return { left, right };
     }
 </script>
 
@@ -117,20 +146,21 @@
                                                     <span>New Value</span>
                                                 </div>
                                                 {#each Object.entries(log.details.changes) as [field, change]}
+                                                    {@const diffs = getDiffHtml(change.old, change.new)}
                                                     <div class="diff-grid-row">
                                                         <div class="diff-field">{field}</div>
                                                         <div class="diff-old">
                                                             {#if change.old === undefined}
                                                                 <span class="tag-new">New Entry</span>
                                                             {:else}
-                                                                <pre>{prettyVal(change.old)}</pre>
+                                                                <pre>{@html diffs.left}</pre>
                                                             {/if}
                                                         </div>
                                                         <div class="diff-new">
                                                             {#if change.new === undefined}
                                                                 <span class="tag-deleted">Deleted</span>
                                                             {:else}
-                                                                <pre>{prettyVal(change.new)}</pre>
+                                                                <pre>{@html diffs.right}</pre>
                                                             {/if}
                                                         </div>
                                                     </div>
@@ -177,13 +207,14 @@
 
     .log-table td { padding: 12px 16px; color: var(--text-primary); font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    .icon-cell { 
+    .log-table .icon-cell { 
         color: var(--text-secondary); 
         text-align: center; 
         padding: 0;
         width: 40px;
         overflow: visible;
         text-overflow: clip;
+        white-space: normal;
     }
     .icon-cell i { transition: transform 0.2s; }
     .icon-cell i.rotate { transform: rotate(90deg); }
@@ -223,12 +254,16 @@
         padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: start;
     }
     
-    .diff-field { font-family: monospace; color: var(--accent-blue); font-weight: 600; word-break: break-all; }
+    .diff-field { font-family: monospace; color: var(--accent-blue); font-weight: 600; word-break: break-all;
+    }
     
-    .diff-old, .diff-new { font-size: 0.85rem; color: #dcddde; }
+    .diff-old, .diff-new { font-size: 0.85rem; color: #dcddde;
+    }
     .diff-old pre, .diff-new pre { 
-        margin: 0; white-space: pre-wrap; word-break: break-word; font-family: monospace; 
-        background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; 
+        margin: 0;
+        white-space: pre-wrap; word-break: break-word; font-family: monospace; 
+        background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px;
+        color: #b9bbbe;
     }
     
     .diff-old pre { color: #ff9999; }
@@ -244,4 +279,14 @@
 
     .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px; font-size: 1.2rem; }
     .state-msg i { font-size: 2rem; opacity: 0.7; }
+    :global(.diff-red) {
+        color: #ff5555;
+        background: rgba(255, 85, 85, 0.1);
+        font-weight: bold;
+    }
+    :global(.diff-green) {
+        color: #4ade80;
+        background: rgba(74, 222, 128, 0.1);
+        font-weight: bold;
+    }
 </style>
