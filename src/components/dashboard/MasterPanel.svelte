@@ -7,7 +7,6 @@
     import BundleEditor from './BundleEditor.svelte';
     import MetaPairingEditor from './MetaPairingEditor.svelte';
     import emojiData from '../../data/emoji_mappings.json';
-
     export let user;
 
     const DATA_SOURCES = [
@@ -16,7 +15,6 @@
         { id: 'bundles', label: 'Bundles', icon: 'fa-box-open' },
         { id: 'meta_lineups', label: 'Meta Pairings', icon: 'fa-users' }
     ];
-
     const COLOR_MAP = {
         commander_main: '#004cff',
         commander_sub: '#313338',
@@ -24,7 +22,6 @@
         bundle: '#e9be74',
         event: '#2ecc71'
     };
-
     function getEmbedColor(hexOrInt) {
         if (!hexOrInt) return '#313338';
         if (typeof hexOrInt === 'string' && hexOrInt.startsWith('#')) return hexOrInt;
@@ -42,10 +39,8 @@
 
     let isEditing = false;
     let editingItem = null;
-
     $: totalEntries = rawData ? Object.keys(rawData).length : 0;
     $: if (activeSource) loadData(activeSource);
-
     async function loadData(source) {
         loading = true;
         error = null;
@@ -81,7 +76,6 @@
         if (activeSource === 'events') newData = { title: "New Event", color: 3066993, fields: [] };
         if (activeSource === 'bundles') newData = { title: "New Bundle", color: "#e9be74", description: [] };
         if (activeSource === 'meta_lineups') newData = { title: "New Lineup", color: "#00c6ff", fields: [] };
-
         editingItem = { id, data: newData };
         isEditing = true;
     }
@@ -103,22 +97,52 @@
         isEditing = true;
     }
 
+    function generateDiff(oldObj, newObj) {
+        const diffs = {};
+        const isEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+        for (const key in newObj) {
+            if (!oldObj || !oldObj.hasOwnProperty(key)) {
+                diffs[key] = { old: undefined, new: newObj[key], status: 'added' };
+            } else if (!isEqual(oldObj[key], newObj[key])) {
+                diffs[key] = { old: oldObj[key], new: newObj[key], status: 'modified' };
+            }
+        }
+
+        if (oldObj) {
+            for (const key in oldObj) {
+                if (!newObj.hasOwnProperty(key)) {
+                    diffs[key] = { old: oldObj[key], new: undefined, status: 'deleted' };
+                }
+            }
+        }
+        return diffs;
+    }
+
     async function handleSave(event) {
-        const { id, commanderId, data, aliasData: newAliasData } = event.detail;
+        const { id, commanderId, data, aliasData: newAliasData, callback } = event.detail;
         const saveId = commanderId || id;
 
+        const oldData = rawData[saveId] ? JSON.parse(JSON.stringify(rawData[saveId])) : {};
+        
+        const changes = generateDiff(oldData, data);
+        
         rawData[saveId] = data;
         if (activeSource === 'commanders' && aliasData) {
             aliasData[saveId] = newAliasData;
         }
 
-        isEditing = false;
-        editingItem = null;
-
         try {
+            const logPayload = {
+                target_key: saveId,
+                target_name: data.title || data.displayName || data.name || saveId,
+                changes: changes
+            };
             await window.auth.fetchWithAuth(`/api/admin/data/${activeSource}`, {
                 method: 'POST',
-                body: JSON.stringify(rawData)
+                body: JSON.stringify({
+                    data: rawData,
+                    logDetails: JSON.stringify(logPayload)
+                })
             });
 
             if (activeSource === 'commanders' && aliasData) {
@@ -129,10 +153,23 @@
             }
             
             await loadData(activeSource);
-            alert('Saved successfully!');
+
+            if (callback) {
+                callback(true);
+            } else {
+                alert('Saved successfully!');
+                isEditing = false;
+                editingItem = null;
+            }
+
         } catch (err) {
             console.error("Save failed:", err);
-            alert("Failed to save changes to API.");
+            
+            if (callback) {
+                callback(false);
+            } else {
+                alert("Failed to save changes to API.");
+            }
             await loadData(activeSource);
         }
     }
@@ -172,7 +209,6 @@
         }
 
         rawData = { ...rawData };
-
         try {
             await window.auth.fetchWithAuth(`/api/admin/data/commanders`, {
                 method: 'POST',
@@ -204,23 +240,24 @@
     <div class="panel-content">
         <div class="controls-toolbar">
              <div class="source-selector">
-                {#each DATA_SOURCES as source}
+                 {#each DATA_SOURCES as source}
                     <button 
                         class="source-btn" 
                         class:active={activeSource === source.id}
-                        on:click={() => { activeSource = source.id; searchQuery = ''; }}
+                        on:click={() => { activeSource = source.id; searchQuery = '';
+                        }}
                     >
                         <i class="fas {source.icon}"></i>
                         <span>{source.label}</span>
                     </button>
-                {/each}
+                 {/each}
             </div>
 
             <div class="actions-group">
                 <span class="entry-count">{totalEntries} Entries</span>
                 <div class="search-wrapper">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" placeholder="Search {activeSource}..." bind:value={searchQuery} class="search-input"/>
+                     <input type="text" placeholder="Search {activeSource}..." bind:value={searchQuery} class="search-input"/>
                 </div>
                 <button class="btn-add" aria-label="Add New Entry" on:click={handleAddEntry}><i class="fas fa-plus"></i></button>
             </div>
@@ -228,7 +265,7 @@
 
         <div class="data-list-container">
             {#if loading}
-                <div class="state-msg"><i class="fas fa-circle-notch fa-spin"></i><p>Fetching {activeSource}...</p></div>
+                 <div class="state-msg"><i class="fas fa-circle-notch fa-spin"></i><p>Fetching {activeSource}...</p></div>
             {:else if error}
                 <div class="state-msg error"><i class="fas fa-exclamation-triangle"></i><p>{error}</p></div>
             {:else if rawData}
@@ -297,24 +334,41 @@
 {/if}
 
 <style>
-    .controls-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
-    .source-selector { display: flex; background: var(--bg-tertiary); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color); gap: 2px; }
-    .source-btn { background: transparent; border: none; color: var(--text-secondary); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; font-size: 0.9rem; }
-    .source-btn:hover { color: var(--text-primary); }
-    .source-btn.active { background: var(--bg-card); color: var(--accent-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .controls-toolbar { display: flex;
+        justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
+    .source-selector { display: flex; background: var(--bg-tertiary);
+        padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color); gap: 2px; }
+    .source-btn { background: transparent; border: none;
+        color: var(--text-secondary); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px;
+        transition: all 0.2s ease; font-size: 0.9rem; }
+    .source-btn:hover { color: var(--text-primary);
+    }
+    .source-btn.active { background: var(--bg-card); color: var(--accent-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
     
-    .actions-group { display: flex; gap: 10px; align-items: center; flex-grow: 1; justify-content: flex-end; }
-    .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px; white-space: nowrap; }
+    .actions-group { display: flex; gap: 10px; align-items: center; flex-grow: 1; justify-content: flex-end;
+    }
+    .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px; white-space: nowrap;
+    }
     .search-wrapper { position: relative; width: 100%; max-width: 300px; }
-    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; }
-    .search-input { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); padding: 10px 10px 10px 36px; border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.95rem; }
-    .search-input:focus { outline: none; border-color: var(--accent-blue); }
+    .search-icon { position: absolute;
+        left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; }
+    .search-input { width: 100%; background: var(--bg-primary);
+        border: 1px solid var(--border-color); padding: 10px 10px 10px 36px; border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.95rem;
+    }
+    .search-input:focus { outline: none; border-color: var(--accent-blue);
+    }
     
-    .btn-add { background: var(--accent-green); color: #000; border: none; width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 1.1rem; }
+    .btn-add { background: var(--accent-green); color: #000; border: none; width: 40px; height: 40px;
+        border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 1.1rem;
+    }
     .btn-add:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-    .data-list-container { min-height: 400px; position: relative; }
-    .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px; font-size: 1.2rem; }
+    .data-list-container { min-height: 400px; position: relative;
+    }
+    .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px;
+        font-size: 1.2rem; }
     .state-msg.error { color: #ef4444; }
-    .state-msg i { font-size: 2rem; opacity: 0.7; }
+    .state-msg i { font-size: 2rem;
+        opacity: 0.7; }
 </style>

@@ -1025,12 +1025,17 @@ app.post('/api/admin/data/:key', authMiddleware, masterAdminMiddleware, async (c
     }
 
     let username = "Unknown Admin";
+    let adminId = c.get('user').id;
+    let adminAvatar = null;
+
     try {
         const userRes = await fetch('https://discord.com/api/users/@me', {
             headers: { 'Authorization': `Bearer ${c.get('user').accessToken}` }
         });
         const uData = await userRes.json() as any;
         username = uData.username || uData.global_name || c.get('user').id;
+        adminId = uData.id;
+        adminAvatar = uData.avatar;
     } catch(e) {}
 
     await c.env.BOT_DATA.put(key, JSON.stringify(bodyData));
@@ -1039,6 +1044,8 @@ app.post('/api/admin/data/:key', authMiddleware, masterAdminMiddleware, async (c
     const logEntry = {
         timestamp: Date.now(),
         user: username,
+        userId: adminId,
+        userAvatar: adminAvatar,
         action: `Updated ${key}`,
         details: details
     };

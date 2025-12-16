@@ -1,5 +1,6 @@
 <script>
     import { createEventDispatcher, onMount, tick } from 'svelte';
+    import { fly } from 'svelte/transition';
     import DiscordEmbedPreview from './DiscordEmbedPreview.svelte';
 
     export let commanderId;
@@ -9,6 +10,8 @@
     export let user;
 
     let hasUnsavedChanges = false;
+    let saveState = 'idle'; // 'idle', 'saving', 'success'
+
     function markDirty() {
         hasUnsavedChanges = true;
     }
@@ -24,7 +27,8 @@
     }
     
     function handleKeyEnter(event, callback) {
-        if (event.key === 'Enter' || event.key === ' ') {
+        // FIXED: Removed "|| event.key === ' '" to prevent spacebar closing modal
+        if (event.key === 'Enter') {
             event.preventDefault();
             callback(event);
         }
@@ -40,18 +44,16 @@
     const AUTHOR_ICON = "https://i.postimg.cc/Jn4zn7sy/Kings-Codex-Logo-No-URL-No-Glow.png";
     const AUTHOR_NAME = "The King's Codex";
     const MAIN_FOOTER = "Check out talents & gear recommendations by clicking the buttons below!";
-
     let currentSuffixLabel = "";
     let displayName = "";
     let aliases = "";
     let imageUrl = "";
 
-    let pairingGroups = []; 
+    let pairingGroups = [];
     let activeButtons = [];
     let sub_recAccessories = [null, null];
     let sub_optAccessories = [];
     let sub_formations = [];
-
     let activeTemplateIdx = 0;
     let sortedTemplates = [];
     let isMainTemplate = true;
@@ -72,14 +74,14 @@
         let owner = document.body;
         owner.appendChild(node);
         return {
-            destroy() { if (node.parentNode) node.parentNode.removeChild(node); }
+            destroy() { if (node.parentNode) node.parentNode.removeChild(node);
+            }
         };
     }
 
     onMount(async () => {
         sortAndLoad();
     });
-
     function sortAndLoad() {
         sortedTemplates = [...commanderData].sort((a, b) => {
             if (a.name === commanderId) return -1;
@@ -347,12 +349,25 @@
             display_name: displayName,
             aliases: aliases.split(',').map(s => s.trim()).filter(s => s)
         };
-        hasUnsavedChanges = false; 
+        
+        saveState = 'saving';
         
         dispatch('save', { 
             commanderId, 
             data: newCommanderData,
-            aliasData: newAliasData
+            aliasData: newAliasData,
+            callback: (success) => {
+                if (success) {
+                    saveState = 'success';
+                    setTimeout(() => {
+                        hasUnsavedChanges = false;
+                        saveState = 'idle';
+                    }, 2000);
+                } else {
+                    saveState = 'idle';
+                    alert("Save failed. Please check console.");
+                }
+            }
         });
     }
 
@@ -438,7 +453,8 @@
     } else {
         const groups = [];
         if (sub_recAccessories[0] || sub_recAccessories[1]) {
-            const acc1 = sub_recAccessories[0] ? `${getAccessoryName(sub_recAccessories[0])} <img src="${getAccessoryIcon(sub_recAccessories[0])}" class="emoji inline">` : "None";
+            const acc1 = sub_recAccessories[0] ?
+            `${getAccessoryName(sub_recAccessories[0])} <img src="${getAccessoryIcon(sub_recAccessories[0])}" class="emoji inline">` : "None";
             const acc2 = sub_recAccessories[1] ? `${getAccessoryName(sub_recAccessories[1])} <img src="${getAccessoryIcon(sub_recAccessories[1])}" class="emoji inline">` : "None";
             groups.push({
                 title: "Recommended Accessories",
@@ -485,7 +501,7 @@
         <div class="editor-body">
             <div class="form-column">
                 
-                <div class="section-box">
+                 <div class="section-box">
                     <h3><i class="fas fa-id-card"></i> Commander Details</h3>
                     <div class="row">
                         <div class="form-group">
@@ -505,11 +521,11 @@
                             <label>
                                 <input type="radio" name="template" checked={activeTemplateIdx === idx} on:change={() => loadTemplate(idx)}>
                                 <span class="template-btn" class:is-main={t.name === commanderId}>
-                                  {t.name === commanderId ? 'Main' : t.name.replace(commanderId + '_', '').toUpperCase()}
+                                    {t.name === commanderId ? 'Main' : t.name.replace(commanderId + '_', '').toUpperCase()}
                                 </span>
                             </label>
                         {/each}
-                     </div>
+                    </div>
                     {#if isMainTemplate}
                         <button class="add-build-btn" on:click={() => { showAddBuildModal = true; newBuildButtonKey = ""; newBuildLabel = ""; }}>
                             <i class="fas fa-plus-circle"></i> Add Build
@@ -517,7 +533,7 @@
                     {/if}
                 </div>
 
-              <div class="section-box" style="flex:1;">
+                <div class="section-box" style="flex:1;">
                     <h3>
                         <i class="fas {isMainTemplate ? 'fa-star' : 'fa-puzzle-piece'}"></i> 
                         {isMainTemplate ? 'Main Template Config' : 'Sub-Template Config'}
@@ -532,7 +548,7 @@
 
                     {#if isMainTemplate}
                         <div class="groups-container">
-                        {#each pairingGroups as group, gIdx (group.id)}
+                            {#each pairingGroups as group, gIdx (group.id)}
                                 <div class="pairing-group">
                                     <div class="group-header">
                                         <input type="text" aria-label="Group Title" class="group-title-input" bind:value={group.title} on:input={markDirty} />
@@ -548,7 +564,7 @@
 
                                                 <div class="row-content">
                                                     {#if row.type === 'pair'}
-                                                        <div class="custom-select">
+                                                      <div class="custom-select">
                                                             <div class="select-trigger" 
                                                                  role="button" 
                                                                  tabindex="0"
@@ -558,9 +574,9 @@
                                                                    <div class="trigger-content">
                                                                         <img src={getCmdIcon(row.cmd1)} alt="" class="select-icon">
                                                                         <span>{getCmdName(row.cmd1)}</span>
-                                                                   </div>
+                                                                    </div>
                                                                 {:else}
-                                                                    <span class="placeholder">Select...</span>
+                                                                   <span class="placeholder">Select...</span>
                                                                 {/if}
                                                             </div>
                                                             {#if openDropdownId === `g${gIdx}r${rIdx}s1`}
@@ -572,27 +588,27 @@
                                                                              on:keydown={(e) => handleKeyEnter(e, () => { row.cmd1 = c.key; openDropdownId = null; })}
                                                                              on:click={() => { row.cmd1 = c.key; openDropdownId = null; }}>
                                                                             <img src={`https://cdn.discordapp.com/emojis/${c.emoji}.png`} alt="" class="select-icon"> {c.name}
-                                                                       </div>
+                                                                        </div>
                                                                 {/each}
                                                                 </div>
-                                                           {/if}
+                                                            {/if}
                                                        </div>
-                                                        <span class="sep">|</span>
+                                                       <span class="sep">|</span>
                                         
-                                                        <div class="custom-select">
+                                                       <div class="custom-select">
                                                             <div class="select-trigger" 
                                                                  role="button" 
                                                                  tabindex="0"
                                                                  on:keydown={(e) => handleKeyEnter(e, (ev) => toggleDropdown(`g${gIdx}r${rIdx}s2`, ev))}
                                                                  on:click={(e) => toggleDropdown(`g${gIdx}r${rIdx}s2`, e)}>
-                                                              {#if row.cmd2}
-                                                               <div class="trigger-content">
+                                                                {#if row.cmd2}
+                                                                   <div class="trigger-content">
                                                                         <img src={getCmdIcon(row.cmd2)} alt="" class="select-icon">
                                                                         <span>{getCmdName(row.cmd2)}</span>
-                                                               </div>
+                                                                    </div>
                                                                 {:else}
-                                                               <span class="placeholder">Select...</span>
-                                                            {/if}
+                                                                   <span class="placeholder">Select...</span>
+                                                                {/if}
                                                             </div>
                                                             {#if openDropdownId === `g${gIdx}r${rIdx}s2`}
                                                                <div class="select-options">
@@ -603,19 +619,18 @@
                                                                              on:keydown={(e) => handleKeyEnter(e, () => { row.cmd2 = c.key; openDropdownId = null; })}
                                                                              on:click={() => { row.cmd2 = c.key; openDropdownId = null; }}>
                                                                             <img src={`https://cdn.discordapp.com/emojis/${c.emoji}.png`} alt="" class="select-icon"> {c.name}
-                                                                       </div>
+                                                                        </div>
                                                                     {/each}
                                                                 </div>
                                                             {/if}
-                                                        </div>
+                                                       </div>
                                                     {:else}
                                                         <input type="text" aria-label="Custom text" class="custom-text-input" bind:value={row.customText} on:input={markDirty} />
                                                     {/if}
                                                 </div>
                                                 <button class="btn-icon" aria-label="Remove Row" on:click={() => group.rows = group.rows.filter((_, i) => i !== rIdx)}><i class="fas fa-minus"></i></button>
-                                             </div>
+                                            </div>
                                         {/each}
-                                       
                                         <button class="add-btn-modern" on:click={() => group.rows = [...group.rows, { id: Date.now(), type: 'pair', cmd1: null, cmd2: null }]}>+ Add Row</button>
                                     </div>
                                 </div>
@@ -689,7 +704,7 @@
                                         <i class="fas fa-chevron-down"></i>
                                     </div>
                                     {#if openDropdownId === 'recAcc1'}
-                                       <div class="select-options">
+                                    <div class="select-options">
                                             <div class="option" 
                                                  role="button" 
                                                  tabindex="0"
@@ -709,7 +724,7 @@
                                 </div>
                                 <span class="sep">+</span>
   
-                              <div class="custom-select">
+                                <div class="custom-select">
                                     <div class="select-trigger" 
                                          role="button" 
                                          tabindex="0"
@@ -832,14 +847,28 @@
                         suffixLabel={currentSuffixLabel} 
                     />
                 </div>
-                <div class="actions-footer">
-                    <button class="btn-cancel" on:click={attemptClose}>Cancel</button>
-                    <button class="btn-save" on:click={save}><i class="fas fa-save"></i> Save Changes</button>
-                </div>
             </div>
         </div>
     </div>
     
+    {#if hasUnsavedChanges || saveState === 'success' || saveState === 'saving'}
+        <div class="save-bar" transition:fly={{ y: 50, duration: 300 }}>
+            <div class="save-bar-content">
+                {#if saveState === 'saving'}
+                    <span class="status-msg"><i class="fas fa-circle-notch fa-spin"></i> Saving changes...</span>
+                {:else if saveState === 'success'}
+                    <span class="status-msg success"><i class="fas fa-check-circle"></i> Saved!</span>
+                {:else}
+                    <span class="dirty-msg">You have unsaved changes.</span>
+                    <div class="bar-actions">
+                        <button class="btn-bar-cancel" on:click={attemptClose}>Discard</button>
+                        <button class="btn-bar-save" on:click={save}>Save Changes</button>
+                    </div>
+                {/if}
+            </div>
+        </div>
+    {/if}
+
     {#if showAddBuildModal}
         <div class="modal-backdrop" role="button" tabindex="0" on:click={() => showAddBuildModal = false} on:keydown={(e) => handleKeyEnter(e, () => showAddBuildModal = false)}>
             <div class="modal" role="dialog" aria-modal="true" tabindex="-1" on:click|stopPropagation on:keydown|stopPropagation={() => {}}>
@@ -872,61 +901,163 @@
 
 <style>
     .editor-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-    .editor-modal { background: var(--bg-secondary); width: 95%; max-width: 1400px; height: 90vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.5); border: 1px solid var(--border-color); }
-    .editor-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-tertiary); }
-    .editor-header h2 { margin: 0; font-size: 1.25rem; color: var(--text-primary); }
-    .close-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.25rem; cursor: pointer; }
+    .editor-modal { 
+        background: var(--bg-secondary); width: 95%; max-width: 1400px; height: 90vh; 
+        border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5); border: 1px solid var(--border-color); 
+        position: relative;
+    }
+    .editor-header { 
+        padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-tertiary);
+    }
+    .editor-header h2 { margin: 0; font-size: 1.25rem; color: var(--text-primary);
+    }
+    .close-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.25rem; cursor: pointer;
+    }
     .editor-body { display: flex; flex: 1; overflow: hidden; }
-    .form-column { flex: 1; padding: 20px; overflow-y: auto; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 20px; min-width: 500px; }
-    .preview-column { flex: 0 0 480px; padding: 20px; background: #313338; display: flex; flex-direction: column; border-left: 1px solid #000; }
-    .section-box { background: var(--bg-primary); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; }
-    .section-box h3 { margin: 0; font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-    .row { display: flex; gap: 15px; }
-    .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; }
-    .form-group label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
-    input[type="text"] { background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 4px; color: var(--text-primary); }
-    .template-selector-container { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;}
-    .template-selector { display: flex; gap: 5px; flex-wrap: wrap; }
+    .form-column { flex: 1;
+        padding: 20px; overflow-y: auto; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 20px; min-width: 500px;
+    }
+    .preview-column { flex: 0 0 480px; padding: 20px; background: #313338; display: flex; flex-direction: column;
+        border-left: 1px solid #000; }
+    .section-box { background: var(--bg-primary); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);
+        display: flex; flex-direction: column; gap: 15px; }
+    .section-box h3 { margin: 0; font-size: 0.85rem; color: var(--text-secondary);
+        text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .row { display: flex; gap: 15px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1;
+    }
+    .form-group label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;
+    }
+    input[type="text"] { background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 4px; color: var(--text-primary);
+    }
+    .template-selector-container { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        flex-wrap: wrap;}
+    .template-selector { display: flex; gap: 5px; flex-wrap: wrap;
+    }
     .template-selector label { position: relative; cursor: pointer; }
-    .template-selector input { position: absolute; opacity: 0; width: 0; height: 0; }
-    .template-btn { display: flex; align-items: center; justify-content: center; padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-hover); background-color: var(--bg-tertiary); font-weight: 600; color: #aaa; transition: all 0.2s ease; font-size: 0.8rem; }
-    .template-selector input:checked + .template-btn { background-color: var(--accent-blue-light); border-color: var(--accent-blue); color: white; }
+    .template-selector input { position: absolute;
+        opacity: 0; width: 0; height: 0; }
+    .template-btn { display: flex; align-items: center; justify-content: center;
+        padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-hover); background-color: var(--bg-tertiary); font-weight: 600; color: #aaa; transition: all 0.2s ease;
+        font-size: 0.8rem; }
+    .template-selector input:checked + .template-btn { background-color: var(--accent-blue-light); border-color: var(--accent-blue); color: white;
+    }
     .template-btn.is-main { border-color: #004cff; }
     .add-build-btn { background: var(--accent-green); color: black; border: none;
         padding: 4px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.8rem; height: 32px;
     }
     .custom-select { position: relative; flex: 1; min-width: 0; }
-    .select-trigger { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 4px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; }
-    .select-options { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); margin-top: 4px; }
-    .option { display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; }
+    .select-trigger { display: flex;
+        align-items: center; justify-content: space-between; gap: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 4px; cursor: pointer;
+        color: var(--text-primary); font-size: 0.9rem; }
+    .select-options { position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+        background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); margin-top: 4px;
+    }
+    .option { display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem;
+    }
     .option:hover { background: var(--accent-blue-light); color: white; }
-    .select-icon { width: 20px; height: 20px; object-fit: contain; }
-    .trigger-content { display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; }
+    .select-icon { width: 20px; height: 20px;
+        object-fit: contain; }
+    .trigger-content { display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap;
+    }
     .placeholder { color: var(--text-muted); font-size: 0.85rem; }
-    .pairing-group { background: rgba(0,0,0,0.1); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 10px; }
-    .group-header { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-    .group-title-input { flex: 1; font-weight: bold; background: transparent; border: none; border-bottom: 1px dashed var(--border-color); border-radius: 0; padding-left: 0; }
-    .pairing-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; background: var(--bg-primary); padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); }
-    .row-type-toggle { display: flex; background: var(--bg-tertiary); border-radius: 4px; border: 1px solid var(--border-color); }
-    .row-type-toggle button { background: none; border: none; color: var(--text-secondary); padding: 5px 8px; cursor: pointer; opacity: 0.5; }
-    .row-type-toggle button.active { background: var(--accent-blue); color: white; opacity: 1; }
-    .row-content { flex: 1; display: flex; align-items: center; gap: 5px; min-width: 0; }
+    .pairing-group { background: rgba(0,0,0,0.1);
+        border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 10px; }
+    .group-header { display: flex; justify-content: space-between;
+        gap: 10px; margin-bottom: 10px; }
+    .group-title-input { flex: 1; font-weight: bold; background: transparent; border: none;
+        border-bottom: 1px dashed var(--border-color); border-radius: 0; padding-left: 0; }
+    .pairing-row { display: flex; align-items: center; gap: 8px;
+        margin-bottom: 8px; background: var(--bg-primary); padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); }
+    .row-type-toggle { display: flex;
+        background: var(--bg-tertiary); border-radius: 4px; border: 1px solid var(--border-color); }
+    .row-type-toggle button { background: none; border: none;
+        color: var(--text-secondary); padding: 5px 8px; cursor: pointer; opacity: 0.5; }
+    .row-type-toggle button.active { background: var(--accent-blue); color: white;
+        opacity: 1; }
+    .row-content { flex: 1; display: flex; align-items: center; gap: 5px; min-width: 0;
+    }
     .custom-text-input { width: 100%; }
-    .sep { color: var(--text-secondary); opacity: 0.5; }
-    .add-btn-modern { width: 100%; background: var(--bg-tertiary); border: 1px dashed var(--border-color); color: var(--text-secondary); padding: 8px; border-radius: 4px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; }
-    .add-btn-modern:hover { background: var(--bg-secondary); color: var(--accent-blue); border-color: var(--accent-blue); }
-    .btn-icon { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; }
+    .sep { color: var(--text-secondary); opacity: 0.5;
+    }
+    .add-btn-modern { width: 100%; background: var(--bg-tertiary); border: 1px dashed var(--border-color); color: var(--text-secondary); padding: 8px; border-radius: 4px;
+        cursor: pointer; transition: all 0.2s; font-size: 0.85rem; }
+    .add-btn-modern:hover { background: var(--bg-secondary); color: var(--accent-blue); border-color: var(--accent-blue);
+    }
+    .btn-icon { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px;
+    }
     .btn-icon:hover { color: var(--text-primary); }
-    .btn-icon.danger:hover { color: #ff4444; }
+    .btn-icon.danger:hover { color: #ff4444;
+    }
     .sub-field-group { margin-bottom: 20px; }
-    .sub-field-group .group-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--accent-blue); border-bottom: 1px solid rgba(59, 130, 246, 0.2); padding-bottom: 4px; }
+    .sub-field-group .group-label { display: block; margin-bottom: 8px;
+        font-weight: 600; color: var(--accent-blue); border-bottom: 1px solid rgba(59, 130, 246, 0.2); padding-bottom: 4px;
+    }
     .spacer { height: 10px; }
-    .actions-footer { margin-top: auto; padding-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
-    .btn-save { background: var(--accent-green); color: #000; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-    .btn-cancel { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 4px; cursor: pointer; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-    .modal { background: var(--bg-card); padding: 25px; border-radius: 8px; width: 400px; border: 1px solid var(--border-color); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
-    .modal h3 { margin-top: 0; margin-bottom: 20px; color: var(--text-primary); }
-    .modal select { width: 100%; padding: 10px; margin-bottom: 15px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; }
+
+    .save-bar {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #111214;
+        border: 1px solid #00c6ff;
+        padding: 15px 30px;
+        border-radius: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        z-index: 1000;
+        min-width: 300px;
+        display: flex;
+        justify-content: center;
+    }
+    .save-bar-content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        width: 100%;
+        justify-content: space-between;
+    }
+    .status-msg { font-size: 1.1rem; color: var(--text-primary); display: flex; align-items: center; gap: 10px; margin: 0 auto;}
+    .status-msg.success { color: #4ade80; }
+    .dirty-msg { font-weight: 600; color: var(--text-primary); }
+    .bar-actions { display: flex; gap: 10px; }
+    
+    .btn-bar-cancel {
+        background: transparent;
+        color: #ef4444;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 8px 16px;
+    }
+    .btn-bar-cancel:hover { text-decoration: underline; }
+
+    .btn-bar-save {
+        background: #00c6ff;
+        color: #000;
+        border: none;
+        padding: 8px 24px;
+        border-radius: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.1s;
+    }
+    .btn-bar-save:hover { transform: scale(1.05); filter: brightness(1.1); }
+
+    .btn-save { background: var(--accent-green); color: #000; border: none; padding: 8px 16px;
+        border-radius: 4px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .btn-cancel { background: transparent;
+        color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 4px; cursor: pointer;
+    }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;
+    }
+    .modal { background: var(--bg-card); padding: 25px; border-radius: 8px; width: 400px; border: 1px solid var(--border-color);
+        box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
+    .modal h3 { margin-top: 0; margin-bottom: 20px; color: var(--text-primary);
+    }
+    .modal select { width: 100%; padding: 10px; margin-bottom: 15px; background: var(--bg-tertiary); border: 1px solid var(--border-color);
+        color: var(--text-primary); border-radius: 4px; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
 </style>

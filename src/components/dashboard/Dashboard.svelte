@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import MasterPanel from './MasterPanel.svelte';
     import BotConfigPanel from './BotConfigPanel.svelte';
+    import ChangelogPanel from './ChangelogPanel.svelte';
 
     let user = null;
     let loading = true;
@@ -31,9 +32,9 @@
 
     function determineAccess(userData) {
         allowedViews = [];
-
         if (userData.is_master_admin) {
             allowedViews.push({ id: 'master', label: 'Master Panel', icon: 'fa-user-shield' });
+            allowedViews.push({ id: 'changelog', label: 'Changelog', icon: 'fa-history' });
         }
 
         if (userData.is_active_patron) {
@@ -90,8 +91,9 @@
                 {#if currentView === 'master'}
                     <MasterPanel {user} />
                 {:else if currentView === 'bot_config'}
-                    <BotConfigPanel {user} />
-                {/if}
+                     <BotConfigPanel {user} />
+                {:else if currentView === 'changelog'}
+                     <ChangelogPanel {user} /> {/if}
             </main>
         </div>
     {/if}
