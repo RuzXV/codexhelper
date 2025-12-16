@@ -54,10 +54,17 @@
                 </div>
             `;
         } else {
+            const dashboardLink = user.is_master_admin ? `
+                <a href="/dashboard" class="dropdown-item">
+                    <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                </a>
+            ` : '';
+
             dropdownContent = `
                 <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="dropdown-item">
                     <i class="fab fa-patreon" style="color: #FF424D;"></i> <span>Subscribe</span>
                 </a>
+                ${dashboardLink}
                 <div class="dropdown-item logout-trigger">
                     <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                 </div>
@@ -123,6 +130,7 @@
                 .dropdown-item i {
                     width: 20px;
                     text-align: center;
+                    transform: translateY(1.3px); 
                 }
             `;
             document.head.appendChild(style);

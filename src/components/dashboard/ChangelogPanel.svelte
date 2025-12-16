@@ -1,8 +1,6 @@
 <script>
     import { onMount } from 'svelte';
 
-    export let user;
-
     let logs = [];
     let loading = true;
     let expandedRowId = null;
