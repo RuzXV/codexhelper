@@ -6,7 +6,7 @@
     import EventEditor from './EventEditor.svelte';
     import BundleEditor from './BundleEditor.svelte';
     import MetaPairingEditor from './MetaPairingEditor.svelte';
-    import emojiData from '../../data/emoji_mappings.json';
+    import emojiData from '../../../data/emoji_mappings.json';
     export let user;
 
     const DATA_SOURCES = [

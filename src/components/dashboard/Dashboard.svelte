@@ -1,8 +1,8 @@
 <script>
     import { onMount } from 'svelte';
-    import MasterPanel from './MasterPanel.svelte';
-    import BotConfigPanel from './BotConfigPanel.svelte';
-    import ChangelogPanel from './ChangelogPanel.svelte';
+    import MasterPanel from './master_panel/MasterPanel.svelte';
+    import BotConfigPanel from './bot_panel/BotConfigPanel.svelte';
+    import ChangelogPanel from './master_panel/ChangelogPanel.svelte';
 
     let user = null;
     let loading = true;

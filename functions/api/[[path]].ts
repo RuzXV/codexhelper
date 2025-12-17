@@ -1065,4 +1065,52 @@ app.get('/api/admin/logs', authMiddleware, masterAdminMiddleware, async (c) => {
     return c.json(logs || []);
 });
 
+app.post('/api/bot/query', botAuthMiddleware, async (c) => {
+    const { sql, params, method } = await c.req.json();
+    
+    try {
+        const stmt = c.env.DB.prepare(sql).bind(...(params || []));
+        
+        if (method === 'execute') {
+            const res = await stmt.run();
+            return c.json({ rowcount: res.meta.changes, lastrowid: res.meta.last_row_id });
+        } else if (method === 'one') {
+            return c.json(await stmt.first());
+        } else {
+            const { results } = await stmt.all();
+            return c.json(results || []);
+        }
+    } catch (e) {
+        return c.json({ error: String(e) }, 500);
+    }
+});
+
+app.get('/api/bot/events', botAuthMiddleware, async (c) => {
+    const lastTimestamp = c.req.query('since') || 0;
+    
+    const { results } = await c.env.DB.prepare(
+        "SELECT * FROM system_events WHERE created_at > ? ORDER BY created_at ASC LIMIT 50"
+    ).bind(lastTimestamp).all();
+
+    return c.json(results || []);
+});
+
+app.post('/api/guilds/:guildId/settings/channels', authMiddleware, async (c) => {
+    const { guildId } = c.req.param();
+    const { command_group, channel_id, action } = await c.req.json();
+    
+    if (action === 'Add Channel') {
+        await c.env.DB.prepare("INSERT OR REPLACE INTO allowed_channels (guild_id, command_group, channel_id) VALUES (?, ?, ?)").bind(guildId, command_group, channel_id).run();
+    } else {
+        await c.env.DB.prepare("DELETE FROM allowed_channels WHERE guild_id = ? AND command_group = ?").bind(guildId, command_group).run();
+    }
+
+    const payload = JSON.stringify({ guild_id: guildId });
+    await c.env.DB.prepare(
+        "INSERT INTO system_events (type, payload, created_at) VALUES ('CHANNEL_UPDATE', ?, ?)"
+    ).bind(payload, Date.now() / 1000).run();
+
+    return c.json({ success: true });
+});
+
 export const onRequest = handle(app);

@@ -1053,7 +1053,7 @@
 <style>
     .editor-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; }
     .editor-modal { 
-        background: var(--bg-secondary); width: 95%; max-width: 1400px; height: 90vh; 
+        background: var(--bg-secondary); width: 95%; max-width: 1100px; height: 90vh; 
         border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; 
         box-shadow: 0 4px 20px rgba(0,0,0,0.5); border: 1px solid var(--border-color); 
         position: relative;
@@ -1080,7 +1080,27 @@
     .template-btn { display: flex; align-items: center; justify-content: center; padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-hover); background-color: var(--bg-tertiary); font-weight: 600; color: #aaa; transition: all 0.2s ease; font-size: 0.8rem; }
     .template-selector input:checked + .template-btn { background-color: var(--accent-blue-light); border-color: var(--accent-blue); color: white; }
     .template-btn.is-main { border-color: #004cff; }
-    .add-build-btn { background: var(--accent-green); color: black; border: none; padding: 4px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.8rem; height: 32px; }
+    .template-selector-container .add-build-btn {
+        background: var(--accent-green); 
+        color: black; 
+        border: none;
+        padding: 2px 12px;
+        border-radius: 4px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        gap: 6px; 
+        font-size: 0.8rem; 
+        height: 24px;
+        line-height: 1.2;
+        transition: all 0.2s ease;
+    }
+
+    .template-selector-container .add-build-btn i {
+        font-size: 0.75rem;
+        line-height: 1;
+    }
     .custom-select { position: relative; flex: 1; min-width: 0; }
     .select-trigger { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 4px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; }
     .select-options { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); margin-top: 4px; }
