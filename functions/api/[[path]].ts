@@ -6,6 +6,7 @@ import { encryptFernetToken, decryptFernetToken } from '../crypto';
 
 type Bindings = {
     DB: D1Database;
+    BOT_DB: D1Database;
     API_CACHE: KVNamespace;
     BOT_DATA: KVNamespace;
     WEBSITE_APP_ID: string;
@@ -1069,7 +1070,7 @@ app.post('/api/bot/query', botAuthMiddleware, async (c) => {
     const { sql, params, method } = await c.req.json();
     
     try {
-        const stmt = c.env.DB.prepare(sql).bind(...(params || []));
+        const stmt = c.env.BOT_DB.prepare(sql).bind(...(params || [])); 
         
         if (method === 'execute') {
             const res = await stmt.run();
@@ -1085,10 +1086,10 @@ app.post('/api/bot/query', botAuthMiddleware, async (c) => {
     }
 });
 
-app.get('/api/bot/events', botAuthMiddleware, async (c) => {
+app.get('/api/bot/sync/feed', botAuthMiddleware, async (c) => {
     const lastTimestamp = c.req.query('since') || 0;
     
-    const { results } = await c.env.DB.prepare(
+    const { results } = await c.env.BOT_DB.prepare(
         "SELECT * FROM system_events WHERE created_at > ? ORDER BY created_at ASC LIMIT 50"
     ).bind(lastTimestamp).all();
 
