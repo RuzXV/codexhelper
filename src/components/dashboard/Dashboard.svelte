@@ -23,11 +23,17 @@
             loading = false;
         }, 500);
 
-        document.addEventListener('auth:loggedIn', (e) => {
+        const authHandler = (e) => {
             user = e.detail.user;
             determineAccess(user);
             loading = false;
-        });
+        };
+
+        document.addEventListener('auth:loggedIn', authHandler);
+
+        return () => {
+            document.removeEventListener('auth:loggedIn', authHandler);
+        };
     });
 
     function determineAccess(userData) {
@@ -38,10 +44,10 @@
         }
 
         if (userData.is_active_patron) {
-            allowedViews.push({ id: 'bot_config', label: 'Bot Config', icon: 'fa-robot' });
+            allowedViews.push({ id: 'config', label: 'Bot Config', icon: 'fa-robot' });
         }
 
-        if (allowedViews.length > 0 && !currentView) {
+        if (allowedViews.length > 0) {
             currentView = allowedViews[0].id;
         }
     }
@@ -91,9 +97,10 @@
                 {#if currentView === 'master'}
                     <MasterPanel {user} />
                 {:else if currentView === 'bot_config'}
-                     <BotConfigPanel {user} />
+                    <BotConfigPanel {user} />
                 {:else if currentView === 'changelog'}
-                     <ChangelogPanel {user} /> {/if}
+                     <ChangelogPanel {user} /> 
+                {/if}
             </main>
         </div>
     {/if}

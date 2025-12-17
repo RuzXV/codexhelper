@@ -1,6 +1,6 @@
 <script>
-    import { createEventDispatcher, onMount } from 'svelte';
-    import { fly } from 'svelte/transition';
+    import { createEventDispatcher, onMount, tick } from 'svelte';
+    import { fly, fade, scale } from 'svelte/transition';
 
     export let metaId;
     export let metaData;
@@ -25,23 +25,25 @@
     let fields = [];
     let openDropdownId = null;
     let saveState = 'idle';
+    let showDiscardModal = false;
+
+    let dropdownSearch = "";
+    let lightboxImage = null;
 
     $: sortedCommanders = (emojiData?.commanders || []).sort((a,b) => a.name.localeCompare(b.name));
     $: userAvatar = user?.avatar 
         ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
         : "https://cdn.discordapp.com/embed/avatars/0.png";
     $: userName = user?.display_name || user?.username || "User";
-
     let initialJSON = "";
     $: currentJSON = JSON.stringify({ title, imageUrl, color, fields });
-    $: hasUnsavedChanges = initialJSON !== currentJSON;
-
+    $: hasUnsavedChanges = initialJSON && currentJSON && initialJSON !== currentJSON;
+    
     function portal(node) {
         let owner = document.body;
         owner.appendChild(node);
         return {
-            destroy() { if (node.parentNode) node.parentNode.removeChild(node);
-            }
+            destroy() { if (node.parentNode) node.parentNode.removeChild(node); }
         };
     }
 
@@ -63,7 +65,7 @@
             .replace(/\n/g, '<br>');
     }
 
-    onMount(() => {
+    onMount(async () => {
         title = metaData.title || "";
         imageUrl = metaData.image?.url || "";
         color = metaData.color || "#00c6ff";
@@ -83,7 +85,6 @@
                     if (foundKeys.length === 0) {
                         const cleanLine = line.replace(BULLET_STRING, '').trim();
                         const parts = cleanLine.includes(SEPARATOR) ? cleanLine.split(SEPARATOR) : cleanLine.split('|');
-                        
                         parts.forEach(p => {
                             const pTrim = p.trim().toLowerCase();
                             if(!pTrim) return;
@@ -103,7 +104,8 @@
             fields = [{ id: '1', name: 'Lane Pairings', rows: [{ id: 1, cmd1: null, cmd2: null }] }];
         }
         
-        initialJSON = JSON.stringify({ title, imageUrl, color, fields });
+        await tick();
+        initialJSON = currentJSON;
     });
 
     function addField() {
@@ -135,7 +137,6 @@
                 inline: false
             }))
         };
-        
         saveState = 'saving';
 
         dispatch('save', { 
@@ -144,7 +145,7 @@
             callback: (success) => {
                 if (success) {
                     saveState = 'success';
-                    initialJSON = JSON.stringify({ title, imageUrl, color, fields });
+                    initialJSON = currentJSON;
                     setTimeout(() => {
                         saveState = 'idle';
                     }, 2000);
@@ -156,22 +157,50 @@
         });
     }
 
-    function close() {
-        if (hasUnsavedChanges && !confirm("Discard unsaved changes?")) return;
-        dispatch('close');
+    function attemptClose() {
+        if (hasUnsavedChanges) {
+             showDiscardModal = true;
+        } else {
+            dispatch('close');
+        }
+    }
+
+    function openLightbox(url) {
+        if (url) lightboxImage = url;
+    }
+    function closeLightbox() {
+        lightboxImage = null;
     }
 
     function handleKeydown(e) {
-        if (e.key === 'Escape') close();
+        if (e.key === 'Escape') {
+            if (lightboxImage) {
+                closeLightbox();
+                e.stopPropagation();
+            } else {
+                attemptClose();
+            }
+        }
     }
 
     function toggleDropdown(id, event) {
         event.stopPropagation();
+        dropdownSearch = "";
         openDropdownId = openDropdownId === id ? null : id;
+        
+        if (openDropdownId) {
+            setTimeout(() => {
+                const input = document.querySelector('.dropdown-search-input');
+                if (input) input.focus();
+            }, 50);
+        }
     }
     
-    function handleWindowClick() { openDropdownId = null;
+    function handleSearchClick(event) {
+        event.stopPropagation();
     }
+
+    function handleWindowClick() { openDropdownId = null; }
     
     function handleEnter(event, callback) {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -197,13 +226,13 @@
     use:portal 
     role="button" 
     tabindex="0" 
-    on:click|self={close} 
+    on:click|self={attemptClose} 
     on:keydown={handleKeydown}
 >
     <div class="editor-modal" role="dialog" aria-modal="true">
         <div class="editor-header">
             <h2>Edit Meta Lineup: {title || "New"}</h2>
-            <button class="close-btn" aria-label="Close Editor" on:click={close}><i class="fas fa-times"></i></button>
+            <button class="close-btn" aria-label="Close Editor" on:click={attemptClose}><i class="fas fa-times"></i></button>
         </div>
 
         <div class="editor-body">
@@ -220,7 +249,7 @@
                     </label>
                 </div>
 
-                 <div class="section-box" style="flex: 1;">
+                <div class="section-box" style="flex: 1;">
                     <h3>Pairing Groups</h3>
                     {#each fields as field, fIdx (field.id)}
                         <div class="pairing-group">
@@ -235,30 +264,37 @@
                                             <img src={BULLET_IMG_URL} class="bullet-icon-static" alt="•">
                                         </div>
                                         
-                                         <div class="custom-select">
+                                        <div class="custom-select">
                                             <div class="select-trigger" role="button" tabindex="0"
                                                  on:click={(e) => toggleDropdown(`f${fIdx}r${rIdx}c1`, e)}
                                                  on:keydown={(e) => handleEnter(e, () => toggleDropdown(`f${fIdx}r${rIdx}c1`, e))}>
-                                                
                                                 {#if row.cmd1}
                                                     <div class="trigger-content">
                                                         <img src={getCmdIcon(row.cmd1)} alt="" class="select-icon">
                                                         <span>{getCmdName(row.cmd1)}</span>
                                                     </div>
-                                                 {:else}
+                                                {:else}
                                                     <span class="placeholder">Select...</span>
                                                 {/if}
                                             </div>
 
                                             {#if openDropdownId === `f${fIdx}r${rIdx}c1`}
                                                 <div class="select-options">
-                                                    {#each sortedCommanders as c}
+                                                    <div class="search-container" role="button" tabindex="0" on:click={handleSearchClick} on:keydown={handleSearchClick}>
+                                                        <input type="text" class="dropdown-search-input" placeholder="Search..." bind:value={dropdownSearch} on:keydown|stopPropagation />
+                                                    </div>
+
+                                                    {#each sortedCommanders.filter(c => c.name.toLowerCase().includes(dropdownSearch.toLowerCase())) as c}
                                                         <div class="option" role="button" tabindex="0"
                                                              on:click|stopPropagation={() => { row.cmd1 = c.key; openDropdownId = null; }}
                                                              on:keydown|stopPropagation={(e) => handleEnter(e, () => { row.cmd1 = c.key; openDropdownId = null; })}>
                                                             <img src={`https://cdn.discordapp.com/emojis/${c.emoji}.png`} alt="" class="select-icon"> {c.name}
                                                         </div>
                                                     {/each}
+                                                    
+                                                    {#if sortedCommanders.filter(c => c.name.toLowerCase().includes(dropdownSearch.toLowerCase())).length === 0}
+                                                        <div class="option disabled" style="opacity: 0.5; cursor: default;">No results</div>
+                                                    {/if}
                                                 </div>
                                             {/if}
                                         </div>
@@ -269,7 +305,6 @@
                                             <div class="select-trigger" role="button" tabindex="0"
                                                  on:click={(e) => toggleDropdown(`f${fIdx}r${rIdx}c2`, e)}
                                                  on:keydown={(e) => handleEnter(e, () => toggleDropdown(`f${fIdx}r${rIdx}c2`, e))}>
-                                                
                                                 {#if row.cmd2}
                                                     <div class="trigger-content">
                                                         <img src={getCmdIcon(row.cmd2)} alt="" class="select-icon">
@@ -282,13 +317,21 @@
 
                                             {#if openDropdownId === `f${fIdx}r${rIdx}c2`}
                                                 <div class="select-options">
-                                                    {#each sortedCommanders as c}
+                                                    <div class="search-container" role="button" tabindex="0" on:click={handleSearchClick} on:keydown={handleSearchClick}>
+                                                        <input type="text" class="dropdown-search-input" placeholder="Search..." bind:value={dropdownSearch} on:keydown|stopPropagation />
+                                                    </div>
+
+                                                    {#each sortedCommanders.filter(c => c.name.toLowerCase().includes(dropdownSearch.toLowerCase())) as c}
                                                         <div class="option" role="button" tabindex="0"
                                                              on:click|stopPropagation={() => { row.cmd2 = c.key; openDropdownId = null; }}
                                                              on:keydown|stopPropagation={(e) => handleEnter(e, () => { row.cmd2 = c.key; openDropdownId = null; })}>
                                                             <img src={`https://cdn.discordapp.com/emojis/${c.emoji}.png`} alt="" class="select-icon"> {c.name}
                                                         </div>
                                                     {/each}
+
+                                                    {#if sortedCommanders.filter(c => c.name.toLowerCase().includes(dropdownSearch.toLowerCase())).length === 0}
+                                                        <div class="option disabled" style="opacity: 0.5; cursor: default;">No results</div>
+                                                    {/if}
                                                 </div>
                                             {/if}
                                         </div>
@@ -345,7 +388,18 @@
                         </div>
 
                         {#if imageUrl}
-                            <img src={imageUrl} class="preview-image" alt="meta" />
+                            <button 
+                                class="preview-image-wrapper" 
+                                on:click={() => openLightbox(imageUrl)}
+                                on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { openLightbox(imageUrl); } }}
+                                aria-label="Zoom in on meta image"
+                            >
+                                <img 
+                                    src={imageUrl} 
+                                    class="preview-image" 
+                                    alt="Meta Lineup Banner" 
+                                />
+                            </button>
                         {/if}
                     </div>
                 </div>
@@ -363,213 +417,221 @@
                 {:else}
                     <span class="dirty-msg">You have unsaved changes.</span>
                     <div class="bar-actions">
-                        <button class="btn-bar-cancel" on:click={close}>Discard</button>
+                        <button class="btn-bar-cancel" on:click={attemptClose}>Discard</button>
                         <button class="btn-bar-save" on:click={save}>Save Changes</button>
                     </div>
                 {/if}
             </div>
         </div>
     {/if}
+
+    {#if showDiscardModal}
+        <div class="modal-backdrop" 
+            role="button" 
+            tabindex="0" 
+            on:click|self={() => showDiscardModal = false} 
+            on:keydown|stopPropagation={() => {}}
+        >
+            <div class="modal" role="dialog" aria-modal="true">
+                <h3>Discard Changes?</h3>
+                <p>You have unsaved changes. Are you sure you want to discard them?</p>
+                <div class="modal-actions">
+                    <button class="btn-cancel" on:click={() => showDiscardModal = false}>Cancel</button>
+                    <button class="btn-danger" on:click={() => dispatch('close')}>Discard</button>
+                </div>
+            </div>
+        </div>
+    {/if}
+
+    {#if lightboxImage}
+        <div 
+            class="lightbox-overlay" 
+            role="button" 
+            tabindex="0" 
+            on:click|self={closeLightbox} 
+            on:keydown={(e) => e.key === 'Escape' && closeLightbox()}
+            transition:fade={{ duration: 200 }}
+        >
+        <img 
+            src={lightboxImage} 
+            alt="" class="lightbox-img" 
+            transition:scale={{ start: 0.9, duration: 200 }} 
+        />
+            <button class="lightbox-close" aria-label="Close Lightbox" on:click={closeLightbox}><i class="fas fa-times"></i></button>
+        </div>
+    {/if}
 </div>
 
 <style>
-    .editor-overlay { position: fixed;
-    inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; outline: none;
-    }
-    .editor-modal { background: var(--bg-secondary); width: 95%; max-width: 1200px; height: 90vh; border-radius: 12px; display: flex; flex-direction: column;
-    overflow: hidden; border: 1px solid var(--border-color); position: relative; }
-    .editor-header { padding: 15px 20px; background: var(--bg-tertiary);
-    border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-    .editor-header h2 { margin: 0;
-    color: var(--text-primary); font-size: 1.2rem; }
-    .close-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem;
-    }
+    .editor-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; outline: none; }
+    .editor-modal { background: var(--bg-secondary); width: 95%; max-width: 1200px; height: 90vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border-color); position: relative; }
+    .editor-header { padding: 15px 20px; background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    .editor-header h2 { margin: 0; color: var(--text-primary); font-size: 1.2rem; }
+    .close-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; }
     
-    .editor-body { display: flex; flex: 1; overflow: hidden;
-    }
-    .form-column { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; min-width: 500px;
-    }
-    .preview-column { flex: 0 0 550px; background: #313338; padding: 20px; display: flex; flex-direction: column;
-    border-left: 1px solid #000; }
+    .editor-body { display: flex; flex: 1; overflow: hidden; }
+    .form-column { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; min-width: 500px; }
+    .preview-column { flex: 0 0 550px; background: #313338; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #000; }
     
-    .section-box { background: var(--bg-primary); padding: 15px; border-radius: 8px;
-    border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; }
-    .section-box h3 { margin: 0;
-    font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;
-    }
+    .section-box { background: var(--bg-primary); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; }
+    .section-box h3 { margin: 0; font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
     
-    .form-group { display: flex; flex-direction: column; gap: 5px;
-    }
-    .form-group .label-text { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;
-    }
-    input[type="text"] { background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-primary); width: 100%;
-    }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group .label-text { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
+    input[type="text"] { background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-primary); width: 100%; }
 
-    .discord-preview { 
-        flex: 1; 
-        padding: 20px;
-        padding-right: 30px;
-        overflow-y: auto; 
-        overflow-x: hidden;
-        font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    }
+    .discord-preview { flex: 1; padding: 20px; padding-right: 30px; overflow-y: auto; overflow-x: hidden; font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 
-    .interaction-header { 
-        display: flex; align-items: center; font-size: 0.85rem;
-        color: #949ba4; 
-        margin-bottom: 4px; gap: 8px; position: relative; 
-        left: 18px; 
-        margin-top: -4px;
-    }
-    .interaction-header::before { 
-        content: ""; position: absolute; top: 14px;
-        left: -11px; width: 22px; height: 12px; 
-        border-top: 2px solid #4e5058; border-left: 2px solid #4e5058; border-top-left-radius: 6px; margin-top: -3px;
-    }
+    .interaction-header { display: flex; align-items: center; font-size: 0.85rem; color: #949ba4; margin-bottom: 4px; gap: 8px; position: relative; left: 18px; margin-top: -4px; }
+    .interaction-header::before { content: ""; position: absolute; top: 14px; left: -11px; width: 22px; height: 12px; border-top: 2px solid #4e5058; border-left: 2px solid #4e5058; border-top-left-radius: 6px; margin-top: -3px; }
     .user-avatar-mini { width: 16px; height: 16px; border-radius: 50%; }
-    .username { font-weight: 600;
-    color: #f2f3f5; cursor: pointer; }
+    .username { font-weight: 600; color: #f2f3f5; cursor: pointer; }
     .username:hover { text-decoration: underline; }
-    .command-text { margin-left: 2px;
-    }
-    .command-name { color: #5865f2; background: rgba(88, 101, 242, 0.1); font-weight: 500; padding: 0 2px; border-radius: 3px;
-    cursor: pointer; }
+    .command-text { margin-left: 2px; }
+    .command-name { color: #5865f2; background: rgba(88, 101, 242, 0.1); font-weight: 500; padding: 0 2px; border-radius: 3px; cursor: pointer; }
     .command-name:hover { background: #5865f2; color: #fff; }
 
-    .message-header { display: flex;
-    align-items: center; margin-bottom: 4px; }
-    .bot-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; cursor: pointer;
-    }
+    .message-header { display: flex; align-items: center; margin-bottom: 4px; }
+    .bot-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; cursor: pointer; }
     .bot-avatar:hover { opacity: 0.8; }
-    .header-info { display: flex; align-items: center;
-    }
-    .bot-name { font-weight: 500; color: #f2f3f5; margin-right: 4px; cursor: pointer; font-size: 1rem;
-    }
+    .header-info { display: flex; align-items: center; }
+    .bot-name { font-weight: 500; color: #f2f3f5; margin-right: 4px; cursor: pointer; font-size: 1rem; }
     .bot-name:hover { text-decoration: underline; }
-    .bot-tag { background: #5865f2; color: #fff; font-size: 0.625rem;
-    padding: 0 4px; border-radius: 3px; margin-right: 8px; line-height: 1.3; display: flex; align-items: center; height: 15px; vertical-align: middle; margin-top: 1px;
-    }
+    .bot-tag { background: #5865f2; color: #fff; font-size: 0.625rem; padding: 0 4px; border-radius: 3px; margin-right: 8px; line-height: 1.3; display: flex; align-items: center; height: 15px; vertical-align: middle; margin-top: 1px; }
     .bot-tag-check { font-size: 0.6rem; margin-right: 2px; }
-    .timestamp { font-size: 0.75rem; color: #949ba4;
-    margin-left: 4px; }
+    .timestamp { font-size: 0.75rem; color: #949ba4; margin-left: 4px; }
 
-    .preview-embed { 
-        background: #2b2d31;
-        border-left: 4px solid; 
-        padding: 12px; 
+    .preview-embed { background: #2b2d31; border-left: 4px solid; padding: 12px; border-radius: 4px; margin-left: 52px; margin-top: -2px; }
+    
+    .preview-author { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 600; color: #f2f3f5; margin-bottom: 4px; }
+    .preview-author img { width: 24px; height: 24px; border-radius: 50%; }
+    .preview-title { font-size: 1rem; font-weight: 700; color: #f2f3f5; margin-bottom: 8px; }
+    .preview-fields { display: flex; flex-direction: column; gap: 10px; }
+    .preview-field-name code { background-color: #1e1f22; padding: 2px 4px; border-radius: 3px; font-family: monospace; font-weight: 600; color: #dbdee1; font-size: 0.875rem; }
+    .preview-field-value { font-size: 0.875rem; color: #dcddde; margin-top: 4px; }
+    :global(.emoji-preview) { width: 1.2em; height: 1.2em; vertical-align: -0.2em; object-fit: contain; }
+    .preview-image-wrapper {
+        display: block;
+        padding: 0;
+        border: none;
+        background: none;
+        cursor: zoom-in;
+        margin-top: 12px;
+        max-width: 100%;
         border-radius: 4px; 
-        margin-left: 52px; 
-        margin-top: -2px;
+        overflow: hidden; 
+        transition: transform 0.2s;
     }
-    
-    .preview-author { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 600;
-    color: #f2f3f5; margin-bottom: 4px; }
-    .preview-author img { width: 24px; height: 24px; border-radius: 50%;
+    .preview-image-wrapper:hover { 
+        transform: scale(1.01);
     }
-    .preview-title { font-size: 1rem; font-weight: 700; color: #f2f3f5; margin-bottom: 8px;
-    }
-    .preview-fields { display: flex; flex-direction: column; gap: 10px;
-    }
-    .preview-field-name code { background-color: #1e1f22; padding: 2px 4px; border-radius: 3px; font-family: monospace; font-weight: 600; color: #dbdee1;
-    font-size: 0.875rem; }
-    .preview-field-value { font-size: 0.875rem; color: #dcddde; margin-top: 4px;
-    }
-    :global(.emoji-preview) { width: 1.2em; height: 1.2em; vertical-align: -0.2em; object-fit: contain;
-    }
-    .preview-image { max-width: 100%; border-radius: 4px; margin-top: 12px; }
 
-    .pairing-group { background: rgba(0,0,0,0.1);
-    border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 10px; }
-    .group-header { display: flex; justify-content: space-between;
-    gap: 10px; margin-bottom: 10px; }
-    .group-title-input { flex: 1; font-weight: bold; background: transparent; border: none;
-    border-bottom: 1px dashed var(--border-color); border-radius: 0; padding-left: 0; }
+    .preview-image { 
+        max-width: 100%; 
+        display: block; 
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+    .preview-image:hover { transform: scale(1.01); }
+
+    .pairing-group { background: rgba(0,0,0,0.1); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 10px; }
+    .group-header { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .group-title-input { flex: 1; font-weight: bold; background: transparent; border: none; border-bottom: 1px dashed var(--border-color); border-radius: 0; padding-left: 0; }
     
-    .pairing-row { display: flex;
-    align-items: center; gap: 8px; margin-bottom: 8px; background: var(--bg-primary); padding: 5px; border-radius: 4px; border: 1px solid var(--border-color);
-    }
-    .bullet-wrapper { display: flex; align-items: center; justify-content: center; width: 24px;
-    }
-    .bullet-icon-static { width: 18px; height: 18px; opacity: 0.5; filter: grayscale(100%);
-    }
+    .pairing-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; background: var(--bg-primary); padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); }
+    .bullet-wrapper { display: flex; align-items: center; justify-content: center; width: 24px; }
+    .bullet-icon-static { width: 18px; height: 18px; opacity: 0.5; filter: grayscale(100%); }
     
-    .custom-select { position: relative; flex: 1; min-width: 0;
-    }
-    .select-trigger { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color);
-    padding: 6px 10px; border-radius: 4px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; }
-    .select-trigger:focus { border-color: var(--accent-blue);
-    outline: none; }
-    .select-options { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: var(--bg-secondary);
-    border: 1px solid var(--border-color); border-radius: 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); margin-top: 4px;
-    }
-    .option { display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem;
-    }
-    .option:hover, .option:focus { background: var(--accent-blue-light); color: white; outline: none;
-    }
+    .custom-select { position: relative; flex: 1; min-width: 0; }
+    .select-trigger { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 4px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; }
+    .select-trigger:focus { border-color: var(--accent-blue); outline: none; }
+    .select-options { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.5); margin-top: 4px; }
+    .option { display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; }
+    .option:hover, .option:focus { background: var(--accent-blue-light); color: white; outline: none; }
     .select-icon { width: 20px; height: 20px; object-fit: contain; }
-    .trigger-content { display: flex;
-    align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; }
-    .placeholder { color: var(--text-muted); font-size: 0.85rem;
-    }
-    .sep { color: var(--text-secondary); opacity: 0.5; margin: 0 5px;
-    }
+    .trigger-content { display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; }
+    .placeholder { color: var(--text-muted); font-size: 0.85rem; }
+    .sep { color: var(--text-secondary); opacity: 0.5; margin: 0 5px; }
 
-    .add-btn-modern { width: 100%; background: var(--bg-tertiary); border: 1px dashed var(--border-color); color: var(--text-secondary); padding: 8px; border-radius: 4px;
-    cursor: pointer; }
+    .add-btn-modern { width: 100%; background: var(--bg-tertiary); border: 1px dashed var(--border-color); color: var(--text-secondary); padding: 8px; border-radius: 4px; cursor: pointer; }
     .add-btn-modern:hover { color: var(--accent-blue); border-color: var(--accent-blue); }
-    .group-add { margin-top: 10px;
-    }
+    .group-add { margin-top: 10px; }
     
-    .btn-icon { background: transparent; border: none; color: var(--text-secondary); cursor: pointer;
-    }
+    .btn-icon { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; }
     .btn-icon:hover { color: #ef4444; }
 
-    .save-bar {
-        position: absolute;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #111214;
-        border: 1px solid #00c6ff;
-        padding: 15px 30px;
-        border-radius: 50px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        z-index: 1000;
-        min-width: 300px;
-        display: flex;
-        justify-content: center;
-    }
-    .save-bar-content {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        width: 100%;
-        justify-content: space-between;
-    }
+    .save-bar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: #111214; border: 1px solid #00c6ff; padding: 15px 30px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; min-width: 300px; display: flex; justify-content: center; }
+    .save-bar-content { display: flex; align-items: center; gap: 20px; width: 100%; justify-content: space-between; }
     .status-msg { font-size: 1.1rem; color: var(--text-primary); display: flex; align-items: center; gap: 10px; margin: 0 auto;}
     .status-msg.success { color: #4ade80; }
     .dirty-msg { font-weight: 600; color: var(--text-primary); }
     .bar-actions { display: flex; gap: 10px; }
     
-    .btn-bar-cancel {
-        background: transparent;
-        color: #ef4444;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-        padding: 8px 16px;
-    }
+    .btn-bar-cancel { background: transparent; color: #ef4444; border: none; font-weight: 600; cursor: pointer; padding: 8px 16px; }
     .btn-bar-cancel:hover { text-decoration: underline; }
 
-    .btn-bar-save {
-        background: #00c6ff;
-        color: #000;
-        border: none;
-        padding: 8px 24px;
-        border-radius: 20px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: transform 0.1s;
-    }
+    .btn-bar-save { background: #00c6ff; color: #000; border: none; padding: 8px 24px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: transform 0.1s; }
     .btn-bar-save:hover { transform: scale(1.05); filter: brightness(1.1); }
+    
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+    .modal { background: var(--bg-card); padding: 25px; border-radius: 8px; width: 400px; border: 1px solid var(--border-color); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
+    .modal h3 { margin-top: 0; margin-bottom: 20px; color: var(--text-primary); }
+    .modal p { color: var(--text-secondary); margin-bottom: 25px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .btn-danger { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    .btn-cancel { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+
+    .search-container {
+        padding: 8px;
+        background: var(--bg-secondary);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .dropdown-search-input {
+        width: 100%;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        padding: 6px 8px;
+        border-radius: 4px;
+        color: var(--text-primary);
+        font-size: 0.85rem;
+    }
+    .dropdown-search-input:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+    }
+    
+    .lightbox-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 100000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: zoom-out;
+    }
+    .lightbox-img {
+        max-width: 90vw;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 4px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        cursor: default;
+    }
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        opacity: 0.7;
+    }
+    .lightbox-close:hover { opacity: 1; }
 </style>

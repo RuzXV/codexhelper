@@ -1,4 +1,5 @@
 <script>
+    import { fade, scale } from 'svelte/transition';
     export let displayName;
     export let embedColor;
     export let imageUrl;
@@ -26,6 +27,20 @@
 
     $: userAvatar = getUserAvatar(user);
     $: userName = user ? (user.display_name || user.global_name || user.username) : "User";
+
+    let lightboxImage = null;
+
+    function openLightbox(url) {
+        if (url) lightboxImage = url;
+    }
+
+    function closeLightbox() {
+        lightboxImage = null;
+    }
+
+    function handleKeydown(e) {
+        if (e.key === 'Escape') closeLightbox();
+    }
 
     function getUserAvatar(user) {
         if (!user) return "https://cdn.discordapp.com/embed/avatars/0.png";
@@ -119,9 +134,18 @@
             {/if}
 
             {#if imageUrl}
-                <div class="embed-image">
-                    <img src={imageUrl} alt="Embed Content" />
-                </div>
+                <button 
+                    type="button"
+                    on:click={() => openLightbox(imageUrl)}
+                    style="background: none; border: none; padding: 0; cursor: zoom-in; display: block; max-width: 100%;"
+                >
+                    <img 
+                        src={imageUrl} 
+                        alt="Embed Content" 
+                        class="clickable-image"
+                        style="display: block; max-width: 100%; border-radius: 4px;"
+                    />
+                </button>
             {/if}
 
             {#if isMainTemplate}
@@ -142,6 +166,25 @@
         {/if}
     </div>
 </div>
+
+{#if lightboxImage}
+    <div 
+        class="lightbox-overlay" 
+        role="button" 
+        tabindex="0" 
+        on:click={closeLightbox} 
+        on:keydown={(e) => e.key === 'Escape' && closeLightbox()}
+        transition:fade={{ duration: 200 }}
+    >
+        <button class="lightbox-close" aria-label="Close Lightbox" on:click={closeLightbox}>
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <img src={lightboxImage} alt="Fullscreen" class="lightbox-img" />
+    </div>
+{/if}
+
+<svelte:window on:keydown={handleKeydown} />
 
 <style>
     .discord-container {
@@ -227,9 +270,6 @@
     :global(.emoji.bullet) { width: 1.1em; height: 1.1em; margin-right: 0; }
     :global(.separator) { font-weight: bold; margin: 0 4px; color: #dcddde; }
     :global(.content-text) { display: inline-block; color: #dcddde; }
-
-    .embed-image { margin-top: 12px; border-radius: 4px; overflow: hidden; }
-    .embed-image img { max-width: 100%; display: block; }
     
     .embed-footer { font-size: 0.75rem; color: #dcddde; display: flex; align-items: center; margin-top: 8px; gap: 6px; font-weight: 500; }
     .footer-icon { width: 20px; height: 20px; border-radius: 50%; }
@@ -251,4 +291,33 @@
     }
     .discord-btn:hover { background-color: #4f545c; }
     .btn-emoji { width: 18px; height: 18px; }
+    .lightbox-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 100000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: zoom-out;
+    }
+    .lightbox-img {
+        max-width: 90vw;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 4px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        opacity: 0.7;
+    }
+    .lightbox-close:hover { opacity: 1; }
 </style>

@@ -39,8 +39,10 @@
 
     let isEditing = false;
     let editingItem = null;
+
     $: totalEntries = rawData ? Object.keys(rawData).length : 0;
     $: if (activeSource) loadData(activeSource);
+
     async function loadData(source) {
         loading = true;
         error = null;
@@ -76,22 +78,27 @@
         if (activeSource === 'events') newData = { title: "New Event", color: 3066993, fields: [] };
         if (activeSource === 'bundles') newData = { title: "New Bundle", color: "#e9be74", description: [] };
         if (activeSource === 'meta_lineups') newData = { title: "New Lineup", color: "#00c6ff", fields: [] };
-        editingItem = { id, data: newData };
+        
+        editingItem = { id, data: newData, originalData: null };
         isEditing = true;
     }
 
     function handleEdit(event) {
         const id = event.detail.id;
+        const originalData = rawData[id] ? JSON.parse(JSON.stringify(rawData[id])) : null;
+
         if (activeSource === 'commanders') {
             editingItem = {
                 id: id,
                 data: rawData[id],
-                aliasData: aliasData[id]
+                aliasData: aliasData[id],
+                originalData: originalData
             };
         } else {
             editingItem = {
                 id: id,
-                data: rawData[id]
+                data: rawData[id],
+                originalData: originalData
             };
         }
         isEditing = true;
@@ -122,10 +129,25 @@
         const { id, commanderId, data, aliasData: newAliasData, callback } = event.detail;
         const saveId = commanderId || id;
 
+        if (editingItem && editingItem.originalData) {
+            try {
+                const freshFullData = await window.auth.fetchWithAuth(`/api/data/${activeSource}`);
+                const freshItemData = freshFullData[saveId];
+
+                if (freshItemData && JSON.stringify(freshItemData) !== JSON.stringify(editingItem.originalData)) {
+                    if (!confirm("⚠️ CONFLICT DETECTED!\n\nThe data on the server has changed since you opened this editor.\n\nSaving now will overwrite someone else's changes.\n\nClick OK to OVERWRITE anyway, or Cancel to back out.")) {
+                        if (callback) callback(false);
+                        return;
+                    }
+                }
+            } catch (checkErr) {
+                console.warn("Optimistic lock check failed (network error?), proceeding with save caution:", checkErr);
+            }
+        }
+
         const oldData = rawData[saveId] ? JSON.parse(JSON.stringify(rawData[saveId])) : {};
         
         const changes = generateDiff(oldData, data);
-        
         rawData[saveId] = data;
         if (activeSource === 'commanders' && aliasData) {
             aliasData[saveId] = newAliasData;
@@ -153,7 +175,6 @@
             }
             
             await loadData(activeSource);
-
             if (callback) {
                 callback(true);
             } else {
@@ -164,7 +185,6 @@
 
         } catch (err) {
             console.error("Save failed:", err);
-            
             if (callback) {
                 callback(false);
             } else {
@@ -240,24 +260,23 @@
     <div class="panel-content">
         <div class="controls-toolbar">
              <div class="source-selector">
-                 {#each DATA_SOURCES as source}
+                {#each DATA_SOURCES as source}
                     <button 
                         class="source-btn" 
                         class:active={activeSource === source.id}
-                        on:click={() => { activeSource = source.id; searchQuery = '';
-                        }}
+                        on:click={() => { activeSource = source.id; searchQuery = ''; }}
                     >
                         <i class="fas {source.icon}"></i>
                         <span>{source.label}</span>
                     </button>
-                 {/each}
+                {/each}
             </div>
 
             <div class="actions-group">
                 <span class="entry-count">{totalEntries} Entries</span>
                 <div class="search-wrapper">
                     <i class="fas fa-search search-icon"></i>
-                     <input type="text" placeholder="Search {activeSource}..." bind:value={searchQuery} class="search-input"/>
+                    <input type="text" placeholder="Search {activeSource}..." bind:value={searchQuery} class="search-input"/>
                 </div>
                 <button class="btn-add" aria-label="Add New Entry" on:click={handleAddEntry}><i class="fas fa-plus"></i></button>
             </div>
@@ -265,7 +284,7 @@
 
         <div class="data-list-container">
             {#if loading}
-                 <div class="state-msg"><i class="fas fa-circle-notch fa-spin"></i><p>Fetching {activeSource}...</p></div>
+                <div class="state-msg"><i class="fas fa-circle-notch fa-spin"></i><p>Fetching {activeSource}...</p></div>
             {:else if error}
                 <div class="state-msg error"><i class="fas fa-exclamation-triangle"></i><p>{error}</p></div>
             {:else if rawData}
@@ -334,41 +353,24 @@
 {/if}
 
 <style>
-    .controls-toolbar { display: flex;
-        justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
-    .source-selector { display: flex; background: var(--bg-tertiary);
-        padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color); gap: 2px; }
-    .source-btn { background: transparent; border: none;
-        color: var(--text-secondary); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px;
-        transition: all 0.2s ease; font-size: 0.9rem; }
-    .source-btn:hover { color: var(--text-primary);
-    }
-    .source-btn.active { background: var(--bg-card); color: var(--accent-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+    .controls-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
+    .source-selector { display: flex; background: var(--bg-tertiary); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color); gap: 2px; }
+    .source-btn { background: transparent; border: none; color: var(--text-secondary); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; font-size: 0.9rem; }
+    .source-btn:hover { color: var(--text-primary); }
+    .source-btn.active { background: var(--bg-card); color: var(--accent-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     
-    .actions-group { display: flex; gap: 10px; align-items: center; flex-grow: 1; justify-content: flex-end;
-    }
-    .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px; white-space: nowrap;
-    }
+    .actions-group { display: flex; gap: 10px; align-items: center; flex-grow: 1; justify-content: flex-end; }
+    .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px; white-space: nowrap; }
     .search-wrapper { position: relative; width: 100%; max-width: 300px; }
-    .search-icon { position: absolute;
-        left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; }
-    .search-input { width: 100%; background: var(--bg-primary);
-        border: 1px solid var(--border-color); padding: 10px 10px 10px 36px; border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.95rem;
-    }
-    .search-input:focus { outline: none; border-color: var(--accent-blue);
-    }
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; }
+    .search-input { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); padding: 10px 10px 10px 36px; border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.95rem; }
+    .search-input:focus { outline: none; border-color: var(--accent-blue); }
     
-    .btn-add { background: var(--accent-green); color: #000; border: none; width: 40px; height: 40px;
-        border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 1.1rem;
-    }
+    .btn-add { background: var(--accent-green); color: #000; border: none; width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 1.1rem; }
     .btn-add:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-    .data-list-container { min-height: 400px; position: relative;
-    }
-    .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px;
-        font-size: 1.2rem; }
+    .data-list-container { min-height: 400px; position: relative; }
+    .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px; font-size: 1.2rem; }
     .state-msg.error { color: #ef4444; }
-    .state-msg i { font-size: 2rem;
-        opacity: 0.7; }
+    .state-msg i { font-size: 2rem; opacity: 0.7; }
 </style>
