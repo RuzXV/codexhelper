@@ -183,6 +183,7 @@
         margin: 0;
         font-size: 1rem;
         font-weight: 600;
+        font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
         color: var(--text-primary);
         white-space: nowrap;
         overflow: hidden;

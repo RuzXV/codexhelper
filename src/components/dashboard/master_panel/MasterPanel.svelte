@@ -29,6 +29,8 @@
         return '#313338';
     }
 
+    let onlineUsers = [];
+
     let activeSource = 'commanders';
     let searchQuery = '';
     
@@ -60,6 +62,29 @@
             loading = false;
         }
     }
+
+    async function sendHeartbeat() {
+        try {
+            const res = await window.auth.fetchWithAuth('/api/admin/heartbeat', {
+                method: 'POST',
+                body: JSON.stringify({
+                    username: user.username, 
+                    avatar: user.avatar 
+                })
+            });
+            if (res.users) {
+                onlineUsers = res.users;
+            }
+        } catch (e) {
+            console.error("Heartbeat failed", e);
+        }
+    }
+
+    onMount(() => {
+        sendHeartbeat();
+        const interval = setInterval(sendHeartbeat, 30000);
+        return () => clearInterval(interval);
+    });
 
     function handleAddEntry() {
         if (activeSource === 'commanders') {
@@ -251,38 +276,64 @@
 
 <div class="panel-container">
     <div class="dashboard-header">
-        <div>
-            <h1>Master Admin Panel</h1></div>
-    </div>
+        <div class="header-left">
+            <h1>Master Admin Panel</h1>
+            
+            <div class="online-section">
+                {#each onlineUsers as u}
+                    <div class="user-pill">
+                        <img 
+                            src={u.avatar 
+                                ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png` 
+                                : `https://cdn.discordapp.com/embed/avatars/${(BigInt(u.id) >> 22n) % 6n}.png`} 
+                            alt={u.username} 
+                            class="pill-avatar"
+                            on:error={(e) => e.target.src = "https://cdn.discordapp.com/embed/avatars/0.png"}
+                        />
+                        <span class="pill-name">{u.username}</span>
+                        <span class="status-indicator"></span>
+                    </div>
+                {/each}
+                {#if onlineUsers.length === 0}
+                    <div class="user-pill offline">
+                        <span class="status-indicator red"></span> Offline
+                    </div>
+                {/if}
+            </div>
+        </div>
 
-    <div class="panel-content">
-        <div class="controls-toolbar">
-             <div class="source-selector">
+        <div class="header-controls">
+            <span class="entry-count">{totalEntries} Entries</span>
+
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Search {activeSource}..." bind:value={searchQuery} class="search-input"/>
+            </div>
+
+            <div class="source-selector">
                 {#each DATA_SOURCES as source}
                     <button 
                         class="source-btn" 
                         class:active={activeSource === source.id}
                         on:click={() => { activeSource = source.id; searchQuery = ''; }}
+                        title={source.label}
                     >
                         <i class="fas {source.icon}"></i>
-                        <span>{source.label}</span>
+                        <span class="btn-label">{source.label}</span>
                     </button>
                 {/each}
             </div>
 
-            <div class="actions-group">
-                <span class="entry-count">{totalEntries} Entries</span>f
-                <div class="search-wrapper">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" placeholder="Search {activeSource}..." bind:value={searchQuery} class="search-input"/>
-                </div>
-                <button class="btn-add" aria-label="Add New Entry" on:click={handleAddEntry}><i class="fas fa-plus"></i></button>
-            </div>
+            <button class="btn-add" aria-label="Add New Entry" on:click={handleAddEntry}>
+                <i class="fas fa-plus"></i>
+            </button>
         </div>
+    </div>
 
+    <div class="panel-content">
         <div class="data-list-container">
             {#if loading}
-                <div class="state-msg"><i class="fas fa-circle-notch fa-spin"></i><p>Fetching {activeSource}...</p></div>
+               <div class="state-msg"><i class="fas fa-circle-notch fa-spin"></i><p>Fetching {activeSource}...</p></div>
             {:else if error}
                 <div class="state-msg error"><i class="fas fa-exclamation-triangle"></i><p>{error}</p></div>
             {:else if rawData}
@@ -351,63 +402,180 @@
 {/if}
 
 <style>
-    .controls-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
-    .source-selector { 
-        display: grid; 
-        grid-template-columns: repeat(4, 1fr); 
-        gap: 10px; 
-        width: 100%; 
-        max-width: 800px;
-        margin-bottom: 5px;
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 20px;
+        gap: 20px;
     }
+
+    .header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .header-left h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    .online-badge {
+        font-size: 0.8rem;
+        color: #4ade80;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #4ade80;
+        border-radius: 50%;
+        box-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
+    }
+
+    .online-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 5px;
+    }
+
+    .user-pill {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 4px 10px 4px 4px; /* Less padding left for avatar */
+        gap: 8px;
+        font-size: 0.85rem;
+        color: var(--text-primary);
+        transition: background 0.2s;
+    }
+
+    .user-pill:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--text-secondary);
+    }
+
+    .pill-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .pill-name {
+        font-weight: 500;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: #4ade80;
+        border-radius: 50%;
+        box-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
+    }
+
+    .status-indicator.red {
+        background-color: #ef4444;
+        box-shadow: none;
+    }
+
+    .user-pill.offline {
+        padding-left: 10px;
+        color: var(--text-secondary);
+    }
+
+    .header-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .source-selector { 
+        display: flex;
+        gap: 5px; 
+        background: var(--bg-tertiary);
+        padding: 4px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
+    }
+
     .source-btn { 
-        background: var(--bg-tertiary); 
-        border: 1px solid rgba(255, 255, 255, 0.15); 
+        background: transparent;
+        border: none;
         color: var(--text-secondary); 
-        padding: 12px 16px; 
-        border-radius: var(--radius-md); 
+        padding: 8px 12px; 
+        border-radius: 4px; 
         font-weight: 600; 
         cursor: pointer; 
-        display: flex; 
-        flex-direction: column;
+        display: flex;
         align-items: center; 
-        justify-content: center;
         gap: 8px; 
         transition: all 0.2s ease; 
-        font-size: 0.9rem; 
-        height: 100%;
+        font-size: 0.85rem;
     }
 
     .source-btn:hover { 
-        background: var(--bg-secondary);
-        border-color: rgba(255, 255, 255, 0.3);
         color: var(--text-primary); 
+        background: rgba(255,255,255,0.05);
     }
 
     .source-btn.active { 
-        background: var(--accent-blue-light, rgba(59, 130, 246, 0.1)); 
+        background: var(--bg-card);
         color: var(--accent-blue); 
-        border-color: var(--accent-blue); 
-        box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    
-    .source-btn i {
-        font-size: 1.2rem;
-        margin-bottom: 2px;
-    }
-    
-    .actions-group { display: flex; gap: 10px; align-items: center; flex-grow: 1; justify-content: flex-end; }
+
     .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px; white-space: nowrap; }
-    .search-wrapper { position: relative; width: 100%; max-width: 300px; }
-    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; }
-    .search-input { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); padding: 10px 10px 10px 36px; border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.95rem; }
-    .search-input:focus { outline: none; border-color: var(--accent-blue); }
+
+    .search-wrapper { position: relative; width: 220px; }
     
-    .btn-add { background: var(--accent-green); color: #000; border: none; width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 1.1rem; }
+    .search-icon { 
+        position: absolute;
+        left: 10px; top: 50%; transform: translateY(-50%); 
+        color: var(--text-secondary); pointer-events: none; font-size: 0.8rem;
+    }
+    
+    .search-input { 
+        width: 100%; background: var(--bg-tertiary);
+        border: 1px solid var(--border-color); padding: 8px 8px 8px 30px; 
+        border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.9rem;
+    }
+    .search-input:focus { outline: none; border-color: var(--accent-blue); background: var(--bg-primary); }
+    
+    .btn-add { 
+        background: var(--accent-green); color: #000; border: none; 
+        width: 36px; height: 36px;
+        border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; 
+        cursor: pointer; transition: all 0.2s; font-size: 1rem;
+    }
     .btn-add:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
     .data-list-container { min-height: 400px; position: relative; }
     .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px; font-size: 1.2rem; }
     .state-msg.error { color: #ef4444; }
     .state-msg i { font-size: 2rem; opacity: 0.7; }
+
+    @media (max-width: 1000px) {
+        .dashboard-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        .header-controls { width: 100%; flex-wrap: wrap; }
+        .search-wrapper { flex-grow: 1; width: auto; }
+        .btn-label { display: none; } 
+    }
 </style>

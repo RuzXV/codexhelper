@@ -142,9 +142,18 @@
                     <div class="section-header">
                         <h3>Command Restrictions</h3>
                         <p class="section-desc">
-                            Select the specific channel where commands are allowed. 
+                            Select the specific channel where commands are allowed.
                             If <strong>Disabled / Not Set</strong>, commands for that group will not work in any channel.
                         </p>
+                    
+                        <div class="info-note">
+                            <i class="fas fa-info-circle"></i>
+                            <span>
+                                <strong>Note:</strong> The <em>"All Commands"</em> setting is additive. It enables commands in the selected channel <strong>in addition</strong> to any channels assigned to specific groups below. 
+                                <br><br>
+                                If you want to simply restrict the bot to a single channel for everything, just set <strong>"All Commands"</strong> and leave the specific groups disabled.
+                            </span>
+                        </div>
                     </div>
 
                     <div class="settings-grid">
@@ -411,7 +420,6 @@
         background: var(--bg-secondary);
         border: 1px solid var(--border-color);
         border-radius: 6px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         z-index: 50;
         overflow: hidden;
     }
@@ -495,6 +503,29 @@
         font-size: 0.85rem;
         color: var(--text-muted);
         font-style: italic;
+    }
+
+    .info-note {
+        margin-top: 15px;
+        background: rgba(59, 130, 246, 0.1);
+        border-left: 3px solid var(--accent-blue);
+        padding: 10px 15px;
+        border-radius: 4px;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        line-height: 1.4;
+    }
+
+    .info-note i {
+        color: var(--accent-blue);
+        margin-top: 3px;
+    }
+    
+    .info-note strong {
+        color: var(--text-primary);
     }
 
     @media (max-width: 768px) {

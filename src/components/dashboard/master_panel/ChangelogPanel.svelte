@@ -87,8 +87,7 @@
     <div class="dashboard-header">
         <div>
             <h1>System Changelog</h1>
-            <p>Audit log of all master data modifications.</p>
-        </div>
+            </div>
         <button class="refresh-btn" on:click={() => window.location.reload()}>
             <i class="fas fa-sync-alt"></i> Refresh
         </button>
@@ -278,6 +277,20 @@
     .raw-log { 
         background: #1e1f22; color: #dcddde; padding: 15px; border-radius: 4px; 
         overflow-x: auto; font-family: 'Consolas', monospace; font-size: 0.85rem; margin: 0;
+    }
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .dashboard-header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: var(--text-primary);
     }
 
     .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px; font-size: 1.2rem; }

@@ -27,6 +27,13 @@ type Variables = {
     };
 };
 
+type OnlineUser = {
+    id: string;
+    username: string;
+    avatar: string | null;
+    last_seen: number;
+};
+
 const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
 const MASTER_OVERRIDE_ID = '285201373266575361';
@@ -1151,14 +1158,24 @@ app.get('/api/users/guilds', authMiddleware, async (c) => {
     const discordGuilds = await response.json() as any[];
 
     let activeBotGuildIds = new Set<string>();
+
     try {
-        const { results } = await c.env.BOT_DB.prepare(
+        const { results: authResults } = await c.env.BOT_DB.prepare(
             `SELECT guild_id FROM guild_authorizations WHERE is_active = 1`
         ).all();
         
-        if (results) {
-            results.forEach((r: any) => activeBotGuildIds.add(r.guild_id.toString()));
+        if (authResults) {
+            authResults.forEach((r: any) => activeBotGuildIds.add(r.guild_id.toString()));
         }
+
+        const { results: bypassResults } = await c.env.BOT_DB.prepare(
+            `SELECT guild_id FROM guild_bypass`
+        ).all();
+
+        if (bypassResults) {
+            bypassResults.forEach((r: any) => activeBotGuildIds.add(r.guild_id.toString()));
+        }
+
     } catch (e) {
         console.error("Database error fetching guilds:", e);
         return c.json({ error: 'Internal server error checking guild status' }, 500);
@@ -1254,6 +1271,46 @@ app.get('/api/guilds/:guildId/channels', authMiddleware, async (c) => {
         .sort((a: any, b: any) => a.position - b.position);
 
     return c.json({ channels: validChannels });
+});
+
+app.post('/api/admin/heartbeat', authMiddleware, masterAdminMiddleware, async (c) => {
+    const user = c.get('user');
+    
+    const { username, avatar } = await c.req.json().catch(() => ({ 
+        username: user.username, 
+        avatar: null 
+    }));
+
+    const NOW = Date.now();
+    const TIMEOUT_MS = 60 * 1000;
+
+    let onlineMap: Record<string, OnlineUser> = await c.env.API_CACHE.get('panel_online_users', 'json') || {};
+
+    onlineMap[user.id] = {
+        id: user.id,
+        username: username || user.username || 'Admin',
+        avatar: avatar || null,
+        last_seen: NOW
+    };
+
+    const activeUsers: OnlineUser[] = [];
+    const cleanMap: Record<string, OnlineUser> = {};
+
+    for (const [id, data] of Object.entries(onlineMap)) {
+        if (NOW - data.last_seen < TIMEOUT_MS) {
+            cleanMap[id] = data;
+            activeUsers.push(data);
+        }
+    }
+
+    c.executionCtx.waitUntil(
+        c.env.API_CACHE.put('panel_online_users', JSON.stringify(cleanMap))
+    );
+
+    return c.json({ 
+        online_count: activeUsers.length,
+        users: activeUsers.sort((a, b) => b.last_seen - a.last_seen) 
+    });
 });
 
 export const onRequest = handle(app);

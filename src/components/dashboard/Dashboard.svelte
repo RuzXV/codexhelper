@@ -202,7 +202,7 @@
 <style>
     .dashboard-wrapper {
         min-height: 100vh;
-        padding-top: 80px;
+        padding-top: 10px;
         background-color: var(--bg-primary);
         display: flex;
         flex-direction: column;
