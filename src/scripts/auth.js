@@ -215,13 +215,12 @@
         if (!response.ok) {
             if (response.status === 401) {
                 if (currentUser) {
+                    console.log("Session expired or invalid token. Logging out...");
                     currentUser = null;
                     clearUserCache();
-                    if (!document.body.dataset.sessionExpiredAlertShown) {
-                        document.body.dataset.sessionExpiredAlertShown = "true";
-                        window.showAlert("Your session has expired. Please log in again.", "Session Expired");
-                        setTimeout(() => { delete document.body.dataset.sessionExpiredAlertShown; }, 5000);
-                    }
+                    
+                    window.location.reload(); 
+                    return;
                 }
             }
             const errorData = await response.json().catch(() => ({ message: 'An unknown API error occurred.' }));

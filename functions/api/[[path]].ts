@@ -1,6 +1,7 @@
 import { Hono, Context, Next } from 'hono';
 import { handle } from 'hono/cloudflare-pages';
 import { cors } from 'hono/cors';
+import { StatusCode } from 'hono/utils/http-status';
 import { getCookie } from 'hono/cookie';
 import { encryptFernetToken, decryptFernetToken } from '../crypto';
 
@@ -1112,6 +1113,57 @@ app.post('/api/guilds/:guildId/settings/channels', authMiddleware, async (c) => 
     ).bind(payload, Date.now() / 1000).run();
 
     return c.json({ success: true });
+});
+
+app.get('/api/users/guilds', authMiddleware, async (c) => {
+    const user = c.get('user');
+
+    const response = await fetch('https://discord.com/api/users/@me/guilds', {
+        headers: { 'Authorization': `Bearer ${user.accessToken}` }
+    });
+
+    if (!response.ok) {
+        return c.json({ error: 'Failed to fetch guilds from Discord' }, response.status as any);
+    }
+
+    const discordGuilds = await response.json() as any[];
+
+    const adminGuilds = discordGuilds.filter(g => {
+        const perms = BigInt(g.permissions);
+        const ADMIN = 0x8n;
+        const MANAGE_GUILD = 0x20n;
+        return (perms & ADMIN) === ADMIN || (perms & MANAGE_GUILD) === MANAGE_GUILD;
+    });
+
+    if (adminGuilds.length === 0) {
+        return c.json([]);
+    }
+
+    const guildIds = adminGuilds.map(g => g.id);
+    
+    const placeholders = guildIds.map(() => '?').join(',');
+    
+    try {
+        const { results } = await c.env.BOT_DB.prepare(
+            `SELECT guild_id FROM guild_authorizations WHERE guild_id IN (${placeholders}) AND is_active = 1`
+        ).bind(...guildIds).all();
+
+        const activeBotGuildIds = new Set((results || []).map((r: any) => r.guild_id.toString()));
+
+        const validServers = adminGuilds
+            .filter(g => activeBotGuildIds.has(g.id))
+            .map(g => ({
+                id: g.id,
+                name: g.name,
+                icon: g.icon
+            }));
+
+        return c.json(validServers);
+
+    } catch (e) {
+        console.error("Database error fetching guilds:", e);
+        return c.json({ error: 'Internal server error checking guild status' }, 500);
+    }
 });
 
 export const onRequest = handle(app);
