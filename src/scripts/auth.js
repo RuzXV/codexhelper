@@ -181,9 +181,8 @@
             }
         }
 
-        const scope = 'identify';
+        const scope = 'identify guilds'; 
         const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${WEBSITE_APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
-        
         window.location.href = authUrl;
     }
 
@@ -219,7 +218,7 @@
                     currentUser = null;
                     clearUserCache();
                     
-                    window.location.reload(); 
+                    await logout(); 
                     return;
                 }
             }
