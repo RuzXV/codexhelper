@@ -3,57 +3,117 @@
     import MasterPanel from './master_panel/MasterPanel.svelte';
     import BotConfigPanel from './bot_panel/BotConfigPanel.svelte';
     import ChangelogPanel from './master_panel/ChangelogPanel.svelte';
+    import { fade } from 'svelte/transition';
 
     let user = null;
     let loading = true;
     let currentView = ''; 
     let allowedViews = [];
+    
+    let availableServers = [];
+    let selectedServer = null;
+    let isServerDropdownOpen = false;
 
     onMount(async () => {
         if (window.auth && typeof window.auth.init === 'function') {
             await window.auth.init('#auth-container-dashboard');
         }
         
-        setTimeout(() => {
-            const loggedInUser = window.auth.getLoggedInUser();
-            if (loggedInUser) {
-                user = loggedInUser;
-                determineAccess(user);
-            }
-            loading = false;
-        }, 500);
-
         const authHandler = (e) => {
             user = e.detail.user;
             determineAccess(user);
+            fetchUserServers(user);
             loading = false;
         };
 
         document.addEventListener('auth:loggedIn', authHandler);
 
+        setTimeout(() => {
+            const loggedInUser = window.auth.getLoggedInUser();
+            if (loggedInUser) {
+                user = loggedInUser;
+                determineAccess(user);
+                fetchUserServers(user);
+            }
+            loading = false;
+        }, 500);
+
         return () => {
             document.removeEventListener('auth:loggedIn', authHandler);
+            document.removeEventListener('click', closeServerDropdown);
         };
     });
 
     function determineAccess(userData) {
         allowedViews = [];
+        if (userData.is_active_patron) {
+            allowedViews.push({ id: 'config', label: 'Bot Config', icon: 'fa-robot' });
+        }
+
         if (userData.is_master_admin) {
             allowedViews.push({ id: 'master', label: 'Master Panel', icon: 'fa-user-shield' });
             allowedViews.push({ id: 'changelog', label: 'Changelog', icon: 'fa-history' });
         }
 
-        if (userData.is_active_patron) {
-            allowedViews.push({ id: 'config', label: 'Bot Config', icon: 'fa-robot' });
-        }
-
-        if (allowedViews.length > 0) {
+        if (allowedViews.length > 0 && !currentView) {
             currentView = allowedViews[0].id;
         }
     }
 
     function switchView(viewId) {
         currentView = viewId;
+    }
+    
+    async function fetchUserServers(user) {
+        loading = true;
+        try {
+            const servers = await window.auth.fetchWithAuth('/api/users/guilds');
+            
+            if (Array.isArray(servers)) {
+                availableServers = servers;
+                
+                if (availableServers.length > 0) {
+                    const storedId = localStorage.getItem('codex_last_server_id');
+                    const previousSelection = availableServers.find(s => s.id === storedId);
+                    
+                    if (previousSelection) {
+                        selectServer(previousSelection);
+                    } else {
+                        selectServer(availableServers[0]);
+                    }
+                } else {
+                    selectedServer = null;
+                }
+            }
+        } catch (e) {
+            console.error("Failed to fetch user servers:", e);
+            availableServers = [];
+        } finally {
+        }
+    }
+
+    function toggleServerDropdown(event) {
+        event.stopPropagation();
+        isServerDropdownOpen = !isServerDropdownOpen;
+        if (isServerDropdownOpen) {
+            document.addEventListener('click', closeServerDropdown);
+        }
+    }
+
+    function closeServerDropdown() {
+        isServerDropdownOpen = false;
+        document.removeEventListener('click', closeServerDropdown);
+    }
+
+    function selectServer(server) {
+        selectedServer = server;
+        isServerDropdownOpen = false;
+        localStorage.setItem('codex_last_server_id', server.id);
+    }
+
+    function getIcon(server) {
+        if (server.icon) return `https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`;
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(server.name)}&background=2d2d2d&color=fff`;
     }
 </script>
 
@@ -81,23 +141,53 @@
     {:else}
         <div class="dashboard-container">
             <nav class="dashboard-nav">
-                {#each allowedViews as view}
-                    <button 
-                        class="nav-tab" 
-                        class:active={currentView === view.id}
-                        on:click={() => switchView(view.id)}
-                    >
-                        <i class="fas {view.icon}"></i>
-                        <span>{view.label}</span>
-                    </button>
-                {/each}
+                <div class="nav-left">
+                    {#each allowedViews as view}
+                        <button 
+                            class="nav-tab" 
+                            class:active={currentView === view.id}
+                            on:click={() => switchView(view.id)}
+                        >
+                            <i class="fas {view.icon}"></i>
+                            <span>{view.label}</span>
+                        </button>
+                    {/each}
+                </div>
+
+                {#if currentView === 'config'}
+                    <div class="server-selector-container" transition:fade={{ duration: 200 }}>
+                        <button class="server-select-btn" on:click={toggleServerDropdown}>
+                            {#if selectedServer}
+                                <img src={getIcon(selectedServer)} alt="" class="server-icon-mini" />
+                                <span class="server-name">{selectedServer.name}</span>
+                            {:else}
+                                <span class="server-name">Select Server...</span>
+                            {/if}
+                            <i class="fas fa-chevron-down" style="font-size: 0.8em; opacity: 0.7;"></i>
+                        </button>
+
+                        {#if isServerDropdownOpen}
+                            <div class="server-dropdown">
+                                {#each availableServers as server}
+                                    <button class="server-option" on:click={() => selectServer(server)}>
+                                        <img src={getIcon(server)} alt="" class="server-icon-mini" />
+                                        <span>{server.name}</span>
+                                    </button>
+                                {/each}
+                                {#if availableServers.length === 0}
+                                    <div class="server-option empty">No common servers found</div>
+                                {/if}
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
             </nav>
 
             <main class="dashboard-content">
                 {#if currentView === 'master'}
                     <MasterPanel {user} />
-                {:else if currentView === 'bot_config'}
-                    <BotConfigPanel {user} />
+                {:else if currentView === 'config'}
+                    <BotConfigPanel {user} {selectedServer} />
                 {:else if currentView === 'changelog'}
                      <ChangelogPanel {user} /> 
                 {/if}
@@ -127,12 +217,19 @@
 
     .dashboard-nav {
         display: flex;
-        gap: var(--spacing-2);
+        justify-content: space-between;
+        align-items: flex-end;
         margin-bottom: 0;
         padding-left: var(--spacing-2);
+        padding-right: var(--spacing-2);
         z-index: 10;
         position: relative;
         top: 1px;
+    }
+    
+    .nav-left {
+        display: flex;
+        gap: var(--spacing-2);
     }
 
     .nav-tab {
@@ -168,8 +265,77 @@
         opacity: 1;
     }
 
-    .nav-tab i {
-        font-size: 1.1em;
+    .server-selector-container {
+        position: relative;
+        margin-bottom: 5px;
+    }
+
+    .server-select-btn {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 8px 16px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        min-width: 200px;
+        justify-content: space-between;
+    }
+
+    .server-select-btn:hover {
+        background: var(--bg-secondary);
+        border-color: var(--accent-blue);
+    }
+
+    .server-icon-mini {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .server-dropdown {
+        position: absolute;
+        top: calc(100% + 5px);
+        right: 0;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        width: 100%;
+        min-width: 220px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        z-index: 100;
+        overflow: hidden;
+    }
+
+    .server-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 10px 16px;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        text-align: left;
+        transition: background 0.2s;
+    }
+
+    .server-option:hover {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+    
+    .server-option.empty {
+        cursor: default;
+        font-style: italic;
+        padding: 15px;
+        text-align: center;
     }
 
     .dashboard-content {
@@ -182,31 +348,6 @@
         z-index: 5;
     }
     
-    .dashboard-wrapper :global(.dashboard-header) {
-        margin-bottom: var(--spacing-8);
-        padding-bottom: var(--spacing-6);
-        border-bottom: 1px solid var(--border-color);
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-    }
-
-    .dashboard-wrapper :global(.dashboard-header h1) {
-        font-size: var(--font-size-3xl);
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: var(--spacing-2);
-    }
-
-    .dashboard-wrapper :global(.dashboard-header p) {
-        color: var(--text-secondary);
-        font-size: var(--font-size-lg);
-    }
-
-    .dashboard-wrapper :global(.panel-content) {
-        color: var(--text-primary);
-    }
-
     .loading-container, .unauthorized-container {
         display: flex;
         flex-direction: column;
@@ -231,19 +372,19 @@
 
     @media (max-width: 768px) {
         .dashboard-nav {
-            flex-direction: row;
+            flex-direction: column-reverse;
+            align-items: stretch;
+            gap: 10px;
+        }
+        .nav-left {
             overflow-x: auto;
-            padding-bottom: 0;
         }
-        .nav-tab {
-            flex: 1;
-            min-width: auto;
-            padding: var(--spacing-3);
-            font-size: var(--font-size-sm);
-            white-space: nowrap;
+        .server-selector-container {
+            width: 100%;
+            margin-bottom: 10px;
         }
-        .dashboard-content {
-            padding: var(--spacing-4);
+        .server-select-btn {
+            width: 100%;
         }
     }
 </style>
