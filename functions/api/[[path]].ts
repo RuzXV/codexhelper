@@ -28,6 +28,8 @@ type Variables = {
 
 const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
+const MASTER_OVERRIDE_ID = '285201373266575361';
+
 const CALENDAR_ADMIN_IDS = [
     '285201373266575361', 
     '1121488445836103820',
@@ -385,12 +387,15 @@ app.get('/api/users/@me', authMiddleware, async (c) => {
         return c.json({ error: 'Failed to fetch fresh user data from Discord.' }, 500);
     }
     const userData = await userResponse.json() as { id: string; username: string; [key: string]: any };
+    
     const activePatrons: string[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
-    const MY_TEST_ID = '285201373266575361'; 
 
-    const isActivePatron = (activePatrons ? activePatrons.includes(user.id) : false) || user.id === MY_TEST_ID;
-    const isCalendarAdmin = CALENDAR_ADMIN_IDS.includes(user.id);
-    const isMasterAdmin = MASTER_ADMIN_IDS.includes(user.id);
+    const isMasterOverride = user.id === MASTER_OVERRIDE_ID;
+
+    const isActivePatron = (activePatrons ? activePatrons.includes(user.id) : false) || isMasterOverride;
+    
+    const isCalendarAdmin = CALENDAR_ADMIN_IDS.includes(user.id) || isMasterOverride;
+    const isMasterAdmin = MASTER_ADMIN_IDS.includes(user.id) || isMasterOverride;
 
     user.username = userData.username;
     c.set('user', user);
@@ -1155,8 +1160,15 @@ app.get('/api/users/guilds', authMiddleware, async (c) => {
         return c.json([]);
     }
 
-    const guildIds = adminGuilds.map(g => g.id);
+    if (user.id === MASTER_OVERRIDE_ID) {
+        return c.json(adminGuilds.map(g => ({
+            id: g.id,
+            name: g.name,
+            icon: g.icon
+        })));
+    }
     
+    const guildIds = adminGuilds.map(g => g.id);
     const placeholders = guildIds.map(() => '?').join(',');
     
     try {
@@ -1179,6 +1191,28 @@ app.get('/api/users/guilds', authMiddleware, async (c) => {
     } catch (e) {
         console.error("Database error fetching guilds:", e);
         return c.json({ error: 'Internal server error checking guild status' }, 500);
+    }
+});
+
+app.get('/api/guilds/:guildId/settings/channels', authMiddleware, async (c) => {
+    const { guildId } = c.req.param();
+    
+    try {
+        const { results } = await c.env.DB.prepare(
+            "SELECT command_group, channel_id FROM allowed_channels WHERE guild_id = ?"
+        ).bind(guildId).all();
+
+        const settings: Record<string, string> = {};
+        if (results) {
+            results.forEach((row: any) => {
+                settings[row.command_group] = row.channel_id;
+            });
+        }
+
+        return c.json({ settings });
+    } catch (e) {
+        console.error("Failed to fetch channel settings:", e);
+        return c.json({ settings: {} });
     }
 });
 
