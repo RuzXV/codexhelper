@@ -33,8 +33,8 @@
                 window.auth.fetchWithAuth(`/api/guilds/${guildId}/channels`)
             ]);
 
-            currentSettings = settingsRes.settings || {};
-            guildChannels = channelsRes.channels || [];
+            currentSettings = settingsRes?.settings || {};
+            guildChannels = channelsRes?.channels || [];
             
         } catch (e) {
             console.error("Failed to load server data", e);

@@ -29,11 +29,13 @@
         document.addEventListener('auth:loggedIn', authHandler);
 
         setTimeout(() => {
-            const loggedInUser = window.auth.getLoggedInUser();
-            if (loggedInUser) {
-                user = loggedInUser;
-                determineAccess(user);
-                fetchUserServers(user);
+            if (window.auth && typeof window.auth.getLoggedInUser === 'function') {
+                const loggedInUser = window.auth.getLoggedInUser();
+                if (loggedInUser) {
+                    user = loggedInUser;
+                    determineAccess(user);
+                    fetchUserServers(user);
+                }
             }
             loading = false;
         }, 500);

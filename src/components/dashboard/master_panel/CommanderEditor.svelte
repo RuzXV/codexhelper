@@ -95,7 +95,8 @@
     });
 
     function sortAndLoad() {
-        sortedTemplates = [...commanderData].sort((a, b) => {
+        const safeData = Array.isArray(commanderData) ? commanderData : [];
+        sortedTemplates = [...safeData].sort((a, b) => {
             if (a.name === commanderId) return -1;
             if (b.name === commanderId) return 1;
             return a.name.localeCompare(b.name);
@@ -233,12 +234,12 @@
         if (!str) return null;
         const emojiMatch = str.match(/:(\d+)>/);
         if (emojiMatch) {
-            const entry = emojiData.commanders.find(e => e.emoji === emojiMatch[1]);
+            const entry = emojiData?.commanders?.find(e => e.emoji === emojiMatch[1]);
             if (entry) return entry.key;
         }
         return null;
     }
-
+    
     function formatRow(row) {
         if (row.type === 'custom') return `${BULLET_POINT} ${row.customText}`;
         let text = `${BULLET_POINT} `;

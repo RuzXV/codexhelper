@@ -11,52 +11,58 @@
     let items = [];
 
     $: {
-        const query = search.toLowerCase();
-        items = Object.entries(data).map(([key, templates]) => {
-            const aliasInfo = aliases[key] || {};
-            const displayName = aliasInfo.display_name || key;
-            const knownAliases = aliasInfo.aliases || [];
-            
-            const mainTemplate = templates.find(t => t.name === key) || templates[0];
-            
-            const tags = templates.map(t => {
-                if (t.name === key) return "Main";
-                if (t.name.startsWith(key + '_')) {
-                    const type = t.name.slice(key.length + 1);
-                    return type.charAt(0).toUpperCase() + type.slice(1);
-                }
-                return t.name;
-            }).sort((a, b) => (a === "Main" ? -1 : b === "Main" ? 1 : 0));
-            
-            let avatarUrl = null;
-            let emojiEntry = emojiMap.find(e => e.key === key);
-            
-            if (!emojiEntry) {
-                emojiEntry = emojiMap.find(e => knownAliases.includes(e.key));
-            }
+    const query = search.toLowerCase();
+    items = Object.entries(data).map(([key, rawTemplates]) => {
+        const templates = Array.isArray(rawTemplates) 
+            ? rawTemplates 
+            : (rawTemplates ? [rawTemplates] : []);
 
-            if (emojiEntry) {
-                avatarUrl = `https://cdn.discordapp.com/emojis/${emojiEntry.emoji}.png`;
-            } else {
-                if (mainTemplate?.json?.embeds?.[0]?.author?.icon_url) {
-                    avatarUrl = mainTemplate.json.embeds[0].author.icon_url;
-                } else if (mainTemplate?.json?.embeds?.[0]?.image?.url) {
-                    avatarUrl = mainTemplate.json.embeds[0].image.url;
-                }
+        const aliasInfo = aliases[key] || {};
+        const displayName = aliasInfo.display_name || key;
+        const knownAliases = aliasInfo.aliases || [];
+        
+        const mainTemplate = templates.find(t => t.name === key) || templates[0];
+        
+        const tags = templates.map(t => {
+            if (t.name === key) return "Main";
+            if (t && t.name && t.name.startsWith(key + '_')) {
+                const type = t.name.slice(key.length + 1);
+                return type.charAt(0).toUpperCase() + type.slice(1);
             }
+            return t ? t.name : "Unknown";
+        }).sort((a, b) => (a === "Main" ? -1 : b === "Main" ? 1 : 0));
+        
+        let avatarUrl = null;
 
-            return {
-                id: key,
-                displayName,
-                tags,
-                mainTemplate,
-                avatarUrl
-            };
-        }).filter(item => 
-            item.displayName.toLowerCase().includes(query) || 
-            item.id.toLowerCase().includes(query)
-        ).sort((a, b) => a.displayName.localeCompare(b.displayName));
-    }
+        const safeEmojiMap = Array.isArray(emojiMap) ? emojiMap : [];
+        let emojiEntry = safeEmojiMap.find(e => e.key === key);
+        
+        if (!emojiEntry) {
+            emojiEntry = safeEmojiMap.find(e => knownAliases.includes(e.key));
+        }
+
+        if (emojiEntry) {
+            avatarUrl = `https://cdn.discordapp.com/emojis/${emojiEntry.emoji}.png`;
+        } else {
+            if (mainTemplate?.json?.embeds?.[0]?.author?.icon_url) {
+                avatarUrl = mainTemplate.json.embeds[0].author.icon_url;
+            } else if (mainTemplate?.json?.embeds?.[0]?.image?.url) {
+                avatarUrl = mainTemplate.json.embeds[0].image.url;
+            }
+        }
+
+        return {
+            id: key,
+            displayName,
+            tags,
+            mainTemplate,
+            avatarUrl
+        };
+    }).filter(item => 
+        item.displayName.toLowerCase().includes(query) || 
+        item.id.toLowerCase().includes(query)
+    ).sort((a, b) => a.displayName.localeCompare(b.displayName));
+}
 </script>
 
 <div class="vertical-list">
