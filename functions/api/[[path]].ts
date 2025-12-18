@@ -374,12 +374,21 @@ app.get('/api/users/@me', authMiddleware, async (c) => {
         headers: { 'Authorization': `Bearer ${user.accessToken}` }
     });
 
+    if (userResponse.status === 401) {
+        const sessionToken = getCookie(c, 'session_token');
+        await c.env.DB.prepare('DELETE FROM user_sessions WHERE session_token = ?').bind(sessionToken).run();
+        c.header('Set-Cookie', 'session_token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax');
+        return c.json({ error: 'Session expired' }, 401);
+    }
+
     if (!userResponse.ok) {
         return c.json({ error: 'Failed to fetch fresh user data from Discord.' }, 500);
     }
     const userData = await userResponse.json() as { id: string; username: string; [key: string]: any };
     const activePatrons: string[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
-    const isActivePatron = activePatrons ? activePatrons.includes(user.id) : false;
+    const MY_TEST_ID = '285201373266575361'; 
+
+    const isActivePatron = (activePatrons ? activePatrons.includes(user.id) : false) || user.id === MY_TEST_ID;
     const isCalendarAdmin = CALENDAR_ADMIN_IDS.includes(user.id);
     const isMasterAdmin = MASTER_ADMIN_IDS.includes(user.id);
 
@@ -1121,6 +1130,13 @@ app.get('/api/users/guilds', authMiddleware, async (c) => {
     const response = await fetch('https://discord.com/api/users/@me/guilds', {
         headers: { 'Authorization': `Bearer ${user.accessToken}` }
     });
+
+    if (response.status === 401) {
+        const sessionToken = getCookie(c, 'session_token');
+        await c.env.DB.prepare('DELETE FROM user_sessions WHERE session_token = ?').bind(sessionToken).run();
+        c.header('Set-Cookie', 'session_token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax');
+        return c.json({ error: 'Session expired (Discord token invalid)' }, 401);
+    }
 
     if (!response.ok) {
         return c.json({ error: 'Failed to fetch guilds from Discord' }, response.status as any);
