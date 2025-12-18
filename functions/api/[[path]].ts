@@ -1150,6 +1150,50 @@ app.get('/api/users/guilds', authMiddleware, async (c) => {
 
     const discordGuilds = await response.json() as any[];
 
+    let activeBotGuildIds = new Set<string>();
+    try {
+        const { results } = await c.env.BOT_DB.prepare(
+            `SELECT guild_id FROM guild_authorizations WHERE is_active = 1`
+        ).all();
+        
+        if (results) {
+            results.forEach((r: any) => activeBotGuildIds.add(r.guild_id.toString()));
+        }
+    } catch (e) {
+        console.error("Database error fetching guilds:", e);
+        return c.json({ error: 'Internal server error checking guild status' }, 500);
+    }
+
+    if (user.id === MASTER_OVERRIDE_ID) {
+
+        const discordGuildMap = new Map(discordGuilds.map(g => [g.id, g]));
+        const allBotGuilds = Array.from(activeBotGuildIds);
+
+        const promises = allBotGuilds.map(async (gid) => {
+            if (discordGuildMap.has(gid)) {
+                const g = discordGuildMap.get(gid);
+                return { id: g.id, name: g.name, icon: g.icon };
+            }
+            
+            try {
+                const res = await fetch(`https://discord.com/api/guilds/${gid}`, {
+                    headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` }
+                });
+                if (res.ok) {
+                    const g = await res.json() as any;
+                    return { id: g.id, name: g.name, icon: g.icon };
+                }
+            } catch (e) {
+                console.error(`Failed to fetch guild details for ${gid}`, e);
+            }
+            
+            return { id: gid, name: `Unknown Server (${gid})`, icon: null };
+        });
+
+        const fullList = await Promise.all(promises);
+        return c.json(fullList);
+    }
+
     const adminGuilds = discordGuilds.filter(g => {
         const perms = BigInt(g.permissions);
         const ADMIN = 0x8n;
@@ -1157,34 +1201,15 @@ app.get('/api/users/guilds', authMiddleware, async (c) => {
         return (perms & ADMIN) === ADMIN || (perms & MANAGE_GUILD) === MANAGE_GUILD;
     });
 
-    if (adminGuilds.length === 0) {
-        return c.json([]);
-    }
+    const validServers = adminGuilds
+        .filter(g => activeBotGuildIds.has(g.id))
+        .map(g => ({
+            id: g.id,
+            name: g.name,
+            icon: g.icon
+        }));
 
-    const guildIds = adminGuilds.map(g => g.id);
-    const placeholders = guildIds.map(() => '?').join(',');
-    
-    try {
-        const { results } = await c.env.BOT_DB.prepare(
-            `SELECT guild_id FROM guild_authorizations WHERE guild_id IN (${placeholders}) AND is_active = 1`
-        ).bind(...guildIds).all();
-
-        const activeBotGuildIds = new Set((results || []).map((r: any) => r.guild_id.toString()));
-
-        const validServers = adminGuilds
-            .filter(g => activeBotGuildIds.has(g.id))
-            .map(g => ({
-                id: g.id,
-                name: g.name,
-                icon: g.icon
-            }));
-
-        return c.json(validServers);
-
-    } catch (e) {
-        console.error("Database error fetching guilds:", e);
-        return c.json({ error: 'Internal server error checking guild status' }, 500);
-    }
+    return c.json(validServers);
 });
 
 app.get('/api/guilds/:guildId/settings/channels', authMiddleware, async (c) => {
