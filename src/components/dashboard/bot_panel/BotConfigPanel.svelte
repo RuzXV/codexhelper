@@ -369,7 +369,7 @@
     .custom-select-trigger {
         width: 100%;
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
         padding: 10px 14px;
         background: var(--bg-primary);
@@ -379,9 +379,9 @@
         cursor: pointer;
         font-size: 0.95rem;
         transition: border 0.2s;
-        text-align: left;
+        position: relative;
     }
-    
+
     .custom-select-trigger .selected-text {
         flex-grow: 1;
         text-align: left;
@@ -395,6 +395,8 @@
         font-size: 0.8rem;
         opacity: 0.7;
         transition: transform 0.2s;
+        position: absolute;
+        right: 14px;
     }
 
     .arrow.rotated {
@@ -450,6 +452,7 @@
         cursor: pointer;
         display: flex;
         align-items: center;
+        justify-content: flex-start;
         gap: 8px;
         font-size: 0.9rem;
         transition: background 0.1s;
