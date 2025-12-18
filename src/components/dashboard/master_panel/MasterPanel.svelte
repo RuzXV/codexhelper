@@ -252,9 +252,7 @@
 <div class="panel-container">
     <div class="dashboard-header">
         <div>
-            <h1>Master Admin Panel</h1>
-            <p>Manage core data sources and global bot configurations.</p>
-        </div>
+            <h1>Master Admin Panel</h1></div>
     </div>
 
     <div class="panel-content">
@@ -273,7 +271,7 @@
             </div>
 
             <div class="actions-group">
-                <span class="entry-count">{totalEntries} Entries</span>
+                <span class="entry-count">{totalEntries} Entries</span>f
                 <div class="search-wrapper">
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" placeholder="Search {activeSource}..." bind:value={searchQuery} class="search-input"/>
@@ -354,10 +352,49 @@
 
 <style>
     .controls-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
-    .source-selector { display: flex; background: var(--bg-tertiary); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color); gap: 2px; }
-    .source-btn { background: transparent; border: none; color: var(--text-secondary); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; font-size: 0.9rem; }
-    .source-btn:hover { color: var(--text-primary); }
-    .source-btn.active { background: var(--bg-card); color: var(--accent-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .source-selector { 
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 10px; 
+        width: 100%; 
+        max-width: 800px;
+        margin-bottom: 5px;
+    }
+    .source-btn { 
+        background: var(--bg-tertiary); 
+        border: 1px solid rgba(255, 255, 255, 0.15); 
+        color: var(--text-secondary); 
+        padding: 12px 16px; 
+        border-radius: var(--radius-md); 
+        font-weight: 600; 
+        cursor: pointer; 
+        display: flex; 
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center;
+        gap: 8px; 
+        transition: all 0.2s ease; 
+        font-size: 0.9rem; 
+        height: 100%;
+    }
+
+    .source-btn:hover { 
+        background: var(--bg-secondary);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: var(--text-primary); 
+    }
+
+    .source-btn.active { 
+        background: var(--accent-blue-light, rgba(59, 130, 246, 0.1)); 
+        color: var(--accent-blue); 
+        border-color: var(--accent-blue); 
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); 
+    }
+    
+    .source-btn i {
+        font-size: 1.2rem;
+        margin-bottom: 2px;
+    }
     
     .actions-group { display: flex; gap: 10px; align-items: center; flex-grow: 1; justify-content: flex-end; }
     .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px; white-space: nowrap; }

@@ -1117,13 +1117,13 @@ app.post('/api/guilds/:guildId/settings/channels', authMiddleware, async (c) => 
     const { command_group, channel_id, action } = await c.req.json();
     
     if (action === 'Add Channel') {
-        await c.env.DB.prepare("INSERT OR REPLACE INTO allowed_channels (guild_id, command_group, channel_id) VALUES (?, ?, ?)").bind(guildId, command_group, channel_id).run();
+        await c.env.BOT_DB.prepare("INSERT OR REPLACE INTO allowed_channels (guild_id, command_group, channel_id) VALUES (?, ?, ?)").bind(guildId, command_group, channel_id).run();
     } else {
-        await c.env.DB.prepare("DELETE FROM allowed_channels WHERE guild_id = ? AND command_group = ?").bind(guildId, command_group).run();
+        await c.env.BOT_DB.prepare("DELETE FROM allowed_channels WHERE guild_id = ? AND command_group = ?").bind(guildId, command_group).run();
     }
 
     const payload = JSON.stringify({ guild_id: guildId });
-    await c.env.DB.prepare(
+    await c.env.BOT_DB.prepare(
         "INSERT INTO system_events (type, payload, created_at) VALUES ('CHANNEL_UPDATE', ?, ?)"
     ).bind(payload, Date.now() / 1000).run();
 
@@ -1191,7 +1191,7 @@ app.get('/api/guilds/:guildId/settings/channels', authMiddleware, async (c) => {
     const { guildId } = c.req.param();
     
     try {
-        const { results } = await c.env.DB.prepare(
+        const { results } = await c.env.BOT_DB.prepare(
             "SELECT command_group, channel_id FROM allowed_channels WHERE guild_id = ?"
         ).bind(guildId).all();
 

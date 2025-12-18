@@ -226,6 +226,7 @@
         z-index: 10;
         position: relative;
         top: 1px;
+        min-height: 55px;
     }
     
     .nav-left {

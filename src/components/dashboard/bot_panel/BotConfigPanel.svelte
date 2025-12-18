@@ -259,29 +259,35 @@
     }
 
     .config-tabs {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
         gap: 10px;
+        min-width: 300px;
     }
 
     .config-tab-btn {
-        background: transparent;
-        border: 1px solid var(--border-color);
+        background: var(--bg-tertiary); 
+        border: 1px solid rgba(255, 255, 255, 0.15);
         color: var(--text-secondary);
-        padding: 8px 16px;
-        border-radius: 6px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
         cursor: pointer;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 8px;
+        justify-content: center;
+        gap: 6px;
         transition: all 0.2s;
+        font-weight: 600;
+        font-size: 0.9rem;
     }
 
     .config-tab-btn.active {
-        background: var(--accent-blue);
-        color: white;
+        background: var(--accent-blue-light, rgba(59, 130, 246, 0.1));
+        color: var(--accent-blue);
         border-color: var(--accent-blue);
     }
-
+    
     .config-tab-btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -373,6 +379,12 @@
         cursor: pointer;
         font-size: 0.95rem;
         transition: border 0.2s;
+        text-align: left;
+    }
+    
+    .custom-select-trigger .selected-text {
+        flex-grow: 1;
+        text-align: left;
     }
 
     .custom-select-trigger:hover {
