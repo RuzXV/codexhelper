@@ -77,7 +77,8 @@
                     if (previousSelection) {
                         selectServer(previousSelection);
                     } else {
-                        selectServer(availableServers[0]);
+                        selectedServer = null;
+                        isServerDropdownOpen = false;
                     }
                 } else {
                     selectedServer = null;
@@ -269,6 +270,7 @@
         position: relative;
         margin-bottom: 5px;
         z-index: 20;
+        min-width: 260px;
     }
 
     .server-select-btn {
@@ -284,7 +286,9 @@
         cursor: pointer;
         font-weight: 500;
         transition: all 0.2s ease;
-        min-width: 240px;
+        width: 100%;
+        min-width: 260px; 
+        height: 50px;
     }
 
     .server-select-btn:hover {
@@ -296,6 +300,15 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        overflow: hidden;
+    }
+
+    .server-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+        display: block;
     }
 
     .server-icon-mini {
@@ -314,7 +327,7 @@
         border: 1px solid var(--border-color);
         border-radius: 8px;
         width: 100%;
-        min-width: 240px;
+        min-width: 260px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         z-index: 100;
         overflow-y: auto;
@@ -337,6 +350,14 @@
         text-align: left;
         transition: background 0.2s;
         flex-shrink: 0;
+        height: 56px;
+    }
+
+    .server-option span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-grow: 1;
     }
     
     .server-option:last-child {

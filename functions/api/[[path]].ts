@@ -12,6 +12,7 @@ type Bindings = {
     BOT_DATA: KVNamespace;
     WEBSITE_APP_ID: string;
     WEBSITE_APP_SECRET: string;
+    DISCORD_BOT_TOKEN: string;
     DB_ENCRYPTION_KEY: string;
     BOT_SECRET_KEY: string;
     GOOGLE_SERVICE_ACCOUNT_JSON: string;
@@ -1160,14 +1161,6 @@ app.get('/api/users/guilds', authMiddleware, async (c) => {
         return c.json([]);
     }
 
-    if (user.id === MASTER_OVERRIDE_ID) {
-        return c.json(adminGuilds.map(g => ({
-            id: g.id,
-            name: g.name,
-            icon: g.icon
-        })));
-    }
-    
     const guildIds = adminGuilds.map(g => g.id);
     const placeholders = guildIds.map(() => '?').join(',');
     
@@ -1218,10 +1211,9 @@ app.get('/api/guilds/:guildId/settings/channels', authMiddleware, async (c) => {
 
 app.get('/api/guilds/:guildId/channels', authMiddleware, async (c) => {
     const { guildId } = c.req.param();
-    const user = c.get('user');
-
+    
     const response = await fetch(`https://discord.com/api/guilds/${guildId}/channels`, {
-        headers: { 'Authorization': `Bearer ${user.accessToken}` }
+        headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` } 
     });
 
     if (!response.ok) {
