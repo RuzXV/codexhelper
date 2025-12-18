@@ -1216,4 +1216,27 @@ app.get('/api/guilds/:guildId/settings/channels', authMiddleware, async (c) => {
     }
 });
 
+app.get('/api/guilds/:guildId/channels', authMiddleware, async (c) => {
+    const { guildId } = c.req.param();
+    const user = c.get('user');
+
+    const response = await fetch(`https://discord.com/api/guilds/${guildId}/channels`, {
+        headers: { 'Authorization': `Bearer ${user.accessToken}` }
+    });
+
+    if (!response.ok) {
+        console.error(`Failed to fetch channels for guild ${guildId}: ${response.status}`);
+        return c.json({ channels: [] });
+    }
+
+    const channels = await response.json() as any[];
+    
+    const validChannels = channels
+        .filter((ch: any) => [0, 5, 15].includes(ch.type))
+        .map((ch: any) => ({ id: ch.id, name: ch.name, type: ch.type, position: ch.position }))
+        .sort((a: any, b: any) => a.position - b.position);
+
+    return c.json({ channels: validChannels });
+});
+
 export const onRequest = handle(app);

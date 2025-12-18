@@ -68,10 +68,8 @@
         loading = true;
         try {
             const servers = await window.auth.fetchWithAuth('/api/users/guilds');
-            
             if (Array.isArray(servers)) {
                 availableServers = servers;
-                
                 if (availableServers.length > 0) {
                     const storedId = localStorage.getItem('codex_last_server_id');
                     const previousSelection = availableServers.find(s => s.id === storedId);
@@ -158,8 +156,10 @@
                     <div class="server-selector-container" transition:fade={{ duration: 200 }}>
                         <button class="server-select-btn" on:click={toggleServerDropdown}>
                             {#if selectedServer}
-                                <img src={getIcon(selectedServer)} alt="" class="server-icon-mini" />
-                                <span class="server-name">{selectedServer.name}</span>
+                                <div class="server-btn-content">
+                                    <img src={getIcon(selectedServer)} alt="" class="server-icon-mini" />
+                                    <span class="server-name">{selectedServer.name}</span>
+                                </div>
                             {:else}
                                 <span class="server-name">Select Server...</span>
                             {/if}
@@ -268,6 +268,7 @@
     .server-selector-container {
         position: relative;
         margin-bottom: 5px;
+        z-index: 20;
     }
 
     .server-select-btn {
@@ -275,27 +276,34 @@
         border: 1px solid var(--border-color);
         color: var(--text-primary);
         padding: 8px 16px;
-        border-radius: 20px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        min-width: 200px;
         justify-content: space-between;
+        gap: 15px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        min-width: 240px;
     }
 
     .server-select-btn:hover {
         background: var(--bg-secondary);
-        border-color: var(--accent-blue);
+        border-color: var(--text-secondary);
+    }
+    
+    .server-btn-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     .server-icon-mini {
-        width: 24px;
-        height: 24px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         object-fit: cover;
+        flex-shrink: 0;
     }
 
     .server-dropdown {
@@ -306,28 +314,37 @@
         border: 1px solid var(--border-color);
         border-radius: 8px;
         width: 100%;
-        min-width: 220px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        min-width: 240px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         z-index: 100;
-        overflow: hidden;
+        overflow-y: auto;
+        max-height: 400px;
+        display: flex;
+        flex-direction: column;
     }
 
     .server-option {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         width: 100%;
-        padding: 10px 16px;
+        padding: 12px 16px;
         background: transparent;
         border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
         color: var(--text-secondary);
         cursor: pointer;
         text-align: left;
         transition: background 0.2s;
+        flex-shrink: 0;
+    }
+    
+    .server-option:last-child {
+        border-bottom: none;
     }
 
     .server-option:hover {
-        background: var(--bg-secondary);
+        background: var(--bg-tertiary);
         color: var(--text-primary);
     }
     
