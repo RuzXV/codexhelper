@@ -406,6 +406,8 @@
         }];
 
         commanderData = [...commanderData, newTemplate];
+
+        commitCurrentState();
         
         showAddBuildModal = false;
         newBuildButtonKey = "";
