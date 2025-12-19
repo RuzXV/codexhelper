@@ -184,6 +184,31 @@
         return diffs;
     }
 
+    function generateCommanderDiff(oldArr, newArr) {
+        const diffs = {};
+        const oldMap = new Map((oldArr || []).map(t => [t.name, t]));
+        const newMap = new Map((newArr || []).map(t => [t.name, t]));
+        const allKeys = new Set([...oldMap.keys(), ...newMap.keys()]);
+
+        const isEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+        for (const key of allKeys) {
+            const oldItem = oldMap.get(key);
+            const newItem = newMap.get(key);
+
+            const label = `Template: ${key}`;
+
+            if (!oldItem) {
+                diffs[label] = { old: undefined, new: newItem, status: 'added' };
+            } else if (!newItem) {
+                diffs[label] = { old: oldItem, new: undefined, status: 'deleted' };
+            } else if (!isEqual(oldItem, newItem)) {
+                diffs[label] = { old: oldItem, new: newItem, status: 'modified' };
+            }
+        }
+        return diffs;
+    }
+
     async function handleSave(event) {
         const { id, commanderId, data, aliasData: newAliasData, callback } = event.detail;
         const saveId = commanderId || id;
@@ -206,7 +231,13 @@
 
         const oldData = rawData[saveId] ? JSON.parse(JSON.stringify(rawData[saveId])) : {};
         
-        const changes = generateDiff(oldData, data);
+        let changes;
+        if (activeSource === 'commanders' && Array.isArray(data)) {
+            const oldArr = Array.isArray(oldData) ? oldData : [];
+            changes = generateCommanderDiff(oldArr, data);
+        } else {
+            changes = generateDiff(oldData, data);
+        }
         rawData[saveId] = data;
 
         if (activeSource === 'commanders' && aliasData) {

@@ -20,6 +20,7 @@
     const MAIN_FOOTER = "Check out talents & gear recommendations by clicking the buttons below!";
 
     let initialJSON = "";
+    let originalCommanderDataJSON = "";
     let saveState = 'idle';
     let showDiscardModal = false;
     let dropdownSearch = "";
@@ -55,7 +56,9 @@
         sub_formations,
         isMainTemplate
     });
-    $: hasUnsavedChanges = initialJSON && currentSnapshot && initialJSON !== currentSnapshot;
+    $: isLocalDirty = initialJSON && currentSnapshot && initialJSON !== currentSnapshot;
+    $: isGlobalDirty = originalCommanderDataJSON && JSON.stringify(commanderData) !== originalCommanderDataJSON;
+    $: hasUnsavedChanges = isLocalDirty || isGlobalDirty;
 
     $: accessoriesList = emojiData.accessories || [];
     $: formationsList = emojiData.formations || [];
@@ -72,6 +75,7 @@
     }
 
     onMount(async () => {
+        originalCommanderDataJSON = JSON.stringify(commanderData);
         sortAndLoad();
     });
 
