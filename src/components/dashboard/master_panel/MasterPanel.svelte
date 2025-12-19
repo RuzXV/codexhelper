@@ -7,6 +7,7 @@
     import BundleEditor from './BundleEditor.svelte';
     import MetaPairingEditor from './MetaPairingEditor.svelte';
     import emojiData from '../../../data/emoji_mappings.json';
+
     export let user;
 
     const DATA_SOURCES = [
@@ -15,6 +16,7 @@
         { id: 'bundles', label: 'Bundles', icon: 'fa-box-open' },
         { id: 'meta_lineups', label: 'Meta Pairings', icon: 'fa-users' }
     ];
+
     const COLOR_MAP = {
         commander_main: '#004cff',
         commander_sub: '#313338',
@@ -22,6 +24,7 @@
         bundle: '#e9be74',
         event: '#2ecc71'
     };
+
     function getEmbedColor(hexOrInt) {
         if (!hexOrInt) return '#313338';
         if (typeof hexOrInt === 'string' && hexOrInt.startsWith('#')) return hexOrInt;
@@ -33,7 +36,6 @@
 
     let activeSource = 'commanders';
     let searchQuery = '';
-    
     let rawData = null;
     let aliasData = null; 
     let loading = false;
@@ -87,24 +89,56 @@
     });
 
     function handleAddEntry() {
-        if (activeSource === 'commanders') {
-            alert("Please use the 'Add Build' button inside an existing commander to create variants, or ask Dev to add a new base commander key.");
-            return;
-        }
-
-        const id = prompt(`Enter a unique ID (key) for the new ${activeSource.slice(0, -1)} (e.g., 'golden_kingdom'):`);
+        const id = prompt(`Enter a unique ID (key) for the new ${activeSource.slice(0, -1)} (e.g., 'new_entry_key'):`);
+        
         if (!id) return;
+        
         if (rawData[id]) {
             alert("ID already exists!");
             return;
         }
 
         let newData = {};
+
+        if (activeSource === 'commanders') {
+            newData = [{
+                name: id,
+                json: {
+                    embeds: [{
+                        title: "New Commander", 
+                        description: "",
+                        fields: []
+                    }]
+                }
+            }];
+
+            if (aliasData) {
+                aliasData[id] = {
+                    display_name: "New Commander",
+                    aliases: []
+                };
+            }
+        }
+
         if (activeSource === 'events') newData = { title: "New Event", color: 3066993, fields: [] };
         if (activeSource === 'bundles') newData = { title: "New Bundle", color: "#e9be74", description: [] };
         if (activeSource === 'meta_lineups') newData = { title: "New Lineup", color: "#00c6ff", fields: [] };
+
+        if (activeSource === 'commanders') {
+            editingItem = {
+                id: id,
+                data: newData,
+                aliasData: aliasData[id],
+                originalData: null
+            };
+        } else {
+            editingItem = { 
+                id, 
+                data: newData, 
+                originalData: null 
+            };
+        }
         
-        editingItem = { id, data: newData, originalData: null };
         isEditing = true;
     }
 
@@ -174,6 +208,7 @@
         
         const changes = generateDiff(oldData, data);
         rawData[saveId] = data;
+
         if (activeSource === 'commanders' && aliasData) {
             aliasData[saveId] = newAliasData;
         }
@@ -184,6 +219,7 @@
                 target_name: data.title || data.displayName || data.name || saveId,
                 changes: changes
             };
+
             await window.auth.fetchWithAuth(`/api/admin/data/${activeSource}`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -282,7 +318,7 @@
             <div class="online-section">
                 {#each onlineUsers as u}
                     <div class="user-pill">
-                        <img 
+                         <img 
                             src={u.avatar 
                                 ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png` 
                                 : `https://cdn.discordapp.com/embed/avatars/${(BigInt(u.id) >> 22n) % 6n}.png`} 
@@ -296,7 +332,7 @@
                 {/each}
                 {#if onlineUsers.length === 0}
                     <div class="user-pill offline">
-                        <span class="status-indicator red"></span> Offline
+                       <span class="status-indicator red"></span> Offline
                     </div>
                 {/if}
             </div>
@@ -456,7 +492,7 @@
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid var(--border-color);
         border-radius: 20px;
-        padding: 4px 10px 4px 4px; /* Less padding left for avatar */
+        padding: 4px 10px 4px 4px;
         gap: 8px;
         font-size: 0.85rem;
         color: var(--text-primary);
@@ -526,25 +562,27 @@
         cursor: pointer; 
         display: flex;
         align-items: center; 
-        gap: 8px; 
+        gap: 8px;
         transition: all 0.2s ease; 
         font-size: 0.85rem;
     }
 
     .source-btn:hover { 
-        color: var(--text-primary); 
+        color: var(--text-primary);
         background: rgba(255,255,255,0.05);
     }
 
     .source-btn.active { 
         background: var(--bg-card);
-        color: var(--accent-blue); 
+        color: var(--accent-blue);
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px; white-space: nowrap; }
+    .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px;
+        white-space: nowrap; }
 
-    .search-wrapper { position: relative; width: 220px; }
+    .search-wrapper { position: relative; width: 220px;
+    }
     
     .search-icon { 
         position: absolute;
@@ -553,29 +591,40 @@
     }
     
     .search-input { 
-        width: 100%; background: var(--bg-tertiary);
+        width: 100%;
+        background: var(--bg-tertiary);
         border: 1px solid var(--border-color); padding: 8px 8px 8px 30px; 
         border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.9rem;
     }
-    .search-input:focus { outline: none; border-color: var(--accent-blue); background: var(--bg-primary); }
+    .search-input:focus { outline: none; border-color: var(--accent-blue); background: var(--bg-primary);
+    }
     
     .btn-add { 
-        background: var(--accent-green); color: #000; border: none; 
+        background: var(--accent-green);
+        color: #000; border: none; 
         width: 36px; height: 36px;
         border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; 
-        cursor: pointer; transition: all 0.2s; font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s; font-size: 1rem;
     }
-    .btn-add:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-add:hover { filter: brightness(1.1); transform: translateY(-1px);
+    }
 
     .data-list-container { min-height: 400px; position: relative; }
-    .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px; font-size: 1.2rem; }
-    .state-msg.error { color: #ef4444; }
-    .state-msg i { font-size: 2rem; opacity: 0.7; }
+    .state-msg { display: flex; flex-direction: column;
+        align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px; font-size: 1.2rem; }
+    .state-msg.error { color: #ef4444;
+    }
+    .state-msg i { font-size: 2rem; opacity: 0.7;
+    }
 
     @media (max-width: 1000px) {
-        .dashboard-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-        .header-controls { width: 100%; flex-wrap: wrap; }
-        .search-wrapper { flex-grow: 1; width: auto; }
+        .dashboard-header { flex-direction: column;
+        align-items: flex-start; gap: 15px; }
+        .header-controls { width: 100%; flex-wrap: wrap;
+        }
+        .search-wrapper { flex-grow: 1; width: auto;
+        }
         .btn-label { display: none; } 
     }
 </style>
