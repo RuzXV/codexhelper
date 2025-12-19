@@ -258,18 +258,22 @@
         </div>
     </div>
     
-    {#if hasUnsavedChanges || saveState === 'success' || saveState === 'saving'}
+    {#if hasUnsavedChanges || saveState === 'saving' || saveState === 'success'}
         <div class="save-bar" transition:fly={{ y: 50, duration: 300 }}>
             <div class="save-bar-content">
-                {#if saveState === 'saving'}
-                    <span class="status-msg"><i class="fas fa-circle-notch fa-spin"></i> Saving changes...</span>
-                {:else if saveState === 'success'}
-                    <span class="status-msg success"><i class="fas fa-check-circle"></i> Saved!</span>
+                {#if saveState === 'success'}
+                    <span style="color: #4ade80;"><i class="fas fa-check-circle"></i> Saved Successfully!</span>
                 {:else}
-                    <span class="dirty-msg">You have unsaved changes.</span>
-                    <div class="bar-actions">
-                        <button class="btn-bar-cancel" on:click={attemptClose}>Discard</button>
-                        <button class="btn-bar-save" on:click={save}>Save Changes</button>
+                    <span>You have unsaved changes.</span>
+                    <div class="save-actions">
+                        <button class="btn-discard" on:click={attemptClose} disabled={saveState === 'saving'}>Discard</button>
+                        <button class="btn-calculate" on:click={save} disabled={saveState === 'saving'}>
+                            {#if saveState === 'saving'}
+                                <i class="fas fa-spinner fa-spin"></i>
+                            {:else}
+                                Save Changes
+                            {/if}
+                        </button>
                     </div>
                 {/if}
             </div>
@@ -406,18 +410,54 @@
     .btn-icon { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
     .btn-icon.danger:hover { color: #ef4444; }
 
-    .save-bar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: #111214; border: 1px solid #00c6ff; padding: 15px 30px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; min-width: 300px; display: flex; justify-content: center; }
-    .save-bar-content { display: flex; align-items: center; gap: 20px; width: 100%; justify-content: space-between; }
-    .status-msg { font-size: 1.1rem; color: var(--text-primary); display: flex; align-items: center; gap: 10px; margin: 0 auto;}
-    .status-msg.success { color: #4ade80; }
-    .dirty-msg { font-weight: 600; color: var(--text-primary); }
-    .bar-actions { display: flex; gap: 10px; }
+    .save-bar {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        background: var(--bg-card); border: 1px solid var(--border-color);
+        padding: 12px 24px; border-radius: 50px; box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        z-index: 1000; min-width: 350px;
+    }
+    .save-bar-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%; }
+    .save-bar span { font-weight: 500; color: white; }
+    .save-actions { display: flex; gap: 10px; }
     
-    .btn-bar-cancel { background: transparent; color: #ef4444; border: none; font-weight: 600; cursor: pointer; padding: 8px 16px; }
-    .btn-bar-cancel:hover { text-decoration: underline; }
+    .btn-calculate {
+        background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+        color: white;
+        border: 2px solid #60a5fa; 
+        padding: 8px 24px;
+        border-radius: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-calculate:hover { 
+        transform: translateY(-1px);
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); 
+    }
 
-    .btn-bar-save { background: #00c6ff; color: #000; border: none; padding: 8px 24px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: transform 0.1s; }
-    .btn-bar-save:hover { transform: scale(1.05); filter: brightness(1.1); }
+    .btn-calculate:disabled { 
+        opacity: 0.7; 
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    
+    .btn-discard {
+        background: transparent;
+        color: #ef4444; 
+        border: 2px solid #ef4444;
+        padding: 8px 16px; 
+        border-radius: 20px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        transition: all 0.2s;
+    }
+    
+    .btn-discard:hover { 
+        background: rgba(239, 68, 68, 0.15); 
+        color: #ef4444;
+    }
 
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
     .modal { background: var(--bg-card); padding: 25px; border-radius: 8px; width: 400px; border: 1px solid var(--border-color); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
