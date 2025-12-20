@@ -102,4 +102,26 @@ bot.get('/sync/feed', async (c) => {
     return c.json(results || []);
 });
 
+bot.post('/batch', async (c) => {
+    try {
+        const body = await c.req.json();
+        const operations = body.batch;
+
+        if (!operations || !Array.isArray(operations)) {
+            return c.json({ error: 'Invalid batch format. Expected array in "batch" key.' }, 400);
+        }
+
+        const statements = operations.map((op: any) => 
+            c.env.BOT_DB.prepare(op.sql).bind(...(op.params || []))
+        );
+
+        const results = await c.env.BOT_DB.batch(statements);
+
+        return c.json(results);
+    } catch (e) {
+        console.error("Batch Execution Error:", e);
+        return c.json({ error: String(e) }, 500);
+    }
+});
+
 export default bot;
