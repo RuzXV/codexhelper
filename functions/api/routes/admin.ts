@@ -2,10 +2,27 @@ import { Hono } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { Bindings, Variables, OnlineUser } from '../_types';
 import { authMiddleware, masterAdminMiddleware } from '../_middleware';
-import { EVENT_INTERVALS, TROOP_CYCLE, EVENT_COLOR_MAP, MASTER_ADMIN_IDS } from '../_constants';
+import { EVENT_INTERVALS, TROOP_CYCLE, EVENT_COLOR_MAP, MASTER_ADMIN_IDS, MASTER_OVERRIDE_ID } from '../_constants';
 import { GoogleCalendarService, addDays } from '../services/googleCalendar';
 
 const admin = new Hono<{ Bindings: Bindings, Variables: Variables }>();
+
+async function manageBackups(c: any, key: string, oldData: string | null) {
+    if (!oldData) return;
+    
+    const timestamp = Date.now();
+    await c.env.BOT_DATA.put(`backup:${key}:${timestamp}`, oldData);
+
+    const list = await c.env.BOT_DATA.list({ prefix: `backup:${key}:` });
+    
+    if (list.keys.length > 100) { 
+        const sortedKeys = list.keys.sort((a: any, b: any) => a.name.localeCompare(b.name));
+        const keysToDelete = sortedKeys.slice(0, sortedKeys.length - 100);
+        for (const k of keysToDelete) {
+            await c.env.BOT_DATA.delete(k.name);
+        }
+    }
+}
 
 admin.post('/internal/update-cache', async (c) => {
     const secret = c.req.header('X-Internal-Secret');
@@ -202,6 +219,10 @@ admin.post('/admin/data/:key', async (c) => {
         adminAvatar = uData.avatar;
     } catch(e) {}
 
+    const currentData = await c.env.BOT_DATA.get(key);
+    
+    c.executionCtx.waitUntil(manageBackups(c, key, currentData));
+
     await c.env.BOT_DATA.put(key, JSON.stringify(bodyData));
     await c.env.BOT_DATA.put('data_version', Date.now().toString());
 
@@ -273,6 +294,48 @@ admin.post('/admin/gcal/reset', async (c) => {
         console.error("GCal Sync Error", e);
         return c.json({ error: 'Sync failed', details: String(e) }, 500);
     }
+});
+
+admin.get('/admin/backups/:key', async (c) => {
+    const key = c.req.param('key');
+    const list = await c.env.BOT_DATA.list({ prefix: `backup:${key}:` });
+    
+    const backups = list.keys.map((k: any) => {
+        const parts = k.name.split(':');
+        const ts = parseInt(parts[parts.length - 1]);
+        return {
+            key: k.name,
+            timestamp: ts,
+            date: new Date(ts).toLocaleString()
+        };
+    }).sort((a, b) => b.timestamp - a.timestamp);
+
+    return c.json(backups);
+});
+
+admin.post('/admin/restore', async (c) => {
+    const user = c.get('user');
+
+    if (user.id !== MASTER_OVERRIDE_ID) {
+        return c.json({ 
+            error: 'Forbidden: Only the Master Admin can perform restores.' 
+        }, 403);
+    }
+
+    const { targetKey, backupKey } = await c.req.json();
+    
+    const backupData = await c.env.BOT_DATA.get(backupKey);
+    if (!backupData) return c.json({ error: 'Backup not found' }, 404);
+
+    const currentBrokenState = await c.env.BOT_DATA.get(targetKey);
+    if (currentBrokenState) {
+        await c.env.BOT_DATA.put(`backup:${targetKey}:autorescued_${Date.now()}`, currentBrokenState);
+    }
+
+    await c.env.BOT_DATA.put(targetKey, backupData);
+
+
+    return c.json({ success: true, message: 'Restored successfully' });
 });
 
 export default admin;

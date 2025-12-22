@@ -225,6 +225,95 @@ input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-a
 .select-items div:hover, .same-as-selected { background-color: var(--accent-blue-light); color: var(--text-primary); }
 .select-items div img { width: 24px; height: 24px; }
 
+.ap-potion-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+}
+
+.ap-potion-item {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-3);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.ap-potion-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    z-index: 0;
+    opacity: 0.15;
+    background-image: radial-gradient(circle, #57f287 0%, #15803d 100%);
+    pointer-events: none;
+}
+
+.ap-potion-item img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.ap-potion-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: var(--spacing-1);
+    position: relative;
+    z-index: 1;
+}
+
+.ap-potion-info label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.ap-potion-input {
+    padding: var(--spacing-2);
+    text-align: center;
+    font-size: var(--font-size-base) !important;
+    border-radius: var(--radius-sm);
+    width: 100%;
+    max-width: 120px;
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.ap-potion-input:focus {
+    background: var(--bg-primary) !important;
+    border-color: var(--accent-green) !important;
+}
+
+.calculator-island.compact {
+    min-height: auto;
+    height: fit-content;
+}
+
+.island-content label,
+.form-group-label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-2);
+}
+
 @media (max-width: 1200px) {
     .carousel-arrow.prev { left: calc(50% - 380px); }
     .carousel-arrow.next { right: calc(50% - 380px); }
@@ -343,5 +432,20 @@ input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-a
     
     .hoh-return-btn, .hoh-return-sublabel {
         font-size: 11px;
+    }
+
+    .ap-potion-grid {
+        gap: var(--spacing-2);
+    }
+    .ap-potion-item {
+        padding: var(--spacing-2);
+    }
+    .ap-potion-item img {
+        width: 36px;
+        height: 36px;
+    }
+    .ap-potion-input {
+        font-size: var(--font-size-sm) !important;
+        padding: 4px;
     }
 }

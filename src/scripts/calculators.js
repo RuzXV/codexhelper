@@ -194,12 +194,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!targetSlide || targetSlide.dataset.initialized === 'true') return;
 
         switch(index) {
-            case 0: initSkillCalculator(); break;
-            case 1: initExpCalculator(); break;
-            case 2: initVipCalculator(); break;
-            case 3: initBuildingCalculator(); break;
-            case 4: initPassportCalculator(); break;
-            case 5: initHohCalculator(); break;
+            case 0: initApCalculator(); break;
+            case 1: initSkillCalculator(); break;
+            case 2: initExpCalculator(); break;
+            case 3: initVipCalculator(); break;
+            case 4: initBuildingCalculator(); break;
+            case 5: initPassportCalculator(); break;
+            case 6: initHohCalculator(); break;
         }
         
         targetSlide.dataset.initialized = 'true';
@@ -244,6 +245,45 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('input', format);
     }
 
+    function initApCalculator() {
+        const form = document.querySelector('.carousel-slide[data-title="Action Points"]');
+        const calculateBtn = document.getElementById('calculate-ap-btn');
+        if (!calculateBtn) return;
+
+        const resultDiv = document.getElementById('ap-result');
+        const inputs = form.querySelectorAll('.ap-potion-input');
+
+        inputs.forEach(input => formatNumberInput(input));
+
+        const performCalculation = () => {
+            let totalAp = 0;
+
+            inputs.forEach(input => {
+                const count = parseInt(input.value.replace(/,/g, ''), 10) || 0;
+                const value = parseInt(input.dataset.value, 10);
+                totalAp += count * value;
+            });
+
+            if (totalAp > 0) {
+                const apIcon = getImagePath('ap_icon.webp');
+                
+                resultDiv.innerHTML = `<img src="${apIcon}" alt="AP Icon"><span>Total Action Points: <strong id="ap-total-value">0</strong></span>`;
+                
+                animateCounter(document.getElementById('ap-total-value'), totalAp, 700);
+                
+                triggerSuccessAnimation(resultDiv);
+            } else {
+                resultDiv.textContent = "Enter your potion amounts to calculate total AP.";
+                resultDiv.classList.remove('error', 'result-success');
+            }
+        };
+
+        calculateBtn.addEventListener('click', () => {
+            performCalculation();
+            calculateBtn.style.display = 'none';
+            setupAutoCalculation(inputs, performCalculation);
+        });
+    }
 
     function initSkillCalculator() {
         const form = document.querySelector('.carousel-slide[data-title="Skill Upgrades"]');

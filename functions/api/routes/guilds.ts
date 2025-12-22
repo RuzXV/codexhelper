@@ -338,4 +338,98 @@ guilds.get('/:guildId/roles', async (c) => {
     return c.json({ roles: roles.map((r: any) => ({ id: r.id, name: r.name, color: r.color })) });
 });
 
+guilds.get('/:guildId/ark', async (c) => {
+    const { guildId } = c.req.param();
+    try {
+        const setup = await c.env.BOT_DB.prepare(
+            "SELECT channel_id, announcement_channel_id, admin_role_id, signup_role_id, is_active FROM ark_of_osiris_setups WHERE guild_id = ?"
+        ).bind(guildId).first();
+
+        return c.json({ config: setup || {} });
+    } catch (e) {
+        return c.json({ config: {} });
+    }
+});
+
+guilds.post('/:guildId/ark', async (c) => {
+    const { guildId } = c.req.param();
+    if (!await verifyGuildPatreonAccess(c, guildId)) {
+        return c.json({ error: 'Unauthorized' }, 403);
+    }
+
+    const { channel_id, announcement_channel_id, admin_role_id, signup_role_id } = await c.req.json();
+    const isActive = 1;
+
+    await c.env.BOT_DB.prepare(`
+        INSERT INTO ark_of_osiris_setups (guild_id, channel_id, announcement_channel_id, admin_role_id, signup_role_id, is_active)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON CONFLICT(guild_id) DO UPDATE SET
+            channel_id = excluded.channel_id,
+            announcement_channel_id = excluded.announcement_channel_id,
+            admin_role_id = excluded.admin_role_id,
+            signup_role_id = excluded.signup_role_id,
+            is_active = excluded.is_active
+    `).bind(
+        guildId, 
+        channel_id || null, 
+        announcement_channel_id || null, 
+        admin_role_id || null, 
+        signup_role_id || null, 
+        isActive
+    ).run();
+
+    const payload = JSON.stringify({ guild_id: guildId });
+    await c.env.BOT_DB.prepare(
+        "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)"
+    ).bind(payload, Date.now() / 1000).run();
+
+    return c.json({ success: true });
+});
+
+guilds.get('/:guildId/mge', async (c) => {
+    const { guildId } = c.req.param();
+    try {
+        const setup = await c.env.BOT_DB.prepare(
+            "SELECT signup_channel_id, admin_role_id, log_channel_id, is_active FROM mge_settings WHERE guild_id = ?"
+        ).bind(guildId).first();
+
+        return c.json({ config: setup || {} });
+    } catch (e) {
+        return c.json({ config: {} });
+    }
+});
+
+guilds.post('/:guildId/mge', async (c) => {
+    const { guildId } = c.req.param();
+    if (!await verifyGuildPatreonAccess(c, guildId)) {
+        return c.json({ error: 'Unauthorized' }, 403);
+    }
+
+    const { signup_channel_id, admin_role_id, log_channel_id } = await c.req.json();
+    const isActive = 1;
+
+    await c.env.BOT_DB.prepare(`
+        INSERT INTO mge_settings (guild_id, signup_channel_id, admin_role_id, log_channel_id, is_active)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(guild_id) DO UPDATE SET
+            signup_channel_id = excluded.signup_channel_id,
+            admin_role_id = excluded.admin_role_id,
+            log_channel_id = excluded.log_channel_id,
+            is_active = excluded.is_active
+    `).bind(
+        guildId, 
+        signup_channel_id || null, 
+        admin_role_id || null, 
+        log_channel_id || null, 
+        isActive
+    ).run();
+
+    const payload = JSON.stringify({ guild_id: guildId });
+    await c.env.BOT_DB.prepare(
+        "INSERT INTO system_events (type, payload, created_at) VALUES ('MGE_UPDATE', ?, ?)"
+    ).bind(payload, Date.now() / 1000).run();
+
+    return c.json({ success: true });
+});
+
 export default guilds;

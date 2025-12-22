@@ -4,10 +4,8 @@ import Layout from '../../layouts/Layout.astro';
 import '../../styles/calculators.css';
 
 const allCalculatorImageModules = import.meta.glob<any>('../../assets/images/calculators/**/*.{webp,png,jpg}', { eager: true });
-
 const imageMap: { [key: string]: any } = {};
 const imagePathMap: { [key: string]: string } = {};
-
 for (const path in allCalculatorImageModules) {
     const filename = path.split('/').pop();
     if (filename) {
@@ -19,6 +17,7 @@ for (const path in allCalculatorImageModules) {
 
 
 const skillIconPath = imagePathMap['legendary_sculpture.webp'];
+const apIconPath = imagePathMap['ap_icon.webp'];
 const expIconPath = imagePathMap['experience_book.webp'];
 const vipIconPath = imagePathMap['vip_icon.webp'];
 const buildingIconPath = imagePathMap['book_of_covenant.webp'];
@@ -43,6 +42,54 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
             <div class="carousel-container">
                 <div class="carousel-track-container">
                     <div class="carousel-track">
+                        <div class="carousel-slide" data-title="Action Points" data-description="Calculate the total Action Points available in your inventory." data-icon={apIconPath}>
+                            <div class="calculator-island compact">
+                                <div class="island-content">
+                                    <div class="form-group">
+                                        <label>Action Point Potions</label>
+                                        <div class="ap-potion-grid">
+                                            
+                                            <div class="ap-potion-item">
+                                                <Image src={imageMap['ap_50.webp']} alt="50 AP" width="84" height="84" loading="eager" quality={100}/>
+                                                <div class="ap-potion-info">
+                                                    <label for="ap-50">50 AP</label>
+                                                    <input type="text" id="ap-50" class="ap-potion-input" data-value="50" placeholder="0">
+                                                </div>
+                                            </div>
+
+                                            <div class="ap-potion-item">
+                                                <Image src={imageMap['ap_100.webp']} alt="100 AP" width="84" height="84" loading="eager" quality={100}/>
+                                                <div class="ap-potion-info">
+                                                    <label for="ap-100">100 AP</label>
+                                                    <input type="text" id="ap-100" class="ap-potion-input" data-value="100" placeholder="0">
+                                                </div>
+                                            </div>
+
+                                            <div class="ap-potion-item">
+                                                <Image src={imageMap['ap_500.webp']} alt="500 AP" width="84" height="84" loading="eager" quality={100}/>
+                                                <div class="ap-potion-info">
+                                                    <label for="ap-500">500 AP</label>
+                                                    <input type="text" id="ap-500" class="ap-potion-input" data-value="500" placeholder="0">
+                                                </div>
+                                            </div>
+
+                                            <div class="ap-potion-item">
+                                                <Image src={imageMap['ap_1000.webp']} alt="1000 AP" width="84" height="84" loading="eager" quality={100}/>
+                                                <div class="ap-potion-info">
+                                                    <label for="ap-1k">1000 AP</label>
+                                                    <input type="text" id="ap-1k" class="ap-potion-input" data-value="1000" placeholder="0">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <button id="calculate-ap-btn" class="btn-primary">Calculate</button>
+                                    <div id="ap-result" class="calc-result"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="carousel-slide" data-title="Skill Upgrades" data-description="Calculate the total number of sculptures required to upgrade a commander's skills." data-icon={skillIconPath}>
                             <div class="calculator-island">
                                 <div class="island-content">
@@ -55,7 +102,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                         <input type="text" id="desired-skill" placeholder="Example: 5555" maxlength="4">
                                     </div>
                                     <div class="form-group">
-                                        <div class="form-group-label">Commander Rarity</div>
+                                        <label>Commander Rarity</label>
                                         <div class="rarity-selector">
                                             <label><input type="radio" name="rarity" value="legendary" checked><span class="rarity-btn legendary"><Image src={imageMap['legendary_sculpture.webp']} alt="Legendary" width="72" height="72" loading="eager" quality={100}/><span>Legendary</span></span></label>
                                             <label><input type="radio" name="rarity" value="epic"><span class="rarity-btn epic"><Image src={imageMap['epic_sculpture.webp']} alt="Epic" width="72" height="72" loading="eager" quality={100}/><span>Epic</span></span></label>
@@ -80,7 +127,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                         <label for="current-exp-amount">Current EXP on Level</label>
                                         <input type="text" id="current-exp-amount" placeholder="Example: 500,000">
                                     </div>
-                                    <p class="disclaimer">You can leave level info blank to only calculate EXP from tomes.</p>
+                                     <p class="disclaimer">You can leave level info blank to only calculate EXP from tomes.</p>
                                      <div class="form-group-toggle">
                                         <label for="exp-tome-toggle" class="toggle-switch"><input type="checkbox" id="exp-tome-toggle"><span class="toggle-slider"></span></label>
                                         <label for="exp-tome-toggle" class="toggle-label">Calculate Experience Tomes</label>
@@ -97,7 +144,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <div class="form-group-label">Commander Rarity</div>
+                                        <label>Commander Rarity</label>
                                         <div class="rarity-selector">
                                             <label><input type="radio" name="exp-rarity" value="legendary" checked><span class="rarity-btn legendary"><Image src={imageMap['legendary_sculpture.webp']} alt="Legendary" width="72" height="72" loading="lazy" quality={100}/><span>Legendary</span></span></label>
                                             <label><input type="radio" name="exp-rarity" value="epic"><span class="rarity-btn epic"><Image src={imageMap['epic_sculpture.webp']} alt="Epic" width="72" height="72" loading="lazy" quality={100}/><span>Epic</span></span></label>
@@ -117,12 +164,12 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                     <div class="form-group">
                                         <label for="current-vip-points">Current VIP Points</label>
                                         <input type="text" id="current-vip-points" placeholder="Example: 1,500,000">
-                                    </div>
+                                     </div>
                                      <p class="disclaimer">You can leave VIP points blank to only calculate VIP from tokens.</p>
-                                    <div class="form-group-toggle">
+                                     <div class="form-group-toggle">
                                         <label for="vip-token-toggle" class="toggle-switch"><input type="checkbox" id="vip-token-toggle"><span class="toggle-slider"></span></label>
                                         <label for="vip-token-toggle" class="toggle-label">Calculate VIP Tokens</label>
-                                    </div>
+                                     </div>
                                     <div id="vip-token-grid-container" class="vip-token-grid-container">
                                         <div class="vip-token-grid">
                                             <div class="vip-token-item common"><Image src={imageMap['vip_token_5.webp']} alt="5 VIP" width="84" height="84" loading="lazy" quality={100}/><div class="vip-token-info"><label for="vip-5">5 VIP</label><input type="text" id="vip-5" class="vip-token-input" data-value="5" placeholder="0"></div></div>
@@ -146,12 +193,12 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                 </div>
                             </div>
                         </div>
-                        
+                    
                         <div class="carousel-slide" data-title="Buildings" data-description="Calculate the resource costs for upgrading your Castle, Watchtower, or State Forum." data-icon={buildingIconPath}>
                            <div class="calculator-island">
                                 <div class="island-content">
                                     <div class="form-group">
-                                        <div class="form-group-label">Building</div>
+                                        <label>Building</label>
                                         <div class="building-selector">
                                             <label><input type="radio" name="building" value="castle" checked><span class="building-btn castle"><Image src={imageMap['castle.webp']} alt="Castle" width="96" height="96" loading="lazy" quality={100}/><span>Castle</span></span></label>
                                             <label><input type="radio" name="building" value="watchtower"><span class="building-btn watchtower"><Image src={imageMap['watchtower.webp']} alt="Watchtower" width="96" height="96" loading="lazy" quality={100}/><span>Watchtower</span></span></label>
@@ -162,7 +209,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                         <label for="current-level">Current Level</label>
                                         <input type="number" id="current-level" placeholder="Example: 1" min="1" max="24">
                                     </div>
-                                    <div class="form-group">
+                                     <div class="form-group">
                                         <label for="desired-level">Desired Level</label>
                                         <input type="number" id="desired-level" placeholder="Example: 25" min="2" max="25">
                                     </div>
@@ -186,7 +233,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                                 <label for="hoh-link-toggle" class="toggle-switch">
                                                     <input type="checkbox" id="hoh-link-toggle">
                                                     <span class="toggle-slider"></span>
-                                                </label>
+                                                 </label>
                                                 <label for="hoh-link-toggle" class="hoh-link-label-top">Link</label>
                                                 <a href="#" id="hoh-hyperlink" class="hoh-link-anchor">HoH<Image src={imageMap['hoh_icon.webp']} alt="HoH Icon" width="60" height="60" loading="lazy" quality={100}/></a>
                                             </div>
@@ -204,23 +251,23 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                         </div>
                                         <input type="text" id="hospital-capacity" placeholder="Example: 700,000">
                                     </div>
-                                    <div class="form-group">
+                                     <div class="form-group">
                                         <label for="current-passports-input">Current Passports You Own</label>
                                         <input type="text" id="current-passports-input" placeholder="Example: 10" min="0">
                                     </div>
                                     <div class="form-group">
-                                        <label for="migration-date">Planned Migration Date</label>
+                                         <label for="migration-date">Planned Migration Date</label>
                                         <div class="date-input-container">
-                                            <label for="migration-date" class="calendar-icon-label" title="Select a date">
+                                             <label for="migration-date" class="calendar-icon-label" title="Select a date">
                                                 <Image src={imageMap['calendar_icon.webp']} alt="Calendar Icon" width="144" height="144" loading="lazy" quality={100}/>
-                                            </label>
+                                             </label>
                                             <div class="input-wrapper">
-                                                <input type="date" id="migration-date">
+                                                 <input type="date" id="migration-date">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group-toggle">
-                                        <label for="same-kvk-checkbox" class="toggle-switch"><input type="checkbox" id="same-kvk-checkbox"><span class="toggle-slider"></span></label>
+                                         <label for="same-kvk-checkbox" class="toggle-switch"><input type="checkbox" id="same-kvk-checkbox"><span class="toggle-slider"></span></label>
                                         <label for="same-kvk-checkbox" class="toggle-label">Same KvK / Vacation Mode</label>
                                     </div>
                                     <button id="calculate-passport-btn" class="btn-primary">Calculate</button>
@@ -235,7 +282,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                             <div class="calculator-island">
                                 <div class="island-content">
                                     <div class="form-group">
-                                        <div class="form-group-label">KvK Troop Return Rate</div>
+                                        <label>KvK Troop Return Rate</label>
                                         <div class="hoh-return-selector">
                                             <label><input type="radio" name="hoh-return-rate" value="0.30"><span class="hoh-return-btn">30%<span class="hoh-return-sublabel">Pre-SoC KvK</span></span></label>
                                             <label><input type="radio" name="hoh-return-rate" value="0.40"><span class="hoh-return-btn">40%<span class="hoh-return-sublabel">HoH Bundle</span></span></label>
@@ -245,7 +292,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <div class="form-group-label">T5 Dead Troops</div>
+                                        <label>T5 Dead Troops</label>
                                         <div class="hoh-grid t5-group">
                                             <div class="hoh-item"><label for="t5-inf">Infantry</label><Image src={imageMap['t5_inf.webp']} alt="T5 Infantry" width="96" height="96" loading="lazy" quality={100}/><input type="text" id="t5-inf" class="hoh-input" data-tier="t5" placeholder="0"></div>
                                             <div class="hoh-item"><label for="t5-cav">Cavalry</label><Image src={imageMap['t5_cav.webp']} alt="T5 Cavalry" width="96" height="96" loading="lazy" quality={100}/><input type="text" id="t5-cav" class="hoh-input" data-tier="t5" placeholder="0"></div>
@@ -254,7 +301,7 @@ const hohIconPath = imagePathMap['hoh_icon.webp'];
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <div class="form-group-label">T4 Dead Troops</div>
+                                        <label>T4 Dead Troops</label>
                                         <div class="hoh-grid t4-group">
                                             <div class="hoh-item"><label for="t4-inf">Infantry</label><Image src={imageMap['t4_inf.webp']} alt="T4 Infantry" width="96" height="96" loading="lazy" quality={100}/><input type="text" id="t4-inf" class="hoh-input" data-tier="t4" placeholder="0"></div>
                                             <div class="hoh-item"><label for="t4-cav">Cavalry</label><Image src={imageMap['t4_cav.webp']} alt="T4 Cavalry" width="96" height="96" loading="lazy" quality={100}/><input type="text" id="t4-cav" class="hoh-input" data-tier="t4" placeholder="0"></div>
