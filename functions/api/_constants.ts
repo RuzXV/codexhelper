@@ -9,7 +9,9 @@ export const CALENDAR_ADMIN_IDS = [
 
 export const MASTER_ADMIN_IDS = [
     '285201373266575361', 
-    '388515288666210313'
+    '388515288666210313',
+    '1338843598854033448',
+    '1121488445836103820'
 ];
 
 export const TROOP_CYCLE = ["Infantry", "Archer", "Leadership", "Cavalry"];
