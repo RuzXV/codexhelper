@@ -5,6 +5,8 @@
     import OverviewConfig from './OverviewConfig.svelte';
     import ChannelConfig from './ChannelConfig.svelte';
     import RemindersConfig from './RemindersConfig.svelte';
+    import ArkConfig from './ArkConfig.svelte';
+    import MGEConfig from './MGEConfig.svelte';
 
     export let selectedServer;
     
@@ -64,6 +66,12 @@
                 <button class="config-tab-btn" class:active={activeTab === 'reminders'} on:click={() => activeTab = 'reminders'}>
                     <i class="fas fa-bell"></i> Reminders
                 </button>
+                <button class="config-tab-btn" class:active={activeTab === 'ark'} on:click={() => activeTab = 'ark'}>
+                    <i class="fas fa-dungeon"></i> Ark Signups
+                </button>
+                <button class="config-tab-btn" class:active={activeTab === 'mge'} on:click={() => activeTab = 'mge'}>
+                    <i class="fas fa-crown"></i> MGE Apps
+                </button>
             </div>
         </div>
 
@@ -91,6 +99,10 @@
                     guildId={selectedServer.id} 
                     channels={guildChannels} 
                 />
+            {:else if activeTab === 'ark'}
+                <ArkConfig guildId={selectedServer.id} />
+            {:else if activeTab === 'mge'}
+                <MGEConfig guildId={selectedServer.id} />
             {/if}
         </div>
     {/if}
@@ -102,10 +114,10 @@
     .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); margin-bottom: 10px; }
     .dashboard-header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; color: var(--text-primary); }
     .config-tabs { 
-        display: grid; 
-        grid-template-columns: repeat(4, 1fr);
+        display: flex; /* Changed from grid to flex */
         gap: 10px; 
-        min-width: 480px;
+        overflow-x: auto; /* Allows horizontal scrolling on small screens */
+        padding-bottom: 5px; /* Adds space for the scrollbar if needed */
     }
     .config-tab-btn { background: var(--bg-tertiary); border: 1px solid rgba(255, 255, 255, 0.15); color: var(--text-secondary); padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; font-weight: 600; font-size: 0.9rem; }
     .config-tab-btn.active { background: var(--accent-blue-light, rgba(59, 130, 246, 0.1)); color: var(--accent-blue); border-color: var(--accent-blue); }
