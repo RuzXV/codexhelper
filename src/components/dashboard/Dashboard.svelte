@@ -3,6 +3,7 @@
     import MasterPanel from './master_panel/MasterPanel.svelte';
     import BotConfigPanel from './bot_panel/BotConfigPanel.svelte';
     import ChangelogPanel from './master_panel/ChangelogPanel.svelte';
+    import HistoryPanel from './master_panel/HistoryPanel.svelte';
     import { fade } from 'svelte/transition';
 
     let user = null;
@@ -55,6 +56,8 @@
         if (userData.is_master_admin) {
             allowedViews.push({ id: 'master', label: 'Master Panel', icon: 'fa-user-shield' });
             allowedViews.push({ id: 'changelog', label: 'Changelog', icon: 'fa-history' });
+            
+            allowedViews.push({ id: 'recovery', label: 'Recovery', icon: 'fa-database' });
         }
 
         if (allowedViews.length > 0 && !currentView) {
@@ -193,6 +196,8 @@
                     <BotConfigPanel {user} {selectedServer} />
                 {:else if currentView === 'changelog'}
                      <ChangelogPanel {user} /> 
+                {:else if currentView === 'recovery'}
+                     <HistoryPanel {user} />
                 {/if}
             </main>
         </div>

@@ -9,9 +9,6 @@
     import emojiData from '../../../data/emoji_mappings.json';
 
     export let user;
-    const MASTER_ID = '285201373266575361';
-
-    $: isMasterUser = user && user.id === MASTER_ID;
 
     const DATA_SOURCES = [
         { id: 'commanders', label: 'Commanders', icon: 'fa-chess-knight' },
@@ -49,46 +46,6 @@
 
     $: totalEntries = rawData ? Object.keys(rawData).length : 0;
     $: if (activeSource) loadData(activeSource);
-
-    let showBackupModal = false;
-    let backupList = [];
-    let restoring = false;
-
-    async function openBackupModal() {
-        if (!activeSource) return;
-        loading = true;
-        try {
-            const res = await window.auth.fetchWithAuth(`/api/admin/backups/${activeSource}`);
-            backupList = res || [];
-            showBackupModal = true;
-        } catch (e) {
-            alert("Failed to load backups.");
-            console.error(e);
-        } finally {
-            loading = false;
-        }
-    }
-
-    async function handleRestore(backupKey) {
-        if (!confirm("🚨 ARE YOU SURE?\n\nThis will overwrite the current live data with this backup.\nThe current live state will be saved as a backup before this happens.")) return;
-
-        restoring = true;
-        try {
-            await window.auth.fetchWithAuth('/api/admin/restore', {
-                method: 'POST',
-                body: JSON.stringify({
-                    targetKey: activeSource,
-                    backupKey: backupKey
-                })
-            });
-            alert("Restored successfully! The page will now reload.");
-            window.location.reload();
-        } catch (e) {
-            alert("Restore failed.");
-            console.error(e);
-            restoring = false;
-        }
-    }
 
     async function loadData(source) {
         loading = true;
@@ -133,7 +90,6 @@
 
     function handleAddEntry() {
         const id = prompt(`Enter a unique ID (key) for the new ${activeSource.slice(0, -1)} (e.g., 'new_entry_key'):`);
-        
         if (!id) return;
         
         if (rawData[id]) {
@@ -142,7 +98,6 @@
         }
 
         let newData = {};
-
         if (activeSource === 'commanders') {
             newData = [{
                 name: id,
@@ -154,7 +109,6 @@
                     }]
                 }
             }];
-
             if (aliasData) {
                 aliasData[id] = {
                     display_name: "New Commander",
@@ -209,6 +163,7 @@
     function generateDiff(oldObj, newObj) {
         const diffs = {};
         const isEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
         for (const key in newObj) {
             if (!oldObj || !oldObj.hasOwnProperty(key)) {
                 diffs[key] = { old: undefined, new: newObj[key], status: 'added' };
@@ -392,7 +347,7 @@
             <div class="online-section">
                 {#each onlineUsers as u}
                     <div class="user-pill">
-                         <img 
+                        <img 
                             src={u.avatar 
                                 ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png` 
                                 : `https://cdn.discordapp.com/embed/avatars/${(BigInt(u.id) >> 22n) % 6n}.png`} 
@@ -406,19 +361,13 @@
                 {/each}
                 {#if onlineUsers.length === 0}
                     <div class="user-pill offline">
-                       <span class="status-indicator red"></span> Offline
+                        <span class="status-indicator red"></span> Offline
                     </div>
                 {/if}
             </div>
         </div>
 
         <div class="header-controls">
-            {#if isMasterUser}
-                <button class="source-btn" on:click={openBackupModal} title="Backups & Restore">
-                    <i class="fas fa-history"></i> <span class="btn-label">History</span>
-                </button>
-            {/if}
-
             <span class="entry-count">{totalEntries} Entries</span>
 
             <div class="search-wrapper">
@@ -517,37 +466,6 @@
     {/if}
 {/if}
 
-{#if showBackupModal}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="modal-backdrop" on:click|self={() => showBackupModal = false}>
-        <div class="modal backup-modal">
-            <div class="modal-header">
-                <h3>Backup History: {activeSource}</h3>
-                <button class="close-btn" on:click={() => showBackupModal = false}><i class="fas fa-times"></i></button>
-            </div>
-            
-            <div class="backup-list">
-                {#if backupList.length === 0}
-                    <div class="empty-state">No backups found.</div>
-                {:else}
-                    {#each backupList as backup}
-                        <div class="backup-row">
-                            <div class="backup-info">
-                                <span class="backup-date">{backup.date}</span>
-                                <span class="backup-ts">{backup.key}</span>
-                            </div>
-                            <button class="restore-btn" disabled={restoring} on:click={() => handleRestore(backup.key)}>
-                                <i class="fas fa-undo"></i> Restore
-                            </button>
-                        </div>
-                    {/each}
-                {/if}
-            </div>
-        </div>
-    </div>
-{/if}
-
 <style>
     .dashboard-header {
         display: flex;
@@ -570,23 +488,6 @@
         font-weight: 700;
         margin: 0;
         color: var(--text-primary);
-    }
-
-    .online-badge {
-        font-size: 0.8rem;
-        color: #4ade80;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-weight: 600;
-    }
-
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        background-color: #4ade80;
-        border-radius: 50%;
-        box-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
     }
 
     .online-section {
@@ -689,11 +590,9 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px;
-        white-space: nowrap; }
+    .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px; white-space: nowrap; }
 
-    .search-wrapper { position: relative; width: 220px;
-    }
+    .search-wrapper { position: relative; width: 220px; }
     
     .search-icon { 
         position: absolute;
@@ -707,8 +606,7 @@
         border: 1px solid var(--border-color); padding: 8px 8px 8px 30px; 
         border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.9rem;
     }
-    .search-input:focus { outline: none; border-color: var(--accent-blue); background: var(--bg-primary);
-    }
+    .search-input:focus { outline: none; border-color: var(--accent-blue); background: var(--bg-primary); }
     
     .btn-add { 
         background: var(--accent-green);
@@ -718,45 +616,17 @@
         cursor: pointer;
         transition: all 0.2s; font-size: 1rem;
     }
-    .btn-add:hover { filter: brightness(1.1); transform: translateY(-1px);
-    }
+    .btn-add:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
     .data-list-container { min-height: 400px; position: relative; }
-    .state-msg { display: flex; flex-direction: column;
-        align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px; font-size: 1.2rem; }
-    .state-msg.error { color: #ef4444;
-    }
-    .state-msg i { font-size: 2rem; opacity: 0.7;
-    }
-
-        .backup-modal { width: 500px; max-height: 80vh; display: flex; flex-direction: column; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .backup-list { overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    
-    .backup-row { 
-        display: flex; justify-content: space-between; align-items: center; 
-        padding: 12px; background: var(--bg-tertiary); 
-        border: 1px solid var(--border-color); border-radius: 6px; 
-    }
-    .backup-info { display: flex; flex-direction: column; gap: 2px; }
-    .backup-date { font-weight: 600; color: var(--text-primary); }
-    .backup-ts { font-size: 0.75rem; color: var(--text-secondary); font-family: monospace; }
-    
-    .restore-btn { 
-        background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; 
-        padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.2s;
-    }
-    .restore-btn:hover { background: #ef4444; color: white; }
-    .restore-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .empty-state { text-align: center; color: var(--text-secondary); padding: 20px; font-style: italic; }
+    .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px; font-size: 1.2rem; }
+    .state-msg.error { color: #ef4444; }
+    .state-msg i { font-size: 2rem; opacity: 0.7; }
 
     @media (max-width: 1000px) {
-        .dashboard-header { flex-direction: column;
-        align-items: flex-start; gap: 15px; }
-        .header-controls { width: 100%; flex-wrap: wrap;
-        }
-        .search-wrapper { flex-grow: 1; width: auto;
-        }
+        .dashboard-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        .header-controls { width: 100%; flex-wrap: wrap; }
+        .search-wrapper { flex-grow: 1; width: auto; }
         .btn-label { display: none; } 
     }
 </style>
