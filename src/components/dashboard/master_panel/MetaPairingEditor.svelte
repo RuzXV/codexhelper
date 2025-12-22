@@ -16,8 +16,15 @@
     const BULLET_ID = "1366755663056867389";
     const BULLET_STRING = `<:bullet_point3:${BULLET_ID}>`;
     const BULLET_IMG_URL = `https://cdn.discordapp.com/emojis/${BULLET_ID}.png`;
-
     const SEPARATOR = '\u3021';
+
+    const LIMITS = {
+        TITLE: 256,
+        FIELD_NAME: 256,
+        FIELD_VALUE: 1024,
+        AUTHOR_NAME: 256,
+        TOTAL: 6000
+    };
 
     let title = "";
     let imageUrl = "";
@@ -26,7 +33,6 @@
     let openDropdownId = null;
     let saveState = 'idle';
     let showDiscardModal = false;
-
     let dropdownSearch = "";
     let lightboxImage = null;
 
@@ -35,6 +41,31 @@
         ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
         : "https://cdn.discordapp.com/embed/avatars/0.png";
     $: userName = user?.display_name || user?.username || "User";
+    
+    function getRowStringLength(row) {
+        const c1 = sortedCommanders.find(c => c.key === row.cmd1);
+        const c2 = sortedCommanders.find(c => c.key === row.cmd2);
+        
+        let text = "";
+        if (c1) text += `${c1.name} <:${c1.key}:${c1.emoji}>`;
+        if (c2) text += ` ${SEPARATOR} ${c2.name} <:${c2.key}:${c2.emoji}>`;
+        
+        if (!text) return "Empty Row".length;
+        return BULLET_STRING.length + 1 + text.length; 
+    }
+
+    function getFieldLength(field) {
+        const rowsLength = field.rows.reduce((acc, row) => acc + getRowStringLength(row), 0);
+        const newlines = Math.max(0, field.rows.length - 1);
+        return rowsLength + newlines;
+    }
+
+    $: totalEmbedChars = (title?.length || 0) + 
+                         (AUTHOR_NAME.length) + 
+                         fields.reduce((acc, f) => acc + (f.name ? f.name.length + 2 : 0) + getFieldLength(f), 0); 
+
+    $: isTotalOverLimit = totalEmbedChars > LIMITS.TOTAL;
+
     let initialJSON = "";
     $: currentJSON = JSON.stringify({ title, imageUrl, color, fields });
     $: hasUnsavedChanges = initialJSON && currentJSON && initialJSON !== currentJSON;
@@ -125,6 +156,11 @@
     }
 
     function save() {
+        if (isTotalOverLimit) {
+            alert("Cannot save: Embed exceeds character limits.");
+            return;
+        }
+
         const newData = {
             ...metaData,
             title,
@@ -187,7 +223,6 @@
         event.stopPropagation();
         dropdownSearch = "";
         openDropdownId = openDropdownId === id ? null : id;
-        
         if (openDropdownId) {
             setTimeout(() => {
                 const input = document.querySelector('.dropdown-search-input');
@@ -240,8 +275,11 @@
                 <div class="section-box">
                     <h3>Header Info</h3>
                     <label class="form-group">
-                        <span class="label-text">Title</span>
-                        <input type="text" bind:value={title} />
+                        <div class="label-row">
+                            <span class="label-text">Title</span>
+                            <span class="char-count" class:error={title.length > LIMITS.TITLE}>{title.length}/{LIMITS.TITLE}</span>
+                        </div>
+                        <input type="text" bind:value={title} maxlength={LIMITS.TITLE} />
                     </label>
                     <label class="form-group">
                         <span class="label-text">Image URL</span>
@@ -254,7 +292,10 @@
                     {#each fields as field, fIdx (field.id)}
                         <div class="pairing-group">
                             <div class="group-header">
-                                <input type="text" class="group-title-input" bind:value={field.name} aria-label="Category Name" placeholder="Category Name" />
+                                <div style="flex: 1; display: flex; flex-direction: column;">
+                                    <input type="text" class="group-title-input" bind:value={field.name} aria-label="Category Name" placeholder="Category Name" maxlength={LIMITS.FIELD_NAME} />
+                                    <span class="char-mini" style="position: relative; right: auto; text-align: right; margin-top: 2px;" class:error={field.name.length >= LIMITS.FIELD_NAME}>{field.name.length}/{LIMITS.FIELD_NAME}</span>
+                                </div>
                                 <button class="btn-icon danger" aria-label="Delete Category" on:click={() => removeField(fIdx)}><i class="fas fa-trash"></i></button>
                             </div>
                             <div class="rows-container">
@@ -341,9 +382,21 @@
                                 {/each}
                                 <button class="add-btn-modern" on:click={() => addRow(fIdx)}>+ Add Row</button>
                             </div>
+                            <div class="group-footer-info">
+                                <span class="char-count" 
+                                    class:warning={getFieldLength(field) > LIMITS.FIELD_VALUE * 0.9} 
+                                    class:error={getFieldLength(field) > LIMITS.FIELD_VALUE}>
+                                    Field Value: {getFieldLength(field)} / {LIMITS.FIELD_VALUE}
+                                </span>
+                            </div>
                         </div>
                     {/each}
                     <button class="add-btn-modern group-add" on:click={addField}>+ Add Category</button>
+                    
+                    <div class="total-count-bar" class:error={isTotalOverLimit}>
+                        <span>Total Embed Size</span>
+                        <span>{totalEmbedChars} / {LIMITS.TOTAL}</span>
+                    </div>
                 </div>
             </div>
 
@@ -416,7 +469,7 @@
                     <span>You have unsaved changes.</span>
                     <div class="save-actions">
                         <button class="btn-discard" on:click={attemptClose} disabled={saveState === 'saving'}>Discard</button>
-                        <button class="btn-calculate" on:click={save} disabled={saveState === 'saving'}>
+                        <button class="btn-calculate" on:click={save} disabled={saveState === 'saving' || isTotalOverLimit}>
                             {#if saveState === 'saving'}
                                 <i class="fas fa-spinner fa-spin"></i>
                             {:else}
@@ -482,7 +535,19 @@
     
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-group .label-text { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
+    .label-row { display: flex; justify-content: space-between; align-items: center; }
+    
     input[type="text"] { background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-primary); width: 100%; }
+
+    .char-count { font-size: 0.7rem; color: var(--text-secondary); }
+    .char-count.warning { color: #eab308; }
+    .char-count.error { color: #ef4444; font-weight: bold; }
+    .char-mini { font-size: 0.7rem; color: var(--text-secondary); }
+    .char-mini.error { color: #ef4444; }
+    
+    .group-footer-info { display: flex; justify-content: flex-end; padding-top: 5px; }
+    .total-count-bar { background: var(--bg-tertiary); padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-top: 10px; }
+    .total-count-bar.error { border-color: #ef4444; background: rgba(239, 68, 68, 0.1); color: #ef4444; }
 
     .discord-preview { flex: 1; padding: 20px; padding-right: 30px; overflow-y: auto; overflow-x: hidden; font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 
@@ -514,29 +579,9 @@
     .preview-field-name code { background-color: #1e1f22; padding: 2px 4px; border-radius: 3px; font-family: monospace; font-weight: 600; color: #dbdee1; font-size: 0.875rem; }
     .preview-field-value { font-size: 0.875rem; color: #dcddde; margin-top: 4px; }
     :global(.emoji-preview) { width: 1.2em; height: 1.2em; vertical-align: -0.2em; object-fit: contain; }
-    .preview-image-wrapper {
-        display: block;
-        padding: 0;
-        border: none;
-        background: none;
-        cursor: zoom-in;
-        margin-top: 12px;
-        max-width: 100%;
-        border-radius: 4px; 
-        overflow: hidden; 
-        transition: transform 0.2s;
-    }
-    .preview-image-wrapper:hover { 
-        transform: scale(1.01);
-    }
-
-    .preview-image { 
-        max-width: 100%; 
-        display: block; 
-        width: 100%;
-        height: auto;
-        border-radius: 4px;
-    }
+    .preview-image-wrapper { display: block; padding: 0; border: none; background: none; cursor: zoom-in; margin-top: 12px; max-width: 100%; border-radius: 4px; overflow: hidden; transition: transform 0.2s; }
+    .preview-image-wrapper:hover { transform: scale(1.01); }
+    .preview-image { max-width: 100%; display: block; width: 100%; height: auto; border-radius: 4px; }
     .preview-image:hover { transform: scale(1.01); }
 
     .pairing-group { background: rgba(0,0,0,0.1); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 10px; }
@@ -565,54 +610,17 @@
     .btn-icon { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; }
     .btn-icon:hover { color: #ef4444; }
 
-    .save-bar {
-        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-        background: var(--bg-card); border: 1px solid var(--border-color);
-        padding: 12px 24px; border-radius: 50px; box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-        z-index: 1000; min-width: 350px;
-    }
+    .save-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 24px; border-radius: 50px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); z-index: 1000; min-width: 350px; }
     .save-bar-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%; }
     .save-bar span { font-weight: 500; color: white; }
     .save-actions { display: flex; gap: 10px; }
     
-    .btn-calculate {
-        background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-        color: white;
-        border: 2px solid #60a5fa; 
-        padding: 8px 24px;
-        border-radius: 20px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-    }
+    .btn-calculate { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; border: 2px solid #60a5fa; padding: 8px 24px; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+    .btn-calculate:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
+    .btn-calculate:disabled { opacity: 0.7; cursor: not-allowed; box-shadow: none; }
     
-    .btn-calculate:hover { 
-        transform: translateY(-1px);
-        box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); 
-    }
-
-    .btn-calculate:disabled { 
-        opacity: 0.7; 
-        cursor: not-allowed;
-        box-shadow: none;
-    }
-    
-    .btn-discard {
-        background: transparent;
-        color: #ef4444; 
-        border: 2px solid #ef4444;
-        padding: 8px 16px; 
-        border-radius: 20px; 
-        font-weight: 600; 
-        cursor: pointer; 
-        transition: all 0.2s;
-    }
-    
-    .btn-discard:hover { 
-        background: rgba(239, 68, 68, 0.15); 
-        color: #ef4444;
-    }
+    .btn-discard { background: transparent; color: #ef4444; border: 2px solid #ef4444; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-discard:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
     
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
     .modal { background: var(--bg-card); padding: 25px; border-radius: 8px; width: 400px; border: 1px solid var(--border-color); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
@@ -622,56 +630,12 @@
     .btn-danger { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
     .btn-cancel { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 4px; cursor: pointer; }
 
-    .search-container {
-        padding: 8px;
-        background: var(--bg-secondary);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        border-bottom: 1px solid var(--border-color);
-    }
-    .dropdown-search-input {
-        width: 100%;
-        background: var(--bg-primary);
-        border: 1px solid var(--border-color);
-        padding: 6px 8px;
-        border-radius: 4px;
-        color: var(--text-primary);
-        font-size: 0.85rem;
-    }
-    .dropdown-search-input:focus {
-        outline: none;
-        border-color: var(--accent-blue);
-    }
+    .search-container { padding: 8px; background: var(--bg-secondary); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border-color); }
+    .dropdown-search-input { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); padding: 6px 8px; border-radius: 4px; color: var(--text-primary); font-size: 0.85rem; }
+    .dropdown-search-input:focus { outline: none; border-color: var(--accent-blue); }
     
-    .lightbox-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.9);
-        z-index: 100000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: zoom-out;
-    }
-    .lightbox-img {
-        max-width: 90vw;
-        max-height: 90vh;
-        object-fit: contain;
-        border-radius: 4px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        cursor: default;
-    }
-    .lightbox-close {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: none;
-        border: none;
-        color: white;
-        font-size: 2rem;
-        cursor: pointer;
-        opacity: 0.7;
-    }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); z-index: 100000; display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
+    .lightbox-img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; box-shadow: 0 0 20px rgba(0,0,0,0.5); cursor: default; }
+    .lightbox-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer; opacity: 0.7; }
     .lightbox-close:hover { opacity: 1; }
 </style>

@@ -10,18 +10,28 @@ const admin = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 async function manageBackups(c: any, key: string, oldData: string | null) {
     if (!oldData) return;
     
-    const timestamp = Date.now();
-    await c.env.BOT_DATA.put(`backup:${key}:${timestamp}`, oldData);
+    const BACKUP_KEY = `backup_history:${key}`;
+    const RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
 
-    const list = await c.env.BOT_DATA.list({ prefix: `backup:${key}:` });
-    
-    if (list.keys.length > 100) { 
-        const sortedKeys = list.keys.sort((a: any, b: any) => a.name.localeCompare(b.name));
-        const keysToDelete = sortedKeys.slice(0, sortedKeys.length - 100);
-        for (const k of keysToDelete) {
-            await c.env.BOT_DATA.delete(k.name);
-        }
+    let history = await c.env.BOT_DATA.get(BACKUP_KEY, 'json');
+    if (!Array.isArray(history)) history = [];
+
+    let parsedData = oldData;
+    try {
+        parsedData = JSON.parse(oldData);
+    } catch (e) {
     }
+
+    history.push({
+        timestamp: now,
+        date: new Date(now).toISOString(),
+        data: parsedData
+    });
+
+    const cleanHistory = history.filter((entry: any) => (now - entry.timestamp) < RETENTION_MS);
+
+    await c.env.BOT_DATA.put(BACKUP_KEY, JSON.stringify(cleanHistory));
 }
 
 admin.post('/internal/update-cache', async (c) => {

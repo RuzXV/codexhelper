@@ -11,6 +11,15 @@
     const BOT_ICON = "https://cdn.discordapp.com/avatars/1289603576104091679/aaa1f4a186484a62377665c086a40f24.webp?size=80";
     const BOT_NAME = "Codex Helper";
     
+    const LIMITS = {
+        TITLE: 256,
+        DESCRIPTION: 4096,
+        FIELD_NAME: 256,
+        FIELD_VALUE: 1024,
+        AUTHOR_NAME: 256,
+        TOTAL: 6000
+    };
+
     let title = "";
     let color = "#313338";
     let imageUrl = "";
@@ -25,10 +34,17 @@
         ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
         : "https://cdn.discordapp.com/embed/avatars/0.png";
     $: userName = user?.display_name || user?.username || "User";
+    
     let initialJSON = "";
     $: currentSnapshot = JSON.stringify({ title, color, imageUrl, thumbnailUrl, fields });
     $: hasUnsavedChanges = initialJSON && currentSnapshot && initialJSON !== currentSnapshot;
-    
+
+    $: totalEmbedChars = (title?.length || 0) + 
+                         (AUTHOR_NAME.length) + 
+                         fields.reduce((acc, f) => acc + (f.name?.length || 0) + (f.value?.length || 0), 0);
+
+    $: isTotalOverLimit = totalEmbedChars > LIMITS.TOTAL;
+
     function portal(node) {
         let owner = document.body;
         owner.appendChild(node);
@@ -55,7 +71,7 @@
         
         imageUrl = eventData.image?.url || "";
         thumbnailUrl = eventData.thumbnail?.url || "";
-  
+
         if (eventData.fields) {
             fields = eventData.fields.map(f => ({
                 id: Math.random().toString(36),
@@ -79,6 +95,11 @@
     }
 
     function save() {
+        if (isTotalOverLimit) {
+            alert("Cannot save: Embed exceeds Discord's 6000 character limit.");
+            return;
+        }
+
         const newData = {
             ...eventData,
             title,
@@ -156,8 +177,13 @@
                 <div class="section-box">
                     <h3>General Info</h3>
                     <label class="form-group">
-                        <span class="label-text">Event Title</span>
-                        <input type="text" bind:value={title} />
+                        <div class="label-row">
+                            <span class="label-text">Event Title</span>
+                            <span class="char-count" class:error={title.length > LIMITS.TITLE}>
+                                {title.length}/{LIMITS.TITLE}
+                            </span>
+                        </div>
+                        <input type="text" bind:value={title} maxlength={LIMITS.TITLE} />
                     </label>
                     
                     <div class="row" style="align-items: flex-end;">
@@ -184,19 +210,36 @@
                         {#each fields as field, idx (field.id)}
                             <div class="field-item">
                                 <div class="field-header">
-                                    <input type="text" class="field-name-input" bind:value={field.name} placeholder="Field Name" aria-label="Field Name" />
+                                    <div class="field-name-wrapper" style="flex: 1;">
+                                        <input type="text" class="field-name-input" bind:value={field.name} placeholder="Field Name" aria-label="Field Name" maxlength={LIMITS.FIELD_NAME} />
+                                        <span class="char-mini" class:error={field.name.length >= LIMITS.FIELD_NAME}>{field.name.length}/{LIMITS.FIELD_NAME}</span>
+                                    </div>
                                     <button class="btn-icon danger" aria-label="Delete Field" on:click={() => removeField(idx)}><i class="fas fa-trash"></i></button>
                                 </div>
-                                <textarea 
-                                    class="field-value-input" 
-                                    bind:value={field.value} 
-                                    placeholder="Enter field text here. Use \n for new lines."
-                                    rows="4"
-                                    aria-label="Field Value"
-                                ></textarea>
+                                <div class="field-value-wrapper">
+                                    <textarea 
+                                        class="field-value-input" 
+                                        bind:value={field.value} 
+                                        placeholder="Enter field text here. Use \n for new lines."
+                                        rows="4"
+                                        aria-label="Field Value"
+                                    ></textarea>
+                                    <div class="field-footer-info">
+                                        <span class="char-count" 
+                                            class:warning={field.value.length > LIMITS.FIELD_VALUE * 0.9} 
+                                            class:error={field.value.length > LIMITS.FIELD_VALUE}>
+                                            {field.value.length} / {LIMITS.FIELD_VALUE}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         {/each}
                         <button class="add-btn-modern" on:click={addField}>+ Add Field</button>
+                    </div>
+
+                    <div class="total-count-bar" class:error={isTotalOverLimit}>
+                        <span>Total Embed Size</span>
+                        <span>{totalEmbedChars} / {LIMITS.TOTAL}</span>
                     </div>
                 </div>
             </div>
@@ -222,7 +265,7 @@
                     <div class="preview-embed" style="border-left-color: {color}">
                         <div class="preview-content">
                             <div class="preview-author">
-                                 <img src={AUTHOR_ICON} alt="" /> {AUTHOR_NAME}
+                                <img src={AUTHOR_ICON} alt="" /> {AUTHOR_NAME}
                             </div>
                             <div class="preview-title">{title}</div>
                             
@@ -244,11 +287,11 @@
                                     on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { openLightbox(imageUrl); } }}
                                     aria-label="Zoom in on main image"
                                 >
-                                <img 
-                                    src={imageUrl} 
-                                    class="preview-image" 
-                                    alt="" 
-                                />
+                                    <img 
+                                        src={imageUrl} 
+                                        class="preview-image" 
+                                        alt="" 
+                                    />
                                 </button>
                             {/if}
                         </div>
@@ -267,7 +310,7 @@
                     <span>You have unsaved changes.</span>
                     <div class="save-actions">
                         <button class="btn-discard" on:click={attemptClose} disabled={saveState === 'saving'}>Discard</button>
-                        <button class="btn-calculate" on:click={save} disabled={saveState === 'saving'}>
+                        <button class="btn-calculate" on:click={save} disabled={saveState === 'saving' || isTotalOverLimit}>
                             {#if saveState === 'saving'}
                                 <i class="fas fa-spinner fa-spin"></i>
                             {:else}
@@ -336,10 +379,34 @@
     
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-group .label-text { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
+    .label-row { display: flex; justify-content: space-between; align-items: center; }
+    
     input[type="text"], textarea { background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-primary); width: 100%; }
     
-    .discord-preview { flex: 1; padding: 20px; padding-right: 30px; overflow-y: auto; overflow-x: hidden; font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    /* Field Items Styling */
+    .field-item { background: rgba(0,0,0,0.1); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 10px; }
+    .field-header { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
+    .field-name-wrapper { position: relative; }
+    .field-name-input { font-weight: bold; }
+    .field-value-wrapper { display: flex; flex-direction: column; }
+    .field-value-input { font-family: monospace; font-size: 0.9rem; resize: vertical; margin-bottom: 4px; }
+    
+    .field-footer-info { display: flex; justify-content: flex-end; }
+    
+    /* Character Counters */
+    .char-count { font-size: 0.7rem; color: var(--text-secondary); transition: color 0.2s; }
+    .char-count.warning { color: #eab308; }
+    .char-count.error { color: #ef4444; font-weight: bold; }
+    
+    .char-mini { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--text-secondary); pointer-events: none; background: rgba(0,0,0,0.5); padding: 2px 4px; border-radius: 3px; }
+    .char-mini.error { color: #ef4444; }
 
+    /* Total Count Bar */
+    .total-count-bar { background: var(--bg-tertiary); padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-top: 10px; }
+    .total-count-bar.error { border-color: #ef4444; background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+    /* Discord Preview */
+    .discord-preview { flex: 1; padding: 20px; padding-right: 30px; overflow-y: auto; overflow-x: hidden; font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
     .interaction-header { display: flex; align-items: center; font-size: 0.85rem; color: #949ba4; margin-bottom: 4px; gap: 8px; position: relative; left: 18px; margin-top: -4px; }
     .interaction-header::before { content: ""; position: absolute; top: 14px; left: -11px; width: 22px; height: 12px; border-top: 2px solid #4e5058; border-left: 2px solid #4e5058; border-top-left-radius: 6px; margin-top: -3px; }
     .user-avatar-mini { width: 16px; height: 16px; border-radius: 50%; }
@@ -370,94 +437,31 @@
     
     :global(.emoji-preview) { width: 1.2em; height: 1.2em; vertical-align: -0.2em; object-fit: contain; }
     
-    .preview-image-wrapper {
-        display: block;
-        padding: 0;
-        border: none;
-        background: none;
-        cursor: zoom-in;
-        margin-top: 8px;
-        max-width: 100%;
-        border-radius: 4px; 
-        overflow: hidden;
-        transition: transform 0.2s;
-    }
-    .preview-image-wrapper:hover { 
-        transform: scale(1.01);
-    }
-
-    .preview-image { 
-        max-width: 100%; 
-        display: block;
-        width: 100%;
-        height: auto;
-        border-radius: 4px;
-    }
-    .preview-image:hover { transform: scale(1.01); }
+    .preview-image-wrapper { display: block; padding: 0; border: none; background: none; cursor: zoom-in; margin-top: 8px; max-width: 100%; border-radius: 4px; overflow: hidden; transition: transform 0.2s; }
+    .preview-image-wrapper:hover { transform: scale(1.01); }
+    .preview-image { max-width: 100%; display: block; width: 100%; height: auto; border-radius: 4px; }
     .preview-thumb { position: absolute; top: 12px; right: 12px; width: 60px; height: 60px; border-radius: 4px; object-fit: cover; }
 
     .row { display: flex; gap: 10px; }
     .color-picker-wrapper { display: flex; align-items: center; gap: 10px; width: 100%; }
     .color-picker-wrapper input { width: 100%; cursor: pointer; background: var(--bg-tertiary); border: 1px solid var(--border-color); }
     
-    .field-item { background: rgba(0,0,0,0.1); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 10px; }
-    .field-header { display: flex; gap: 10px; margin-bottom: 8px; }
-    .field-name-input { font-weight: bold; }
-    .field-value-input { font-family: monospace; font-size: 0.9rem; resize: vertical; }
-    
     .add-btn-modern { width: 100%; padding: 8px; background: var(--bg-tertiary); border: 1px dashed var(--border-color); color: var(--text-secondary); cursor: pointer; border-radius: 4px; }
     .add-btn-modern:hover { color: var(--accent-blue); border-color: var(--accent-blue); }
     .btn-icon { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
     .btn-icon.danger:hover { color: #ef4444; }
 
-    .save-bar {
-        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-        background: var(--bg-card); border: 1px solid var(--border-color);
-        padding: 12px 24px; border-radius: 50px; box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-        z-index: 1000; min-width: 350px;
-    }
+    .save-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 24px; border-radius: 50px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); z-index: 1000; min-width: 350px; }
     .save-bar-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%; }
     .save-bar span { font-weight: 500; color: white; }
     .save-actions { display: flex; gap: 10px; }
     
-    .btn-calculate {
-        background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-        color: white;
-        border: 2px solid #60a5fa; 
-        padding: 8px 24px;
-        border-radius: 20px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-    }
+    .btn-calculate { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; border: 2px solid #60a5fa; padding: 8px 24px; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+    .btn-calculate:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
+    .btn-calculate:disabled { opacity: 0.7; cursor: not-allowed; box-shadow: none; }
     
-    .btn-calculate:hover { 
-        transform: translateY(-1px);
-        box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); 
-    }
-
-    .btn-calculate:disabled { 
-        opacity: 0.7; 
-        cursor: not-allowed;
-        box-shadow: none;
-    }
-    
-    .btn-discard {
-        background: transparent;
-        color: #ef4444; 
-        border: 2px solid #ef4444;
-        padding: 8px 16px; 
-        border-radius: 20px; 
-        font-weight: 600; 
-        cursor: pointer; 
-        transition: all 0.2s;
-    }
-    
-    .btn-discard:hover { 
-        background: rgba(239, 68, 68, 0.15); 
-        color: #ef4444;
-    }
+    .btn-discard { background: transparent; color: #ef4444; border: 2px solid #ef4444; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-discard:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
     .modal { background: var(--bg-card); padding: 25px; border-radius: 8px; width: 400px; border: 1px solid var(--border-color); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
@@ -467,34 +471,8 @@
     .btn-danger { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
     .btn-cancel { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 4px; cursor: pointer; }
 
-    .lightbox-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.9);
-        z-index: 100000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: zoom-out;
-    }
-    .lightbox-img {
-        max-width: 90vw;
-        max-height: 90vh;
-        object-fit: contain;
-        border-radius: 4px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        cursor: default;
-    }
-    .lightbox-close {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: none;
-        border: none;
-        color: white;
-        font-size: 2rem;
-        cursor: pointer;
-        opacity: 0.7;
-    }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); z-index: 100000; display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
+    .lightbox-img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; box-shadow: 0 0 20px rgba(0,0,0,0.5); cursor: default; }
+    .lightbox-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer; opacity: 0.7; }
     .lightbox-close:hover { opacity: 1; }
 </style>

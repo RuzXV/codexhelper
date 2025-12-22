@@ -84,7 +84,7 @@
 
     onMount(() => {
         sendHeartbeat();
-        const interval = setInterval(sendHeartbeat, 30000);
+        const interval = setInterval(sendHeartbeat, 600000); 
         return () => clearInterval(interval);
     });
 

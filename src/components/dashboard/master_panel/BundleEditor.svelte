@@ -19,6 +19,14 @@
         tiers: "<:tiers:1366505580109238332>",
         bullet: "<:bullet_point2:1366755670304624732>"
     };
+    
+    const LIMITS = {
+        TITLE: 256,
+        DESCRIPTION: 4096,
+        AUTHOR_NAME: 256,
+        TOTAL: 6000
+    };
+
     let title = "";
     let imageUrl = "";
     let color = "#e9be74";
@@ -34,11 +42,11 @@
     let showDiscardModal = false;
 
     let lightboxImage = null;
-
     $: userAvatar = user?.avatar 
         ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
         : "https://cdn.discordapp.com/embed/avatars/0.png";
     $: userName = user?.display_name || user?.username || "User";
+    
     $: description = [
         `**${EMOJI.available} Availability:** ${inputAvailability}`,
         "",
@@ -53,6 +61,16 @@
         "",
         "*All $ prices are listed in USD*"
     ];
+
+    $: descriptionLength = description.join('\n').length;
+
+    $: totalEmbedChars = (title?.length || 0) + 
+                         (AUTHOR_NAME.length) + 
+                         descriptionLength;
+    
+    $: isTotalOverLimit = totalEmbedChars > LIMITS.TOTAL;
+    $: isDescOverLimit = descriptionLength > LIMITS.DESCRIPTION;
+
     let initialJSON = "";
     $: currentSnapshot = JSON.stringify({ 
         title, imageUrl, color, inputAvailability, inputCost, 
@@ -102,9 +120,11 @@
 
         const tierMatch = strDesc.match(/Bundle Tiers:\*\* (.*)/);
         if(tierMatch) inputTiers = tierMatch[1].replace(/\$/g, '').trim();
+        
         extraContents = desc
             .filter(line => line.includes(EMOJI.bullet))
             .map(line => line.replace(EMOJI.bullet, '').trim());
+
         await tick();
         initialJSON = currentSnapshot;
     });
@@ -131,6 +151,11 @@
     }
 
     function save() {
+        if (isTotalOverLimit || isDescOverLimit) {
+            alert("Cannot save: Embed exceeds character limits.");
+            return;
+        }
+
         const newData = {
             ...bundleData,
             title,
@@ -204,8 +229,11 @@
                 <div class="section-box">
                     <h3>Header Info</h3>
                     <label class="form-group">
-                        <span class="label-text">Bundle Name</span>
-                        <input type="text" bind:value={title} />
+                        <div class="label-row">
+                            <span class="label-text">Bundle Name</span>
+                            <span class="char-count" class:error={title.length > LIMITS.TITLE}>{title.length}/{LIMITS.TITLE}</span>
+                        </div>
+                        <input type="text" bind:value={title} maxlength={LIMITS.TITLE} />
                     </label>
                     <label class="form-group">
                         <span class="label-text">Image URL</span>
@@ -255,6 +283,17 @@
                             </div>
                         {/each}
                         <button class="add-btn-modern" on:click={addContent}>+ Add Item</button>
+                    </div>
+                    
+                    <div class="total-count-bar" class:error={isTotalOverLimit || isDescOverLimit}>
+                        <div class="count-row">
+                            <span>Description Length</span>
+                            <span class:error={isDescOverLimit}>{descriptionLength} / {LIMITS.DESCRIPTION}</span>
+                        </div>
+                        <div class="count-row">
+                            <span>Total Embed Size</span>
+                            <span>{totalEmbedChars} / {LIMITS.TOTAL}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -322,7 +361,7 @@
                     <span>You have unsaved changes.</span>
                     <div class="save-actions">
                         <button class="btn-discard" on:click={attemptClose} disabled={saveState === 'saving'}>Discard</button>
-                        <button class="btn-calculate" on:click={save} disabled={saveState === 'saving'}>
+                        <button class="btn-calculate" on:click={save} disabled={saveState === 'saving' || isTotalOverLimit || isDescOverLimit}>
                             {#if saveState === 'saving'}
                                 <i class="fas fa-spinner fa-spin"></i>
                             {:else}
@@ -390,10 +429,20 @@
     
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-group .label-text { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; }
+    .label-row { display: flex; justify-content: space-between; align-items: center; }
+
     input[type="text"], input[type="number"] { background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-primary); width: 100%; }
 
-    .discord-preview { flex: 1; padding: 20px; padding-right: 30px; overflow-y: auto; overflow-x: hidden; font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    /* Character Counters */
+    .char-count { font-size: 0.7rem; color: var(--text-secondary); }
+    .char-count.error { color: #ef4444; font-weight: bold; }
+    
+    .total-count-bar { background: var(--bg-tertiary); padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 5px; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-top: 10px; }
+    .total-count-bar.error { border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+    .count-row { display: flex; justify-content: space-between; width: 100%; }
+    .count-row span.error { color: #ef4444; }
 
+    .discord-preview { flex: 1; padding: 20px; padding-right: 30px; overflow-y: auto; overflow-x: hidden; font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
     .interaction-header { display: flex; align-items: center; font-size: 0.85rem; color: #949ba4; margin-bottom: 4px; gap: 8px; position: relative; left: 18px; margin-top: -4px; }
     .interaction-header::before { content: ""; position: absolute; top: 14px; left: -11px; width: 22px; height: 12px; border-top: 2px solid #4e5058; border-left: 2px solid #4e5058; border-top-left-radius: 6px; margin-top: -3px; }
     .user-avatar-mini { width: 16px; height: 16px; border-radius: 50%; }
@@ -414,7 +463,6 @@
     .timestamp { font-size: 0.75rem; color: #949ba4; margin-left: 4px; }
 
     .preview-embed { background: #2b2d31; border-left: 4px solid; padding: 12px; border-radius: 4px; margin-left: 52px; margin-top: -2px; }
-
     .preview-author { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 600; color: #f2f3f5; margin-bottom: 4px; }
     .preview-author img { width: 24px; height: 24px; border-radius: 50%; }
     .preview-title { font-size: 1rem; font-weight: 700; color: #f2f3f5; margin-bottom: 8px; }
@@ -424,14 +472,7 @@
     .desc-line { margin-bottom: 2px; }
     .preview-image { max-width: 100%; border-radius: 4px; margin-top: 12px; transition: transform 0.2s; }
     .preview-image:hover { transform: scale(1.01); }
-    .preview-btn {
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: zoom-in;
-        width: 100%;
-        display: block;
-    }
+    .preview-btn { background: none; border: none; padding: 0; cursor: zoom-in; width: 100%; display: block; }
 
     .row { display: flex; gap: 10px; }
     .pairing-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -441,54 +482,15 @@
     .btn-icon { background: none; border: none; color: var(--text-secondary); cursor: pointer; }
     .btn-icon:hover { color: #ef4444; }
 
-    .save-bar {
-        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-        background: var(--bg-card); border: 1px solid var(--border-color);
-        padding: 12px 24px; border-radius: 50px; box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-        z-index: 1000; min-width: 350px;
-    }
+    .save-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 24px; border-radius: 50px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); z-index: 1000; min-width: 350px; }
     .save-bar-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%; }
     .save-bar span { font-weight: 500; color: white; }
     .save-actions { display: flex; gap: 10px; }
-    
-    .btn-calculate {
-        background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-        color: white;
-        border: 2px solid #60a5fa; 
-        padding: 8px 24px;
-        border-radius: 20px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-    }
-    
-    .btn-calculate:hover { 
-        transform: translateY(-1px);
-        box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); 
-    }
-
-    .btn-calculate:disabled { 
-        opacity: 0.7; 
-        cursor: not-allowed;
-        box-shadow: none;
-    }
-    
-    .btn-discard {
-        background: transparent;
-        color: #ef4444; 
-        border: 2px solid #ef4444;
-        padding: 8px 16px; 
-        border-radius: 20px; 
-        font-weight: 600; 
-        cursor: pointer; 
-        transition: all 0.2s;
-    }
-    
-    .btn-discard:hover { 
-        background: rgba(239, 68, 68, 0.15); 
-        color: #ef4444;
-    }
+    .btn-calculate { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; border: 2px solid #60a5fa; padding: 8px 24px; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+    .btn-calculate:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
+    .btn-calculate:disabled { opacity: 0.7; cursor: not-allowed; box-shadow: none; }
+    .btn-discard { background: transparent; color: #ef4444; border: 2px solid #ef4444; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-discard:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
     
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
     .modal { background: var(--bg-card); padding: 25px; border-radius: 8px; width: 400px; border: 1px solid var(--border-color); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
@@ -498,34 +500,8 @@
     .btn-danger { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
     .btn-cancel { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 4px; cursor: pointer; }
 
-    .lightbox-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.9);
-        z-index: 100000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: zoom-out;
-    }
-    .lightbox-img {
-        max-width: 90vw;
-        max-height: 90vh;
-        object-fit: contain;
-        border-radius: 4px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        cursor: default;
-    }
-    .lightbox-close {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: none;
-        border: none;
-        color: white;
-        font-size: 2rem;
-        cursor: pointer;
-        opacity: 0.7;
-    }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); z-index: 100000; display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
+    .lightbox-img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; box-shadow: 0 0 20px rgba(0,0,0,0.5); cursor: default; }
+    .lightbox-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer; opacity: 0.7; }
     .lightbox-close:hover { opacity: 1; }
 </style>
