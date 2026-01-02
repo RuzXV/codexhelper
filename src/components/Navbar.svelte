@@ -3,7 +3,6 @@
     
     export let currentPath = "/";
 
-    import santaHat from '../assets/images/navi/santa_hat.webp';
     import logo from '../assets/images/global/logo-new.webp';
     import homeIcon from '../assets/images/navi/navi_home.webp';
     import faqIcon from '../assets/images/navi/navi_question.webp';
@@ -23,7 +22,6 @@
     <div class="nav-container">
         <div class="nav-brand">
             <a href="/" style="position: relative; text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--spacing-2);">
-                <img src={santaHat.src} alt="Festive Hat" class="santa-hat" />
                 <img src={logo.src} alt="Codex Helper Logo" class="logo-image" width="120" height="120" loading="eager"/>
                 <span>Codex Helper</span>
             </a>
@@ -112,17 +110,6 @@
         width: 24px;
         height: 24px;
         object-fit: contain;
-    }
-
-    .santa-hat {
-        position: absolute;
-        left: 7px; 
-        top: -5px;
-        transform: rotate(-5deg);
-        width: 30px;
-        height: auto;
-        z-index: 10;
-        pointer-events: none;
     }
 
     #auth-container {
