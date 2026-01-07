@@ -66,12 +66,7 @@
                 <button class="config-tab-btn" class:active={activeTab === 'reminders'} on:click={() => activeTab = 'reminders'}>
                     <i class="fas fa-bell"></i> Reminders
                 </button>
-                <button class="config-tab-btn" class:active={activeTab === 'ark'} on:click={() => activeTab = 'ark'}>
-                    <i class="fas fa-dungeon"></i> Ark Signups
-                </button>
-                <button class="config-tab-btn" class:active={activeTab === 'mge'} on:click={() => activeTab = 'mge'}>
-                    <i class="fas fa-crown"></i> MGE Apps
-                </button>
+                
             </div>
         </div>
 

@@ -140,34 +140,78 @@
 </div>
 
 <style>
-    .ark-container { display: flex; flex-direction: column; gap: 20px; }
+    .ark-container { 
+        display: flex;
+        flex-direction: column; 
+        gap: 0;
+    }
     
     .section-header { 
-        display: flex; align-items: center; 
-        padding-bottom: 0; border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center; 
+        padding-bottom: 0; 
+        border-bottom: 1px solid var(--border-color);
         min-height: 45px;
     }
     
     .header-loading { color: var(--text-secondary); padding: 10px; font-style: italic; }
 
     .tabs-container {
-        display: flex; gap: 5px; overflow-x: auto; width: 100%;
+        display: flex; 
+        gap: 0;
+        overflow-x: auto;
+        width: 100%;
+        scrollbar-width: none; 
+        -ms-overflow-style: none;
+        padding-top: 1px;
+        align-self: flex-end;
     }
     
     .tab-btn {
-        background: transparent; border: 1px solid transparent; border-bottom: none;
-        padding: 10px 20px; color: var(--text-secondary); cursor: pointer; 
-        font-weight: 600; border-radius: 8px 8px 0 0; transition: all 0.2s;
-        font-size: 0.95rem; white-space: nowrap;
-        display: flex; align-items: center; gap: 8px;
+        position: relative;
+        background: transparent;
+        border: 1px solid transparent; 
+        border-bottom: none;
+        padding: 14px 20px;
+        color: var(--text-secondary); 
+        cursor: pointer; 
+        font-weight: 600; 
+        border-radius: 8px 8px 0 0;
+        transition: all 0.2s;
+        font-size: 1.1rem;
+        white-space: nowrap;
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        gap: 10px;
+        flex-shrink: 0;
+        min-width: 33%;
     }
     
-    .tab-btn:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+    .tab-btn.add-btn {
+        min-width: auto;
+        width: auto;
+    }
+    
+    .tab-btn:hover { 
+        background: rgba(255,255,255,0.03); 
+        color: var(--text-primary);
+    }
     
     .tab-btn.active { 
-        background: var(--bg-secondary); color: var(--accent-blue); 
-        border-color: var(--border-color); border-bottom-color: var(--bg-secondary);
-        margin-bottom: -1px; z-index: 10;
+        background: var(--bg-secondary);
+        color: var(--accent-blue); 
+        border: 1px solid var(--border-color); 
+        border-bottom: 1px solid var(--bg-secondary); 
+        margin-bottom: -1px; 
+        z-index: 10; 
+    }
+    .tab-content {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        padding: 20px;
     }
     
     .tab-btn.add-btn { color: var(--accent-green, #10b981); opacity: 0.8; }
