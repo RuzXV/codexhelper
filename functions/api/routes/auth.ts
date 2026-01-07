@@ -40,7 +40,7 @@ auth.get('/callback', async (c) => {
     const userId = userData.id;
 
     const sessionToken = crypto.randomUUID().replace(/-/g, '');
-    const SESSION_DURATION_SECONDS = 86400 * 90;
+    const SESSION_DURATION_SECONDS = 86400 * 365;
     const expiryDate = (Date.now() / 1000) + SESSION_DURATION_SECONDS;
 
     const encryptedAccessToken = await encryptFernetToken(c.env.DB_ENCRYPTION_KEY, accessToken);

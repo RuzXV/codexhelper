@@ -25,7 +25,7 @@ window.loadUserData = function(key) {
 
         const storageItem = JSON.parse(json);
         
-        const EXPIRY_TIME = 90 * 24 * 60 * 60 * 1000; 
+        const EXPIRY_TIME = 365 * 24 * 60 * 60 * 1000;
 
         if (Date.now() - storageItem.timestamp > EXPIRY_TIME) {
             console.log("Data expired, clearing:", key);

@@ -21,10 +21,7 @@
     let clockInterval;
     let isLoading = false;
     let selectedEventId = null;
-    
     let hoveredSeriesId = null; 
-    let useLocalTime = false;
-    
     let isFilterOpen = false;
     let activeFilters = [];
     const ALL_EVENT_TYPES = Object.keys(eventConfigs.events);
@@ -118,33 +115,25 @@
     function startClock() {
         const update = () => {
             const now = new Date();
-            if (useLocalTime) {
-                const datePart = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                const timePart = now.toLocaleTimeString('en-GB', { hour12: false });
-                clockTime = `${datePart}, ${timePart} Local Time`;
-            } else {
-                const datePart = now.toLocaleDateString('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'short' });
-                const timePart = now.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false });
-                clockTime = `${datePart}, ${timePart} UTC`;
-            }
+            const datePart = new Intl.DateTimeFormat('en-GB', { 
+                day: 'numeric', 
+                month: 'short', 
+                timeZone: 'UTC' 
+            }).format(now);
+            
+            const timePart = new Intl.DateTimeFormat('en-GB', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                timeZone: 'UTC', 
+                hour12: false 
+            }).format(now);
+
+            clockTime = `${datePart} • ${timePart} UTC`;
         };
         update();
         clockInterval = setInterval(update, 1000);
     }
     
-    $: if (useLocalTime !== undefined && clockInterval) {
-        const now = new Date();
-        if (useLocalTime) {
-            const datePart = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-            const timePart = now.toLocaleTimeString('en-GB', { hour12: false });
-            clockTime = `${datePart}, ${timePart} Local Time`;
-        } else {
-            const datePart = now.toLocaleDateString('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'short' });
-            const timePart = now.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false });
-            clockTime = `${datePart}, ${timePart} UTC`;
-        }
-    }
-
     function checkAdminStatus() {
         const user = window.auth ? window.auth.getLoggedInUser() : null;
         isAdmin = user?.is_calendar_admin || false; 
@@ -415,15 +404,7 @@
 
     function getEventTimeString(dateStr) {
         if (!dateStr) return '';
-        if (useLocalTime) {
-            const d = new Date(dateStr + 'T00:00:00Z');
-            return d.toLocaleString(undefined, {
-                year: 'numeric', month: 'short', day: 'numeric',
-                hour: '2-digit', minute: '2-digit'
-            });
-        } else {
-            return dateStr + ' 00:00 UTC';
-        }
+        return dateStr + ' 00:00 UTC';
     }
 
     function handleKeydown(e) {
@@ -509,18 +490,10 @@
     <div class="tool-container calendar-container">
         
         <div class="calendar-header-card">
-            
-            <div class="clock-toggle-wrapper">
-                <div class="utc-clock">{clockTime}</div>
-                <button 
-                    class="time-toggle-btn" 
-                    class:active={useLocalTime}
-                    on:click={() => useLocalTime = !useLocalTime}
-                    title={useLocalTime ? "Switch to Game Time (UTC)" : "Switch to Local Time"}
-                >
-                    <i class="fas" class:fa-globe={!useLocalTime} class:fa-home={useLocalTime}></i>
-                    {useLocalTime ? 'Local' : 'UTC'}
-                </button>
+        
+            <div class="utc-clock-modern">
+                <i class="fas fa-globe-americas clock-icon"></i>
+                <span class="clock-text">{clockTime}</span>
             </div>
 
             <div class="nav-controls">
@@ -617,7 +590,6 @@
                                             class:selected={selectedEventId === event.id}
                                             class:dimmed={hoveredSeriesId && hoveredSeriesId !== event.series_id}
                                             class:highlighted={hoveredSeriesId === event.series_id}
-                                            in:fly={{ y: 10, duration: 300, delay: (cIndex * 10) + (i * 20) }}
                                             on:mouseenter={() => hoveredSeriesId = event.series_id}
                                             on:mouseleave={() => hoveredSeriesId = null}
                                             on:click|stopPropagation={() => selectedEventId = (selectedEventId === event.id ? null : event.id)}
@@ -763,44 +735,6 @@
         padding-bottom: 0;
     }
     
-    .clock-toggle-wrapper {
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(0, 0, 0, 0.3);
-        padding: 4px;
-        border-radius: 10px;
-        border: 1px solid var(--border-color);
-    }
-
-    .utc-clock {
-        font-family: 'Monaco', monospace;
-        font-size: 0.95rem;
-        color: var(--accent-blue-bright);
-        padding: 6px 12px;
-    }
-
-    .time-toggle-btn {
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--text-secondary);
-        border: 1px solid transparent;
-        border-radius: 6px;
-        padding: 4px 10px;
-        font-size: 0.8rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.2s;
-    }
-    .time-toggle-btn:hover { color: white; background: rgba(255, 255, 255, 0.1);
-    }
-    .time-toggle-btn.active {
-        background: var(--accent-blue);
-        color: white;
-        font-weight: 600;
-    }
-
     .calendar-header-card {
         display: flex; justify-content: space-between; align-items: center;
         background: linear-gradient(145deg, var(--bg-secondary), #181a1f);
@@ -812,6 +746,37 @@
         flex-wrap: wrap; gap: 16px;
         position: relative;
         z-index: 200;
+    }
+
+    .utc-clock-modern {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 6px 14px;
+        border-radius: 9999px; /* Pill shape */
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+    
+    .utc-clock-modern:hover {
+        background: rgba(0, 0, 0, 0.6);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .clock-icon {
+        color: var(--accent-blue-bright);
+        font-size: 0.9rem;
+    }
+
+    .clock-text {
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #e5e7eb;
+        letter-spacing: 0.5px;
     }
     
     .nav-controls { 
@@ -998,7 +963,6 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.4);
         border-left: none;
         border-right: none;
-        backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
         
         cursor: pointer;
         z-index: 10;
@@ -1145,7 +1109,12 @@
             position: static;
             transform: none;
         }
-        .clock-toggle-wrapper { order: 2; width: auto; flex-grow: 1; }
+        .utc-clock-modern { 
+            order: 2; 
+            width: auto; 
+            flex-grow: 1; 
+            justify-content: center; 
+        }
         .right-controls { order: 3; width: auto; justify-content: flex-end;
         }
         

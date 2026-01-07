@@ -9,12 +9,18 @@ import appleTouchIcon from '../assets/images/favicon/apple-touch-icon.png';
 import favicon32 from '../assets/images/favicon/favicon-32x32.png';
 import favicon16 from '../assets/images/favicon/favicon-16x16.png';
 
+import toolBgImage from '../assets/images/global/tool_bg.webp';
+import { ViewTransitions } from 'astro:transitions';
+
 const { 
     title, 
     description = "ROK information done right. Enhance your Rise of Kingdoms experience on Discord today.", 
     bodyClass = "" 
 } = Astro.props;
+
 const currentPath = Astro.url.pathname;
+
+const isToolPage = currentPath.startsWith('/tools');
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -50,6 +56,10 @@ const currentPath = Astro.url.pathname;
     <slot name="head-scripts" />
 </head>
 <body class={bodyClass}>
+    {isToolPage && (
+        <div class="global-tool-bg" style={`background-image: url(${toolBgImage.src})`}></div>
+    )}
+
     <Navbar client:load {currentPath} />
 
     <slot />
@@ -63,5 +73,21 @@ const currentPath = Astro.url.pathname;
     </script>
 
     <slot name="body-scripts" />
+
+    <style>
+        .global-tool-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            background-color: #000;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
 </body>
 </html>
