@@ -338,50 +338,212 @@ guilds.get('/:guildId/roles', async (c) => {
     return c.json({ roles: roles.map((r: any) => ({ id: r.id, name: r.name, color: r.color })) });
 });
 
-guilds.get('/:guildId/ark', async (c) => {
+guilds.get('/:guildId/ark/all', async (c) => {
     const { guildId } = c.req.param();
     try {
-        const setup = await c.env.BOT_DB.prepare(
-            "SELECT channel_id, announcement_channel_id, admin_role_id, signup_role_id, is_active FROM ark_of_osiris_setups WHERE guild_id = ?"
-        ).bind(guildId).first();
+        const { results: setups } = await c.env.BOT_DB.prepare(
+            "SELECT * FROM ark_of_osiris_setups WHERE guild_id = ?"
+        ).bind(guildId).all();
 
-        return c.json({ config: setup || {} });
+        const { results: teams } = await c.env.BOT_DB.prepare(
+            "SELECT * FROM ark_of_osiris_teams WHERE guild_id = ? ORDER BY team_number ASC"
+        ).bind(guildId).all();
+
+        const { results: signups } = await c.env.BOT_DB.prepare(
+            "SELECT * FROM ark_of_osiris_signups WHERE guild_id = ? ORDER BY signup_timestamp ASC"
+        ).bind(guildId).all();
+
+        const alliances: Record<string, any> = {};
+
+        if (setups) {
+            setups.forEach((s: any) => {
+                alliances[s.alliance_tag] = {
+                    config: {
+                        channel_id: s.channel_id,
+                        admin_role_id: s.admin_role_id,
+                        notification_role_id: s.tag_role_id,
+                        reminder_interval: s.reminder_interval_seconds,
+                        is_active: s.is_active
+                    },
+                    teams: {},
+                    signups: []
+                };
+            });
+        }
+
+        if (teams) {
+            teams.forEach((t: any) => {
+                if (alliances[t.alliance_tag]) {
+                    alliances[t.alliance_tag].teams[t.team_number] = {
+                        name: t.team_name,
+                        match_timestamp: t.next_match_timestamp,
+                        cap: t.signup_cap,
+                        role_id: t.role_id
+                    };
+                }
+            });
+        }
+
+        if (signups) {
+            signups.forEach((su: any) => {
+                if (alliances[su.alliance_tag]) {
+                    alliances[su.alliance_tag].signups.push(su);
+                }
+            });
+        }
+
+        return c.json({ alliances });
     } catch (e) {
-        return c.json({ config: {} });
+        console.error("Failed to fetch Ark data:", e);
+        return c.json({ alliances: {} });
     }
 });
 
-guilds.post('/:guildId/ark', async (c) => {
+guilds.post('/:guildId/ark/alliance', async (c) => {
     const { guildId } = c.req.param();
+    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+
+    const { alliance_tag, channel_id, admin_role_id, notification_role_id, reminder_interval } = await c.req.json();
+
+    try {
+        await c.env.BOT_DB.prepare(`
+            INSERT INTO ark_of_osiris_setups (guild_id, alliance_tag, channel_id, admin_role_id, tag_role_id, reminder_interval_seconds, is_active)
+            VALUES (?, ?, ?, ?, ?, ?, 1)
+            ON CONFLICT(guild_id, alliance_tag) DO UPDATE SET
+                channel_id = excluded.channel_id,
+                admin_role_id = excluded.admin_role_id,
+                tag_role_id = excluded.tag_role_id,
+                reminder_interval_seconds = excluded.reminder_interval_seconds,
+                is_active = 1
+        `).bind(
+            guildId, alliance_tag, 
+            channel_id || null, 
+            admin_role_id || null, 
+            notification_role_id || null, 
+            reminder_interval || 3600
+        ).run();
+
+        const payload = JSON.stringify({ guild_id: guildId });
+        await c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)").bind(payload, Date.now() / 1000).run();
+
+        return c.json({ success: true });
+    } catch (e) {
+        return c.json({ error: String(e) }, 500);
+    }
+});
+
+guilds.delete('/:guildId/ark/alliance/:tag', async (c) => {
+    const { guildId, tag } = c.req.param();
+    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+
+    await c.env.BOT_DB.batch([
+        c.env.BOT_DB.prepare("DELETE FROM ark_of_osiris_setups WHERE guild_id = ? AND alliance_tag = ?").bind(guildId, tag),
+        c.env.BOT_DB.prepare("DELETE FROM ark_of_osiris_teams WHERE guild_id = ? AND alliance_tag = ?").bind(guildId, tag),
+        c.env.BOT_DB.prepare("DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ?").bind(guildId, tag)
+    ]);
+
+    const payload = JSON.stringify({ guild_id: guildId });
+    await c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)").bind(payload, Date.now() / 1000).run();
+
+    return c.json({ success: true });
+});
+
+guilds.post('/:guildId/ark/team', async (c) => {
+    const { guildId } = c.req.param();
+    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+
+    const { alliance_tag, team_number, team_name, match_timestamp, signup_cap } = await c.req.json();
+
+    const teamNum = parseInt(team_number);
+    const cap = signup_cap ? parseInt(signup_cap) : null;
+
+    try {
+        const existing = await c.env.BOT_DB.prepare(
+            "SELECT 1 FROM ark_of_osiris_teams WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?"
+        ).bind(guildId, alliance_tag, teamNum).first();
+
+        if (existing) {
+            await c.env.BOT_DB.prepare(`
+                UPDATE ark_of_osiris_teams 
+                SET team_name = ?, next_match_timestamp = ?, signup_cap = ?
+                WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?
+            `).bind(team_name, match_timestamp, cap, guildId, alliance_tag, teamNum).run();
+        } else {
+            await c.env.BOT_DB.prepare(`
+                INSERT INTO ark_of_osiris_teams (guild_id, alliance_tag, team_number, team_name, next_match_timestamp, signup_cap, role_id)
+                VALUES (?, ?, ?, ?, ?, ?, 0)
+            `).bind(guildId, alliance_tag, teamNum, team_name, match_timestamp, cap).run();
+        }
+
+        const payload = JSON.stringify({ guild_id: guildId });
+        await c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)").bind(payload, Date.now() / 1000).run();
+
+        return c.json({ success: true });
+    } catch (e) {
+        console.error("Failed to update ark team:", e);
+        return c.json({ error: String(e) }, 500);
+    }
+});
+
+guilds.delete('/:guildId/ark/signup', async (c) => {
+    const { guildId } = c.req.param();
+    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+
+    const { alliance_tag, in_game_name } = await c.req.json();
+
+    await c.env.BOT_DB.prepare(
+        "DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ? AND in_game_name = ?"
+    ).bind(guildId, alliance_tag, in_game_name).run();
+
+    const payload = JSON.stringify({ guild_id: guildId });
+    await c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)").bind(payload, Date.now() / 1000).run();
+
+    return c.json({ success: true });
+});
+
+guilds.delete('/:guildId/ark/team/:alliance_tag/:team_number', async (c) => {
+    const { guildId, alliance_tag, team_number } = c.req.param();
+    
     if (!await verifyGuildPatreonAccess(c, guildId)) {
         return c.json({ error: 'Unauthorized' }, 403);
     }
 
-    const { channel_id, announcement_channel_id, admin_role_id, signup_role_id } = await c.req.json();
-    const isActive = 1;
+    await c.env.BOT_DB.prepare(
+        "DELETE FROM ark_of_osiris_teams WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?"
+    ).bind(guildId, alliance_tag, team_number).run();
 
-    await c.env.BOT_DB.prepare(`
-        INSERT INTO ark_of_osiris_setups (guild_id, channel_id, announcement_channel_id, admin_role_id, signup_role_id, is_active)
-        VALUES (?, ?, ?, ?, ?, ?)
-        ON CONFLICT(guild_id) DO UPDATE SET
-            channel_id = excluded.channel_id,
-            announcement_channel_id = excluded.announcement_channel_id,
-            admin_role_id = excluded.admin_role_id,
-            signup_role_id = excluded.signup_role_id,
-            is_active = excluded.is_active
-    `).bind(
-        guildId, 
-        channel_id || null, 
-        announcement_channel_id || null, 
-        admin_role_id || null, 
-        signup_role_id || null, 
-        isActive
-    ).run();
+    await c.env.BOT_DB.prepare(
+        "DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?"
+    ).bind(guildId, alliance_tag, team_number).run();
 
     const payload = JSON.stringify({ guild_id: guildId });
     await c.env.BOT_DB.prepare(
         "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)"
     ).bind(payload, Date.now() / 1000).run();
+
+    return c.json({ success: true });
+});
+
+guilds.post('/:guildId/ark/signup', async (c) => {
+    const { guildId } = c.req.param();
+    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+
+    const { alliance_tag, team_number, in_game_name } = await c.req.json();
+
+    await c.env.BOT_DB.prepare(
+        "DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ? AND in_game_name = ?"
+    ).bind(guildId, alliance_tag, in_game_name).run();
+
+    const placeholderUserId = -Math.floor(Math.random() * 1000000);
+    const nowTs = Date.now() / 1000;
+
+    await c.env.BOT_DB.prepare(`
+        INSERT INTO ark_of_osiris_signups (guild_id, alliance_tag, team_number, user_id, in_game_name, signup_timestamp)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(guildId, alliance_tag, team_number, placeholderUserId, in_game_name, nowTs).run();
+
+    const payload = JSON.stringify({ guild_id: guildId });
+    await c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)").bind(payload, nowTs).run();
 
     return c.json({ success: true });
 });
