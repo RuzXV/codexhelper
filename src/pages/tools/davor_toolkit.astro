@@ -8,6 +8,7 @@ import weightingData from '../../data/weighting_data.json';
 import scorePairings from '../../data/score_pairings.json';
 import inscriptionsData from '../../data/inscriptions.json';
 import inscriptionStats from '../../data/inscription_stats.json';
+import inscriptionTierList from '../../data/inscription_tierlist.json';
 
 import cavalryIcon from '../../assets/images/materials/troop_icons/cavalry_icon_mini.webp';
 import infantryIcon from '../../assets/images/materials/troop_icons/infantry_icon_mini.webp';
@@ -199,6 +200,57 @@ const davorIconHeight = davorIcon.height;
                                 </div>
                             </div>
                         </div>
+
+                        <div class="carousel-slide" data-title="Inscription Tier List" data-description="A mathematically driven tier list evaluating inscription efficiency relative to the strongest option for each pairing." data-icon={statsWeightingIconPath}>
+                            <div class="calculator-island">
+                                <div class="island-content">
+                                    <p class="tool-explanation">
+                                        This tool provides a <span class="wizard-gradient">mathematically driven</span> tier list, differing from subjective rankings.
+                                        Each inscription is evaluated using a baseline armament (Triple equal stats) and Formation buff.
+                                        The strongest inscription sets the <span class="wizard-gradient">100% reference point</span>, and all others are scored relative to it.
+                                    </p>
+
+                                    <div class="form-group">
+                                        <div class="form-label-heading">Troop Type</div>
+                                        <div id="tierlist-troop-selector" class="button-selector">
+                                            <button class="selector-btn active" data-type="cavalry"><Image loading="lazy" src={cavalryIcon} alt="Cavalry" width="24" height="24"/><span>Cavalry</span></button>
+                                            <button class="selector-btn" data-type="infantry"><Image loading="lazy" src={infantryIcon} alt="Infantry" width="24" height="24"/><span>Infantry</span></button>
+                                            <button class="selector-btn" data-type="archer"><Image loading="lazy" src={archerIcon} alt="Archers" width="24" height="24"/><span>Archers</span></button>
+                                        </div>
+                                    </div>
+
+                                    <div class="selectors-container">
+                                        <div class="pairing-selector-wrapper">
+                                            <div class="form-label-heading">Commander Pairing</div>
+                                            <div id="tierlist-pairing-selector" class="pairing-selector"></div>
+                                        </div>
+
+                                        <div class="inscription-selector-wrapper">
+                                            <div class="form-label-heading">Inscription Tier List</div>
+                                            <div id="tierlist-container" class="inscription-selector">
+                                                
+                                                <div id="tierlist-controls" style="display: none; margin-bottom: 10px;">
+                                                    <div id="tierlist-slot-selector" class="button-selector">
+                                                        <button class="selector-btn active" data-slot="Scroll" style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;">Scroll</button>
+                                                        <button class="selector-btn" data-slot="Instrument" style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;">Instrument</button>
+                                                        <button class="selector-btn" data-slot="Flag" style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;">Flag</button>
+                                                        <button class="selector-btn" data-slot="Emblem" style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;">Emblem</button>
+                                                    </div>
+                                                </div>
+
+                                                <div id="tierlist-display" style="display: none;"></div>
+                                                
+                                                <div id="tierlist-placeholder">
+                                                    Select a pairing to view tiers.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                     
+                                    <p class="last-updated-note">Last Updated: January 2026</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <button class="carousel-arrow prev" id="prev-slide"><i class="fas fa-chevron-left"></i></button>
@@ -235,7 +287,7 @@ const davorIconHeight = davorIcon.height;
         </section>
     </main>
 
-    <script define:vars={{ imagePaths: imagePathMap, equipmentData, inscriptionsData, inscriptionStats, davorIconPath, davorIconWidth, davorIconHeight, weightingData, scorePairings }}>
+    <script define:vars={{ imagePaths: imagePathMap, equipmentData, inscriptionsData, inscriptionStats, davorIconPath, davorIconWidth, davorIconHeight, weightingData, scorePairings, inscriptionTierList }}>
         window.DAVOR_IMAGE_PATHS = imagePaths;
         window.equipmentData = equipmentData;
         window.inscriptionsData = inscriptionsData;
@@ -245,6 +297,7 @@ const davorIconHeight = davorIcon.height;
         window.davorIconHeight = davorIconHeight;
         window.weightingData = weightingData;
         window.scorePairings = scorePairings;
+        window.inscriptionTierList = inscriptionTierList;
     </script>
     <script>
         import "../../scripts/utils.js";

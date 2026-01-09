@@ -353,6 +353,127 @@
 .logged-out-overlay { position: absolute; inset: 0; background: rgba(12, 12, 15, 0.8); display: flex; align-items: center; justify-content: center; text-align: center; border-radius: var(--radius-lg); z-index: 10; backdrop-filter: blur(4px); }
 .logged-out-message h3 { margin-bottom: var(--spacing-6); font-size: var(--font-size-lg); color: var(--text-secondary); }
 
+#tierlist-slot-selector .selector-btn {
+    padding: var(--spacing-1) var(--spacing-3);
+    min-height: 36px;
+}
+
+.tier-row {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    min-height: 60px;
+    margin-bottom: var(--spacing-3);
+}
+
+.tier-label {
+    width: 60px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #1a1b1e;
+    font-size: 1.4rem;
+    text-shadow: none;
+}
+
+.tier-content {
+    padding: var(--spacing-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    align-items: center;
+    width: 100%;
+}
+
+.tier-content .inscription-tag {
+    font-size: 11px;
+    padding: 3px 12px;
+    white-space: nowrap;
+    position: relative;
+    display: inline-block;
+}
+
+#tierlist-display.inscription-selector {
+    max-height: none;
+    height: auto;
+    overflow-y: visible;
+}
+
+.carousel-slide[data-title="Inscription Tier List"] .calculator-island {
+    min-height: 850px;
+}
+
+.carousel-slide[data-title="Inscription Tier List"] .inscription-selector-wrapper,
+.carousel-slide[data-title="Inscription Tier List"] .island-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.selectors-container { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: var(--spacing-6); 
+    margin-top: var(--spacing-4);
+    align-items: start;
+}
+
+#tierlist-container {
+    min-height: 400px;
+    height: auto;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+}
+
+#tierlist-display {
+    flex-grow: 1;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+}
+
+#tierlist-placeholder {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+#tierlist-slot-selector .selector-btn.active {
+    background: var(--accent-blue-light);
+    border-color: var(--accent-blue);
+    color: white !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
+    background-image: none;
+}
+
+#tierlist-controls {
+    margin-bottom: var(--spacing-4) !important;
+    padding-bottom: var(--spacing-4);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.carousel-slide[data-title="Inscription Tier List"] .pairing-selector-wrapper {
+    height: auto !important;
+    min-height: 0;
+    align-self: start;
+}
+
+#tierlist-pairing-selector {
+    height: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
 @media (max-width: 768px) {
     .carousel-slide { padding: 0 var(--spacing-8); }
     .carousel-arrow { font-size: 2rem; }
@@ -514,10 +635,11 @@
 #armament-pairing-selector, 
 #result-display, 
 #conversion-result,
-#inscription-selector {
+#inscription-selector,
+#tierlist-pairing-selector,
+#tierlist-display {
     transition: opacity 0.15s ease-in-out;
 }
-
 .fade-out {
     opacity: 0;
 }

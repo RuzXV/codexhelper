@@ -1,0 +1,422 @@
+{
+    "Bai Qi / Liu Che": {
+        "Scroll": {
+            "S+": ["Toppler"],
+            "S": [],
+            "A": ["Imploder", "Ward", "Robust", "Onslaught", "Iron Wall", "Pulverize"],
+            "B": ["Swift", "Warcry", "Well Clad", "Bellicose", "Breaker", "Destructive", "Battle-Ready", "Hurried", "Valiant", "Loosed", "Calm", "Furious"],
+            "C": ["Retaliatory", "Phalanx", "Tremors", "Enraged", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Demolisher"],
+            "S": ["Straight to the Point"],
+            "A": ["Raider", "Even-Keeled", "Fit", "Warhunger", "Respite"],
+            "B": ["Fine Horse", "Brutal", "Armored", "Requital", "Primed", "Fearsome", "Uplifting", "Bluster", "Spirited", "Embattled"],
+            "C": ["Evasive", "Alert", "Patronage", "Devious", "Vengeful", "Guarded", "Annexer"]
+        },
+        "Flag": {
+            "S+": [],
+            "S": ["Invincible", "Airtight"],
+            "A": ["Assertive", "Strategic", "Vitality", "Desperado", "Cohesive", "Striker", "Ballistics", "Eclipsed", "Unswerving"],
+            "B": ["Galloping", "Spiked", "Metallics", "Wary", "Warflames", "Pursuer", "Brave"],
+            "C": ["Rebuff", "Siegework", "Hardheaded", "Brawler", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Thundering", "Fearless"],
+            "S": ["Rattling"],
+            "A": ["Forceful", "Smite", "Hardy", "Militant", "Rapacious", "Watchmen"],
+            "B": ["Deflecter", "Haste", "Infamy", "Guardians", "Shielded", "Evasive", "Elite", "Lineshot", "Artisan", "Enduring", "Counterer"],
+            "C": ["Resistant", "Daring", "Pacifier"]
+        }
+    },
+    "Bai Qi / William Wallace": {
+        "Scroll": {
+            "S+": ["Toppler"],
+            "S": [],
+            "A": ["Imploder", "Ward", "Robust", "Onslaught", "Iron Wall", "Pulverize"],
+            "B": ["Swift", "Warcry", "Well Clad", "Bellicose", "Breaker", "Destructive", "Battle-Ready", "Hurried", "Valiant", "Loosed", "Calm", "Furious"],
+            "C": ["Retaliatory", "Phalanx", "Tremors", "Enraged", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Demolisher"],
+            "S": ["Straight to the Point"],
+            "A": ["Raider", "Even-Keeled", "Fit", "Warhunger", "Respite"],
+            "B": ["Fine Horse", "Brutal", "Armored", "Requital", "Primed", "Fearsome", "Uplifting", "Bluster", "Patronage", "Spirited", "Embattled"],
+            "C": ["Evasive", "Alert", "Devious", "Vengeful", "Guarded", "Annexer"]
+        },
+        "Flag": {
+            "S+": [],
+            "S": ["Invincible", "Airtight"],
+            "A": ["Assertive", "Strategic", "Vitality", "Desperado", "Cohesive", "Striker", "Ballistics", "Eclipsed", "Unswerving"],
+            "B": ["Galloping", "Spiked", "Metallics", "Wary", "Warflames", "Pursuer", "Brave"],
+            "C": ["Rebuff", "Siegework", "Hardheaded", "Brawler", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Thundering", "Fearless"],
+            "S": ["Rattling"],
+            "A": ["Forceful", "Smite", "Hardy", "Militant", "Rapacious", "Watchmen"],
+            "B": ["Deflecter", "Haste", "Infamy", "Guardians", "Shielded", "Evasive", "Elite", "Lineshot", "Artisan", "Enduring", "Counterer"],
+            "C": ["Resistant", "Daring", "Pacifier"]
+        }
+    },
+    "Liu Che / Philip II": {
+        "Scroll": {
+            "S+": ["Toppler"],
+            "S": ["Imploder", "Robust"],
+            "A": ["Ward", "Warcry", "Well Clad", "Breaker", "Calm", "Bellicose", "Valiant", "Onslaught", "Iron Wall", "Pulverize", "Furious", "Swift", "Loosed", "Enraged", "Destructive", "Battle-Ready"],
+            "B": ["Hurried", "Retaliatory"],
+            "C": ["Tremors", "Phalanx", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Demolisher", "Straight to the Point"],
+            "S": ["Raider", "Fit", "Even-Keeled"],
+            "A": ["Brutal", "Respite", "Armored", "Requital", "Fearsome", "Warhunger", "Fine Horse", "Primed", "Uplifting", "Spirited", "Devious", "Evasive"],
+            "B": ["Alert", "Guarded", "Embattled"],
+            "C": ["Vengeful", "Bluster", "Patronage", "Annexer"]
+        },
+        "Flag": {
+            "S+": ["Airtight", "Invincible"],
+            "S": ["Vitality", "Assertive", "Desperado", "Strategic"],
+            "A": ["Spiked", "Cohesive", "Metallics", "Unswerving", "Warflames", "Striker", "Ballistics", "Pursuer", "Galloping", "Wary", "Brave", "Brawler", "Eclipsed"],
+            "B": ["Rebuff", "Hardheaded"],
+            "C": ["Siegework", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Fearless", "Thundering"],
+            "S": ["Hardy", "Rattling", "Forceful"],
+            "A": ["Infamy", "Rapacious", "Watchmen", "Shielded", "Smite", "Elite", "Militant", "Evasive", "Haste", "Lineshot", "Artisan", "Daring", "Deflecter", "Enduring", "Counterer"],
+            "B": ["Resistant", "Guardians"],
+            "C": ["Pacifier"]
+        }
+    },
+    "Ragnar Lodbrok Prime / Scipio Africanus Prime": {
+        "Scroll": {
+            "S+": ["Hunter"],
+            "S": ["Furious"],
+            "A": ["Enraged", "Ward", "Robust", "Warcry", "Swift"],
+            "B": ["Well Clad", "Bellicose", "Hurried", "Crazed", "Breaker", "Valiant", "Calm", "Iron Wall"],
+            "C": ["Onslaught", "Pulverize", "Retaliatory", "Loosed", "Tremors", "Phalanx", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Unstoppable"],
+            "S": [],
+            "A": ["Boiling Blood", "Devious", "Fit", "Respite", "Brutal", "Fine Horse", "Primed"],
+            "B": ["Armored", "Guarded", "Fearsome", "Patronage"],
+            "C": ["Requital", "Warhunger", "Alert", "Evasive", "Uplifting", "Spirited", "Vengeful", "Embattled", "Bluster", "Annexer"]
+        },
+        "Flag": {
+            "S+": ["Balanced"],
+            "S": [],
+            "A": ["Assertive", "Brawler", "Strategic", "Cohesive", "Eclipsed", "Vitality", "Desperado", "Spiked", "Galloping", "Wary"],
+            "B": ["Defiant", "Metallics", "Warflames", "Pursuer", "Brave"],
+            "C": ["Striker", "Ballistics", "Rebuff", "Siegework", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Intrepid"],
+            "S": ["Focus Fire"],
+            "A": ["Artisan", "Deflecter", "Daring", "Hardy", "Rapacious", "Watchmen", "Infamy", "Haste"],
+            "B": ["Shielded", "Evasive", "Elite", "Smite"],
+            "C": ["Guardians", "Militant", "Counterer", "Enduring", "Resistant", "Lineshot", "Pacifier"]
+        }
+    },
+    "Arthur Pendragon / Achilles": {
+        "Scroll": {
+            "S+": ["Thrasher"],
+            "S": ["Pummeler"],
+            "A": ["Bellicose", "Ward", "Onslaught", "Robust", "Iron Wall", "Well Clad", "Breaker", "Warcry", "Valiant", "Pulverize", "Loosed", "Calm"],
+            "B": ["Destructive", "Swift", "Battle-Ready", "Hurried", "Furious", "Retaliatory"],
+            "C": ["Phalanx", "Tremors", "Enraged", "Payback"]
+        },
+        "Instrument": {
+            "S+": [],
+            "S": ["Straight to the Point", "Butterfly Effect", "Causative"],
+            "A": ["Even-Keeled", "Warhunger", "Fit", "Respite", "Armored", "Brutal", "Uplifting", "Fearsome"],
+            "B": ["Fine Horse", "Primed", "Requital", "Spirited", "Alert", "Bluster", "Evasive", "Embattled", "Guarded"],
+            "C": ["Devious", "Vengeful", "Patronage", "Annexer"]
+        },
+        "Flag": {
+            "S+": ["Steelskin"],
+            "S": ["Invincible"],
+            "A": ["Assertive", "Determined", "Strategic", "Desperado", "Cohesive", "Striker", "Vitality", "Unswerving", "Metallics", "Spiked", "Warflames", "Pursuer", "Brave"],
+            "B": ["Galloping", "Wary", "Rebuff", "Ballistics", "Eclipsed"],
+            "C": ["Siegework", "Brawler", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Flurry", "Fearless"],
+            "S": ["Relentless", "Forceful"],
+            "A": ["Smite", "Militant", "Rapacious", "Watchmen", "Hardy", "Shielded", "Infamy", "Evasive", "Elite", "Lineshot"],
+            "B": ["Haste", "Enduring", "Counterer", "Guardians", "Resistant", "Deflecter", "Artisan"],
+            "C": ["Daring", "Pacifier"]
+        }
+    },
+    "Gang Gamchan / Achilles": {
+        "Scroll": {
+            "S+": ["Thrasher"],
+            "S": ["Pummeler"],
+            "A": ["Bellicose", "Ward", "Onslaught", "Robust", "Iron Wall", "Well Clad", "Breaker", "Warcry", "Valiant", "Pulverize", "Loosed", "Calm"],
+            "B": ["Destructive", "Swift", "Battle-Ready", "Hurried", "Furious", "Retaliatory"],
+            "C": ["Phalanx", "Tremors", "Enraged", "Payback"]
+        },
+        "Instrument": {
+            "S+": [],
+            "S": ["Straight to the Point", "Butterfly Effect", "Causative"],
+            "A": ["Even-Keeled", "Warhunger", "Fit", "Respite", "Patronage", "Armored", "Brutal", "Uplifting", "Fearsome"],
+            "B": ["Fine Horse", "Primed", "Requital", "Spirited", "Alert", "Bluster", "Evasive", "Embattled", "Guarded"],
+            "C": ["Devious", "Vengeful", "Annexer"]
+        },
+        "Flag": {
+            "S+": ["Steelskin"],
+            "S": ["Invincible"],
+            "A": ["Assertive", "Determined", "Strategic", "Desperado", "Cohesive", "Striker", "Vitality", "Unswerving", "Metallics", "Spiked", "Warflames", "Pursuer", "Brave"],
+            "B": ["Galloping", "Wary", "Rebuff", "Ballistics", "Eclipsed"],
+            "C": ["Siegework", "Brawler", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Flurry", "Fearless"],
+            "S": ["Relentless", "Forceful"],
+            "A": ["Smite", "Militant", "Rapacious", "Watchmen", "Hardy", "Shielded", "Infamy", "Evasive", "Elite", "Lineshot"],
+            "B": ["Haste", "Enduring", "Counterer", "Guardians", "Resistant", "Deflecter", "Artisan"],
+            "C": ["Daring", "Pacifier"]
+        }
+    },
+    "Arthur Pendragon / Philip II": {
+        "Scroll": {
+            "S+": ["Thrasher"],
+            "S": [],
+            "A": ["Robust", "Ward", "Well Clad", "Warcry", "Breaker", "Calm", "Bellicose", "Valiant", "Onslaught", "Iron Wall", "Pulverize", "Furious", "Loosed", "Enraged", "Destructive", "Battle-Ready"],
+            "B": ["Retaliatory", "Swift", "Hurried", "Pummeler"],
+            "C": ["Tremors", "Phalanx", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Butterfly Effect"],
+            "S": ["Straight to the Point", "Causative"],
+            "A": ["Fit", "Armored", "Even-Keeled", "Respite", "Brutal", "Requital", "Fearsome", "Warhunger", "Uplifting", "Spirited", "Devious", "Evasive"],
+            "B": ["Alert", "Guarded", "Fine Horse", "Primed", "Embattled"],
+            "C": ["Vengeful", "Bluster", "Patronage", "Annexer"]
+        },
+        "Flag": {
+            "S+": ["Steelskin"],
+            "S": ["Invincible", "Determined", "Assertive", "Desperado", "Strategic"],
+            "A": ["Vitality", "Metallics", "Cohesive", "Unswerving", "Spiked", "Warflames", "Striker", "Ballistics", "Pursuer", "Brave", "Brawler", "Eclipsed"],
+            "B": ["Rebuff", "Galloping", "Wary"],
+            "C": ["Siegework", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Flurry"],
+            "S": ["Fearless", "Relentless"],
+            "A": ["Hardy", "Shielded", "Rapacious", "Watchmen", "Infamy", "Smite", "Forceful", "Elite", "Militant", "Evasive", "Lineshot", "Artisan", "Daring", "Deflecter", "Enduring", "Counterer"],
+            "B": ["Resistant", "Guardians", "Haste"],
+            "C": ["Pacifier"]
+        }
+    },
+    "Huo Qubing / Arthur Pendragon": {
+        "Scroll": {
+            "S+": ["Hunter"],
+            "S": ["Furious"],
+            "A": ["Enraged", "Ward", "Robust", "Well Clad", "Breaker", "Warcry", "Bellicose"],
+            "B": ["Valiant", "Crazed", "Calm", "Swift", "Hurried"],
+            "C": ["Onslaught", "Iron Wall", "Pulverize", "Retaliatory", "Loosed", "Tremors", "Phalanx", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Unstoppable"],
+            "S": ["Boiling Blood"],
+            "A": ["Devious", "Respite", "Fit", "Armored", "Brutal", "Guarded"],
+            "B": ["Fearsome", "Fine Horse", "Primed", "Requital"],
+            "C": ["Warhunger", "Alert", "Evasive", "Patronage", "Uplifting", "Spirited", "Vengeful", "Embattled", "Bluster", "Annexer"]
+        },
+        "Flag": {
+            "S+": ["Balanced"],
+            "S": [],
+            "A": ["Brawler", "Assertive", "Strategic", "Cohesive", "Eclipsed", "Desperado", "Vitality", "Metallics", "Defiant", "Spiked"],
+            "B": ["Warflames", "Pursuer", "Galloping", "Wary", "Brave"],
+            "C": ["Striker", "Ballistics", "Rebuff", "Siegework", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Intrepid"],
+            "S": ["Focus Fire", "Artisan"],
+            "A": ["Daring", "Deflecter", "Hardy", "Rapacious", "Shielded", "Watchmen", "Infamy"],
+            "B": ["Elite", "Evasive", "Haste", "Smite", "Guardians"],
+            "C": ["Militant", "Counterer", "Enduring", "Resistant", "Lineshot", "Pacifier"]
+        }
+    },
+    "Huo Qubing / Joan of Arc Prime": {
+        "Scroll": {
+            "S+": ["Hunter"],
+            "S": ["Furious"],
+            "A": ["Enraged", "Ward", "Robust", "Well Clad", "Breaker", "Warcry", "Bellicose"],
+            "B": ["Valiant", "Crazed", "Calm", "Swift", "Hurried"],
+            "C": ["Onslaught", "Iron Wall", "Pulverize", "Retaliatory", "Loosed", "Tremors", "Phalanx", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Unstoppable"],
+            "S": ["Boiling Blood"],
+            "A": ["Devious", "Respite", "Fit", "Armored", "Brutal", "Guarded"],
+            "B": ["Fearsome", "Fine Horse", "Primed", "Requital"],
+            "C": ["Warhunger", "Alert", "Evasive", "Patronage", "Uplifting", "Spirited", "Vengeful", "Embattled", "Bluster", "Annexer"]
+        },
+        "Flag": {
+            "S+": ["Balanced"],
+            "S": [],
+            "A": ["Brawler", "Assertive", "Strategic", "Cohesive", "Eclipsed", "Desperado", "Vitality", "Metallics", "Defiant", "Spiked"],
+            "B": ["Warflames", "Pursuer", "Galloping", "Wary", "Brave"],
+            "C": ["Striker", "Ballistics", "Rebuff", "Siegework", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Intrepid"],
+            "S": ["Focus Fire", "Artisan"],
+            "A": ["Daring", "Deflecter", "Hardy", "Rapacious", "Shielded", "Watchmen", "Infamy"],
+            "B": ["Elite", "Evasive", "Haste", "Smite", "Guardians"],
+            "C": ["Militant", "Counterer", "Enduring", "Resistant", "Lineshot", "Pacifier"]
+        }
+    },
+    "Qin Shi Huang / Yi Seong-Gye": {
+        "Scroll": {
+            "S+": ["Hunter"],
+            "S": ["Furious"],
+            "A": ["Enraged", "Crazed (without Rejuvenate)", "Swift", "Ward"],
+            "B": ["Hurried", "Warcry", "Robust", "Well Clad", "Breaker", "Calm", "Bellicose", "Valiant"],
+            "C": ["Crazed (with Rejuvenate)", "Retaliatory", "Iron Wall", "Tremors", "Phalanx", "Onslaught", "Pulverize", "Loosed", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Unstoppable"],
+            "S": [],
+            "A": ["Boiling Blood", "Devious", "Spirited", "Fine Horse", "Primed"],
+            "B": ["Brutal", "Fit", "Armored", "Respite", "Guarded", "Fearsome"],
+            "C": ["Evasive", "Requital", "Warhunger", "Alert", "Vengeful", "Embattled", "Patronage", "Bluster", "Annexer", "Uplifting"]
+        },
+        "Flag": {
+            "S+": [],
+            "S": [],
+            "A": ["Brawler", "Balanced", "Assertive", "Strategic", "Desperado", "Cohesive", "Eclipsed", "Galloping", "Wary"],
+            "B": ["Defiant", "Spiked", "Vitality", "Metallics", "Warflames"],
+            "C": ["Brave", "Pursuer", "Siegework", "Striker", "Rebuff", "Ballistics", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Intrepid"],
+            "S": ["Focus Fire"],
+            "A": ["Artisan", "Daring", "Deflecter", "Hardy", "Haste"],
+            "B": ["Infamy", "Shielded", "Rapacious", "Watchmen", "Guardians", "Elite", "Evasive"],
+            "C": ["Enduring", "Counterer", "Smite", "Militant", "Resistant", "Lineshot", "Pacifier"]
+        }
+    },
+    "Qin Shi Huang / Zhuge Liang": {
+        "Scroll": {
+            "S+": ["Hunter"],
+            "S": ["Furious"],
+            "A": ["Enraged", "Crazed (without Rejuvenate)", "Warcry", "Swift", "Ward"],
+            "B": ["Well Clad", "Robust", "Hurried", "Breaker", "Calm", "Bellicose", "Valiant"],
+            "C": ["Crazed (with Rejuvenate)", "Retaliatory", "Iron Wall", "Tremors", "Phalanx", "Onslaught", "Pulverize", "Loosed", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Unstoppable"],
+            "S": ["Boiling Blood"],
+            "A": ["Devious", "Spirited", "Brutal", "Fine Horse", "Primed"],
+            "B": ["Armored", "Fit", "Respite", "Guarded", "Fearsome"],
+            "C": ["Evasive", "Requital", "Warhunger", "Alert", "Vengeful", "Embattled", "Patronage", "Bluster", "Annexer", "Uplifting"]
+        },
+        "Flag": {
+            "S+": [],
+            "S": [],
+            "A": ["Brawler", "Balanced", "Assertive", "Strategic", "Desperado", "Cohesive", "Spiked", "Eclipsed", "Galloping", "Wary"],
+            "B": ["Metallics", "Vitality", "Defiant", "Warflames"],
+            "C": ["Brave", "Pursuer", "Siegework", "Striker", "Rebuff", "Ballistics", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Intrepid"],
+            "S": ["Focus Fire", "Artisan"],
+            "A": ["Daring", "Deflecter", "Infamy", "Haste"],
+            "B": ["Shielded", "Hardy", "Rapacious", "Watchmen", "Guardians", "Elite", "Evasive"],
+            "C": ["Enduring", "Counterer", "Smite", "Militant", "Resistant", "Lineshot", "Pacifier"]
+        }
+    },
+    "Zhuge Liang / Hermann Prime": {
+        "Scroll": {
+            "S+": ["Hunter"],
+            "S": ["Furious"],
+            "A": ["Enraged", "Ward", "Robust", "Warcry", "Swift"],
+            "B": ["Breaker", "Well Clad", "Hurried", "Crazed", "Bellicose", "Valiant", "Calm"],
+            "C": ["Iron Wall", "Onslaught", "Pulverize", "Retaliatory", "Tremors", "Phalanx", "Loosed", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Unstoppable"],
+            "S": ["Boiling Blood"],
+            "A": ["Devious", "Fit", "Respite", "Brutal", "Fine Horse", "Primed"],
+            "B": ["Armored", "Guarded", "Fearsome"],
+            "C": ["Requital", "Warhunger", "Spirited", "Evasive", "Alert", "Uplifting", "Vengeful", "Embattled", "Patronage", "Bluster", "Annexer"]
+        },
+        "Flag": {
+            "S+": [],
+            "S": ["Balanced"],
+            "A": ["Brawler", "Assertive", "Strategic", "Desperado", "Cohesive", "Eclipsed", "Vitality", "Spiked", "Galloping", "Wary"],
+            "B": ["Metallics", "Defiant", "Warflames", "Pursuer", "Brave"],
+            "C": ["Striker", "Rebuff", "Ballistics", "Siegework", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Intrepid"],
+            "S": ["Focus Fire"],
+            "A": ["Artisan", "Daring", "Deflecter", "Hardy", "Infamy", "Rapacious", "Haste"],
+            "B": ["Shielded", "Watchmen", "Guardians", "Elite", "Evasive"],
+            "C": ["Smite", "Militant", "Lineshot", "Resistant", "Enduring", "Counterer", "Pacifier"]
+        }
+    },
+    "Zhuge Liang / Philip II": {
+        "Scroll": {
+            "S+": ["Hunter"],
+            "S": ["Furious"],
+            "A": ["Enraged", "Ward", "Well Clad", "Warcry", "Swift"],
+            "B": ["Breaker", "Robust", "Hurried", "Crazed", "Bellicose", "Valiant", "Calm"],
+            "C": ["Iron Wall", "Onslaught", "Pulverize", "Retaliatory", "Tremors", "Phalanx", "Loosed", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Unstoppable"],
+            "S": ["Boiling Blood"],
+            "A": ["Devious", "Armored", "Respite", "Brutal", "Fine Horse", "Primed"],
+            "B": ["Fit", "Guarded", "Fearsome"],
+            "C": ["Requital", "Warhunger", "Spirited", "Evasive", "Alert", "Uplifting", "Vengeful", "Embattled", "Patronage", "Bluster", "Annexer"]
+        },
+        "Flag": {
+            "S+": [],
+            "S": ["Balanced"],
+            "A": ["Brawler", "Assertive", "Strategic", "Desperado", "Cohesive", "Eclipsed", "Metallics", "Spiked", "Galloping", "Wary"],
+            "B": ["Vitality", "Defiant", "Warflames", "Pursuer", "Brave"],
+            "C": ["Striker", "Rebuff", "Ballistics", "Siegework", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Intrepid"],
+            "S": ["Focus Fire"],
+            "A": ["Artisan", "Daring", "Deflecter", "Shielded", "Infamy", "Rapacious", "Haste"],
+            "B": ["Hardy", "Watchmen", "Guardians", "Elite", "Evasive"],
+            "C": ["Smite", "Militant", "Lineshot", "Resistant", "Enduring", "Counterer", "Pacifier"]
+        }
+    },
+    "Shajar al-Durr / Ashurbanipal": {
+        "Scroll": {
+            "S+": ["Hunter"],
+            "S": ["Furious"],
+            "A": ["Enraged", "Ward", "Robust", "Warcry", "Swift", "Well Clad"],
+            "B": ["Breaker", "Hurried", "Crazed", "Bellicose", "Valiant", "Calm"],
+            "C": ["Iron Wall", "Onslaught", "Pulverize", "Retaliatory", "Tremors", "Phalanx", "Loosed", "Payback"]
+        },
+        "Instrument": {
+            "S+": ["Unstoppable"],
+            "S": ["Boiling Blood"],
+            "A": ["Devious", "Fit", "Respite", "Brutal", "Fine Horse", "Primed", "Armored", "Patronage"],
+            "B": ["Guarded", "Fearsome"],
+            "C": ["Requital", "Warhunger", "Spirited", "Evasive", "Alert", "Uplifting", "Vengeful", "Embattled", "Bluster", "Annexer"]
+        },
+        "Flag": {
+            "S+": [],
+            "S": ["Balanced"],
+            "A": ["Brawler", "Assertive", "Strategic", "Desperado", "Cohesive", "Eclipsed", "Vitality", "Spiked", "Galloping", "Wary", "Metallics"],
+            "B": ["Defiant", "Warflames", "Pursuer", "Brave"],
+            "C": ["Striker", "Rebuff", "Ballistics", "Siegework", "Sentries", "Cleanser"]
+        },
+        "Emblem": {
+            "S+": ["Intrepid"],
+            "S": ["Focus Fire"],
+            "A": ["Artisan", "Daring", "Deflecter", "Hardy", "Rapacious", "Infamy", "Haste", "Shielded"],
+            "B": ["Watchmen", "Guardians", "Elite", "Evasive"],
+            "C": ["Smite", "Militant", "Lineshot", "Resistant", "Enduring", "Counterer", "Pacifier"]
+        }
+    }
+}

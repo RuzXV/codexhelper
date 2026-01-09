@@ -36,8 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         currentIndex = targetIndex;
         updateCarouselUI();
-        if(slides[currentIndex].dataset.title === "Score my Armaments") {
+        
+        const currentTitle = slides[currentIndex].dataset.title;
+        if(currentTitle === "Score my Armaments") {
             initArmamentCalculator();
+        } else if (currentTitle === "Inscription Tier List") {
+            if (typeof initTierListTool === 'function') initTierListTool();
         }
     };
 
@@ -430,6 +434,207 @@ document.addEventListener('DOMContentLoaded', () => {
         updateArmamentPairingSelector('cavalry');
         updateSaveScoreSection();
         isArmamentCalculatorInitialized = true;
+    }
+
+    const tierListTroopSelector = document.getElementById('tierlist-troop-selector');
+    const tierListPairingSelector = document.getElementById('tierlist-pairing-selector');
+    const tierListSlotSelector = document.getElementById('tierlist-slot-selector');
+    const tierListControls = document.getElementById('tierlist-controls');
+    const tierListDisplay = document.getElementById('tierlist-display');
+    const tierListPlaceholder = document.getElementById('tierlist-placeholder');
+    
+    const TIER_CONFIG = {
+        "S+": { color: "#FF9F43", bg: "rgba(255, 159, 67, 0.15)", border: "#FF9F43" },
+        "S":  { color: "#FDCB6E", bg: "rgba(253, 203, 110, 0.15)", border: "#FDCB6E" },
+        "A":  { color: "#48dbfb", bg: "rgba(148, 255, 126, 0.15)", border: "#48dbfb" },
+        "B":  { color: "#ff9ff3", bg: "rgba(255, 159, 243, 0.15)", border: "#ff9ff3" },
+        "C":  { color: "#ff6b6b", bg: "rgba(255, 107, 107, 0.15)", border: "#ff6b6b" }
+    };
+
+    const TIER_LIST_PAIRINGS = {
+        cavalry: [
+            "Arthur Pendragon / Achilles",
+            "Arthur Pendragon / Philip II",
+            "Gang Gamchan / Achilles",
+            "Huo Qubing / Arthur Pendragon",
+            "Huo Qubing / Joan of Arc Prime"
+        ],
+        infantry: [
+            "Bai Qi / Liu Che",
+            "Bai Qi / William Wallace",
+            "Liu Che / Philip II",
+            "Ragnar Lodbrok Prime / Scipio Africanus Prime"
+
+        ],
+        archer: [
+            "Qin Shi Huang / Yi Seong-Gye",
+            "Qin Shi Huang / Zhuge Liang",
+            "Shajar al-Durr / Ashurbanipal",
+            "Zhuge Liang / Hermann Prime",
+            "Zhuge Liang / Philip II"
+
+        ]
+    };
+
+    let tierState = {
+        troop: 'cavalry',
+        pairing: null,
+        slot: 'Scroll'
+    };
+
+    function initTierListTool() {
+        if (!tierListTroopSelector) return;
+
+        tierListTroopSelector.addEventListener('click', e => {
+            const button = e.target.closest('.selector-btn');
+            if (button) {
+                tierListTroopSelector.querySelector('.active').classList.remove('active');
+                button.classList.add('active');
+                tierState.troop = button.dataset.type;
+                updateTierListPairings(tierState.troop);
+            }
+        });
+
+        tierListPairingSelector.addEventListener('click', e => {
+            const item = e.target.closest('.pairing-item');
+            if (item) {
+                const currentActive = tierListPairingSelector.querySelector('.active');
+                if (currentActive) currentActive.classList.remove('active');
+                item.classList.add('active');
+                tierState.pairing = item.dataset.pairing;
+                tierListPlaceholder.style.display = 'none';
+                tierListControls.style.display = 'block';
+                tierListDisplay.style.display = 'flex';
+                tierListDisplay.style.flexDirection = 'column';
+                tierListDisplay.style.gap = '10px';
+                
+                renderTierList();
+            }
+        });
+
+        tierListSlotSelector.addEventListener('click', e => {
+            const button = e.target.closest('.selector-btn');
+            if (button) {
+                tierListSlotSelector.querySelector('.active').classList.remove('active');
+                button.classList.add('active');
+                tierState.slot = button.dataset.slot;
+                renderTierList();
+            }
+        });
+
+        updateTierListPairings('cavalry');
+    }
+
+    function updateTierListPairings(troopType) {
+        if (!tierListPairingSelector) return;
+        
+        tierListPairingSelector.classList.add('fade-out');
+        
+        setTimeout(() => {
+            tierListPairingSelector.innerHTML = '';
+            tierState.pairing = null;
+            tierListControls.style.display = 'none';
+            tierListDisplay.style.display = 'none';
+            tierListDisplay.innerHTML = '';
+            tierListPlaceholder.style.display = 'flex';
+            
+            const pairings = TIER_LIST_PAIRINGS[troopType] || [];
+            
+            if (pairings.length === 0) {
+                 tierListPairingSelector.innerHTML = '<p class="inscription-placeholder">No pairings available for this troop type in the Tier List.</p>';
+            }
+
+            pairings.forEach((pairing, index) => {
+                const [primary, secondary] = pairing.split(' / ');
+                let primName = primary;
+
+                const primaryFilename = `${primName.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
+                const secondaryFilename = `${secondary.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
+                
+                let primaryImg = getImagePath(primaryFilename);
+                let secondaryImg = getImagePath(secondaryFilename);
+
+                const div = document.createElement('div');
+                div.className = 'pairing-item';
+                div.dataset.pairing = pairing;
+                
+                div.innerHTML = `
+                    <div class="pairing-images">
+                        <img src="${primaryImg}" alt="${primary}" class="commander-icon" loading="lazy">
+                        <img src="${secondaryImg}" alt="${secondary}" class="commander-icon secondary" loading="lazy">
+                    </div>
+                    <span>${pairing}</span>
+                `;
+                tierListPairingSelector.appendChild(div);
+            });
+
+            tierListPairingSelector.classList.remove('fade-out');
+            
+            tierState.pairing = null;
+            tierListContentArea.style.display = 'none';
+            tierListPlaceholder.style.display = 'flex';
+        }, 150);
+    }
+
+    function renderTierList() {
+        if (!tierListDisplay || !tierState.pairing || !window.inscriptionTierList) return;
+
+        const data = window.inscriptionTierList[tierState.pairing];
+        
+        if (!data) {
+            tierListDisplay.innerHTML = `<p class="inscription-placeholder">No tier data found for this pairing.</p>`;
+            return;
+        }
+
+        const slotData = data[tierState.slot];
+        if (!slotData) {
+            tierListDisplay.innerHTML = `<p class="inscription-placeholder">No data for ${tierState.slot}.</p>`;
+            return;
+        }
+
+        tierListDisplay.classList.add('fade-out');
+
+        setTimeout(() => {
+            let html = '';
+            const tiers = ["S+", "S", "A", "B", "C"];
+
+            tiers.forEach(tier => {
+                const inscriptions = slotData[tier] || [];
+                if (inscriptions.length === 0) return;
+
+                const style = TIER_CONFIG[tier];
+                
+                const badges = inscriptions.map(name => {
+                    let className = "inscription-tag";
+                    if (SPECIAL_INSCRIPTIONS.includes(name)) className += " special";
+                    else if (RARE_INSCRIPTIONS.includes(name)) className += " rare";
+
+                    return `<div class="${className}" style="cursor: default; margin: 0;">${name.replace(/_/g, ' ')}</div>`;
+                }).join('');
+
+                html += `
+                    <div class="tier-row" style="background: ${style.bg}; border-color: ${style.border};">
+                        <div class="tier-label" style="background: ${style.border};">
+                            ${tier}
+                        </div>
+                        <div class="tier-content">
+                            ${badges}
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (html === '') {
+                html = '<p class="inscription-placeholder">No rated inscriptions for this slot.</p>';
+            }
+
+            tierListDisplay.innerHTML = html;
+            tierListDisplay.classList.remove('fade-out');
+        }, 100);
+    }
+
+    if (document.querySelector('.carousel-slide[data-title="Inscription Tier List"]')) {
+        initTierListTool();
     }
 
     function switchArmamentView(tabName) {
