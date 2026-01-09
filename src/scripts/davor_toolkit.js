@@ -444,11 +444,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const tierListPlaceholder = document.getElementById('tierlist-placeholder');
     
     const TIER_CONFIG = {
-        "S+": { color: "#FF9F43", bg: "rgba(255, 159, 67, 0.15)", border: "#FF9F43" },
-        "S":  { color: "#FDCB6E", bg: "rgba(253, 203, 110, 0.15)", border: "#FDCB6E" },
-        "A":  { color: "#48dbfb", bg: "rgba(148, 255, 126, 0.15)", border: "#48dbfb" },
-        "B":  { color: "#ff9ff3", bg: "rgba(255, 159, 243, 0.15)", border: "#ff9ff3" },
-        "C":  { color: "#ff6b6b", bg: "rgba(255, 107, 107, 0.15)", border: "#ff6b6b" }
+        "S+": { color: "#eaa965", bg: "rgba(234, 169, 101, 0.15)", border: "#eaa965" },
+        "S":  { color: "#ffd956", bg: "rgba(255, 217, 86, 0.15)", border: "#ffd956" },
+        "A":  { color: "#b6d7a8", bg: "rgba(182, 215, 168, 0.15)", border: "#b6d7a8" },
+        "B":  { color: "#ea9999", bg: "rgba(234, 153, 153, 0.15)", border: "#ea9999" },
+        "C":  { color: "#ff0000", bg: "rgba(255, 0, 0, 0.15)", border: "#ff0000" }
     };
 
     const TIER_LIST_PAIRINGS = {
