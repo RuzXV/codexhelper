@@ -21,6 +21,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainTitle = document.getElementById('calculator-main-title');
     const mainDescription = document.getElementById('calculator-main-description');
 
+    const SLIDE_SLUGS = [
+        'action-points',
+        'skill-upgrades',
+        'commander-exp',
+        'vip-level',
+        'buildings',
+        'passports',
+        'hall-of-heroes'
+    ];
+
+    let currentIndex = 0;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentTool = urlParams.get('tool');
+    if (currentTool) {
+        const slugIndex = SLIDE_SLUGS.indexOf(currentTool);
+        if (slugIndex !== -1) {
+            currentIndex = slugIndex;
+        }
+    }
+
     const calendarIconLabel = document.querySelector('.calendar-icon-label');
     const migrationDateInputJs = document.getElementById('migration-date');
 
@@ -86,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return hasInput ? state : null;
     };
 
-    let currentIndex = 0;
     let hohReturnedPower = 0;
 
     const CALCULATORS_CACHE_KEY = 'generalCalculatorsState';
@@ -135,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const moveToSlide = (targetIndex, animate = true) => {
+    const moveToSlide = (targetIndex, animate = true, updateUrl = true) => {
         if (!slides.length || !slides[targetIndex]) return;
 
         const containerWidth = container.clientWidth;
@@ -156,6 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
         currentIndex = targetIndex;
         updateUI();
         initializeCalculator(targetIndex);
+
+        if (updateUrl && SLIDE_SLUGS[targetIndex]) {
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('tool', SLIDE_SLUGS[targetIndex]);
+            window.history.pushState({ index: targetIndex }, '', newUrl);
+        }
     };
 
     const updateUI = () => {
@@ -932,6 +958,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const initAndResize = () => {
         moveToSlide(currentIndex, false);
     };
+
+    window.addEventListener('popstate', (event) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentTool = urlParams.get('tool');
+        if (currentTool) {
+            const slugIndex = SLIDE_SLUGS.indexOf(currentTool);
+            if (slugIndex !== -1) {
+                moveToSlide(slugIndex, true, false); 
+            }
+        } else {
+             moveToSlide(0, true, false);
+        }
+    });
 
     window.requestAnimationFrame(() => {
         initAndResize();

@@ -1,9 +1,45 @@
 <script>
+    import { onMount } from 'svelte';
     import TrainingCalculator from './TrainingCalculator.svelte';
     import HealingCalculator from './HealingCalculator.svelte';
     
     export let images = {};
     let activeTool = 'training';
+    let isLoaded = false;
+
+    onMount(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const toolSlug = urlParams.get('tool');
+
+        if (toolSlug === 'healing') {
+            activeTool = 'healing';
+        } else {
+            activeTool = 'training';
+        }
+        
+        setTimeout(() => { isLoaded = true; }, 100);
+
+        window.addEventListener('popstate', () => {
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('tool');
+            
+            if (slug === 'healing') {
+                activeTool = 'healing';
+            } else {
+                activeTool = 'training';
+            }
+        });
+    });
+
+    $: if (isLoaded) {
+        const url = new URL(window.location);
+        const currentSlug = url.searchParams.get('tool');
+
+        if (currentSlug !== activeTool) {
+            url.searchParams.set('tool', activeTool);
+            window.history.pushState({ tool: activeTool }, '', url);
+        }
+    }
 </script>
 
 <div class="speedups-hub">

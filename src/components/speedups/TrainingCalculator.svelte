@@ -31,7 +31,7 @@
         }
     };
 
-    let activeTab = 'troops';
+    export let activeTab = 'troops';
     let trainingSpeed = '';
 
     let sliderThumb1 = 0;

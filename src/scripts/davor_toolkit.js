@@ -26,9 +26,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickNav = document.getElementById('quick-access-nav');
     const mainTitle = document.getElementById('calculator-main-title');
     const mainDescription = document.getElementById('calculator-main-description');
+    
+    const SLIDE_SLUGS = [
+        'stats-weighting',
+        'score-my-armaments',
+        'inscription-tier-list'
+    ];
+
     let currentIndex = 0;
 
-    const moveToSlide = (targetIndex) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialTool = urlParams.get('tool');
+    if (initialTool) {
+        const slugIndex = SLIDE_SLUGS.indexOf(initialTool);
+        if (slugIndex !== -1) {
+            currentIndex = slugIndex;
+        }
+    }
+
+    const moveToSlide = (targetIndex, updateUrl = true) => {
         if (!slides.length || !slides[targetIndex]) return;
         
         slides.forEach((slide, index) => {
@@ -36,6 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         currentIndex = targetIndex;
         updateCarouselUI();
+        
+        if (updateUrl && SLIDE_SLUGS[targetIndex]) {
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('tool', SLIDE_SLUGS[targetIndex]);
+            window.history.pushState({ index: targetIndex }, '', newUrl);
+        }
         
         const currentTitle = slides[currentIndex].dataset.title;
         if(currentTitle === "Score my Armaments") {
@@ -444,11 +466,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const tierListPlaceholder = document.getElementById('tierlist-placeholder');
     
     const TIER_CONFIG = {
-        "S+": { color: "#eaa965", bg: "rgba(234, 169, 101, 0.15)", border: "#eaa965" },
-        "S":  { color: "#ffd956", bg: "rgba(255, 217, 86, 0.15)", border: "#ffd956" },
-        "A":  { color: "#b6d7a8", bg: "rgba(182, 215, 168, 0.15)", border: "#b6d7a8" },
-        "B":  { color: "#ea9999", bg: "rgba(234, 153, 153, 0.15)", border: "#ea9999" },
-        "C":  { color: "#ff0000", bg: "rgba(255, 0, 0, 0.15)", border: "#ff0000" }
+        "S+": { color: "#ff8a8a", bg: "rgba(255, 138, 138, 0.15)", border: "#ff8a8a" },
+        "S":  { color: "#ffc078", bg: "rgba(255, 192, 120, 0.15)", border: "#ffc078" },
+        "A":  { color: "#f7d794", bg: "rgba(247, 215, 148, 0.15)", border: "#f7d794" },
+        "B":  { color: "#88d8b0", bg: "rgba(136, 216, 176, 0.15)", border: "#88d8b0" },
+        "C":  { color: "#89c2d9", bg: "rgba(137, 194, 217, 0.15)", border: "#89c2d9" }
     };
 
     const TIER_LIST_PAIRINGS = {
@@ -1146,8 +1168,19 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeTimer = setTimeout(initAndResize, 100);
     });
 
+    window.addEventListener('popstate', (event) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const toolSlug = urlParams.get('tool');
+        const slugIndex = SLIDE_SLUGS.indexOf(toolSlug);
+        
+        const targetIndex = (slugIndex !== -1) ? slugIndex : 0;
+        
+        moveToSlide(targetIndex, false);
+    });
+
     initAndResize();
-    moveToSlide(0);
+    moveToSlide(currentIndex, false); 
+    
     if(document.querySelector('.carousel-slide[data-title="Stats Weighting"]')) {
         updateWeightingUI();
     }
