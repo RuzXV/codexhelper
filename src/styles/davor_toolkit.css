@@ -474,6 +474,33 @@
     overflow-y: auto;
 }
 
+#inscription-tooltip {
+    position: fixed;
+    display: none;
+    background: rgba(15, 17, 20, 0.98);
+    border: 1px solid var(--accent-blue);
+    padding: 12px;
+    border-radius: 6px;
+    z-index: 9999;
+    pointer-events: none;
+    max-width: 300px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-align: left;
+    backdrop-filter: blur(4px);
+}
+
+#inscription-tooltip strong {
+    display: block;
+    color: var(--accent-blue-bright);
+    margin-bottom: 4px;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 4px;
+}
+
 @media (max-width: 768px) {
     .carousel-slide { padding: 0 var(--spacing-8); }
     .carousel-arrow { font-size: 2rem; }

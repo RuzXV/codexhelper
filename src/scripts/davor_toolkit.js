@@ -44,6 +44,95 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const tooltip = document.getElementById('inscription-tooltip');
+    
+    function getInscriptionName(target) {
+        const text = target.textContent.trim();
+        if (window.inscriptionDescriptions && window.inscriptionDescriptions[text]) {
+            return text;
+        }
+        const parent = target.closest('.inscription-btn, .tier-item, button'); 
+        if (parent) {
+            const parentText = parent.textContent.trim();
+            if (window.inscriptionDescriptions && window.inscriptionDescriptions[parentText]) {
+                return parentText;
+            }
+        }
+        return null;
+    }
+
+    document.addEventListener('mouseover', (e) => {
+        const name = getInscriptionName(e.target);
+        if (name) {
+            let description = window.inscriptionDescriptions[name];
+
+            if (description) {
+                description = description.replace(
+                    /(Cooldown:.*)/i, 
+                    '<div style="margin-top: 8px; color: #ff8787;">$1</div>'
+                );
+            }
+
+            tooltip.innerHTML = `<strong>${name}</strong>${description}`;
+            tooltip.style.display = 'block';
+
+            const tag = e.target.closest('.inscription-tag');
+            const tierRow = e.target.closest('.tier-row');
+            
+            let activeColor = '#D1D5DB'; 
+            let titleColor = '#F3F4F6'; 
+
+            if (tierRow) {
+                activeColor = tierRow.style.borderColor || activeColor;
+                titleColor = activeColor;
+            } else if (tag) {
+                if (tag.classList.contains('special')) {
+                    activeColor = '#fdd451';
+                    titleColor = '#fdd451';
+                } else if (tag.classList.contains('rare')) {
+                    activeColor = '#60a5fa';
+                    titleColor = '#60a5fa';
+                }
+            }
+
+            tooltip.style.borderColor = activeColor;
+            tooltip.style.boxShadow = `0 4px 20px ${activeColor === '#D1D5DB' ? 'rgba(0,0,0,0.5)' : activeColor + '40'}`;
+            
+            const strongTag = tooltip.querySelector('strong');
+            if (strongTag) {
+                strongTag.style.color = titleColor;
+                strongTag.style.borderBottomColor = activeColor;
+            }
+        }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (tooltip.style.display === 'block') {
+            const xOffset = 15;
+            const yOffset = 15;
+            
+            let left = e.clientX + xOffset;
+            let top = e.clientY + yOffset;
+            
+            if (left + tooltip.offsetWidth > window.innerWidth) {
+                left = e.clientX - tooltip.offsetWidth - xOffset;
+            }
+            if (top + tooltip.offsetHeight > window.innerHeight) {
+                top = e.clientY - tooltip.offsetHeight - yOffset;
+            }
+
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+        }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+        const name = getInscriptionName(e.target);
+        if (name) {
+             tooltip.style.display = 'none';
+        }
+    });
+
     const moveToSlide = (targetIndex, updateUrl = true) => {
         if (!slides.length || !slides[targetIndex]) return;
         

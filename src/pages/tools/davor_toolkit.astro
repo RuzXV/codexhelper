@@ -9,6 +9,7 @@ import scorePairings from '../../data/score_pairings.json';
 import inscriptionsData from '../../data/inscriptions.json';
 import inscriptionStats from '../../data/inscription_stats.json';
 import inscriptionTierList from '../../data/inscription_tierlist.json';
+import inscriptionDescriptions from '../../data/inscription_descriptions.json';
 
 import cavalryIcon from '../../assets/images/materials/troop_icons/cavalry_icon_mini.webp';
 import infantryIcon from '../../assets/images/materials/troop_icons/infantry_icon_mini.webp';
@@ -287,7 +288,9 @@ const davorIconHeight = davorIcon.height;
         </section>
     </main>
 
-    <script define:vars={{ imagePaths: imagePathMap, equipmentData, inscriptionsData, inscriptionStats, davorIconPath, davorIconWidth, davorIconHeight, weightingData, scorePairings, inscriptionTierList }}>
+    <div id="inscription-tooltip"></div>
+
+    <script define:vars={{ imagePaths: imagePathMap, equipmentData, inscriptionsData, inscriptionStats, davorIconPath, davorIconWidth, davorIconHeight, weightingData, scorePairings, inscriptionTierList, inscriptionDescriptions }}>
         window.DAVOR_IMAGE_PATHS = imagePaths;
         window.equipmentData = equipmentData;
         window.inscriptionsData = inscriptionsData;
@@ -298,6 +301,7 @@ const davorIconHeight = davorIcon.height;
         window.weightingData = weightingData;
         window.scorePairings = scorePairings;
         window.inscriptionTierList = inscriptionTierList;
+        window.inscriptionDescriptions = inscriptionDescriptions;
     </script>
     <script>
         import "../../scripts/utils.js";
