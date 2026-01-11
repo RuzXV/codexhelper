@@ -82,10 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let activeColor = '#D1D5DB'; 
             let titleColor = '#F3F4F6'; 
 
-            if (tierRow) {
-                activeColor = tierRow.style.borderColor || activeColor;
-                titleColor = activeColor;
-            } else if (tag) {
+            if (tag) {
                 if (tag.classList.contains('special')) {
                     activeColor = '#fdd451';
                     titleColor = '#fdd451';
@@ -93,6 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeColor = '#60a5fa';
                     titleColor = '#60a5fa';
                 }
+            } else if (tierRow) {
+                activeColor = tierRow.style.borderColor || activeColor;
+                titleColor = activeColor;
             }
 
             tooltip.style.borderColor = activeColor;
