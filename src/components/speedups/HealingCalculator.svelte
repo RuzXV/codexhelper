@@ -85,7 +85,7 @@
             const resTable = RESOURCES[tier];
 
             Object.entries(counts[tier]).forEach(([type, val]) => {
-                const count = parseInt(val.replace(/,/g, '') || '0');
+                const count = parseInt(val.replace(/\D/g, '') || '0'); 
                 if (count > 0) {
                     hasInput = true;
                     unitSum += count;
