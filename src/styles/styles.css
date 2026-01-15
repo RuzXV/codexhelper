@@ -548,6 +548,12 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
     .faq-hero h1 { font-size: var(--font-size-3xl); }
     .faq-content { padding: var(--spacing-12) var(--spacing-4); }
     ::-webkit-scrollbar { width: 0px; background: transparent; }
+    .feature-showcase-item .feature-image,
+    .feature-showcase-item.reverse .feature-image {
+        order: 2;
+        padding: 40px var(--spacing-4);
+        overflow: visible;
+    }
 }
 
 @media (max-width: 480px) {
