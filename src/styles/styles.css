@@ -501,11 +501,6 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
         padding: var(--spacing-1);
         line-height: 1.2;
     }
-    .feature-image-container::before {
-        inset: -4px;
-        filter: blur(8px);
-        opacity: 0.5;
-    }
     .patreon-btn { background: transparent; border: none; }
     .patreon-btn .patreon-logo { height: 28px; width: auto; }
     .hero { padding: 80px var(--spacing-3) var(--spacing-12); min-height: 80vh; }
@@ -665,6 +660,9 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
     .server-logo { width: 35px; height: 35px; margin-right: 10px; }
     .sub-nav-container::-webkit-scrollbar {
         display: none;
+    }
+    .feature-image-container::before {
+        display: none !important;
     }
 }
 
