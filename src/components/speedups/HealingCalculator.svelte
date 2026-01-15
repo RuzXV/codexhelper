@@ -336,8 +336,7 @@
                 <div class="healing-time-display">
                     <div class="time-row main">
                         <img src={images['healing_speedup.webp']} alt="Clock" on:error={(e) => e.target.src = images['training_speedup.webp']}/>
-                        <span class="label">Total:</span>
-                        <strong style="color: var(--accent-blue-bright);">{finalTimeStr}</strong>
+                        <span>Total: <strong style="color: var(--accent-blue-bright);">{finalTimeStr}</strong></span>
                     </div>
                 </div>
 
@@ -384,7 +383,7 @@
         margin-bottom: 10px;
     }
     .time-row { display: flex; align-items: center; gap: 8px; }
-    .time-row.main { font-size: 1.3rem; margin-bottom: 4px; }
+    .time-row.main { font-size: 1.2rem; margin-bottom: 5px; }
     .time-row.main img { height: 32px; }
 
     .result-divider { width: 100%; height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0; }
