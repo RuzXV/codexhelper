@@ -27,7 +27,7 @@
       "cavalry": [
           "Alexander Nevsky / Joan of Arc Prime", "Arthur Pendragon / Achilles", "Arthur Pendragon / Hector", "Arthur Pendragon / Philip II", "Arthur Pendragon / William I", "Attila / Philip II", "Huo Qubing / Arthur Pendragon", "Huo Qubing / Belisarius Prime", "Huo Qubing / Joan of Arc Prime", "Joan of Arc Prime / Arthur Pendragon", "Arthur Pendragon / Gang Gamchan", "Achilles / Gang Gamchan"
       ],
-      "infantry": ["Bai Qi / Liu Che", "Bai Qi / William Wallace", "Liu Che / Alexander the Great", "Liu Che / Philip II", "Ragnar Lodbrok Prime / Scipio Africanus Prime"],
+      "infantry": ["Bai Qi / Liu Che", "Bai Qi / William Wallace", "Liu Che / Alexander the Great", "Liu Che / Philip II", "Ragnar Lodbrok Prime / Scipio Africanus Prime", "Sun Tzu Prime / Bai Qi", "Sun Tzu Prime / Liu Che" ],
       "archer": [
           "Ashurbanipal / Hermann Prime", "Qin Shi Huang / Yi Seong-Gye", "Qin Shi Huang / Zhuge Liang", "Shajar al-Durr / Yi Seong-Gye", "Zhuge Liang / Hermann Prime", "Zhuge Liang / Philip II"
       ],
@@ -123,6 +123,18 @@
           "Infantry Set 2": { "allDamage": 1, "health": 2.1, "defense": 3.1, "attack": 2.8 },
           "Infantry Set 3": { "allDamage": 1, "health": 2.1, "defense": 3.1, "attack": 2.85 },
           "Infantry Set 4": { "allDamage": 1, "health": 2.1, "defense": 2.9, "attack": 3.1 }
+      },
+      "Sun Tzu Prime / Liu Che": {
+          "Infantry Set 1": { "allDamage": 1, "health": 2.35, "defense": 2.95, "attack": 2.6 },
+          "Infantry Set 2": { "allDamage": 1, "health": 2.15, "defense": 3.05, "attack": 2.6 },
+          "Infantry Set 3": { "allDamage": 1, "health": 2.15, "defense": 3.1, "attack": 2.85 },
+          "Infantry Set 4": { "allDamage": 1, "health": 2.15, "defense": 2.8, "attack": 2.95 }
+      },
+      "Sun Tzu Prime / Bai Qi": {
+          "Infantry Set 1": { "allDamage": 1, "health": 2.45, "defense": 2.75, "attack": 2.8 },
+          "Infantry Set 2": { "allDamage": 1, "health": 2.25, "defense": 2.9, "attack": 2.8 },
+          "Infantry Set 3": { "allDamage": 1, "health": 2.25, "defense": 2.9, "attack": 3 },
+          "Infantry Set 4": { "allDamage": 1, "health": 2.25, "defense": 2.7, "attack": 3.23 }
       },
       "Qin Shi Huang / Zhuge Liang": {
           "Archer Set 1": { "allDamage": 1, "health": 2.1, "defense": 2.25, "attack": 2.05 },

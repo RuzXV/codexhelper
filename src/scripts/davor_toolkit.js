@@ -682,7 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tierListPairingSelector.classList.remove('fade-out');
             
             tierState.pairing = null;
-            tierListContentArea.style.display = 'none';
+            tierListControls.style.display = 'none';
             tierListPlaceholder.style.display = 'flex';
         }, 150);
     }
