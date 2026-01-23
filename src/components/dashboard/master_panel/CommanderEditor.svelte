@@ -429,7 +429,6 @@
 
         commitCurrentState();
         saveState = 'saving';
-        
         dispatch('save', { 
             commanderId, 
             data: commanderData,
@@ -437,10 +436,14 @@
             callback: (success) => {
                 if (success) {
                     saveState = 'success';
+                    
                     initialJSON = currentSnapshot; 
+                    originalCommanderDataJSON = JSON.stringify(commanderData); 
+
                     setTimeout(() => {
                         saveState = 'idle';
                     }, 2000);
+            
                 } else {
                     saveState = 'idle';
                     alert("Save failed. Please check console.");
