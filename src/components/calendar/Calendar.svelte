@@ -481,7 +481,6 @@
 
 <section class="tool-hero">
     <div class="tool-hero-container">
-        <div class="section-badge">Community Tools</div>
         <h1>Event Calendar</h1>
     </div>
 </section>

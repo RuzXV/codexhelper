@@ -192,8 +192,6 @@ body.home .navbar { position: fixed; }
 
 .features-header { text-align: center; margin-bottom: var(--spacing-16); }
 
-.section-badge { display: inline-block; background: var(--accent-blue-light); color: var(--accent-blue); padding: var(--spacing-2) var(--spacing-4); border-radius: var(--radius-lg); font-size: var(--font-size-sm); font-weight: 500; margin-bottom: var(--spacing-6); }
-
 .features-header h2 { font-size: var(--font-size-3xl); font-weight: 700; line-height: 1.2; max-width: 950px; margin: 0 auto; color: var(--text-primary); padding: 0 var(--spacing-4); }
 
 .features-showcase { display: flex; flex-direction: column; gap: var(--spacing-24); }
