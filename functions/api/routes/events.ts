@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
 import { Bindings, Variables } from '../_types';
 import { authMiddleware } from '../_middleware';
-import { CALENDAR_ADMIN_IDS, EVENT_COLOR_MAP, TROOP_CYCLE } from '../_constants';
+import { parseAdminIds, EVENT_COLOR_MAP, TROOP_CYCLE } from '../_constants';
 import { GoogleCalendarService, addDays } from '../services/googleCalendar';
+import { CreateEventSchema, ShiftEventsSchema, UpdateEventSchema, validateBody } from '../_validation';
 
 const events = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
@@ -24,19 +25,22 @@ events.get('/', async (c) => {
 });
 
 events.post('/', authMiddleware, async (c) => {
-    const user = c.get('user'); 
+    const user = c.get('user');
+    const calendarAdminIds = parseAdminIds(c.env.CALENDAR_ADMIN_IDS);
 
-    if (!CALENDAR_ADMIN_IDS.includes(user.id)) {
+    if (!calendarAdminIds.includes(user.id)) {
         return c.json({ error: 'Unauthorized' }, 403);
     }
 
     try {
         const body = await c.req.json();
-        const { title, type, troop_type, start, duration, repeat_count, repeat_interval } = body;
+        const validation = validateBody(CreateEventSchema, body);
 
-        if (!title || !start || !duration) {
-            return c.json({ error: 'Missing required fields' }, 400);
+        if (!validation.success) {
+            return c.json({ error: validation.error }, 400);
         }
+
+        const { title, type, troop_type, start, duration, repeat_count, repeat_interval } = validation.data;
 
         const seriesId = crypto.randomUUID();
         const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
@@ -100,11 +104,18 @@ events.post('/', authMiddleware, async (c) => {
 
 events.post('/shift', authMiddleware, async (c) => {
     const user = c.get('user');
-    if (!CALENDAR_ADMIN_IDS.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
+    const calendarAdminIds = parseAdminIds(c.env.CALENDAR_ADMIN_IDS);
+    if (!calendarAdminIds.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
 
     try {
-        const { series_id, shift_days } = await c.req.json();
-        if (!series_id || !shift_days) return c.json({ error: 'Missing series_id or shift_days' }, 400);
+        const body = await c.req.json();
+        const validation = validateBody(ShiftEventsSchema, body);
+
+        if (!validation.success) {
+            return c.json({ error: validation.error }, 400);
+        }
+
+        const { series_id, shift_days } = validation.data;
 
         const { results } = await c.env.DB.prepare(
             'SELECT id, start_date, duration FROM events WHERE series_id = ?'
@@ -135,8 +146,9 @@ events.post('/shift', authMiddleware, async (c) => {
 events.delete('/:id', authMiddleware, async (c) => {
     const user = c.get('user');
     const { id } = c.req.param();
+    const calendarAdminIds = parseAdminIds(c.env.CALENDAR_ADMIN_IDS);
 
-    if (!CALENDAR_ADMIN_IDS.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!calendarAdminIds.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
 
     try {
         const { success } = await c.env.DB.prepare(
@@ -158,12 +170,19 @@ events.delete('/:id', authMiddleware, async (c) => {
 events.patch('/:id', authMiddleware, async (c) => {
     const user = c.get('user');
     const { id } = c.req.param();
-    if (!CALENDAR_ADMIN_IDS.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
+    const calendarAdminIds = parseAdminIds(c.env.CALENDAR_ADMIN_IDS);
+    if (!calendarAdminIds.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
 
     try {
         const body = await c.req.json();
-        const { start_date, title, type, duration } = body;
-        
+        const validation = validateBody(UpdateEventSchema, body);
+
+        if (!validation.success) {
+            return c.json({ error: validation.error }, 400);
+        }
+
+        const { start_date, title, type, duration } = validation.data;
+
         const { success } = await c.env.DB.prepare(
             `UPDATE events SET start_date = ?, title = ?, type = ?, duration = ? WHERE id = ?`
         ).bind(start_date, title, type, duration, id).run();

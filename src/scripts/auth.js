@@ -1,6 +1,6 @@
 (function() {
     const API_BASE_URL = '';
-    const WEBSITE_APP_ID = '1434105087722258573';
+    const WEBSITE_APP_ID = import.meta.env.PUBLIC_DISCORD_APP_ID || '1434105087722258573';
     const REDIRECT_URI = `${window.location.origin}/api/auth/callback`;
     const CACHE_KEY = 'codex-auth-user';
     const CACHE_DURATION_MS = 5 * 60 * 1000;

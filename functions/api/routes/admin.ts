@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { Bindings, Variables, OnlineUser } from '../_types';
 import { authMiddleware, masterAdminMiddleware } from '../_middleware';
-import { EVENT_INTERVALS, TROOP_CYCLE, EVENT_COLOR_MAP, MASTER_ADMIN_IDS, MASTER_OVERRIDE_ID } from '../_constants';
+import { EVENT_INTERVALS, TROOP_CYCLE, EVENT_COLOR_MAP, parseAdminIds } from '../_constants';
 import { GoogleCalendarService, addDays } from '../services/googleCalendar';
 
 const admin = new Hono<{ Bindings: Bindings, Variables: Variables }>();
@@ -158,7 +158,8 @@ admin.get('/data/:key', async (c) => {
         if (!sessionToken) return c.json({ error: 'Unauthorized' }, 401);
         
         const session = await c.env.DB.prepare('SELECT user_id FROM user_sessions WHERE session_token = ?').bind(sessionToken).first();
-        if (!session || !MASTER_ADMIN_IDS.includes(session.user_id as string)) {
+        const masterAdminIds = parseAdminIds(c.env.MASTER_ADMIN_IDS);
+        if (!session || !masterAdminIds.includes(session.user_id as string)) {
              return c.json({ error: 'Unauthorized' }, 401);
         }
     }
@@ -326,9 +327,9 @@ admin.get('/admin/backups/:key', async (c) => {
 admin.post('/admin/restore', async (c) => {
     const user = c.get('user');
 
-    if (user.id !== MASTER_OVERRIDE_ID) {
-        return c.json({ 
-            error: 'Forbidden: Only the Master Admin can perform restores.' 
+    if (user.id !== c.env.MASTER_OVERRIDE_ID) {
+        return c.json({
+            error: 'Forbidden: Only the Master Admin can perform restores.'
         }, 403);
     }
 

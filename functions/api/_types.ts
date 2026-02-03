@@ -12,6 +12,9 @@ export type Bindings = {
     BOT_SECRET_KEY: string;
     GOOGLE_SERVICE_ACCOUNT_JSON: string;
     GOOGLE_CALENDAR_ID: string;
+    MASTER_OVERRIDE_ID: string;
+    MASTER_ADMIN_IDS: string;
+    CALENDAR_ADMIN_IDS: string;
 };
 
 export type Variables = {

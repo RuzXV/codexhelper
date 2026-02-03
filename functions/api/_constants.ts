@@ -1,19 +1,6 @@
-export const MASTER_OVERRIDE_ID = '285201373266575361';
-
-export const CALENDAR_ADMIN_IDS = [
-    '285201373266575361', 
-    '1121488445836103820',
-    '593329463245144084',
-    '545152090910228492',
-    '599928471925555226'
-];
-
-export const MASTER_ADMIN_IDS = [
-    '285201373266575361', 
-    '388515288666210313',
-    '1338843598854033448',
-    '1121488445836103820'
-];
+export function parseAdminIds(envValue: string | undefined): string[] {
+    return envValue ? envValue.split(',').map(id => id.trim()).filter(Boolean) : [];
+}
 
 export const TROOP_CYCLE = ["Infantry", "Archer", "Leadership", "Cavalry"];
 

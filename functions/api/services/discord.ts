@@ -1,19 +1,19 @@
 import { Context } from 'hono';
 import { Bindings, Variables } from '../_types';
-import { MASTER_ADMIN_IDS } from '../_constants';
+import { parseAdminIds } from '../_constants';
 
 export async function verifyGuildAdmin(c: Context<{ Bindings: Bindings, Variables: Variables }>, guildId: string): Promise<boolean> {
     const user = c.get('user');
     const response = await fetch(`https://discord.com/api/users/@me/guilds`, {
         headers: { 'Authorization': `Bearer ${user.accessToken}` }
     });
-    
+
     if (!response.ok) return false;
     const guilds = await response.json() as any[];
-    
+
     const targetGuild = guilds.find((g: any) => g.id === guildId);
     if (!targetGuild) return false;
-    
+
     const perms = BigInt(targetGuild.permissions);
     const ADMIN = 0x8n;
     const MANAGE_GUILD = 0x20n;
@@ -22,8 +22,9 @@ export async function verifyGuildAdmin(c: Context<{ Bindings: Bindings, Variable
 
 export async function verifyGuildPatreonAccess(c: Context<{ Bindings: Bindings, Variables: Variables }>, guildId: string): Promise<boolean> {
     const user = c.get('user');
+    const masterAdminIds = parseAdminIds(c.env.MASTER_ADMIN_IDS);
 
-    if (MASTER_ADMIN_IDS.includes(user.id)) return true;
+    if (masterAdminIds.includes(user.id)) return true;
 
     const isDiscordAdmin = await verifyGuildAdmin(c, guildId);
     if (!isDiscordAdmin) return false;

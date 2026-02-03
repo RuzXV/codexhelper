@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { Bindings, Variables } from '../_types';
 import { authMiddleware } from '../_middleware';
-import { MASTER_OVERRIDE_ID, CALENDAR_ADMIN_IDS, MASTER_ADMIN_IDS } from '../_constants';
+import { parseAdminIds } from '../_constants';
 
 const users = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
@@ -29,10 +29,13 @@ users.get('/@me', async (c) => {
     
     const activePatrons: string[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
 
-    const isMasterOverride = user.id === MASTER_OVERRIDE_ID;
+    const calendarAdminIds = parseAdminIds(c.env.CALENDAR_ADMIN_IDS);
+    const masterAdminIds = parseAdminIds(c.env.MASTER_ADMIN_IDS);
+
+    const isMasterOverride = user.id === c.env.MASTER_OVERRIDE_ID;
     const isActivePatron = (activePatrons ? activePatrons.includes(user.id) : false) || isMasterOverride;
-    const isCalendarAdmin = CALENDAR_ADMIN_IDS.includes(user.id) || isMasterOverride;
-    const isMasterAdmin = MASTER_ADMIN_IDS.includes(user.id) || isMasterOverride;
+    const isCalendarAdmin = calendarAdminIds.includes(user.id) || isMasterOverride;
+    const isMasterAdmin = masterAdminIds.includes(user.id) || isMasterOverride;
 
     user.username = userData.username;
     c.set('user', user);
@@ -103,7 +106,7 @@ users.get('/guilds', async (c) => {
         return c.json({ error: 'Internal server error checking guild status' }, 500);
     }
 
-    if (user.id === MASTER_OVERRIDE_ID) {
+    if (user.id === c.env.MASTER_OVERRIDE_ID) {
         const discordGuildMap = new Map(discordGuilds.map(g => [g.id, g]));
         const allBotGuilds = Array.from(activeBotGuildIds);
 

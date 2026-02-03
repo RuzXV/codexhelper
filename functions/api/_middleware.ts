@@ -2,7 +2,7 @@ import { Context, Next } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { decryptFernetToken } from '../crypto';
 import { Bindings, Variables } from './_types';
-import { MASTER_ADMIN_IDS } from './_constants';
+import { parseAdminIds } from './_constants';
 
 export const authMiddleware = async (c: Context<{ Bindings: Bindings, Variables: Variables }>, next: Next) => {
     const sessionToken = getCookie(c, 'session_token');
@@ -44,7 +44,8 @@ export const botAuthMiddleware = async (c: Context<{ Bindings: Bindings }>, next
 
 export const masterAdminMiddleware = async (c: Context<{ Bindings: Bindings, Variables: Variables }>, next: Next) => {
     const user = c.get('user');
-    if (!user || !MASTER_ADMIN_IDS.includes(user.id)) {
+    const masterAdminIds = parseAdminIds(c.env.MASTER_ADMIN_IDS);
+    if (!user || !masterAdminIds.includes(user.id)) {
         return c.json({ error: 'Unauthorized: Master Admin access required' }, 403);
     }
     await next();
