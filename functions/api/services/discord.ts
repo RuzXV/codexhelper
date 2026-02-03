@@ -1,5 +1,5 @@
 import { Context } from 'hono';
-import { Bindings, Variables } from '../_types';
+import { Bindings, Variables, DiscordGuild } from '../_types';
 import { parseAdminIds } from '../_constants';
 
 export async function verifyGuildAdmin(c: Context<{ Bindings: Bindings, Variables: Variables }>, guildId: string): Promise<boolean> {
@@ -9,10 +9,10 @@ export async function verifyGuildAdmin(c: Context<{ Bindings: Bindings, Variable
     });
 
     if (!response.ok) return false;
-    const guilds = await response.json() as any[];
+    const guilds = await response.json() as DiscordGuild[];
 
-    const targetGuild = guilds.find((g: any) => g.id === guildId);
-    if (!targetGuild) return false;
+    const targetGuild = guilds.find((g) => g.id === guildId);
+    if (!targetGuild || !targetGuild.permissions) return false;
 
     const perms = BigInt(targetGuild.permissions);
     const ADMIN = 0x8n;

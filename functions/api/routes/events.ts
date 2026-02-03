@@ -1,9 +1,10 @@
 import { Hono } from 'hono';
-import { Bindings, Variables } from '../_types';
+import { Bindings, Variables, EventRecord } from '../_types';
 import { authMiddleware } from '../_middleware';
 import { parseAdminIds, EVENT_COLOR_MAP, TROOP_CYCLE } from '../_constants';
 import { GoogleCalendarService, addDays } from '../services/googleCalendar';
 import { CreateEventSchema, ShiftEventsSchema, UpdateEventSchema, validateBody } from '../_validation';
+import { errors } from '../_errors';
 
 const events = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
@@ -17,10 +18,9 @@ events.get('/', async (c) => {
         c.header('Pragma', 'no-cache');
         c.header('Expires', '0');
 
-        return c.json(results || []);
+        return c.json((results as EventRecord[]) || []);
     } catch (e) {
-        console.error("Failed to fetch events:", e);
-        return c.json({ error: 'Failed to fetch events' }, 500);
+        return errors.internal(c, e);
     }
 });
 
@@ -29,7 +29,7 @@ events.post('/', authMiddleware, async (c) => {
     const calendarAdminIds = parseAdminIds(c.env.CALENDAR_ADMIN_IDS);
 
     if (!calendarAdminIds.includes(user.id)) {
-        return c.json({ error: 'Unauthorized' }, 403);
+        return errors.forbidden(c, 'Calendar admin access required');
     }
 
     try {
@@ -37,7 +37,7 @@ events.post('/', authMiddleware, async (c) => {
         const validation = validateBody(CreateEventSchema, body);
 
         if (!validation.success) {
-            return c.json({ error: validation.error }, 400);
+            return errors.validation(c, validation.error);
         }
 
         const { title, type, troop_type, start, duration, repeat_count, repeat_interval } = validation.data;
@@ -97,22 +97,21 @@ events.post('/', authMiddleware, async (c) => {
 
         return c.json({ status: 'success', message: `Created ${count} events` }, 201);
     } catch (e) {
-        console.error("Failed to create event:", e);
-        return c.json({ error: 'Internal server error' }, 500);
+        return errors.internal(c, e);
     }
 });
 
 events.post('/shift', authMiddleware, async (c) => {
     const user = c.get('user');
     const calendarAdminIds = parseAdminIds(c.env.CALENDAR_ADMIN_IDS);
-    if (!calendarAdminIds.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!calendarAdminIds.includes(user.id)) return errors.forbidden(c, 'Calendar admin access required');
 
     try {
         const body = await c.req.json();
         const validation = validateBody(ShiftEventsSchema, body);
 
         if (!validation.success) {
-            return c.json({ error: validation.error }, 400);
+            return errors.validation(c, validation.error);
         }
 
         const { series_id, shift_days } = validation.data;
@@ -121,7 +120,7 @@ events.post('/shift', authMiddleware, async (c) => {
             'SELECT id, start_date, duration FROM events WHERE series_id = ?'
         ).bind(series_id).all();
 
-        if (!results || results.length === 0) return c.json({ error: 'No events found' }, 404);
+        if (!results || results.length === 0) return errors.notFound(c, 'Event series');
 
         const modifier = `${shift_days > 0 ? '+' : ''}${shift_days} days`;
         await c.env.DB.prepare(
@@ -129,17 +128,17 @@ events.post('/shift', authMiddleware, async (c) => {
         ).bind(modifier, series_id).run();
 
         const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
-        const gcalPromises = results.map(ev => {
-            const newStartDate = addDays(ev.start_date as string, shift_days);
-            return gcal.patchEventDate(ev.id as string, newStartDate, ev.duration as number);
+        const eventResults = results as Pick<EventRecord, 'id' | 'start_date' | 'duration'>[];
+        const gcalPromises = eventResults.map(ev => {
+            const newStartDate = addDays(ev.start_date, shift_days);
+            return gcal.patchEventDate(ev.id, newStartDate, ev.duration);
         });
 
         c.executionCtx.waitUntil(Promise.all(gcalPromises));
 
         return c.json({ status: 'success', message: 'Events shifted' });
     } catch (e) {
-        console.error("Failed to shift events:", e);
-        return c.json({ error: 'Internal server error' }, 500);
+        return errors.internal(c, e);
     }
 });
 
@@ -148,7 +147,7 @@ events.delete('/:id', authMiddleware, async (c) => {
     const { id } = c.req.param();
     const calendarAdminIds = parseAdminIds(c.env.CALENDAR_ADMIN_IDS);
 
-    if (!calendarAdminIds.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!calendarAdminIds.includes(user.id)) return errors.forbidden(c, 'Calendar admin access required');
 
     try {
         const { success } = await c.env.DB.prepare(
@@ -160,10 +159,10 @@ events.delete('/:id', authMiddleware, async (c) => {
             c.executionCtx.waitUntil(gcal.deleteEvent(id));
             return c.json({ status: 'success' });
         } else {
-            return c.json({ error: 'Event not found' }, 404);
+            return errors.notFound(c, 'Event');
         }
     } catch (e) {
-        return c.json({ error: 'Internal server error' }, 500);
+        return errors.internal(c, e);
     }
 });
 
@@ -171,14 +170,14 @@ events.patch('/:id', authMiddleware, async (c) => {
     const user = c.get('user');
     const { id } = c.req.param();
     const calendarAdminIds = parseAdminIds(c.env.CALENDAR_ADMIN_IDS);
-    if (!calendarAdminIds.includes(user.id)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!calendarAdminIds.includes(user.id)) return errors.forbidden(c, 'Calendar admin access required');
 
     try {
         const body = await c.req.json();
         const validation = validateBody(UpdateEventSchema, body);
 
         if (!validation.success) {
-            return c.json({ error: validation.error }, 400);
+            return errors.validation(c, validation.error);
         }
 
         const { start_date, title, type, duration } = validation.data;
@@ -186,15 +185,15 @@ events.patch('/:id', authMiddleware, async (c) => {
         const { success } = await c.env.DB.prepare(
             `UPDATE events SET start_date = ?, title = ?, type = ?, duration = ? WHERE id = ?`
         ).bind(start_date, title, type, duration, id).run();
-        
+
         if (success) {
              const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
              c.executionCtx.waitUntil(gcal.patchEventDate(id, start_date, duration));
         }
 
-        return success ? c.json({ status: 'success' }) : c.json({ error: 'Event not found' }, 404);
+        return success ? c.json({ status: 'success' }) : errors.notFound(c, 'Event');
     } catch (e) {
-        return c.json({ error: 'Internal server error' }, 500);
+        return errors.internal(c, e);
     }
 });
 

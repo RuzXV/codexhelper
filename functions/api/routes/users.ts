@@ -1,8 +1,13 @@
 import { Hono } from 'hono';
 import { getCookie } from 'hono/cookie';
-import { Bindings, Variables } from '../_types';
+import { Bindings, Variables, DiscordUser, DiscordGuild } from '../_types';
 import { authMiddleware } from '../_middleware';
 import { parseAdminIds } from '../_constants';
+import { errors } from '../_errors';
+
+interface GuildIdRecord {
+    guild_id: string | number;
+}
 
 const users = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
@@ -19,13 +24,13 @@ users.get('/@me', async (c) => {
         const sessionToken = getCookie(c, 'session_token');
         await c.env.DB.prepare('DELETE FROM user_sessions WHERE session_token = ?').bind(sessionToken).run();
         c.header('Set-Cookie', 'session_token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax');
-        return c.json({ error: 'Session expired' }, 401);
+        return errors.unauthorized(c, 'Session expired');
     }
 
     if (!userResponse.ok) {
-        return c.json({ error: 'Failed to fetch fresh user data from Discord.' }, 500);
+        return errors.internal(c, 'Failed to fetch user data from Discord');
     }
-    const userData = await userResponse.json() as { id: string; username: string; [key: string]: any };
+    const userData = await userResponse.json() as DiscordUser;
     
     const activePatrons: string[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
 
@@ -80,30 +85,30 @@ users.get('/guilds', async (c) => {
         const sessionToken = getCookie(c, 'session_token');
         await c.env.DB.prepare('DELETE FROM user_sessions WHERE session_token = ?').bind(sessionToken).run();
         c.header('Set-Cookie', 'session_token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax');
-        return c.json({ error: 'Session expired (Discord token invalid)' }, 401);
+        return errors.unauthorized(c, 'Session expired (Discord token invalid)');
     }
 
     if (!response.ok) {
-        return c.json({ error: 'Failed to fetch guilds from Discord' }, response.status as any);
+        return errors.internal(c, 'Failed to fetch guilds from Discord');
     }
 
-    const discordGuilds = await response.json() as any[];
+    const discordGuilds = await response.json() as DiscordGuild[];
     let activeBotGuildIds = new Set<string>();
 
     try {
         const { results: authResults } = await c.env.BOT_DB.prepare(
             `SELECT guild_id FROM guild_authorizations WHERE is_active = 1`
         ).all();
-        if (authResults) authResults.forEach((r: any) => activeBotGuildIds.add(r.guild_id.toString()));
+        if (authResults) (authResults as GuildIdRecord[]).forEach((r) => activeBotGuildIds.add(r.guild_id.toString()));
 
         const { results: bypassResults } = await c.env.BOT_DB.prepare(
             `SELECT guild_id FROM guild_bypass`
         ).all();
-        if (bypassResults) bypassResults.forEach((r: any) => activeBotGuildIds.add(r.guild_id.toString()));
+        if (bypassResults) (bypassResults as GuildIdRecord[]).forEach((r) => activeBotGuildIds.add(r.guild_id.toString()));
 
     } catch (e) {
         console.error("Database error fetching guilds:", e);
-        return c.json({ error: 'Internal server error checking guild status' }, 500);
+        return errors.internal(c, e);
     }
 
     if (user.id === c.env.MASTER_OVERRIDE_ID) {
@@ -120,10 +125,10 @@ users.get('/guilds', async (c) => {
                     headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` }
                 });
                 if (res.ok) {
-                    const g = await res.json() as any;
+                    const g = await res.json() as DiscordGuild;
                     return { id: g.id, name: g.name, icon: g.icon };
                 }
-            } catch (e) {}
+            } catch { /* Guild fetch failed, use fallback */ }
             return { id: gid, name: `Unknown Server (${gid})`, icon: null };
         });
 
