@@ -27,7 +27,26 @@ for (const path in allMaterialImageModules) {
     keywords="Rise of Kingdoms equipment, ROK equipment calculator, equipment crafting, ROK gear planner, Rise of Kingdoms gear, equipment materials, ROK loadout"
     bodyClass="has-sub-nav"
 >
-    
+    <script type="application/ld+json" slot="head-scripts">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ROK Equipment Calculator",
+        "description": "Plan your Rise of Kingdoms equipment crafting and compare different loadouts",
+        "url": "https://codexhelper.com/tools/equipment/",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "Codex Helper"
+        }
+    }
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image-more/2.9.5/dom-to-image-more.min.js" slot="head-scripts"></script>
 
     <script define:vars={{ equipmentData, equipmentSetData, iconicData, imagePaths: imagePathMap }}>

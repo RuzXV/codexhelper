@@ -35,8 +35,33 @@ const processedTemplatesData = templatesData.map(template => {
     return template;
 });
 ---
-<Layout title="Alliance Mail Generator" bodyClass="has-sub-nav">
-    
+<Layout
+    title="Alliance Mail Generator"
+    description="Create formatted in-game alliance mails for Rise of Kingdoms. Use templates, custom colors, gradients, and styling to make professional looking mails."
+    keywords="Rise of Kingdoms mail, ROK alliance mail, mail generator, ROK mail template, alliance mail formatter, Rise of Kingdoms tools"
+    bodyClass="has-sub-nav"
+>
+    <script type="application/ld+json" slot="head-scripts">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ROK Alliance Mail Generator",
+        "description": "Create formatted in-game alliance mails for Rise of Kingdoms with templates and styling",
+        "url": "https://codexhelper.com/tools/mail/",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "Codex Helper"
+        }
+    }
+    </script>
+
     <script define:vars={{ templatesData: processedTemplatesData }}>
         window.templatesData = templatesData;
     </script>
