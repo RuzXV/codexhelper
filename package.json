@@ -11,6 +11,7 @@
     "local": "concurrently \"npm run dev\" \"npx wrangler pages dev --proxy 4321\" --kill-others --names \"ASTRO,WRANGLER\""
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.0",
     "@astrojs/svelte": "^7.2.2",
     "astro": "^5.15.3",
     "hono": "^4.2.8",

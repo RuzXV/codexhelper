@@ -12,30 +12,52 @@ import favicon16 from '../assets/images/favicon/favicon-16x16.png';
 import toolBgImage from '../assets/images/global/tool_bg.webp';
 import { ViewTransitions } from 'astro:transitions';
 
-const { 
-    title, 
-    description = "ROK information done right. Enhance your Rise of Kingdoms experience on Discord today.", 
-    bodyClass = "" 
+const {
+    title,
+    description = "ROK information done right. Enhance your Rise of Kingdoms experience on Discord today.",
+    bodyClass = "",
+    keywords = "Rise of Kingdoms, ROK, calculator, tools, speedup calculator, troop calculator, RoK helper, Rise of Kingdoms guide"
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
-
 const isToolPage = currentPath.startsWith('/tools');
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const fullTitle = `${title} - Codex Helper | Rise of Kingdoms Tools`;
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>{title} - Codex Helper</title>
-    <meta name="description" content={description}>
 
-    <meta property="og:title" content={`${title} - Codex Helper`}>
-    <meta property="og:description" content={description}>
-    <meta property="og:image" content={new URL(metaImage.src, Astro.url)}>
-    <meta property="og:url" content={Astro.url.href}>
+    <!-- Primary Meta Tags -->
+    <title>{fullTitle}</title>
+    <meta name="title" content={fullTitle}>
+    <meta name="description" content={description}>
+    <meta name="keywords" content={keywords}>
+    <meta name="author" content="Codex Helper">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href={canonicalURL}>
+
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
+    <meta property="og:url" content={canonicalURL}>
+    <meta property="og:title" content={fullTitle}>
+    <meta property="og:description" content={description}>
+    <meta property="og:image" content={new URL(metaImage.src, Astro.site)}>
+    <meta property="og:site_name" content="Codex Helper">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content={canonicalURL}>
+    <meta name="twitter:title" content={fullTitle}>
+    <meta name="twitter:description" content={description}>
+    <meta name="twitter:image" content={new URL(metaImage.src, Astro.site)}>
+
+    <!-- Additional SEO -->
     <meta name="theme-color" content="#3b82f6">
+    <meta name="application-name" content="Codex Helper">
+    <meta name="apple-mobile-web-app-title" content="Codex Helper">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -52,7 +74,7 @@ const isToolPage = currentPath.startsWith('/tools');
       gtag('js', new Date());
       gtag('config', 'G-156DRH9ZB0');
     </script>
-    
+
     <slot name="head-scripts" />
 </head>
 <body class={bodyClass}>
