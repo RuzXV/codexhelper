@@ -802,7 +802,7 @@
                             </div>
                         </div>
                         <div class="stat-item">
-                            <img src={images['mge_icon.webp']} alt="MGE" on:error={() => (event.target.style.display = 'none')}/>
+                            <img src={images['mge_icon.webp']} alt="MGE" on:error={(e) => e.currentTarget.style.display = 'none'}/>
                             <div class="stat-info">
                                 <span class="stat-label">MGE Points</span>
                                 <span class="stat-value" style="color: var(--accent-blue-bright);">{totalMge.toLocaleString()}</span>
@@ -855,7 +855,7 @@
                                     <span class="stat-value" style="color: var(--accent-blue-bright);">{maxTroops.toLocaleString()}</span>
                                 </div>
                             {:else}
-                                <img src={images['mge_icon.webp']} alt="MGE" on:error={() => (event.target.style.display = 'none')}/>
+                                <img src={images['mge_icon.webp']} alt="MGE" on:error={(e) => e.currentTarget.style.display = 'none'}/>
                                 <div class="stat-info">
                                     <span class="stat-label">MGE Points</span>
                                     <span class="stat-value" style="color: var(--accent-blue-bright);">{totalMge.toLocaleString()}</span>
