@@ -681,8 +681,8 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 
 @keyframes slide-down { to { transform: translateY(0); opacity: 1; } }
 
-.sub-nav-container { max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing-6); display: flex; gap: var(--spacing-4); }
-.sub-nav-link { color: var(--text-secondary); text-decoration: none; padding: var(--spacing-3) var(--spacing-2); font-weight: 500; position: relative; transition: color 0.2s ease; }
+.sub-nav-container { max-width: 1400px; margin: 0 auto; padding: 0 var(--spacing-6); display: flex; gap: var(--spacing-4); }
+.sub-nav-link { color: var(--text-secondary); text-decoration: none; padding: var(--spacing-3) var(--spacing-2); font-weight: 500; position: relative; transition: color 0.2s ease; white-space: nowrap; }
 .sub-nav-link:hover { color: var(--text-primary); }
 .sub-nav-link.active { color: var(--text-primary); }
 .sub-nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--accent-blue); }

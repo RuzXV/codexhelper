@@ -8,6 +8,8 @@ import equipmentIcon from '../../assets/images/navi/equipment.webp';
 import davorIcon from '../../assets/images/navi/davor_icon.webp';
 import calendarIcon from '../../assets/images/navi/calendar.webp';
 import speedupsIcon from '../../assets/images/navi/speedups.webp';
+// TODO: Add kvk_icon.webp when available
+// import kvkIcon from '../../assets/images/navi/kvk_icon.webp';
 ---
 
 <Layout
@@ -95,7 +97,19 @@ import speedupsIcon from '../../assets/images/navi/speedups.webp';
                         <h3>Event Calendar</h3>
                         <p>Track upcoming events, manage rotations, and plan your growth ahead.</p>
                     </div>
-                    <div class="card-badge">New!</div>
+                    <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <a href="/tools/kvk_suite/" class="tool-card-modern coming-soon-card">
+                    <div class="card-glow"></div>
+                    <div class="card-icon-container kvk-icon-placeholder">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3>KvK Suite</h3>
+                        <p>Comprehensive tools for Kingdom vs Kingdom management and optimization.</p>
+                    </div>
+                    <div class="card-badge coming-soon">Coming Soon</div>
                     <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
                 </a>
             </div>
@@ -221,6 +235,12 @@ import speedupsIcon from '../../assets/images/navi/speedups.webp';
     .special-card {
         border-color: rgba(255, 215, 0, 0.15);
     }
+    .coming-soon-card {
+        border-color: rgba(59, 130, 246, 0.2);
+    }
+    .coming-soon-card:hover {
+        border-color: rgba(59, 130, 246, 0.4);
+    }
     .card-badge {
         position: absolute;
         top: 12px;
@@ -234,6 +254,23 @@ import speedupsIcon from '../../assets/images/navi/speedups.webp';
         border-radius: 12px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+    }
+    .card-badge.coming-soon {
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: var(--accent-blue-bright);
+    }
+    .kvk-icon-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .kvk-icon-placeholder i {
+        font-size: 2rem;
+        color: var(--accent-blue);
+    }
+    .tool-card-modern:hover .kvk-icon-placeholder i {
+        color: var(--accent-blue-bright);
     }
 
     @media (max-width: 768px) {

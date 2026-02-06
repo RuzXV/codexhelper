@@ -14,6 +14,7 @@
     import speedupsIcon from '../assets/images/navi/speedups.webp';
     import davorIcon from '../assets/images/navi/davor_icon.webp';
     import calendarIcon from '../assets/images/navi/calendar.webp';
+    import kvkSuiteIcon from '../assets/images/navi/kvk_suite.webp';
 
     $: isToolsPage = currentPath.startsWith('/tools');
 </script>
@@ -75,6 +76,11 @@
                 <a href="/tools/calendar/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/calendar')}>
                     <img src={calendarIcon.src} alt="Calendar" class="sub-nav-icon" width="24" height="24"/>
                     <span class="sub-nav-text">Event Calendar</span>
+                </a>
+
+                <a href="/tools/kvk_suite/" class="sub-nav-link" class:active={currentPath.startsWith('/tools/kvk_suite')}>
+                    <img src={kvkSuiteIcon.src} alt="KvK Suite" class="sub-nav-icon" width="24" height="24"/>
+                    <span class="sub-nav-text">KvK Suite</span>
                 </a>
             </div>
         </div>
@@ -148,4 +154,5 @@
             height: 28px;
         }
     }
+
 </style>

@@ -1,0 +1,180 @@
+/* KvK Suite Styles */
+
+.tool-hero { transition: all 0.5s ease-out; }
+
+.calculator-main-title { display: flex; align-items: center; justify-content: center; gap: var(--spacing-4); }
+.calculator-main-title img { height: 40px; }
+
+/* Quick Access Navigation */
+.quick-access-container { display: flex; justify-content: center; margin-bottom: var(--spacing-8); }
+.quick-access-nav { display: flex; justify-content: center; gap: var(--spacing-3); flex-wrap: nowrap; background: rgba(20, 21, 24, 0.65); padding: var(--spacing-2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--radius-md); }
+.quick-nav-btn { background: var(--bg-secondary); border: 1px solid var(--border-color); padding: var(--spacing-2) var(--spacing-3); border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: var(--spacing-2); color: var(--text-primary); font-weight: 600; font-size: var(--font-size-sm); white-space: nowrap; }
+.quick-nav-btn:hover { background: var(--bg-tertiary); border-color: var(--border-hover); }
+.quick-nav-btn.active { background: var(--accent-blue-light); border-color: var(--accent-blue); color: var(--text-primary); }
+
+/* Carousel */
+.carousel-container { position: relative; width: 100%; max-width: 1200px; margin: 0 auto; overflow: hidden; }
+.carousel-track-container { overflow: hidden; }
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.carousel-slide {
+    flex: 0 0 100%;
+    padding: 0 var(--spacing-4);
+    box-sizing: border-box;
+}
+
+/* Calculator Island */
+.calculator-island {
+    background: rgba(20, 21, 24, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    width: 100%;
+    margin: 0 auto;
+    min-height: 400px;
+}
+
+.island-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+/* ================================================
+   COMING SOON SLIDE STYLES
+   ================================================ */
+
+.coming-soon-slide {
+    text-align: center;
+    padding: var(--spacing-6);
+}
+
+.coming-soon-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--spacing-6);
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.coming-soon-icon i {
+    font-size: 2rem;
+    color: var(--accent-blue);
+}
+
+.coming-soon-slide h3 {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-4);
+}
+
+.coming-soon-slide p {
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    max-width: 450px;
+    margin: 0 auto var(--spacing-6);
+}
+
+.planned-features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-6);
+}
+
+.feature-tag {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.coming-soon-badge-large {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    padding: var(--spacing-3) var(--spacing-6);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--accent-blue-bright);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ================================================
+   MOBILE RESPONSIVE
+   ================================================ */
+
+@media (max-width: 768px) {
+    .quick-access-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--spacing-2);
+    }
+
+    .quick-nav-btn {
+        padding: var(--spacing-1) var(--spacing-2);
+        font-size: var(--font-size-xs);
+    }
+
+    .calculator-island {
+        padding: var(--spacing-4);
+        min-height: 350px;
+    }
+
+    .coming-soon-slide {
+        padding: var(--spacing-4);
+    }
+
+    .coming-soon-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .coming-soon-icon i {
+        font-size: 1.5rem;
+    }
+
+    .coming-soon-slide h3 {
+        font-size: var(--font-size-xl);
+    }
+
+    .coming-soon-slide p {
+        font-size: var(--font-size-sm);
+    }
+
+    .planned-features {
+        gap: var(--spacing-1);
+    }
+
+    .feature-tag {
+        padding: var(--spacing-1) var(--spacing-2);
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .quick-nav-btn span {
+        display: none;
+    }
+
+    .quick-nav-btn::before {
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+    }
+}

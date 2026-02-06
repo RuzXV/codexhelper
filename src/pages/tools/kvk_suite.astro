@@ -1,0 +1,89 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/kvk_suite.css';
+import TechSimulator from '../../components/kvk_suite/TechSimulator.svelte';
+import crystalIcon from '../../assets/images/kvk_suite/crystal.webp';
+---
+
+<Layout
+    title="KvK Suite"
+    description="Rise of Kingdoms KvK tools - Crystal Tech simulator, flag cost calculator, and KvK timers. Plan your Kingdom vs Kingdom strategy with our comprehensive tools."
+    keywords="Rise of Kingdoms KvK, ROK KvK calculator, crystal tech simulator, flag calculator, KvK timer, Kingdom vs Kingdom, ROK KvK tools, Rise of Kingdoms war"
+    bodyClass="has-sub-nav"
+>
+    <main class="tool-page-wrapper">
+        <section class="tool-hero">
+            <div class="tool-hero-container">
+                <div class="quick-access-container">
+                    <div class="quick-access-nav" id="quick-access-nav"></div>
+                </div>
+                <h1 id="calculator-main-title" class="calculator-main-title"></h1>
+                <p id="calculator-main-description"></p>
+            </div>
+        </section>
+
+        <section class="tool-content">
+            <div class="carousel-container">
+                <div class="carousel-track-container">
+                    <div class="carousel-track">
+
+                        <!-- Crystal Tech Simulator -->
+                        <div class="carousel-slide" data-title="Crystal Tech Simulator" data-description="Simulate and plan your Crystal Technology upgrades for optimal KvK performance.">
+                            <TechSimulator client:load />
+                        </div>
+
+                        <!-- Timers & Tracking -->
+                        <div class="carousel-slide" data-title="Timers & Tracking" data-description="Track KvK timers, stages, and important events.">
+                            <div class="calculator-island">
+                                <div class="island-content">
+                                    <div class="coming-soon-slide">
+                                        <div class="coming-soon-icon">
+                                            <i class="fas fa-stopwatch"></i>
+                                        </div>
+                                        <h3>Timers & Tracking</h3>
+                                        <p>Keep track of KvK stages, countdown timers, and important events so you never miss a critical moment.</p>
+                                        <div class="planned-features">
+                                            <span class="feature-tag">Stage Timers</span>
+                                            <span class="feature-tag">Event Countdowns</span>
+                                            <span class="feature-tag">Progress Tracking</span>
+                                        </div>
+                                        <div class="coming-soon-badge-large">Coming Soon</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Flag Cost Calculator -->
+                        <div class="carousel-slide" data-title="Flag Cost Calculator" data-description="Calculate the resource costs for placing and upgrading alliance flags.">
+                            <div class="calculator-island">
+                                <div class="island-content">
+                                    <div class="coming-soon-slide">
+                                        <div class="coming-soon-icon">
+                                            <i class="fas fa-flag"></i>
+                                        </div>
+                                        <h3>Flag Cost Calculator</h3>
+                                        <p>Calculate the resource costs for placing alliance flags and plan your territory expansion strategy.</p>
+                                        <div class="planned-features">
+                                            <span class="feature-tag">Resource Costs</span>
+                                            <span class="feature-tag">Flag Placement</span>
+                                            <span class="feature-tag">Territory Planning</span>
+                                        </div>
+                                        <div class="coming-soon-badge-large">Coming Soon</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script define:vars={{ crystalIconSrc: crystalIcon.src }}>
+        window.kvkCrystalIcon = crystalIconSrc;
+    </script>
+    <script>
+        import "../../scripts/kvk_suite.js";
+    </script>
+</Layout>
