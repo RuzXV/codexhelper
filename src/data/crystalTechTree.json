@@ -191,20 +191,25 @@
       "description": "Increases Favor and Crystals gained from completing Bastion Quests",
       "buffType": "Favor & Crystals Earned",
       "category": "utility",
-      "maxLevel": 10,
+      "maxLevel": 15,
       "levels": [
         { "level": 1, "buff": "5%", "time": "41m 53s", "crystals": 20000, "seasonCoins": 1000 },
-        { "level": 2, "buff": "10%", "time": "1h 23m", "crystals": 40000, "seasonCoins": 1100 },
-        { "level": 3, "buff": "15%", "time": "2h 47m", "crystals": 60000, "seasonCoins": 1200 },
-        { "level": 4, "buff": "20%", "time": "5h 35m", "crystals": 80000, "seasonCoins": 1300 },
+        { "level": 2, "buff": "10%", "time": "1h 23m", "crystals": 400000, "seasonCoins": 1100 },
+        { "level": 3, "buff": "15%", "time": "2h 47m", "crystals": 600000, "seasonCoins": 1200 },
+        { "level": 4, "buff": "20%", "time": "5h 35m", "crystals": 800000, "seasonCoins": 1300 },
         { "level": 5, "buff": "25%", "time": "11h 10m", "crystals": 100000, "seasonCoins": 1400 },
         { "level": 6, "buff": "30%", "time": "11h 10m", "crystals": 120000, "seasonCoins": 1500 },
         { "level": 7, "buff": "35%", "time": "11h 10m", "crystals": 140000, "seasonCoins": 1600 },
         { "level": 8, "buff": "40%", "time": "11h 10m", "crystals": 160000, "seasonCoins": 1700 },
         { "level": 9, "buff": "45%", "time": "11h 10m", "crystals": 180000, "seasonCoins": 1800 },
-        { "level": 10, "buff": "50%", "time": "11h 10m", "crystals": 200000, "seasonCoins": 2000 }
+        { "level": 10, "buff": "50%", "time": "11h 10m", "crystals": 200000, "seasonCoins": 2000 },
+        { "level": 11, "buff": "60%", "time": "11h 10m", "crystals": 220000, "seasonCoins": 2100 },
+        { "level": 12, "buff": "70%", "time": "11h 10m", "crystals": 240000, "seasonCoins": 2200 },
+        { "level": 13, "buff": "80%", "time": "11h 10m", "crystals": 260000, "seasonCoins": 2300 },
+        { "level": 14, "buff": "90%", "time": "11h 10m", "crystals": 280000, "seasonCoins": 2400 },
+        { "level": 15, "buff": "100%", "time": "11h 10m", "crystals": 300000, "seasonCoins": 2500 }
       ],
-      "totals": { "buff": "50%", "time": "3d 5h 26m 53s", "crystals": 1100000, "seasonCoins": 14600 },
+      "totals": { "buff": "100%", "time": "5d 13h 34m 53s", "crystals": 4020000, "seasonCoins": 26100 },
       "requirements": [
         { "level": 1, "tech": "callToArmsI", "techLevel": 5 },
         { "level": 5, "tech": "callToArmsI", "techLevel": 8 },
@@ -286,7 +291,7 @@
       "description": "Increases damage dealt to all Karaku warriors and Crystals earned per hour in the Trial of Kau Karuak event",
       "buffType": "Damage to Karaku & Crystal Income",
       "category": "utility",
-      "maxLevel": 10,
+      "maxLevel": 15,
       "levels": [
         { "level": 1, "buff": "5%", "time": "41m 53s", "crystals": 20000, "seasonCoins": 1000 },
         { "level": 2, "buff": "10%", "time": "1h 23m", "crystals": 40000, "seasonCoins": 1100 },
@@ -297,9 +302,14 @@
         { "level": 7, "buff": "35%", "time": "11h 10m", "crystals": 140000, "seasonCoins": 1600 },
         { "level": 8, "buff": "40%", "time": "11h 10m", "crystals": 160000, "seasonCoins": 1700 },
         { "level": 9, "buff": "45%", "time": "11h 10m", "crystals": 180000, "seasonCoins": 1800 },
-        { "level": 10, "buff": "50%", "time": "11h 10m", "crystals": 200000, "seasonCoins": 2000 }
+        { "level": 10, "buff": "50%", "time": "11h 10m", "crystals": 200000, "seasonCoins": 2000 },
+        { "level": 11, "buff": "60%", "time": "11h 10m", "crystals": 220000, "seasonCoins": 2100 },
+        { "level": 12, "buff": "70%", "time": "11h 10m", "crystals": 240000, "seasonCoins": 2200 },
+        { "level": 13, "buff": "80%", "time": "11h 10m", "crystals": 260000, "seasonCoins": 2300 },
+        { "level": 14, "buff": "90%", "time": "11h 10m", "crystals": 280000, "seasonCoins": 2400 },
+        { "level": 15, "buff": "100%", "time": "11h 10m", "crystals": 300000, "seasonCoins": 2500 }
       ],
-      "totals": { "buff": "100%/100%", "time": "3d 5h 26m 53s", "crystals": 1100000, "seasonCoins": 14600 },
+      "totals": { "buff": "100%", "time": "5d 13h 34m 53s", "crystals": 2400000, "seasonCoins": 26100 },
       "requirements": [
         { "level": 8, "tech": "culturalExchange", "techLevel": 8 },
         { "level": 10, "tech": "culturalExchange", "techLevel": 10 }
@@ -310,15 +320,20 @@
       "description": "Further reduces the number of Crystals required to research Crystal Research Center Technologies",
       "buffType": "Crystal Cost Reduction",
       "category": "utility",
-      "maxLevel": 5,
+      "maxLevel": 10,
       "levels": [
-        { "level": 1, "buff": "1%", "time": "7m 32s", "crystals": 100000, "seasonCoins": 1000 },
-        { "level": 2, "buff": "3%", "time": "22m 37s", "crystals": 200000, "seasonCoins": 1100 },
-        { "level": 3, "buff": "4.5%", "time": "1h 7m", "crystals": 300000, "seasonCoins": 1200 },
-        { "level": 4, "buff": "6%", "time": "2h 47m", "crystals": 400000, "seasonCoins": 1300 },
-        { "level": 5, "buff": "7.5%", "time": "5h 35m", "crystals": 500000, "seasonCoins": 1500 }
+        { "level": 1, "buff": "1%", "time": "41m 53s", "crystals": 30000, "seasonCoins": 500 },
+        { "level": 2, "buff": "2%", "time": "1h 23m", "crystals": 60000, "seasonCoins": 600 },
+        { "level": 3, "buff": "3%", "time": "2h 47m", "crystals": 90000, "seasonCoins": 700 },
+        { "level": 4, "buff": "4%", "time": "5h 35m", "crystals": 120000, "seasonCoins": 800 },
+        { "level": 5, "buff": "5%", "time": "11h 10m", "crystals": 150000, "seasonCoins": 1000 },
+        { "level": 6, "buff": "6%", "time": "11h 10m", "crystals": 200000, "seasonCoins": 1100 },
+        { "level": 7, "buff": "7%", "time": "11h 10m", "crystals": 250000, "seasonCoins": 1200 },
+        { "level": 8, "buff": "8%", "time": "11h 10m", "crystals": 300000, "seasonCoins": 1300 },
+        { "level": 9, "buff": "9%", "time": "11h 10m", "crystals": 400000, "seasonCoins": 1400 },
+        { "level": 10, "buff": "10%", "time": "11h 10m", "crystals": 500000, "seasonCoins": 1500 }
       ],
-      "totals": { "buff": "7.5%", "time": "9h 59m 9s", "crystals": 1500000, "seasonCoins": 6100 },
+      "totals": { "buff": "10%", "time": "3d 5h 26m 53s", "crystals": 2100000, "seasonCoins": 10100 },
       "requirements": []
     },
     "leadershipII": {
@@ -326,15 +341,20 @@
       "description": "Further increases the Unit Capacity of alliance rallied armies you initiate",
       "buffType": "Rallied Army Capacity",
       "category": "utility",
-      "maxLevel": 5,
+      "maxLevel": 10,
       "levels": [
         { "level": 1, "buff": "1%", "time": "41m 53s", "crystals": 50000, "seasonCoins": 1000 },
         { "level": 2, "buff": "3%", "time": "1h 23m", "crystals": 100000, "seasonCoins": 1100 },
         { "level": 3, "buff": "5%", "time": "2h 47m", "crystals": 150000, "seasonCoins": 1200 },
         { "level": 4, "buff": "8%", "time": "5h 35m", "crystals": 200000, "seasonCoins": 1300 },
-        { "level": 5, "buff": "11%", "time": "11h 10m", "crystals": 250000, "seasonCoins": 1400 }
+        { "level": 5, "buff": "11%", "time": "11h 10m", "crystals": 250000, "seasonCoins": 1400 },
+        { "level": 6, "buff": "14%", "time": "11h 10m", "crystals": 300000, "seasonCoins": 1500 },
+        { "level": 7, "buff": "18%", "time": "11h 10m", "crystals": 400000, "seasonCoins": 1600 },
+        { "level": 8, "buff": "22%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1700 },
+        { "level": 9, "buff": "27%", "time": "11h 10m", "crystals": 900000, "seasonCoins": 1800 },
+        { "level": 10, "buff": "35%", "time": "11h 10m", "crystals": 1500000, "seasonCoins": 2000 }
       ],
-      "totals": { "buff": "11%", "time": "21h 34m 38s", "crystals": 750000, "seasonCoins": 6000 },
+      "totals": { "buff": "35%", "time": "3d 5h 26m 53s", "crystals": 4450000, "seasonCoins": 14600 },
       "requirements": [
         { "level": 3, "tech": "leadershipI", "techLevel": 5 },
         { "level": 5, "tech": "callToArmsII", "techLevel": 10 }
@@ -345,20 +365,15 @@
       "description": "Increases the Attack of your Infantry units",
       "buffType": "Infantry Attack",
       "category": "infantry",
-      "maxLevel": 10,
+      "maxLevel": 5,
       "levels": [
         { "level": 1, "buff": "1%", "time": "7m 32s", "crystals": 100000, "seasonCoins": 1000 },
         { "level": 2, "buff": "3%", "time": "22m 37s", "crystals": 200000, "seasonCoins": 1100 },
         { "level": 3, "buff": "4.5%", "time": "1h 7m", "crystals": 300000, "seasonCoins": 1200 },
         { "level": 4, "buff": "6%", "time": "2h 47m", "crystals": 400000, "seasonCoins": 1300 },
-        { "level": 5, "buff": "7.5%", "time": "5h 35m", "crystals": 500000, "seasonCoins": 1500 },
-        { "level": 6, "buff": "9%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1100 },
-        { "level": 7, "buff": "10.5%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1200 },
-        { "level": 8, "buff": "12%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1300 },
-        { "level": 9, "buff": "13.5%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1400 },
-        { "level": 10, "buff": "15%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1500 }
+        { "level": 5, "buff": "7.5%", "time": "5h 35m", "crystals": 500000, "seasonCoins": 1500 }
       ],
-      "totals": { "buff": "15%", "time": "3d 5h 26m 53s", "crystals": 4500000, "seasonCoins": 12600 },
+      "totals": { "buff": "7.5%", "time": "9h 59m 9s", "crystals": 1500000, "seasonCoins": 6100 },
       "requirements": [
         { "level": 1, "tech": "callToArmsII", "techLevel": 8 },
         { "level": 5, "allOf": ["swiftMarchingI", "fleetOfFootI", "swiftSteedsI", "reinforcedAxlesI"], "techLevel": 5 }
@@ -369,20 +384,15 @@
       "description": "Increases the Attack of your Archer units",
       "buffType": "Archer Attack",
       "category": "archer",
-      "maxLevel": 10,
+      "maxLevel": 5,
       "levels": [
         { "level": 1, "buff": "1%", "time": "7m 32s", "crystals": 100000, "seasonCoins": 1000 },
         { "level": 2, "buff": "3%", "time": "22m 37s", "crystals": 200000, "seasonCoins": 1100 },
         { "level": 3, "buff": "4.5%", "time": "1h 7m", "crystals": 300000, "seasonCoins": 1200 },
         { "level": 4, "buff": "6%", "time": "2h 47m", "crystals": 400000, "seasonCoins": 1300 },
-        { "level": 5, "buff": "7.5%", "time": "5h 35m", "crystals": 500000, "seasonCoins": 1500 },
-        { "level": 6, "buff": "9%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1100 },
-        { "level": 7, "buff": "10.5%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1200 },
-        { "level": 8, "buff": "12%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1300 },
-        { "level": 9, "buff": "13.5%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1400 },
-        { "level": 10, "buff": "15%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1500 }
+        { "level": 5, "buff": "7.5%", "time": "5h 35m", "crystals": 500000, "seasonCoins": 1500 }
       ],
-      "totals": { "buff": "15%", "time": "3d 5h 26m 53s", "crystals": 4500000, "seasonCoins": 12600 },
+      "totals": { "buff": "7.5%", "time": "9h 59m 9s", "crystals": 1500000, "seasonCoins": 6100 },
       "requirements": [
         { "level": 1, "tech": "callToArmsII", "techLevel": 8 },
         { "level": 5, "allOf": ["swiftMarchingI", "fleetOfFootI", "swiftSteedsI", "reinforcedAxlesI"], "techLevel": 5 }
@@ -393,20 +403,15 @@
       "description": "Increases the Attack of your Cavalry units",
       "buffType": "Cavalry Attack",
       "category": "cavalry",
-      "maxLevel": 10,
+      "maxLevel": 5,
       "levels": [
         { "level": 1, "buff": "1%", "time": "7m 32s", "crystals": 100000, "seasonCoins": 1000 },
         { "level": 2, "buff": "3%", "time": "22m 37s", "crystals": 200000, "seasonCoins": 1100 },
         { "level": 3, "buff": "4.5%", "time": "1h 7m", "crystals": 300000, "seasonCoins": 1200 },
         { "level": 4, "buff": "6%", "time": "2h 47m", "crystals": 400000, "seasonCoins": 1300 },
-        { "level": 5, "buff": "7.5%", "time": "5h 35m", "crystals": 500000, "seasonCoins": 1500 },
-        { "level": 6, "buff": "9%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1100 },
-        { "level": 7, "buff": "10.5%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1200 },
-        { "level": 8, "buff": "12%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1300 },
-        { "level": 9, "buff": "13.5%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1400 },
-        { "level": 10, "buff": "15%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1500 }
+        { "level": 5, "buff": "7.5%", "time": "5h 35m", "crystals": 500000, "seasonCoins": 1500 }
       ],
-      "totals": { "buff": "15%", "time": "3d 5h 26m 53s", "crystals": 4500000, "seasonCoins": 12600 },
+      "totals": { "buff": "7.5%", "time": "9h 59m 9s", "crystals": 1500000, "seasonCoins": 6100 },
       "requirements": [
         { "level": 1, "tech": "callToArmsII", "techLevel": 8 },
         { "level": 5, "allOf": ["swiftMarchingI", "fleetOfFootI", "swiftSteedsI", "reinforcedAxlesI"], "techLevel": 5 }
@@ -417,20 +422,15 @@
       "description": "Increases the Attack of your Siege units",
       "buffType": "Siege Attack",
       "category": "siege",
-      "maxLevel": 10,
+      "maxLevel": 5,
       "levels": [
         { "level": 1, "buff": "1%", "time": "7m 32s", "crystals": 100000, "seasonCoins": 1000 },
         { "level": 2, "buff": "3%", "time": "22m 37s", "crystals": 200000, "seasonCoins": 1100 },
         { "level": 3, "buff": "4.5%", "time": "1h 7m", "crystals": 300000, "seasonCoins": 1200 },
         { "level": 4, "buff": "6%", "time": "2h 47m", "crystals": 400000, "seasonCoins": 1300 },
-        { "level": 5, "buff": "7.5%", "time": "5h 35m", "crystals": 500000, "seasonCoins": 1500 },
-        { "level": 6, "buff": "9%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1100 },
-        { "level": 7, "buff": "10.5%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1200 },
-        { "level": 8, "buff": "12%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1300 },
-        { "level": 9, "buff": "13.5%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1400 },
-        { "level": 10, "buff": "15%", "time": "11h 10m", "crystals": 600000, "seasonCoins": 1500 }
+        { "level": 5, "buff": "7.5%", "time": "5h 35m", "crystals": 500000, "seasonCoins": 1500 }
       ],
-      "totals": { "buff": "15%", "time": "3d 5h 26m 53s", "crystals": 4500000, "seasonCoins": 12600 },
+      "totals": { "buff": "7.5%", "time": "9h 59m 9s", "crystals": 1500000, "seasonCoins": 6100 },
       "requirements": [
         { "level": 1, "tech": "callToArmsII", "techLevel": 8 },
         { "level": 5, "allOf": ["swiftMarchingI", "fleetOfFootI", "swiftSteedsI", "reinforcedAxlesI"], "techLevel": 5 }
@@ -704,7 +704,7 @@
       "description": "Increases your Hospital Capacity",
       "buffType": "Hospital Capacity",
       "category": "utility",
-      "maxLevel": 1,
+      "maxLevel": 10,
       "levels": [
         { "level": 1, "buff": "2%", "time": "41m 53s", "crystals": 50000, "seasonCoins": 500 },
         { "level": 2, "buff": "4%", "time": "1h 23m", "crystals": 100000, "seasonCoins": 600 },
@@ -722,7 +722,7 @@
     },
     "rapidRetreat": {
       "name": "Rapid Retreat",
-      "description": "Unlocks the ability to use Gems to instantly return defeated troops to your city",
+      "description": "Unlocks the ability to use Gems to instantly return defeated troops to your city - 80 gems per march",
       "buffType": "Ability Unlock",
       "category": "utility",
       "maxLevel": 1,
@@ -954,7 +954,7 @@
         { "level": 9, "buff": "7%", "time": "8d 4h", "crystals": 1050000, "seasonCoins": 1800 },
         { "level": 10, "buff": "10%", "time": "16d 8h", "crystals": 1500000, "seasonCoins": 2000 }
       ],
-      "totals": { "buff": "15%", "time": "32d 16h", "crystals": 5887500, "seasonCoins": 14600 },
+      "totals": { "buff": "25%", "time": "32d 16h", "crystals": 5887500, "seasonCoins": 14600 },
       "requirements": [
         { "level": 1, "anyOf": ["swiftMarchingIII", "fleetOfFootIII", "swiftSteedsIII", "reinforcedAxlesIII"], "techLevel": 5 },
         { "level": 3, "anyOf": ["swiftMarchingIII", "fleetOfFootIII", "swiftSteedsIII", "reinforcedAxlesIII"], "techLevel": 10 },
@@ -966,11 +966,13 @@
       "description": "Unlocks automatic alliance help",
       "buffType": "Auto Help Count",
       "category": "utility",
-      "maxLevel": 1,
+      "maxLevel": 3,
       "levels": [
-        { "level": 1, "buff": "100%", "time": "8d 18h 26m", "crystals": 3000000, "seasonCoins": 2000 }
+        { "level": 1, "buff": "10/30 Helps", "time": "42m 5s", "crystals": 300000, "seasonCoins": 1000 },
+        { "level": 2, "buff": "20/30 Helps", "time": "1h 24m", "crystals": 500000, "seasonCoins": 1500 },
+        { "level": 3, "buff": "30/30 Helps", "time": "2h 48m", "crystals": 800000, "seasonCoins": 2000 }
       ],
-      "totals": { "buff": "100%", "time": "8d 18h 26m", "crystals": 3000000, "seasonCoins": 2000 },
+      "totals": { "buff": "30/30 Helps", "time": "4h 54m 5s", "crystals": 1600000, "seasonCoins": 4500 },
       "requirements": [
         { "level": 1, "tech": "specialConcoctionsII", "techLevel": 3 }
       ]

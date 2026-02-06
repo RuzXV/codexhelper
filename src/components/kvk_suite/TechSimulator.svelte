@@ -467,6 +467,9 @@
         technology: Technology | null;
     }
 
+    // Mobile detection
+    let isMobile = false;
+
     // Tooltip state
     let hoveredNode: PlaceholderNode | null = null;
     let tooltipX = 0;
@@ -506,6 +509,15 @@
         return researchCenterLevel >= req;
     }
 
+    // Get all RC requirements for a tech (for displaying in requirements box)
+    function getTechRCRequirements(techKey: string): { level: number; rcLevel: number }[] {
+        const techReqs = rcRequirements[techKey];
+        if (!techReqs) return [];
+        return Object.entries(techReqs)
+            .map(([level, rcLevel]) => ({ level: parseInt(level), rcLevel }))
+            .sort((a, b) => a.level - b.level);
+    }
+
     // Toggle dropdowns
     function toggleVersionDropdown() {
         isVersionDropdownOpen = !isVersionDropdownOpen;
@@ -536,12 +548,17 @@
         }
     }
 
-    // Global click handler for closing dropdowns
+    // Global click handler for closing dropdowns and tooltip
     function handleGlobalClick(event: MouseEvent) {
         const target = event.target as HTMLElement;
         if (!target.closest('.settings-dropdown')) {
             isVersionDropdownOpen = false;
             isRCDropdownOpen = false;
+        }
+        // Close tooltip if clicking outside of it and outside of info buttons
+        if (!target.closest('.tech-tooltip') && !target.closest('.info-btn')) {
+            showTooltip = false;
+            hoveredNode = null;
         }
     }
 
@@ -1016,6 +1033,19 @@
     }
 
     onMount(() => {
+        // Check if user is on mobile device
+        const checkMobile = () => {
+            const userAgent = navigator.userAgent || navigator.vendor;
+            const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isSmallScreen = window.innerWidth <= 768;
+            isMobile = mobileRegex.test(userAgent) || (isTouchDevice && isSmallScreen);
+        };
+        checkMobile();
+
+        // If mobile, don't set up the rest of the component
+        if (isMobile) return;
+
         setTimeout(drawConnections, 100);
 
         document.addEventListener('mousemove', handleMouseMove);
@@ -1030,9 +1060,31 @@
     });
 </script>
 
-<!-- Settings Island -->
-<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-<div class="settings-island" on:click={handleSettingsOutsideClick}>
+{#if isMobile}
+    <!-- Mobile Warning Message -->
+    <div class="mobile-warning">
+        <div class="mobile-warning-content">
+            <div class="mobile-warning-icon">
+                <i class="fas fa-desktop"></i>
+            </div>
+            <h2 class="mobile-warning-title">Desktop Required</h2>
+            <p class="mobile-warning-text">
+                The Crystal Tech Simulator is not optimized for mobile devices due to its complex interactive interface.
+            </p>
+            <p class="mobile-warning-text">
+                For the best experience, please visit this page on a <strong>desktop computer</strong>, <strong>laptop</strong>, or <strong>tablet in landscape mode</strong>.
+            </p>
+            <div class="mobile-warning-features">
+                <span class="feature-item"><i class="fas fa-mouse-pointer"></i> Drag & drop interactions</span>
+                <span class="feature-item"><i class="fas fa-expand-arrows-alt"></i> Large tech tree visualization</span>
+                <span class="feature-item"><i class="fas fa-info-circle"></i> Detailed tooltips</span>
+            </div>
+        </div>
+    </div>
+{:else}
+    <!-- Settings Island -->
+    <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+    <div class="settings-island" on:click={handleSettingsOutsideClick}>
     <div class="settings-info">
         <p class="settings-info-text">
             Currently <strong>ALL</strong> KvK modes feature the "New" Crystal Tech changes (v5) including kingdoms entering KvK 4. When new, major crystal tech adjustments occur in-game, they are not always immediately accessible in every KvK mode, therefore please choose the version that matches your situation.
@@ -1040,10 +1092,10 @@
     </div>
     <div class="settings-controls">
         <div class="settings-dropdown">
-            <label class="settings-label">
+            <span class="settings-label">
                 <img src={versionIcon.src} alt="Version" class="settings-icon" />
                 <span>Crystal Tech Version</span>
-            </label>
+            </span>
             <div class="custom-select-container">
                 <button
                     class="select-trigger"
@@ -1070,10 +1122,10 @@
         </div>
 
         <div class="settings-dropdown">
-            <label class="settings-label">
+            <span class="settings-label">
                 <img src={researchCenterIcon.src} alt="Research Center" class="settings-icon" />
                 <span>Research Center Level</span>
-            </label>
+            </span>
             <div class="custom-select-container">
                 <button
                     class="select-trigger"
@@ -1226,17 +1278,9 @@
                     </thead>
                     <tbody>
                         {#each tech.levels as level}
-                            {@const rcReq = hoveredNode?.techKey ? getRCRequirement(hoveredNode.techKey, level.level) : null}
                             {@const meetsRC = hoveredNode?.techKey ? meetsRCRequirement(hoveredNode.techKey, level.level) : true}
                             <tr class:completed={level.level <= currentLevel} class:next={level.level === currentLevel + 1} class:rc-locked={!meetsRC}>
-                                <td class="level-col">
-                                    {level.level}
-                                    {#if rcReq}
-                                        <span class="rc-req" class:rc-met={meetsRC} class:rc-not-met={!meetsRC} title="Requires Research Center Level {rcReq}">
-                                            RC{rcReq}
-                                        </span>
-                                    {/if}
-                                </td>
+                                <td class="level-col">{level.level}</td>
                                 <td class="buff-col">{level.buff}</td>
                                 <td class="time-col">{level.time}</td>
                                 <td class="crystal-col">{formatNumber(level.crystals)}</td>
@@ -1255,12 +1299,16 @@
                     </tfoot>
                 </table>
             </div>
-            {#if tech.requirements.length > 0}
+            {#if tech.requirements.length > 0 || (hoveredNode?.techKey && getTechRCRequirements(hoveredNode.techKey).length > 0)}
                 <div class="tooltip-requirements">
                     <span class="req-label">Requirements:</span>
                     {#each tech.requirements as req}
                         {@const parts = getRequirementParts(req)}
                         <span class="req-item"><span class="req-unlock-level">Lvl {req.level}:</span> {#if parts.keyword}<span class="req-keyword">{parts.keyword}</span>&nbsp;{/if}{#each parts.techIds as techId, i}<span class="req-tech-link" on:click={() => navigateToTech(techId)} on:keydown={(e) => e.key === 'Enter' && navigateToTech(techId)} role="button" tabindex="0">{getTechName(techId)}</span>{#if i < parts.techIds.length - 1},&nbsp;{/if}{/each} <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {req.techLevel || 0}</span></span>
+                    {/each}
+                    {#each hoveredNode?.techKey ? getTechRCRequirements(hoveredNode.techKey) : [] as rcReq}
+                        {@const meetsRC = researchCenterLevel >= rcReq.rcLevel}
+                        <span class="req-item"><span class="req-unlock-level">Lvl {rcReq.level}:</span> <span class="rc-req-name" class:rc-met={meetsRC} class:rc-not-met={!meetsRC}>Research Center</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {rcReq.rcLevel}</span></span>
                     {/each}
                 </div>
             {/if}
@@ -1285,8 +1333,78 @@
         </div>
     </div>
 </div>
+{/if}
 
 <style>
+    /* ================================================
+       MOBILE WARNING STYLES
+       ================================================ */
+
+    .mobile-warning {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        padding: 40px 20px;
+    }
+
+    .mobile-warning-content {
+        text-align: center;
+        max-width: 400px;
+        padding: 30px;
+        background: var(--bg-secondary, #1e293b);
+        border: 1px solid var(--border-color, rgba(100, 180, 220, 0.2));
+        border-radius: var(--radius-lg, 12px);
+    }
+
+    .mobile-warning-icon {
+        font-size: 3rem;
+        color: #64b4dc;
+        margin-bottom: 20px;
+    }
+
+    .mobile-warning-title {
+        font-family: 'Cinzel', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 15px;
+    }
+
+    .mobile-warning-text {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .mobile-warning-text strong {
+        color: #64b4dc;
+    }
+
+    .mobile-warning-features {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(100, 180, 220, 0.2);
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .feature-item i {
+        color: #64b4dc;
+        width: 20px;
+    }
+
     /* ================================================
        SETTINGS ISLAND STYLES
        ================================================ */
@@ -2131,34 +2249,11 @@
     .tooltip-table .level-col {
         font-weight: 700;
         color: rgba(255, 255, 255, 0.7);
-        width: 70px;
-        white-space: nowrap;
+        width: 35px;
     }
 
     .tooltip-table tbody tr.rc-locked {
         opacity: 0.5;
-    }
-
-    .rc-req {
-        display: inline-block;
-        font-size: 0.55rem;
-        font-weight: 600;
-        padding: 1px 4px;
-        border-radius: 3px;
-        margin-left: 4px;
-        vertical-align: middle;
-    }
-
-    .rc-req.rc-met {
-        background: rgba(100, 200, 100, 0.2);
-        color: #7dd87d;
-        border: 1px solid rgba(100, 200, 100, 0.3);
-    }
-
-    .rc-req.rc-not-met {
-        background: rgba(239, 68, 68, 0.2);
-        color: #f87171;
-        border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
     .tooltip-table .buff-col {
@@ -2243,6 +2338,19 @@
     .req-tech-link:hover {
         color: #bae6fd;
         text-decoration: underline;
+    }
+
+    .rc-req-name {
+        font-weight: 600;
+        color: #e8a0a0;
+    }
+
+    .rc-req-name.rc-met {
+        color: #e8a0a0;
+    }
+
+    .rc-req-name.rc-not-met {
+        color: #f87171;
     }
 
     /* ================================================
