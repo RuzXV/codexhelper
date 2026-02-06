@@ -376,7 +376,7 @@
       "totals": { "buff": "7.5%", "time": "9h 59m 9s", "crystals": 1500000, "seasonCoins": 6100 },
       "requirements": [
         { "level": 1, "tech": "callToArmsII", "techLevel": 8 },
-        { "level": 5, "allOf": ["swiftMarchingI", "fleetOfFootI", "swiftSteedsI", "reinforcedAxlesI"], "techLevel": 5 }
+        { "level": 5, "tech": "swiftMarchingI", "techLevel": 5 }
       ]
     },
     "improvedBowsII": {
@@ -395,7 +395,7 @@
       "totals": { "buff": "7.5%", "time": "9h 59m 9s", "crystals": 1500000, "seasonCoins": 6100 },
       "requirements": [
         { "level": 1, "tech": "callToArmsII", "techLevel": 8 },
-        { "level": 5, "allOf": ["swiftMarchingI", "fleetOfFootI", "swiftSteedsI", "reinforcedAxlesI"], "techLevel": 5 }
+        { "level": 5, "tech": "fleetOfFootI", "techLevel": 5 }
       ]
     },
     "mountedCombatTechniquesII": {
@@ -414,7 +414,7 @@
       "totals": { "buff": "7.5%", "time": "9h 59m 9s", "crystals": 1500000, "seasonCoins": 6100 },
       "requirements": [
         { "level": 1, "tech": "callToArmsII", "techLevel": 8 },
-        { "level": 5, "allOf": ["swiftMarchingI", "fleetOfFootI", "swiftSteedsI", "reinforcedAxlesI"], "techLevel": 5 }
+        { "level": 5, "tech": "swiftSteedsI", "techLevel": 5 }
       ]
     },
     "improvedProjectilesII": {
@@ -433,7 +433,7 @@
       "totals": { "buff": "7.5%", "time": "9h 59m 9s", "crystals": 1500000, "seasonCoins": 6100 },
       "requirements": [
         { "level": 1, "tech": "callToArmsII", "techLevel": 8 },
-        { "level": 5, "allOf": ["swiftMarchingI", "fleetOfFootI", "swiftSteedsI", "reinforcedAxlesI"], "techLevel": 5 }
+        { "level": 5, "tech": "reinforcedAxlesI", "techLevel": 5 }
       ]
     },
     "starmetalShields": {

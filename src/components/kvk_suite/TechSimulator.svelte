@@ -454,8 +454,66 @@
         };
     });
 
+    // Storage cache key for saving/loading progress
+    const TECH_SIMULATOR_CACHE_KEY = 'crystalTechSimulatorState';
+
+    // Type for the window with our custom functions
+    interface WindowWithStorage extends Window {
+        saveUserData?: (key: string, data: unknown) => void;
+        loadUserData?: (key: string) => { userTechLevels?: Record<string, number>; researchCenterLevel?: number; selectedVersion?: string } | null;
+    }
+
     // User's current tech levels (will be made interactive later)
     let userTechLevels: Record<string, number> = {};
+
+    // Flag to prevent saving during initial load
+    let isInitialLoad = true;
+
+    // Debounced save function for auto-saving progress
+    function saveProgress() {
+        if (isInitialLoad) return;
+        if (typeof window !== 'undefined') {
+            const win = window as WindowWithStorage;
+            if (win.saveUserData) {
+                const state = {
+                    userTechLevels,
+                    researchCenterLevel,
+                    selectedVersion
+                };
+                win.saveUserData(TECH_SIMULATOR_CACHE_KEY, state);
+            }
+        }
+    }
+
+    // Create debounced version of save (500ms delay)
+    let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+    function debouncedSave() {
+        if (saveTimeout) clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(saveProgress, 500);
+    }
+
+    // Load saved progress from storage
+    function loadProgress() {
+        if (typeof window !== 'undefined') {
+            const win = window as WindowWithStorage;
+            if (win.loadUserData) {
+                const savedState = win.loadUserData(TECH_SIMULATOR_CACHE_KEY);
+                if (savedState) {
+                    if (savedState.userTechLevels) {
+                        userTechLevels = savedState.userTechLevels;
+                    }
+                    if (savedState.researchCenterLevel) {
+                        researchCenterLevel = savedState.researchCenterLevel;
+                    }
+                    if (savedState.selectedVersion) {
+                        selectedVersion = savedState.selectedVersion;
+                    }
+                }
+            }
+        }
+        // After loading, allow saving
+        isInitialLoad = false;
+    }
 
     // Build placeholder nodes to visualize the layout
     interface PlaceholderNode {
@@ -579,6 +637,11 @@
     // Get total crystal cost reduction percentage
     $: totalCostReduction = getRCCostReduction(researchCenterLevel) + getCuttingCornersReduction();
 
+    // Auto-save when state changes
+    $: if (userTechLevels || researchCenterLevel || selectedVersion) {
+        debouncedSave();
+    }
+
     // Calculate reduced crystal cost
     function getReducedCost(baseCost: number, reductionPercent: number): number {
         return Math.round(baseCost * (1 - reductionPercent / 100));
@@ -690,17 +753,14 @@
         // Emergency Support has no level 1 prereqs in JSON
         // Rapid Retreat requires Emergency Support
         rapidRetreat: { allOf: ['emergencySupport'] },
-        // Expanded Formation I requires Larger Camps level 5 in JSON
-        expandedFormationI: { allOf: ['largerCamps'] },
-        // Expanded Formation II requires Special Concoctions II
-        expandedFormationII: { allOf: ['specialConcoctionsII'] },
+        // Expanded Formations I requires Larger Camps level 5 in JSON
+        expandedFormationsI: { allOf: ['largerCamps'] },
+        // Expanded Formations II requires Special Concoctions II
+        expandedFormationsII: { allOf: ['specialConcoctionsII'] },
         // Celestial Guidance requires Special Concoctions II
         celestialGuidance: { allOf: ['specialConcoctionsII'] },
-        // Unit-specific techs require Emergency Support
-        ironInfantry: { allOf: ['emergencySupport'] },
-        archersFocus: { allOf: ['emergencySupport'] },
-        ridersResilience: { allOf: ['emergencySupport'] },
-        siegeProvisions: { allOf: ['emergencySupport'] },
+        // Note: ironInfantry, archersFocus, ridersResilience, siegeProvisions
+        // have their requirements defined in JSON (specialConcoctionsI level 5), not as prereqs
     };
 
     // Check if prerequisite techs are met
@@ -1678,6 +1738,9 @@
     }
 
     onMount(() => {
+        // Load saved progress from storage
+        loadProgress();
+
         // Check if user is on mobile device
         const checkMobile = () => {
             const userAgent = navigator.userAgent || navigator.vendor;
@@ -1701,6 +1764,8 @@
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
             document.removeEventListener('click', handleGlobalClick);
+            // Clear any pending save timeout
+            if (saveTimeout) clearTimeout(saveTimeout);
         };
     });
 </script>
@@ -2013,7 +2078,7 @@
                 <i class="fas {simulatorMessage.type === 'error' ? 'fa-exclamation-circle' : 'fa-exclamation-triangle'}"></i>
                 <span class="message-text">
                     {#if simulatorMessage.multiTechLinks && simulatorMessage.multiTechLinks.length > 0}
-                        {#if simulatorMessage.text}{simulatorMessage.text} {/if}{simulatorMessage.prefix} {#each simulatorMessage.multiTechLinks as link, i}<span class="message-tech-link" on:click={() => { navigateToTech(link.techKey); clearMessage(); }} on:keydown={(e) => { if (e.key === 'Enter') { navigateToTech(link.techKey); clearMessage(); } }} role="button" tabindex="0">{link.techName}</span>{#if i < (simulatorMessage.multiTechLinks?.length || 0) - 1}, {/if}{/each} <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.requiredLevel}</span>
+                        {#if simulatorMessage.text}{simulatorMessage.text} {/if}{simulatorMessage.prefix} {#each simulatorMessage.multiTechLinks as link, i}<span class="message-tech-link" on:click={() => { navigateToTech(link.techKey); clearMessage(); }} on:keydown={(e) => { if (e.key === 'Enter') { navigateToTech(link.techKey); clearMessage(); } }} role="button" tabindex="0">{link.techName}</span>{#if i < (simulatorMessage.multiTechLinks?.length || 0) - 1},&nbsp;{/if}{/each} <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.requiredLevel}</span>
                     {:else if simulatorMessage.techLink}
                         Requires <span class="message-tech-link" on:click={() => { if (simulatorMessage?.techLink) navigateToTech(simulatorMessage.techLink.techKey); clearMessage(); }} on:keydown={(e) => { if (e.key === 'Enter' && simulatorMessage?.techLink) { navigateToTech(simulatorMessage.techLink.techKey); clearMessage(); } }} role="button" tabindex="0">{simulatorMessage.techLink.techName}</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.techLink.requiredLevel}</span> to {simulatorMessage.type === 'warning' ? 'finish' : 'continue'}.
                     {:else if simulatorMessage.rcRequirement}
@@ -2051,8 +2116,8 @@
 
 <!-- Clear Confirmation Modal -->
 {#if showClearModal}
-    <div class="modal-overlay" on:click={cancelClear} on:keydown={(e) => e.key === 'Escape' && cancelClear()} role="button" tabindex="0">
-        <div class="modal-content" on:click|stopPropagation role="dialog" aria-modal="true" aria-labelledby="clear-modal-title">
+    <div class="modal-overlay" on:click={cancelClear} on:keydown={(e) => e.key === 'Escape' && cancelClear()} role="button" tabindex="-1" aria-label="Close modal">
+        <div class="modal-content" on:click|stopPropagation on:keydown|stopPropagation role="dialog" aria-modal="true" aria-labelledby="clear-modal-title" tabindex="-1">
             <div class="modal-icon">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
