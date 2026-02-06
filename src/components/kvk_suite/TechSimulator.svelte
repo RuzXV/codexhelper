@@ -487,6 +487,9 @@
         type: 'error' | 'warning';
         text: string;
         techLink?: { techKey: string; techName: string; requiredLevel: number };
+        multiTechLinks?: { techKey: string; techName: string }[];
+        requiredLevel?: number;
+        prefix?: string;
         rcRequirement?: number;
     }
     let simulatorMessage: SimulatorMessage | null = null;
@@ -503,6 +506,36 @@
     function clearMessage() {
         if (messageTimeout) clearTimeout(messageTimeout);
         simulatorMessage = null;
+    }
+
+    // Clear confirmation modal state
+    let showClearModal = false;
+
+    function openClearModal() {
+        const techCount = Object.keys(userTechLevels).filter(k => userTechLevels[k] > 0).length;
+        if (techCount === 0) {
+            showMessage({ type: 'warning', text: 'All technologies are already at Level 0.' });
+            currentMode = 'single'; // Switch back to single mode
+            return;
+        }
+        showClearModal = true;
+    }
+
+    function confirmClear() {
+        const techCount = Object.keys(userTechLevels).filter(k => userTechLevels[k] > 0).length;
+        // Reset all tech levels to 0
+        for (const key in userTechLevels) {
+            userTechLevels[key] = 0;
+        }
+        userTechLevels = { ...userTechLevels }; // Trigger reactivity
+        showClearModal = false;
+        currentMode = 'single'; // Switch back to single mode
+        showMessage({ type: 'warning', text: `Cleared all progress. ${techCount} technologies reset to Level 0.` });
+    }
+
+    function cancelClear() {
+        showClearModal = false;
+        currentMode = 'single'; // Switch back to single mode
     }
 
     // Settings state
@@ -883,6 +916,110 @@
         return maxLevel;
     }
 
+    // Check if removing a level from a tech would break any dependencies
+    // Returns info about what tech depends on this level being maintained
+    function checkRemovalDependencies(techKey: string, newLevel: number): { canRemove: boolean; blockingTech?: string; blockingTechName?: string; blockingTechLevel?: number; requiredLevel?: number; isAnyOf?: boolean; otherOptions?: string[] } {
+        // Check all other techs to see if any of them depend on this tech at a higher level
+        for (const [otherTechKey, otherTech] of Object.entries(allTechs)) {
+            const otherTechLevel = userTechLevels[otherTechKey] || 0;
+            if (otherTechLevel === 0) continue; // Skip techs that aren't researched
+
+            // Check this tech's requirements
+            for (const req of otherTech.requirements) {
+                if (req.level > otherTechLevel) continue; // This requirement doesn't apply at their current level
+
+                const requiredLevel = req.techLevel || 0;
+
+                // Single tech requirement
+                if (req.tech === techKey) {
+                    if (newLevel < requiredLevel) {
+                        return {
+                            canRemove: false,
+                            blockingTech: otherTechKey,
+                            blockingTechName: otherTech.name,
+                            blockingTechLevel: otherTechLevel,
+                            requiredLevel: requiredLevel
+                        };
+                    }
+                }
+
+                // anyOf requirement - only blocks if this is the ONLY tech meeting the requirement
+                if (req.anyOf && req.anyOf.includes(techKey)) {
+                    const currentLevel = userTechLevels[techKey] || 0;
+                    if (currentLevel >= requiredLevel && newLevel < requiredLevel) {
+                        // Check if any OTHER tech in the anyOf list meets the requirement
+                        const othersMeetReq = req.anyOf.some(altKey =>
+                            altKey !== techKey && (userTechLevels[altKey] || 0) >= requiredLevel
+                        );
+                        if (!othersMeetReq) {
+                            // This tech is the only one meeting the anyOf requirement
+                            return {
+                                canRemove: false,
+                                blockingTech: otherTechKey,
+                                blockingTechName: otherTech.name,
+                                blockingTechLevel: otherTechLevel,
+                                requiredLevel: requiredLevel,
+                                isAnyOf: true,
+                                otherOptions: req.anyOf.filter(k => k !== techKey)
+                            };
+                        }
+                    }
+                }
+
+                // allOf requirement - blocks if this tech is in the list and we'd go below required
+                if (req.allOf && req.allOf.includes(techKey)) {
+                    if (newLevel < requiredLevel) {
+                        return {
+                            canRemove: false,
+                            blockingTech: otherTechKey,
+                            blockingTechName: otherTech.name,
+                            blockingTechLevel: otherTechLevel,
+                            requiredLevel: requiredLevel
+                        };
+                    }
+                }
+            }
+
+            // Check prerequisite techs (for level 1 unlock)
+            const prereqRule = prerequisiteTechs[otherTechKey];
+            if (prereqRule && otherTechLevel >= 1) {
+                if ('allOf' in prereqRule && prereqRule.allOf.includes(techKey)) {
+                    if (newLevel < 1) {
+                        return {
+                            canRemove: false,
+                            blockingTech: otherTechKey,
+                            blockingTechName: otherTech.name,
+                            blockingTechLevel: otherTechLevel,
+                            requiredLevel: 1
+                        };
+                    }
+                }
+                if ('anyOf' in prereqRule && prereqRule.anyOf.includes(techKey)) {
+                    const currentLevel = userTechLevels[techKey] || 0;
+                    if (currentLevel >= 1 && newLevel < 1) {
+                        // Check if any OTHER tech in the anyOf list is unlocked
+                        const othersMeetReq = prereqRule.anyOf.some(altKey =>
+                            altKey !== techKey && (userTechLevels[altKey] || 0) >= 1
+                        );
+                        if (!othersMeetReq) {
+                            return {
+                                canRemove: false,
+                                blockingTech: otherTechKey,
+                                blockingTechName: otherTech.name,
+                                blockingTechLevel: otherTechLevel,
+                                requiredLevel: 1,
+                                isAnyOf: true,
+                                otherOptions: prereqRule.anyOf.filter(k => k !== techKey)
+                            };
+                        }
+                    }
+                }
+            }
+        }
+
+        return { canRemove: true };
+    }
+
     // Handle tech node click based on current mode
     function handleTechClick(techKey: string) {
         const tech = allTechs[techKey];
@@ -920,16 +1057,22 @@
                 } else if (check.failedTech && check.requiredLevel) {
                     // Check if this is a multi-tech requirement (anyOf or allOf)
                     if (check.isAnyOf && check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 0) {
-                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
                         showMessage({
                             type: 'error',
-                            text: `Requires any of: ${techNames.join(', ')} → Lvl ${check.requiredLevel}`
+                            text: '',
+                            prefix: 'Requires any of:',
+                            multiTechLinks: techLinks,
+                            requiredLevel: check.requiredLevel
                         });
                     } else if (check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 1) {
-                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
                         showMessage({
                             type: 'error',
-                            text: `Requires all of: ${techNames.join(', ')} → Lvl ${check.requiredLevel}`
+                            text: '',
+                            prefix: 'Requires all of:',
+                            multiTechLinks: techLinks,
+                            requiredLevel: check.requiredLevel
                         });
                     } else {
                         const failedTechName = allTechs[check.failedTech]?.name || check.failedTech;
@@ -976,16 +1119,22 @@
                 } else if (check.failedTech && check.requiredLevel) {
                     // Check if this is a multi-tech requirement (anyOf or allOf)
                     if (check.isAnyOf && check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 0) {
-                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
                         showMessage({
                             type: 'error',
-                            text: `Requires any of: ${techNames.join(', ')} → Lvl ${check.requiredLevel}`
+                            text: '',
+                            prefix: 'Requires any of:',
+                            multiTechLinks: techLinks,
+                            requiredLevel: check.requiredLevel
                         });
                     } else if (check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 1) {
-                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
                         showMessage({
                             type: 'error',
-                            text: `Requires all of: ${techNames.join(', ')} → Lvl ${check.requiredLevel}`
+                            text: '',
+                            prefix: 'Requires all of:',
+                            multiTechLinks: techLinks,
+                            requiredLevel: check.requiredLevel
                         });
                     } else {
                         const failedTechName = allTechs[check.failedTech]?.name || check.failedTech;
@@ -1014,16 +1163,22 @@
                 } else if (check.failedTech && check.requiredLevel) {
                     // Check if this is a multi-tech requirement (anyOf or allOf)
                     if (check.isAnyOf && check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 0) {
-                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
                         showMessage({
                             type: 'warning',
-                            text: `Upgraded to Level ${maxPossible}. Requires any of: ${techNames.join(', ')} → Lvl ${check.requiredLevel} to finish.`
+                            text: `Upgraded to Level ${maxPossible}.`,
+                            prefix: 'Requires any of:',
+                            multiTechLinks: techLinks,
+                            requiredLevel: check.requiredLevel
                         });
                     } else if (check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 1) {
-                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
                         showMessage({
                             type: 'warning',
-                            text: `Upgraded to Level ${maxPossible}. Requires all of: ${techNames.join(', ')} → Lvl ${check.requiredLevel} to finish.`
+                            text: `Upgraded to Level ${maxPossible}.`,
+                            prefix: 'Requires all of:',
+                            multiTechLinks: techLinks,
+                            requiredLevel: check.requiredLevel
                         });
                     } else {
                         const failedTechName = allTechs[check.failedTech]?.name || check.failedTech;
@@ -1040,6 +1195,29 @@
             // Remove 1 level
             if (currentLevel <= 0) {
                 showMessage({ type: 'warning', text: `${tech.name} is already at Level 0.` });
+                return;
+            }
+
+            // Check if removing this level would break any dependencies
+            const depCheck = checkRemovalDependencies(techKey, currentLevel - 1);
+            if (!depCheck.canRemove) {
+                if (depCheck.isAnyOf && depCheck.otherOptions && depCheck.otherOptions.length > 0) {
+                    // Show message that they need to level up an alternative first
+                    const altTechLinks = depCheck.otherOptions.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
+                    showMessage({
+                        type: 'error',
+                        text: `${depCheck.blockingTechName} Lvl ${depCheck.blockingTechLevel} requires this. Upgrade any of:`,
+                        prefix: '',
+                        multiTechLinks: altTechLinks,
+                        requiredLevel: depCheck.requiredLevel
+                    });
+                } else {
+                    showMessage({
+                        type: 'error',
+                        text: `Cannot remove. ${depCheck.blockingTechName} Lvl ${depCheck.blockingTechLevel} requires ${tech.name} → Lvl ${depCheck.requiredLevel}.`,
+                        techLink: { techKey: depCheck.blockingTech!, techName: depCheck.blockingTechName!, requiredLevel: depCheck.blockingTechLevel! }
+                    });
+                }
                 return;
             }
 
@@ -1675,6 +1853,14 @@
                     <i class="fas fa-minus"></i>
                     <span>Remove</span>
                 </button>
+                <button
+                    class="mode-btn clear"
+                    on:click={openClearModal}
+                    title="Clear all progress"
+                >
+                    <i class="fas fa-trash"></i>
+                    <span>Clear</span>
+                </button>
             </div>
         </div>
 
@@ -1826,7 +2012,9 @@
             <div class="message-content">
                 <i class="fas {simulatorMessage.type === 'error' ? 'fa-exclamation-circle' : 'fa-exclamation-triangle'}"></i>
                 <span class="message-text">
-                    {#if simulatorMessage.techLink}
+                    {#if simulatorMessage.multiTechLinks && simulatorMessage.multiTechLinks.length > 0}
+                        {#if simulatorMessage.text}{simulatorMessage.text} {/if}{simulatorMessage.prefix} {#each simulatorMessage.multiTechLinks as link, i}<span class="message-tech-link" on:click={() => { navigateToTech(link.techKey); clearMessage(); }} on:keydown={(e) => { if (e.key === 'Enter') { navigateToTech(link.techKey); clearMessage(); } }} role="button" tabindex="0">{link.techName}</span>{#if i < (simulatorMessage.multiTechLinks?.length || 0) - 1}, {/if}{/each} <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.requiredLevel}</span>
+                    {:else if simulatorMessage.techLink}
                         Requires <span class="message-tech-link" on:click={() => { if (simulatorMessage?.techLink) navigateToTech(simulatorMessage.techLink.techKey); clearMessage(); }} on:keydown={(e) => { if (e.key === 'Enter' && simulatorMessage?.techLink) { navigateToTech(simulatorMessage.techLink.techKey); clearMessage(); } }} role="button" tabindex="0">{simulatorMessage.techLink.techName}</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.techLink.requiredLevel}</span> to {simulatorMessage.type === 'warning' ? 'finish' : 'continue'}.
                     {:else if simulatorMessage.rcRequirement}
                         Requires <span class="rc-req-name">Research Center</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.rcRequirement}</span> to {simulatorMessage.type === 'warning' ? 'finish' : 'continue'}.
@@ -1861,7 +2049,126 @@
 </div>
 {/if}
 
+<!-- Clear Confirmation Modal -->
+{#if showClearModal}
+    <div class="modal-overlay" on:click={cancelClear} on:keydown={(e) => e.key === 'Escape' && cancelClear()} role="button" tabindex="0">
+        <div class="modal-content" on:click|stopPropagation role="dialog" aria-modal="true" aria-labelledby="clear-modal-title">
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="clear-modal-title">Clear All Progress?</h3>
+            <p>This will reset all technologies to Level 0. This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" on:click={cancelClear}>
+                    Cancel
+                </button>
+                <button class="modal-btn confirm" on:click={confirmClear}>
+                    Clear All
+                </button>
+            </div>
+        </div>
+    </div>
+{/if}
+
 <style>
+    /* ================================================
+       CLEAR CONFIRMATION MODAL
+       ================================================ */
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0d1b2a 100%);
+        border: 1px solid rgba(100, 180, 220, 0.3);
+        border-radius: 12px;
+        padding: 28px 32px;
+        max-width: 380px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(100, 180, 220, 0.1);
+    }
+
+    .modal-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 16px;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-icon i {
+        font-size: 1.75rem;
+        color: #ef4444;
+    }
+
+    .modal-content h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 12px 0;
+    }
+
+    .modal-content p {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0 0 24px 0;
+        line-height: 1.5;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .modal-btn {
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+
+    .modal-btn.cancel {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .modal-btn.cancel:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .modal-btn.confirm {
+        background: rgba(239, 68, 68, 0.8);
+        border-color: rgba(239, 68, 68, 1);
+        color: #fff;
+    }
+
+    .modal-btn.confirm:hover {
+        background: rgba(239, 68, 68, 1);
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    }
+
     /* ================================================
        MOBILE WARNING STYLES
        ================================================ */
@@ -2282,11 +2589,11 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        flex: 1;
     }
 
     .footer-counter.speedups {
         justify-content: flex-start;
-        min-width: 280px;
     }
 
     .footer-counter.crystals {
@@ -2305,6 +2612,7 @@
         font-weight: 700;
         color: #4a4a4a;
         font-family: 'NotoSansHans', sans-serif;
+        line-height: 1;
     }
 
     .counter-value {
@@ -2312,6 +2620,7 @@
         font-weight: 900;
         color: #2a5a7a;
         font-family: 'NotoSansHans', sans-serif;
+        line-height: 1;
     }
 
     .footer-counter.speedups .counter-value {
@@ -2334,6 +2643,7 @@
         background: none;
         border: none;
         padding: 0;
+        flex-shrink: 0;
     }
 
     /* Main Panel - Tech Tree Viewport */
@@ -2421,8 +2731,16 @@
         box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
     }
 
-    /* Remove mode - red when active */
+    /* Remove mode - orange when active */
     .mode-btn.remove.active {
+        background: rgba(249, 115, 22, 0.6);
+        border-color: rgba(249, 115, 22, 0.8);
+        color: #fff;
+        box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+    }
+
+    /* Clear mode - red when active */
+    .mode-btn.clear.active {
         background: rgba(239, 68, 68, 0.6);
         border-color: rgba(239, 68, 68, 0.8);
         color: #fff;
@@ -2715,8 +3033,8 @@
 
     .info-btn {
         position: absolute;
-        bottom: 4px;
-        right: 4px;
+        bottom: 1px;
+        right: 1px;
         width: 24px !important;
         height: 24px !important;
         min-width: 24px !important;
