@@ -777,6 +777,41 @@
             .sort((a, b) => a.level - b.level);
     }
 
+    // Combined requirement type for sorted display
+    type CombinedRequirement =
+        | { type: 'tech'; level: number; req: TechRequirement }
+        | { type: 'rc'; level: number; rcLevel: number };
+
+    // Get all requirements (tech + RC) merged and sorted by level
+    function getCombinedRequirements(techKey: string): CombinedRequirement[] {
+        const tech = allTechs[techKey];
+        if (!tech) return [];
+
+        const combined: CombinedRequirement[] = [];
+
+        // Add tech requirements
+        for (const req of tech.requirements) {
+            combined.push({ type: 'tech', level: req.level, req });
+        }
+
+        // Add RC requirements
+        const rcReqs = getTechRCRequirements(techKey);
+        for (const rcReq of rcReqs) {
+            combined.push({ type: 'rc', level: rcReq.level, rcLevel: rcReq.rcLevel });
+        }
+
+        // Sort by level, then by type (tech before rc at same level)
+        combined.sort((a, b) => {
+            if (a.level !== b.level) return a.level - b.level;
+            // At same level, put tech requirements before RC requirements
+            if (a.type === 'tech' && b.type === 'rc') return -1;
+            if (a.type === 'rc' && b.type === 'tech') return 1;
+            return 0;
+        });
+
+        return combined;
+    }
+
     // Prerequisite tech requirements - must have at least 1 point in the prerequisite to unlock
     // allOf: need at least 1 point in ALL listed techs
     // anyOf: need at least 1 point in ANY ONE of the listed techs
@@ -2172,16 +2207,17 @@
                     </tfoot>
                 </table>
             </div>
-            {#if tech.requirements.length > 0 || (hoveredNode?.techKey && getTechRCRequirements(hoveredNode.techKey).length > 0)}
+            {#if hoveredNode?.techKey && getCombinedRequirements(hoveredNode.techKey).length > 0}
                 <div class="tooltip-requirements">
                     <span class="req-label">Requirements:</span>
-                    {#each tech.requirements as req}
-                        {@const parts = getRequirementParts(req)}
-                        <span class="req-item"><span class="req-unlock-level">Lvl {req.level}:</span> {#if parts.keyword}<span class="req-keyword">{parts.keyword}</span>&nbsp;{/if}{#each parts.techIds as techId, i}<span class="req-tech-link" on:click={() => navigateToTech(techId)} on:keydown={(e) => e.key === 'Enter' && navigateToTech(techId)} role="button" tabindex="0">{getTechName(techId)}</span>{#if i < parts.techIds.length - 1},&nbsp;{/if}{/each} <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {req.techLevel || 0}</span></span>
-                    {/each}
-                    {#each hoveredNode?.techKey ? getTechRCRequirements(hoveredNode.techKey) : [] as rcReq}
-                        {@const meetsRC = researchCenterLevel >= rcReq.rcLevel}
-                        <span class="req-item"><span class="req-unlock-level">Lvl {rcReq.level}:</span> <span class="rc-req-name" class:rc-met={meetsRC} class:rc-not-met={!meetsRC}>Research Center</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {rcReq.rcLevel}</span></span>
+                    {#each getCombinedRequirements(hoveredNode.techKey) as combinedReq}
+                        {#if combinedReq.type === 'tech'}
+                            {@const parts = getRequirementParts(combinedReq.req)}
+                            <span class="req-item"><span class="req-unlock-level">Lvl {combinedReq.level}:</span> {#if parts.keyword}<span class="req-keyword">{parts.keyword}</span>&nbsp;{/if}{#each parts.techIds as techId, i}<span class="req-tech-link" on:click={() => navigateToTech(techId)} on:keydown={(e) => e.key === 'Enter' && navigateToTech(techId)} role="button" tabindex="0">{getTechName(techId)}</span>{#if i < parts.techIds.length - 1},&nbsp;{/if}{/each} <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {combinedReq.req.techLevel || 0}</span></span>
+                        {:else}
+                            {@const meetsRC = researchCenterLevel >= combinedReq.rcLevel}
+                            <span class="req-item"><span class="req-unlock-level">Lvl {combinedReq.level}:</span> <span class="rc-req-name" class:rc-met={meetsRC} class:rc-not-met={!meetsRC}>Research Center</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {combinedReq.rcLevel}</span></span>
+                        {/if}
                     {/each}
                 </div>
             {/if}
