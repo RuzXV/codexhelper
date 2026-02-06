@@ -478,6 +478,33 @@
     // Highlighted tech state (for when clicking on a requirement)
     let highlightedTechKey: string | null = null;
 
+    // Mode selector state
+    type SimulatorMode = 'single' | 'max' | 'remove';
+    let currentMode: SimulatorMode = 'single';
+
+    // Error/warning message state
+    interface SimulatorMessage {
+        type: 'error' | 'warning';
+        text: string;
+        techLink?: { techKey: string; techName: string; requiredLevel: number };
+        rcRequirement?: number;
+    }
+    let simulatorMessage: SimulatorMessage | null = null;
+    let messageTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    function showMessage(message: SimulatorMessage, duration: number = 5000) {
+        if (messageTimeout) clearTimeout(messageTimeout);
+        simulatorMessage = message;
+        messageTimeout = setTimeout(() => {
+            simulatorMessage = null;
+        }, duration);
+    }
+
+    function clearMessage() {
+        if (messageTimeout) clearTimeout(messageTimeout);
+        simulatorMessage = null;
+    }
+
     // Settings state
     let selectedVersion = 'v5';
     let researchCenterLevel = 25;
@@ -488,6 +515,67 @@
     const availableVersions = [
         { id: 'v5', name: 'Version 5 (Current)' }
     ];
+
+    // Research Center crystal cost reduction percentages by level
+    // Level 1-10: 0.1% per level (1% at 10)
+    // Level 11-20: 0.2% per level (3% at 20)
+    // Level 21-25: 3.3%, 3.6%, 4%, 4.5%, 5%
+    function getRCCostReduction(rcLevel: number): number {
+        if (rcLevel <= 0) return 0;
+        if (rcLevel <= 10) return rcLevel * 0.1;
+        if (rcLevel <= 20) return 1 + (rcLevel - 10) * 0.2;
+        // Levels 21-25: 3.3, 3.6, 4, 4.5, 5
+        const level21Plus = [3.3, 3.6, 4, 4.5, 5];
+        return level21Plus[Math.min(rcLevel - 21, 4)];
+    }
+
+    // Get current Cutting Corners reduction based on user's tech levels
+    function getCuttingCornersReduction(): number {
+        const cc1Level = userTechLevels['cuttingCornersI'] || 0;
+        const cc2Level = userTechLevels['cuttingCornersII'] || 0;
+
+        // Cutting Corners I: 1% per level up to 5%
+        const cc1Reduction = cc1Level;
+
+        // Cutting Corners II: 1% per level up to 10%
+        const cc2Reduction = cc2Level;
+
+        return cc1Reduction + cc2Reduction;
+    }
+
+    // Get total crystal cost reduction percentage
+    $: totalCostReduction = getRCCostReduction(researchCenterLevel) + getCuttingCornersReduction();
+
+    // Calculate reduced crystal cost
+    function getReducedCost(baseCost: number, reductionPercent: number): number {
+        return Math.round(baseCost * (1 - reductionPercent / 100));
+    }
+
+    // Get the cost reduction that was active when a specific level was researched
+    // This is needed because Cutting Corners applies proactively
+    function getCostReductionAtLevel(techKey: string, targetLevel: number): number {
+        const rcReduction = getRCCostReduction(researchCenterLevel);
+
+        // For Cutting Corners I, only levels researched AFTER a CC1 level count that level's bonus
+        // For example, CC1 level 1 gives 1% which applies to CC1 level 2 onwards
+        let cc1Reduction = 0;
+        let cc2Reduction = 0;
+
+        if (techKey === 'cuttingCornersI') {
+            // CC1 level N applies CC1 levels 1 to N-1
+            cc1Reduction = Math.max(0, targetLevel - 1);
+        } else if (techKey === 'cuttingCornersII') {
+            // CC2 uses full CC1 reduction + CC2 levels 1 to N-1
+            cc1Reduction = userTechLevels['cuttingCornersI'] || 0;
+            cc2Reduction = Math.max(0, targetLevel - 1);
+        } else {
+            // Other techs use current CC1 and CC2 levels
+            cc1Reduction = userTechLevels['cuttingCornersI'] || 0;
+            cc2Reduction = userTechLevels['cuttingCornersII'] || 0;
+        }
+
+        return rcReduction + cc1Reduction + cc2Reduction;
+    }
 
     // RC level requirements for specific techs
     const rcRequirements: Record<string, Record<number, number>> = {
@@ -516,6 +604,98 @@
         return Object.entries(techReqs)
             .map(([level, rcLevel]) => ({ level: parseInt(level), rcLevel }))
             .sort((a, b) => a.level - b.level);
+    }
+
+    // Prerequisite tech requirements - must have at least 1 point in the prerequisite to unlock
+    // allOf: need at least 1 point in ALL listed techs
+    // anyOf: need at least 1 point in ANY ONE of the listed techs
+    type PrereqRule = { allOf: string[] } | { anyOf: string[] };
+    const prerequisiteTechs: Record<string, PrereqRule> = {
+        // March speed techs require their respective attack techs
+        swiftMarchingI: { allOf: ['quenchedBladesI'] },
+        fleetOfFootI: { allOf: ['improvedBowsI'] },
+        swiftSteedsI: { allOf: ['mountedCombatTechniquesI'] },
+        reinforcedAxlesI: { allOf: ['improvedProjectilesI'] },
+        // Note: callToArmsI has anyOf requirements in JSON, so no prereq needed here
+        // Cutting Corners I requires Call to Arms I
+        cuttingCornersI: { allOf: ['callToArmsI'] },
+        // Leadership I requires Call to Arms I
+        leadershipI: { allOf: ['callToArmsI'] },
+        // Cultural Exchange requires Cutting Corners I
+        culturalExchange: { allOf: ['cuttingCornersI'] },
+        // Barbarian Bounties, Karaku Reports require Cultural Exchange
+        barbarianBounties: { allOf: ['culturalExchange'] },
+        karakuReports: { allOf: ['culturalExchange'] },
+        // Starmetal techs require their respective march speed techs
+        starmetalShields: { allOf: ['swiftMarchingI'] },
+        starmetalBracers: { allOf: ['fleetOfFootI'] },
+        starmetalBarding: { allOf: ['swiftSteedsI'] },
+        starmetalAxles: { allOf: ['reinforcedAxlesI'] },
+        // March speed II techs require Starmetal techs
+        swiftMarchingII: { allOf: ['starmetalShields'] },
+        fleetOfFootII: { allOf: ['starmetalBracers'] },
+        swiftSteedsII: { allOf: ['starmetalBarding'] },
+        reinforcedAxlesII: { allOf: ['starmetalAxles'] },
+        // Note: callToArmsII requires culturalExchange in JSON, not march speed II techs
+        // Cutting Corners II requires Call to Arms II
+        cuttingCornersII: { allOf: ['callToArmsII'] },
+        // Leadership II requires Leadership I
+        leadershipII: { allOf: ['leadershipI'] },
+        // Note: Attack II techs require callToArmsII level 8 in JSON, not level 1
+        // March speed III techs require their respective II techs
+        swiftMarchingIII: { allOf: ['swiftMarchingII'] },
+        fleetOfFootIII: { allOf: ['fleetOfFootII'] },
+        swiftSteedsIII: { allOf: ['swiftSteedsII'] },
+        reinforcedAxlesIII: { allOf: ['reinforcedAxlesII'] },
+        // Note: largerCamps has anyOf requirements in JSON (march speed II at level 8)
+        // Special Concoctions I requires Larger Camps (JSON has it at level 3)
+        specialConcoctionsI: { allOf: ['largerCamps'] },
+        // Special Concoctions II requires Special Concoctions I
+        specialConcoctionsII: { allOf: ['specialConcoctionsI'] },
+        // Runecraft requires Larger Camps level 5 in JSON
+        runecraft: { allOf: ['largerCamps'] },
+        // Emergency Support has no level 1 prereqs in JSON
+        // Rapid Retreat requires Emergency Support
+        rapidRetreat: { allOf: ['emergencySupport'] },
+        // Expanded Formation I requires Larger Camps level 5 in JSON
+        expandedFormationI: { allOf: ['largerCamps'] },
+        // Expanded Formation II requires Special Concoctions II
+        expandedFormationII: { allOf: ['specialConcoctionsII'] },
+        // Celestial Guidance requires Special Concoctions II
+        celestialGuidance: { allOf: ['specialConcoctionsII'] },
+        // Unit-specific techs require Emergency Support
+        ironInfantry: { allOf: ['emergencySupport'] },
+        archersFocus: { allOf: ['emergencySupport'] },
+        ridersResilience: { allOf: ['emergencySupport'] },
+        siegeProvisions: { allOf: ['emergencySupport'] },
+    };
+
+    // Check if prerequisite techs are met
+    function checkPrerequisites(techKey: string): { met: boolean; missingTechs?: string[]; isAnyOf?: boolean } {
+        const prereqRule = prerequisiteTechs[techKey];
+        if (!prereqRule) return { met: true };
+
+        if ('anyOf' in prereqRule) {
+            // ANY ONE of these techs needs at least 1 point
+            const anyMet = prereqRule.anyOf.some(prereqKey => (userTechLevels[prereqKey] || 0) >= 1);
+            if (!anyMet) {
+                return { met: false, missingTechs: prereqRule.anyOf, isAnyOf: true };
+            }
+        } else if ('allOf' in prereqRule) {
+            // ALL of these techs need at least 1 point
+            const missingTechs: string[] = [];
+            for (const prereqKey of prereqRule.allOf) {
+                const prereqLevel = userTechLevels[prereqKey] || 0;
+                if (prereqLevel < 1) {
+                    missingTechs.push(prereqKey);
+                }
+            }
+            if (missingTechs.length > 0) {
+                return { met: false, missingTechs, isAnyOf: false };
+            }
+        }
+
+        return { met: true };
     }
 
     // Toggle dropdowns
@@ -565,13 +745,27 @@
     // Get all techs for lookup - directly from the flat technologies object
     const allTechs: Record<string, Technology> = techTreeData.technologies as Record<string, Technology>;
 
-    // Reactive counters for total crystals and speedups used
+    // Calculate reduced crystal cost for a specific tech level
+    // We need to track what the reduction was at each level when it was researched
+    function calculateActualCrystalCost(techKey: string, levelIndex: number, baseCost: number): number {
+        // The reduction that applies is based on what was unlocked BEFORE this level
+        const reductionPercent = getCostReductionAtLevel(techKey, levelIndex + 1);
+        return getReducedCost(baseCost, reductionPercent);
+    }
+
+    // Reactive counters for total crystals and speedups used (with cost reduction)
     $: totalCrystalsUsed = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
         const tech = allTechs[techKey];
         if (!tech || level <= 0) return total;
-        // Sum crystals for all levels up to current level
-        const crystalsForLevels = tech.levels.slice(0, level).reduce((sum: number, lvl: TechLevel) => sum + lvl.crystals, 0);
-        return total + crystalsForLevels;
+
+        // Sum crystals for all levels up to current level with appropriate reduction
+        let crystalsSum = 0;
+        for (let i = 0; i < level; i++) {
+            const baseCost = tech.levels[i].crystals;
+            const actualCost = calculateActualCrystalCost(techKey, i, baseCost);
+            crystalsSum += actualCost;
+        }
+        return total + crystalsSum;
     }, 0);
 
     $: totalSpeedupsUsed = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
@@ -594,6 +788,279 @@
         }, 0);
         return total + timeForLevels;
     }, 0);
+
+    // Check if a tech requirement is met
+    function checkTechRequirement(req: TechRequirement, targetLevel: number): { met: boolean; failedTech?: string; failedTechs?: string[]; requiredLevel?: number; isAnyOf?: boolean } {
+        if (req.level > targetLevel) return { met: true }; // Requirement doesn't apply yet
+
+        const requiredLevel = req.techLevel || 0;
+
+        if (req.tech) {
+            // Single tech requirement
+            const currentLevel = userTechLevels[req.tech] || 0;
+            if (currentLevel < requiredLevel) {
+                return { met: false, failedTech: req.tech, requiredLevel: requiredLevel };
+            }
+        } else if (req.anyOf) {
+            // Any of these techs at required level
+            const anyMet = req.anyOf.some(techKey => (userTechLevels[techKey] || 0) >= requiredLevel);
+            if (!anyMet) {
+                return { met: false, failedTech: req.anyOf[0], failedTechs: req.anyOf, requiredLevel: requiredLevel, isAnyOf: true };
+            }
+        } else if (req.allOf) {
+            // All of these techs at required level
+            const failedTechs: string[] = [];
+            for (const techKey of req.allOf) {
+                const currentLevel = userTechLevels[techKey] || 0;
+                if (currentLevel < requiredLevel) {
+                    failedTechs.push(techKey);
+                }
+            }
+            if (failedTechs.length > 0) {
+                return { met: false, failedTech: failedTechs[0], failedTechs: failedTechs, requiredLevel: requiredLevel };
+            }
+        }
+
+        return { met: true };
+    }
+
+    // Check all requirements for upgrading a tech to a specific level
+    function canUpgradeToLevel(techKey: string, targetLevel: number): { canUpgrade: boolean; blockingReq?: TechRequirement; failedTech?: string; failedTechs?: string[]; requiredLevel?: number; rcRequired?: number; missingPrereqs?: string[]; isAnyOf?: boolean; isPrereqAnyOf?: boolean } {
+        const tech = allTechs[techKey];
+        if (!tech) return { canUpgrade: false };
+
+        // Check prerequisite techs (need at least 1 point in previous tech to unlock)
+        if (targetLevel === 1) {
+            const prereqCheck = checkPrerequisites(techKey);
+            if (!prereqCheck.met && prereqCheck.missingTechs) {
+                return { canUpgrade: false, missingPrereqs: prereqCheck.missingTechs, isPrereqAnyOf: prereqCheck.isAnyOf };
+            }
+        }
+
+        // Check RC requirements
+        const rcReq = getRCRequirement(techKey, targetLevel);
+        if (rcReq && researchCenterLevel < rcReq) {
+            return { canUpgrade: false, rcRequired: rcReq };
+        }
+
+        // Check tech requirements
+        for (const req of tech.requirements) {
+            if (req.level <= targetLevel) {
+                const result = checkTechRequirement(req, targetLevel);
+                if (!result.met) {
+                    return {
+                        canUpgrade: false,
+                        blockingReq: req,
+                        failedTech: result.failedTech,
+                        failedTechs: result.failedTechs,
+                        requiredLevel: result.requiredLevel,
+                        isAnyOf: result.isAnyOf
+                    };
+                }
+            }
+        }
+
+        return { canUpgrade: true };
+    }
+
+    // Find the maximum level a tech can be upgraded to given current requirements
+    function findMaxUpgradeableLevel(techKey: string): number {
+        const tech = allTechs[techKey];
+        if (!tech) return 0;
+
+        const currentLevel = userTechLevels[techKey] || 0;
+        let maxLevel = currentLevel;
+
+        for (let level = currentLevel + 1; level <= tech.maxLevel; level++) {
+            const check = canUpgradeToLevel(techKey, level);
+            if (check.canUpgrade) {
+                maxLevel = level;
+            } else {
+                break;
+            }
+        }
+
+        return maxLevel;
+    }
+
+    // Handle tech node click based on current mode
+    function handleTechClick(techKey: string) {
+        const tech = allTechs[techKey];
+        if (!tech) return;
+
+        const currentLevel = userTechLevels[techKey] || 0;
+        clearMessage();
+
+        if (currentMode === 'single') {
+            // Upgrade by 1 level
+            if (currentLevel >= tech.maxLevel) {
+                showMessage({ type: 'warning', text: `${tech.name} is already at max level.` });
+                return;
+            }
+
+            const targetLevel = currentLevel + 1;
+            const check = canUpgradeToLevel(techKey, targetLevel);
+
+            if (!check.canUpgrade) {
+                if (check.missingPrereqs && check.missingPrereqs.length > 0) {
+                    const prereqNames = check.missingPrereqs.map(key => allTechs[key]?.name || key);
+                    const prereqList = prereqNames.join(', ');
+                    const prefix = check.isPrereqAnyOf ? 'Requires any of' : 'Requires at least 1 point in each of';
+                    showMessage({
+                        type: 'error',
+                        text: `${prefix}: ${prereqList} to unlock.`,
+                        techLink: { techKey: check.missingPrereqs[0], techName: prereqNames[0], requiredLevel: 1 }
+                    });
+                } else if (check.rcRequired) {
+                    showMessage({
+                        type: 'error',
+                        text: `Requires Research Center Level ${check.rcRequired} to unlock Level ${targetLevel}.`,
+                        rcRequirement: check.rcRequired
+                    });
+                } else if (check.failedTech && check.requiredLevel) {
+                    // Check if this is a multi-tech requirement (anyOf or allOf)
+                    if (check.isAnyOf && check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 0) {
+                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        showMessage({
+                            type: 'error',
+                            text: `Requires any of: ${techNames.join(', ')} → Lvl ${check.requiredLevel}`
+                        });
+                    } else if (check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 1) {
+                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        showMessage({
+                            type: 'error',
+                            text: `Requires all of: ${techNames.join(', ')} → Lvl ${check.requiredLevel}`
+                        });
+                    } else {
+                        const failedTechName = allTechs[check.failedTech]?.name || check.failedTech;
+                        showMessage({
+                            type: 'error',
+                            text: `Requires ${failedTechName} → Lvl ${check.requiredLevel}`,
+                            techLink: { techKey: check.failedTech, techName: failedTechName, requiredLevel: check.requiredLevel }
+                        });
+                    }
+                }
+                return;
+            }
+
+            userTechLevels[techKey] = targetLevel;
+            userTechLevels = { ...userTechLevels }; // Trigger reactivity
+
+        } else if (currentMode === 'max') {
+            // Upgrade to max possible level
+            if (currentLevel >= tech.maxLevel) {
+                showMessage({ type: 'warning', text: `${tech.name} is already at max level.` });
+                return;
+            }
+
+            const maxPossible = findMaxUpgradeableLevel(techKey);
+
+            if (maxPossible <= currentLevel) {
+                // Can't upgrade at all - show what's blocking
+                const check = canUpgradeToLevel(techKey, currentLevel + 1);
+                if (check.missingPrereqs && check.missingPrereqs.length > 0) {
+                    const prereqNames = check.missingPrereqs.map(key => allTechs[key]?.name || key);
+                    const prereqList = prereqNames.join(', ');
+                    const prefix = check.isPrereqAnyOf ? 'Requires any of' : 'Requires at least 1 point in each of';
+                    showMessage({
+                        type: 'error',
+                        text: `${prefix}: ${prereqList} to unlock.`,
+                        techLink: { techKey: check.missingPrereqs[0], techName: prereqNames[0], requiredLevel: 1 }
+                    });
+                } else if (check.rcRequired) {
+                    showMessage({
+                        type: 'error',
+                        text: `Requires Research Center Level ${check.rcRequired} to continue.`,
+                        rcRequirement: check.rcRequired
+                    });
+                } else if (check.failedTech && check.requiredLevel) {
+                    // Check if this is a multi-tech requirement (anyOf or allOf)
+                    if (check.isAnyOf && check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 0) {
+                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        showMessage({
+                            type: 'error',
+                            text: `Requires any of: ${techNames.join(', ')} → Lvl ${check.requiredLevel}`
+                        });
+                    } else if (check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 1) {
+                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        showMessage({
+                            type: 'error',
+                            text: `Requires all of: ${techNames.join(', ')} → Lvl ${check.requiredLevel}`
+                        });
+                    } else {
+                        const failedTechName = allTechs[check.failedTech]?.name || check.failedTech;
+                        showMessage({
+                            type: 'error',
+                            text: `Requires ${failedTechName} → Lvl ${check.requiredLevel}`,
+                            techLink: { techKey: check.failedTech, techName: failedTechName, requiredLevel: check.requiredLevel }
+                        });
+                    }
+                }
+                return;
+            }
+
+            userTechLevels[techKey] = maxPossible;
+            userTechLevels = { ...userTechLevels }; // Trigger reactivity
+
+            // Show warning if couldn't max completely
+            if (maxPossible < tech.maxLevel) {
+                const check = canUpgradeToLevel(techKey, maxPossible + 1);
+                if (check.rcRequired) {
+                    showMessage({
+                        type: 'warning',
+                        text: `Upgraded to Level ${maxPossible}. Requires Research Center Level ${check.rcRequired} to continue.`,
+                        rcRequirement: check.rcRequired
+                    });
+                } else if (check.failedTech && check.requiredLevel) {
+                    // Check if this is a multi-tech requirement (anyOf or allOf)
+                    if (check.isAnyOf && check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 0) {
+                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        showMessage({
+                            type: 'warning',
+                            text: `Upgraded to Level ${maxPossible}. Requires any of: ${techNames.join(', ')} → Lvl ${check.requiredLevel} to finish.`
+                        });
+                    } else if (check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 1) {
+                        const techNames = check.failedTechs.map(key => allTechs[key]?.name || key);
+                        showMessage({
+                            type: 'warning',
+                            text: `Upgraded to Level ${maxPossible}. Requires all of: ${techNames.join(', ')} → Lvl ${check.requiredLevel} to finish.`
+                        });
+                    } else {
+                        const failedTechName = allTechs[check.failedTech]?.name || check.failedTech;
+                        showMessage({
+                            type: 'warning',
+                            text: `Upgraded to Level ${maxPossible}. Requires ${failedTechName} Level ${check.requiredLevel} to finish.`,
+                            techLink: { techKey: check.failedTech, techName: failedTechName, requiredLevel: check.requiredLevel }
+                        });
+                    }
+                }
+            }
+
+        } else if (currentMode === 'remove') {
+            // Remove 1 level
+            if (currentLevel <= 0) {
+                showMessage({ type: 'warning', text: `${tech.name} is already at Level 0.` });
+                return;
+            }
+
+            userTechLevels[techKey] = currentLevel - 1;
+            userTechLevels = { ...userTechLevels }; // Trigger reactivity
+        }
+    }
+
+    // Format speedups display
+    function formatSpeedups(days: number): string {
+        if (days === 0) return '0d';
+        if (days < 1) {
+            const hours = days * 24;
+            if (hours < 1) {
+                const mins = hours * 60;
+                return `${mins.toFixed(0)}m`;
+            }
+            return `${hours.toFixed(1)}h`;
+        }
+        return `${days.toFixed(1)}d`;
+    }
 
     // Build placeholder nodes for visualization
     let placeholderNodes: PlaceholderNode[] = generatedPositions.map(pos => {
@@ -1177,6 +1644,40 @@
         aria-label="Crystal Technology Tree - drag to scroll"
         style="height: {canvasHeight}px;"
     >
+        <!-- Mode Selector (top right of viewport) -->
+        <div class="mode-selector">
+            <span class="mode-label">Mode:</span>
+            <div class="mode-buttons">
+                <button
+                    class="mode-btn single"
+                    class:active={currentMode === 'single'}
+                    on:click={() => currentMode = 'single'}
+                    title="Add 1 level"
+                >
+                    <i class="fas fa-plus"></i>
+                    <span>Single</span>
+                </button>
+                <button
+                    class="mode-btn max"
+                    class:active={currentMode === 'max'}
+                    on:click={() => currentMode = 'max'}
+                    title="Max out tech"
+                >
+                    <i class="fas fa-angles-up"></i>
+                    <span>Max</span>
+                </button>
+                <button
+                    class="mode-btn remove"
+                    class:active={currentMode === 'remove'}
+                    on:click={() => currentMode = 'remove'}
+                    title="Remove 1 level"
+                >
+                    <i class="fas fa-minus"></i>
+                    <span>Remove</span>
+                </button>
+            </div>
+        </div>
+
         <div class="tech-tree-canvas" bind:this={canvas} style="width: {canvasWidth}px; height: {canvasHeight}px;">
             <!-- SVG for connection lines -->
             <svg class="tech-connections" bind:this={svg}></svg>
@@ -1200,6 +1701,9 @@
                         data-slot={node.slot}
                         data-col={node.col}
                         data-row={node.row}
+                        on:click={(e) => { if (node.techKey && !(e.target as HTMLElement).closest('.info-btn')) handleTechClick(node.techKey); }}
+                        role="button"
+                        tabindex={node.techKey ? 0 : -1}
                     >
                         <div class="tech-icon-frame">
                             {#if techIcon}
@@ -1279,11 +1783,12 @@
                     <tbody>
                         {#each tech.levels as level}
                             {@const meetsRC = hoveredNode?.techKey ? meetsRCRequirement(hoveredNode.techKey, level.level) : true}
+                            {@const displayCost = hoveredNode?.techKey ? getReducedCost(level.crystals, getCostReductionAtLevel(hoveredNode.techKey, level.level)) : level.crystals}
                             <tr class:completed={level.level <= currentLevel} class:next={level.level === currentLevel + 1} class:rc-locked={!meetsRC}>
                                 <td class="level-col">{level.level}</td>
                                 <td class="buff-col">{level.buff}</td>
                                 <td class="time-col">{level.time}</td>
-                                <td class="crystal-col">{formatNumber(level.crystals)}</td>
+                                <td class="crystal-col">{formatNumber(displayCost)}</td>
                                 <td class="coin-col">{formatNumber(level.seasonCoins)}</td>
                             </tr>
                         {/each}
@@ -1293,7 +1798,7 @@
                             <td>Total</td>
                             <td class="buff-col">{tech.totals.buff}</td>
                             <td class="time-col">{tech.totals.time}</td>
-                            <td class="crystal-col">{formatNumber(tech.totals.crystals)}</td>
+                            <td class="crystal-col">{formatNumber(hoveredNode?.techKey ? tech.levels.reduce((sum, lvl, i) => sum + getReducedCost(lvl.crystals, getCostReductionAtLevel(hoveredNode!.techKey!, i + 1)), 0) : tech.totals.crystals)}</td>
                             <td class="coin-col">{formatNumber(tech.totals.seasonCoins)}</td>
                         </tr>
                     </tfoot>
@@ -1315,12 +1820,33 @@
         </div>
     {/if}
 
+    <!-- Message Display -->
+    {#if simulatorMessage}
+        <div class="simulator-message" class:error={simulatorMessage.type === 'error'} class:warning={simulatorMessage.type === 'warning'}>
+            <div class="message-content">
+                <i class="fas {simulatorMessage.type === 'error' ? 'fa-exclamation-circle' : 'fa-exclamation-triangle'}"></i>
+                <span class="message-text">
+                    {#if simulatorMessage.techLink}
+                        Requires <span class="message-tech-link" on:click={() => { if (simulatorMessage?.techLink) navigateToTech(simulatorMessage.techLink.techKey); clearMessage(); }} on:keydown={(e) => { if (e.key === 'Enter' && simulatorMessage?.techLink) { navigateToTech(simulatorMessage.techLink.techKey); clearMessage(); } }} role="button" tabindex="0">{simulatorMessage.techLink.techName}</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.techLink.requiredLevel}</span> to {simulatorMessage.type === 'warning' ? 'finish' : 'continue'}.
+                    {:else if simulatorMessage.rcRequirement}
+                        Requires <span class="rc-req-name">Research Center</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.rcRequirement}</span> to {simulatorMessage.type === 'warning' ? 'finish' : 'continue'}.
+                    {:else}
+                        {simulatorMessage.text}
+                    {/if}
+                </span>
+                <button class="message-close" on:click={clearMessage} aria-label="Close message">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    {/if}
+
     <!-- Footer Bar with Counters and Scroll Hint -->
     <div class="crystal-tech-footer">
         <div class="footer-counter speedups">
             <img src={researchSpeedupIcon.src} alt="Speedup" class="counter-icon" width="28" height="28" />
             <span class="counter-label">Total Speedups Spent:</span>
-            <span class="counter-value">{totalSpeedupsUsed.toFixed(1)}d</span>
+            <span class="counter-value">{formatSpeedups(totalSpeedupsUsed)}</span>
         </div>
         <div class="scroll-hint">
             <i class="fas fa-arrows-alt-h"></i>
@@ -1649,12 +2175,103 @@
         -webkit-mask-image: linear-gradient(to left, transparent, black);
     }
 
+    /* Simulator Message */
+    .simulator-message {
+        position: absolute;
+        bottom: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        max-width: 90%;
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    .message-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .simulator-message.error .message-content {
+        background: rgba(220, 50, 50, 0.95);
+        color: #fff;
+        border: 1px solid rgba(255, 100, 100, 0.5);
+    }
+
+    .simulator-message.warning .message-content {
+        background: rgba(200, 150, 50, 0.95);
+        color: #fff;
+        border: 1px solid rgba(255, 200, 100, 0.5);
+    }
+
+    .message-content i {
+        font-size: 1rem;
+    }
+
+    .message-text {
+        flex: 1;
+    }
+
+    .message-text .message-tech-link {
+        color: #7dd3fc;
+        cursor: pointer;
+        text-decoration: underline;
+        font-weight: 600;
+    }
+
+    .message-text .message-tech-link:hover {
+        color: #bae6fd;
+    }
+
+    .message-text .rc-req-name {
+        color: #fca5a5;
+        font-weight: 600;
+    }
+
+    .message-text .req-arrow {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .message-text .req-tech-level {
+        color: #fcd34d;
+        font-weight: 700;
+    }
+
+    .message-close {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        padding: 4px;
+        font-size: 0.9rem;
+        transition: color 0.15s ease;
+    }
+
+    .message-close:hover {
+        color: #fff;
+    }
+
     /* Footer Bar with Counters */
     .crystal-tech-footer {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        height: 40px;
+        height: 44px;
         background: linear-gradient(to bottom, #b8b4a9, #c4c0b5);
         padding: 0 20px;
         position: relative;
@@ -1667,10 +2284,20 @@
         gap: 8px;
     }
 
+    .footer-counter.speedups {
+        justify-content: flex-start;
+        min-width: 280px;
+    }
+
+    .footer-counter.crystals {
+        justify-content: flex-end;
+    }
+
     .counter-icon {
         width: 26px;
         height: 26px;
         object-fit: contain;
+        flex-shrink: 0;
     }
 
     .counter-label {
@@ -1685,6 +2312,15 @@
         font-weight: 900;
         color: #2a5a7a;
         font-family: 'NotoSansHans', sans-serif;
+    }
+
+    .footer-counter.speedups .counter-value {
+        text-align: left;
+        min-width: 70px;
+    }
+
+    .footer-counter.crystals .counter-value {
+        text-align: right;
     }
 
     .crystal-tech-footer .scroll-hint {
@@ -1713,6 +2349,92 @@
 
     .tech-tree-viewport:active {
         cursor: grabbing;
+    }
+
+    /* Mode Selector - positioned in top right of viewport */
+    .mode-selector {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        padding: 6px 18px;
+        border-radius: 7px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    }
+
+    .mode-label {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+        text-transform: uppercase;
+        letter-spacing: 0.75px;
+    }
+
+    .mode-buttons {
+        display: flex;
+        gap: 9px;
+    }
+
+    .mode-btn {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 1.05rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        line-height: 1.2;
+        min-height: unset;
+        min-width: unset;
+        height: auto;
+    }
+
+    .mode-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Single mode - green when active */
+    .mode-btn.single.active {
+        background: rgba(34, 197, 94, 0.6);
+        border-color: rgba(34, 197, 94, 0.8);
+        color: #fff;
+        box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+    }
+
+    /* Max mode - blue when active */
+    .mode-btn.max.active {
+        background: rgba(59, 130, 246, 0.6);
+        border-color: rgba(59, 130, 246, 0.8);
+        color: #fff;
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Remove mode - red when active */
+    .mode-btn.remove.active {
+        background: rgba(239, 68, 68, 0.6);
+        border-color: rgba(239, 68, 68, 0.8);
+        color: #fff;
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .mode-btn i {
+        font-size: 0.95rem;
+    }
+
+    .mode-btn span {
+        font-size: 0.95rem;
     }
 
     .tech-tree-canvas {

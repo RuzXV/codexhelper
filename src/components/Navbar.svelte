@@ -141,17 +141,18 @@
         .sub-nav-link {
             flex: 0 1 auto;
             justify-content: center;
+            padding: 0 4px;
         }
-        
+
         .sub-nav-container {
             justify-content: center;
-            gap: var(--spacing-5, 25px);
-            padding: 0 var(--spacing-2); 
+            gap: 12px;
+            padding: 0 8px;
         }
 
         .sub-nav-icon {
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
         }
     }
 

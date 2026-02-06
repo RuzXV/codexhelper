@@ -48,6 +48,17 @@
    COMING SOON SLIDE STYLES
    ================================================ */
 
+/* Simple Coming Soon - just centered text */
+.coming-soon-simple {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
 .coming-soon-slide {
     text-align: center;
     padding: var(--spacing-6);
