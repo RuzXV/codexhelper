@@ -119,16 +119,13 @@
         surpriseStrike: iconSurpriseStrike,
     };
 
-    // Helper function to get icon for a tech key
     function getTechIcon(techKey: string | null): ImageMetadata | null {
         if (!techKey) return null;
         return techIcons[techKey] || null;
     }
 
-    // Helper function to determine text size class based on name length
     function getTextSizeClass(name: string | undefined): string {
         if (!name) return '';
-        // Exceptions that should use regular size
         if (name === 'Reinforced Axles II' || name === 'Reinforced Axles III') return '';
         const len = name.length;
         if (len > 24) return 'text-xs';
@@ -136,7 +133,6 @@
         return '';
     }
 
-    // Types - Updated for new JSON structure
     interface TechLevel {
         level: number;
         buff: string;
@@ -460,11 +456,85 @@
     // Type for the window with our custom functions
     interface WindowWithStorage extends Window {
         saveUserData?: (key: string, data: unknown) => void;
-        loadUserData?: (key: string) => { userTechLevels?: Record<string, number>; researchCenterLevel?: number; selectedVersion?: string } | null;
+        loadUserData?: (key: string) => {
+            userTechLevels?: Record<string, number>;
+            researchCenterLevel?: number;
+            selectedVersion?: string;
+            researchOrder?: { techKey: string; level: number; cc1AtTime: number; cc2AtTime: number }[];
+        } | null;
     }
 
     // User's current tech levels (will be made interactive later)
     let userTechLevels: Record<string, number> = {};
+
+    // Track the order of research with CC levels at time of research
+    // Each entry records: techKey, level researched, CC1 level at time, CC2 level at time
+    let researchOrder: { techKey: string; level: number; cc1AtTime: number; cc2AtTime: number }[] = [];
+
+    // Build a map of line-based prerequisites from connections
+    // A tech requires at least level 1 in ANY tech that has a line connecting TO it
+    function buildLinePrerequisites(): Record<string, string[]> {
+        const prereqs: Record<string, string[]> = {};
+
+        // Regular connections
+        connections.forEach(([fromSlot, toSlot]) => {
+            const fromTech = techAssignments[fromSlot];
+            const toTech = techAssignments[toSlot];
+            if (fromTech && toTech) {
+                if (!prereqs[toTech]) prereqs[toTech] = [];
+                if (!prereqs[toTech].includes(fromTech)) {
+                    prereqs[toTech].push(fromTech);
+                }
+            }
+        });
+
+        // Pass-through connections - these connect fromCol's slot through throughCol to all 4 slots in toCol
+        passThroughConnections.forEach(({ fromCol, fromSlot, toCol }) => {
+            const fromSlotKey = `col${fromCol}_slot${fromSlot}`;
+            const fromTech = techAssignments[fromSlotKey];
+
+            // Connect to all 4 slots in the target column
+            for (let slot = 0; slot < 4; slot++) {
+                const toSlotKey = `col${toCol}_slot${slot}`;
+                const toTech = techAssignments[toSlotKey];
+                if (fromTech && toTech) {
+                    if (!prereqs[toTech]) prereqs[toTech] = [];
+                    if (!prereqs[toTech].includes(fromTech)) {
+                        prereqs[toTech].push(fromTech);
+                    }
+                }
+            }
+        });
+
+        return prereqs;
+    }
+
+    const linePrerequisites = buildLinePrerequisites();
+
+    // Record a tech research in the order history
+    function recordResearch(techKey: string, level: number) {
+        const cc1AtTime = userTechLevels['cuttingCornersI'] || 0;
+        const cc2AtTime = userTechLevels['cuttingCornersII'] || 0;
+        researchOrder = [...researchOrder, { techKey, level, cc1AtTime, cc2AtTime }];
+    }
+
+    // Remove research history for a tech at a specific level (for downgrades)
+    function removeResearchRecord(techKey: string, level: number) {
+        researchOrder = researchOrder.filter(e => !(e.techKey === techKey && e.level === level));
+    }
+
+    // Check if line-based prerequisites are met (any connecting tech must be at least level 1)
+    function checkLinePrerequisites(techKey: string): { met: boolean; missingTechs?: string[] } {
+        const prereqs = linePrerequisites[techKey];
+        if (!prereqs || prereqs.length === 0) return { met: true };
+
+        // Need at least one of the connecting techs to be at level 1+
+        const anyMet = prereqs.some(prereqKey => (userTechLevels[prereqKey] || 0) >= 1);
+        if (!anyMet) {
+            return { met: false, missingTechs: prereqs };
+        }
+        return { met: true };
+    }
 
     // Flag to prevent saving during initial load
     let isInitialLoad = true;
@@ -478,7 +548,8 @@
                 const state = {
                     userTechLevels,
                     researchCenterLevel,
-                    selectedVersion
+                    selectedVersion,
+                    researchOrder
                 };
                 win.saveUserData(TECH_SIMULATOR_CACHE_KEY, state);
             }
@@ -507,6 +578,9 @@
                     }
                     if (savedState.selectedVersion) {
                         selectedVersion = savedState.selectedVersion;
+                    }
+                    if (savedState.researchOrder) {
+                        researchOrder = savedState.researchOrder;
                     }
                 }
             }
@@ -586,6 +660,7 @@
             userTechLevels[key] = 0;
         }
         userTechLevels = { ...userTechLevels }; // Trigger reactivity
+        researchOrder = []; // Clear research order history
         showClearModal = false;
         currentMode = 'single'; // Switch back to single mode
         showMessage({ type: 'warning', text: `Cleared all progress. ${techCount} technologies reset to Level 0.` });
@@ -838,24 +913,31 @@
     // Get all techs for lookup - directly from the flat technologies object
     const allTechs: Record<string, Technology> = techTreeData.technologies as Record<string, Technology>;
 
-    // Calculate reduced crystal cost for a specific tech level
-    // We need to track what the reduction was at each level when it was researched
-    function calculateActualCrystalCost(techKey: string, levelIndex: number, baseCost: number): number {
-        // The reduction that applies is based on what was unlocked BEFORE this level
-        const reductionPercent = getCostReductionAtLevel(techKey, levelIndex + 1);
+    // Calculate reduced crystal cost for a specific tech level based on CC levels at time of research
+    function calculateActualCrystalCostFromHistory(techKey: string, level: number, baseCost: number): number {
+        // Find the research order entry for this tech/level
+        const entry = researchOrder.find(e => e.techKey === techKey && e.level === level);
+        if (entry) {
+            // Use the CC levels that were active when this was researched
+            const ccReduction = entry.cc1AtTime + entry.cc2AtTime;
+            const rcReduction = getRCCostReduction(researchCenterLevel);
+            return getReducedCost(baseCost, rcReduction + ccReduction);
+        }
+        // Fallback for legacy data without research order - use current CC levels
+        const reductionPercent = getCostReductionAtLevel(techKey, level);
         return getReducedCost(baseCost, reductionPercent);
     }
 
-    // Reactive counters for total crystals and speedups used (with cost reduction)
+    // Reactive counters for total crystals and speedups used (with cost reduction based on research order)
     $: totalCrystalsUsed = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
         const tech = allTechs[techKey];
         if (!tech || level <= 0) return total;
 
-        // Sum crystals for all levels up to current level with appropriate reduction
+        // Sum crystals for all levels up to current level with the CC reduction that was active when researched
         let crystalsSum = 0;
         for (let i = 0; i < level; i++) {
             const baseCost = tech.levels[i].crystals;
-            const actualCost = calculateActualCrystalCost(techKey, i, baseCost);
+            const actualCost = calculateActualCrystalCostFromHistory(techKey, i + 1, baseCost);
             crystalsSum += actualCost;
         }
         return total + crystalsSum;
@@ -918,12 +1000,19 @@
     }
 
     // Check all requirements for upgrading a tech to a specific level
-    function canUpgradeToLevel(techKey: string, targetLevel: number): { canUpgrade: boolean; blockingReq?: TechRequirement; failedTech?: string; failedTechs?: string[]; requiredLevel?: number; rcRequired?: number; missingPrereqs?: string[]; isAnyOf?: boolean; isPrereqAnyOf?: boolean } {
+    function canUpgradeToLevel(techKey: string, targetLevel: number): { canUpgrade: boolean; blockingReq?: TechRequirement; failedTech?: string; failedTechs?: string[]; requiredLevel?: number; rcRequired?: number; missingPrereqs?: string[]; isAnyOf?: boolean; isPrereqAnyOf?: boolean; isLinePrereq?: boolean } {
         const tech = allTechs[techKey];
         if (!tech) return { canUpgrade: false };
 
         // Check prerequisite techs (need at least 1 point in previous tech to unlock)
         if (targetLevel === 1) {
+            // First check line-based prerequisites (from connections)
+            const lineCheck = checkLinePrerequisites(techKey);
+            if (!lineCheck.met && lineCheck.missingTechs) {
+                return { canUpgrade: false, missingPrereqs: lineCheck.missingTechs, isPrereqAnyOf: true, isLinePrereq: true };
+            }
+
+            // Then check explicit prerequisite rules
             const prereqCheck = checkPrerequisites(techKey);
             if (!prereqCheck.met && prereqCheck.missingTechs) {
                 return { canUpgrade: false, missingPrereqs: prereqCheck.missingTechs, isPrereqAnyOf: prereqCheck.isAnyOf };
@@ -1075,6 +1164,26 @@
                     }
                 }
             }
+
+            // Check line-based prerequisites (for level 1 unlock)
+            const linePrereqs = linePrerequisites[otherTechKey];
+            if (linePrereqs && linePrereqs.includes(techKey) && otherTechLevel >= 1 && newLevel < 1) {
+                // Check if any OTHER tech in the line prereqs is unlocked
+                const othersMeetReq = linePrereqs.some(altKey =>
+                    altKey !== techKey && (userTechLevels[altKey] || 0) >= 1
+                );
+                if (!othersMeetReq) {
+                    return {
+                        canRemove: false,
+                        blockingTech: otherTechKey,
+                        blockingTechName: otherTech.name,
+                        blockingTechLevel: otherTechLevel,
+                        requiredLevel: 1,
+                        isAnyOf: true,
+                        otherOptions: linePrereqs.filter(k => k !== techKey)
+                    };
+                }
+            }
         }
 
         return { canRemove: true };
@@ -1146,6 +1255,8 @@
                 return;
             }
 
+            // Record the research in the order history
+            recordResearch(techKey, targetLevel);
             userTechLevels[techKey] = targetLevel;
             userTechLevels = { ...userTechLevels }; // Trigger reactivity
 
@@ -1208,6 +1319,10 @@
                 return;
             }
 
+            // Record each level being researched in the order history
+            for (let lvl = currentLevel + 1; lvl <= maxPossible; lvl++) {
+                recordResearch(techKey, lvl);
+            }
             userTechLevels[techKey] = maxPossible;
             userTechLevels = { ...userTechLevels }; // Trigger reactivity
 
@@ -1281,6 +1396,8 @@
                 return;
             }
 
+            // Remove the research record for this level
+            removeResearchRecord(techKey, currentLevel);
             userTechLevels[techKey] = currentLevel - 1;
             userTechLevels = { ...userTechLevels }; // Trigger reactivity
         }
