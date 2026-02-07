@@ -461,6 +461,7 @@
             researchCenterLevel?: number;
             selectedVersion?: string;
             researchOrder?: { techKey: string; level: number; cc1AtTime: number; cc2AtTime: number }[];
+            includeRCCrystalCost?: boolean;
         } | null;
     }
 
@@ -549,7 +550,8 @@
                     userTechLevels,
                     researchCenterLevel,
                     selectedVersion,
-                    researchOrder
+                    researchOrder,
+                    includeRCCrystalCost
                 };
                 win.saveUserData(TECH_SIMULATOR_CACHE_KEY, state);
             }
@@ -581,6 +583,9 @@
                     }
                     if (savedState.researchOrder) {
                         researchOrder = savedState.researchOrder;
+                    }
+                    if (savedState.includeRCCrystalCost !== undefined) {
+                        includeRCCrystalCost = savedState.includeRCCrystalCost;
                     }
                 }
             }
@@ -676,6 +681,45 @@
     let researchCenterLevel = 25;
     let isVersionDropdownOpen = false;
     let isRCDropdownOpen = false;
+    let includeRCCrystalCost = false;
+
+    // Research Center crystal costs per level (cumulative cost to reach that level)
+    // Level 1 is free, costs start from level 2
+    const rcCrystalCosts: Record<number, number> = {
+        2: 1000,
+        3: 2500,
+        4: 4000,
+        5: 5500,
+        6: 7000,
+        7: 10000,
+        8: 15000,
+        9: 20000,
+        10: 25000,
+        11: 30000,
+        12: 37500,
+        13: 45000,
+        14: 52500,
+        15: 60000,
+        16: 70000,
+        17: 80000,
+        18: 90000,
+        19: 100000,
+        20: 115000,
+        21: 130000,
+        22: 150000,
+        23: 200000,
+        24: 250000,
+        25: 300000
+    };
+
+    // Calculate total RC crystal cost up to a given level
+    function getTotalRCCrystalCost(level: number): number {
+        let total = 0;
+        for (let i = 2; i <= level; i++) {
+            total += rcCrystalCosts[i] || 0;
+        }
+        return total;
+    }
 
     // Available versions (future-proofed for more versions)
     const availableVersions = [
@@ -922,6 +966,18 @@
         isRCDropdownOpen = false;
     }
 
+    // Scroll to total crystals counter and highlight it
+    function scrollToTotalCrystals() {
+        const valueEl = document.getElementById('total-crystals-value');
+        if (valueEl) {
+            valueEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            valueEl.classList.add('glow-highlight');
+            setTimeout(() => {
+                valueEl.classList.remove('glow-highlight');
+            }, 2500);
+        }
+    }
+
     // Close dropdowns when clicking outside
     function handleSettingsOutsideClick(event: MouseEvent) {
         const target = event.target as HTMLElement;
@@ -964,7 +1020,8 @@
     }
 
     // Reactive counters for total crystals and speedups used (with cost reduction based on research order)
-    $: totalCrystalsUsed = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
+    // Calculate tech tree crystal cost
+    $: techTreeCrystalCost = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
         const tech = allTechs[techKey];
         if (!tech || level <= 0) return total;
 
@@ -977,6 +1034,9 @@
         }
         return total + crystalsSum;
     }, 0);
+
+    // Total crystals including optional RC cost
+    $: totalCrystalsUsed = techTreeCrystalCost + (includeRCCrystalCost ? getTotalRCCrystalCost(researchCenterLevel) : 0);
 
     $: totalSpeedupsUsed = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
         const tech = allTechs[techKey];
@@ -1936,11 +1996,6 @@
             <p class="mobile-warning-text">
                 For the best experience, please visit this page on a <strong>desktop computer</strong>, <strong>laptop</strong>, or <strong>tablet in landscape mode</strong>.
             </p>
-            <div class="mobile-warning-features">
-                <span class="feature-item"><i class="fas fa-mouse-pointer"></i> Drag & drop interactions</span>
-                <span class="feature-item"><i class="fas fa-expand-arrows-alt"></i> Large tech tree visualization</span>
-                <span class="feature-item"><i class="fas fa-info-circle"></i> Detailed tooltips</span>
-            </div>
         </div>
     </div>
 {:else}
@@ -2011,6 +2066,16 @@
                     </div>
                 {/if}
             </div>
+        </div>
+
+        <div class="settings-toggle vertical centered">
+            <span class="settings-label rc-toggle-label">
+                <span>Include Research Center Crystal Cost <span class="here-link" on:click={scrollToTotalCrystals} on:keydown={(e) => e.key === 'Enter' && scrollToTotalCrystals()} role="button" tabindex="0">Here</span></span>
+            </span>
+            <label class="toggle-switch modern small">
+                <input type="checkbox" bind:checked={includeRCCrystalCost} />
+                <span class="toggle-slider"></span>
+            </label>
         </div>
     </div>
 </div>
@@ -2261,7 +2326,7 @@
         <div class="footer-counter crystals">
             <img src={crystalIcon.src} alt="Crystal" class="counter-icon" width="28" height="28" />
             <span class="counter-label">Total Crystals Used:</span>
-            <span class="counter-value">{totalCrystalsUsed.toLocaleString()}</span>
+            <span class="counter-value" id="total-crystals-value">{totalCrystalsUsed.toLocaleString()}</span>
         </div>
     </div>
 </div>
@@ -2490,6 +2555,7 @@
 
     .settings-controls {
         display: flex;
+        align-items: stretch;
         gap: 16px;
         flex-shrink: 0;
     }
@@ -2497,6 +2563,7 @@
     .settings-dropdown {
         display: flex;
         flex-direction: column;
+        justify-content: center;
         gap: 6px;
         min-width: 200px;
     }
@@ -2615,6 +2682,183 @@
     .select-dropdown::-webkit-scrollbar-thumb {
         background: rgba(100, 180, 220, 0.4);
         border-radius: 3px;
+    }
+
+    /* Toggle Switch Styles */
+    .settings-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 0;
+    }
+
+    .settings-toggle.vertical {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .settings-toggle.vertical.centered {
+        align-items: center;
+        justify-content: center;
+    }
+
+    .settings-label.rc-toggle-label {
+        font-size: 0.6rem;
+        text-align: center;
+        max-width: 150px;
+    }
+
+    .here-link {
+        color: #4ade80;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        transition: all 0.2s ease;
+    }
+
+    .here-link:hover {
+        color: #86efac;
+        text-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    /* Modern toggle styles */
+    .toggle-switch.modern {
+        width: 52px;
+        height: 28px;
+    }
+
+    /* Small modern toggle (15% smaller) */
+    .toggle-switch.modern.small {
+        width: 44px;
+        height: 24px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(100, 100, 100, 0.4);
+        transition: 0.3s;
+        border-radius: 24px;
+        border: 1px solid rgba(100, 180, 220, 0.2);
+    }
+
+    .toggle-switch.modern .toggle-slider {
+        background: linear-gradient(145deg, rgba(60, 60, 70, 0.8), rgba(40, 40, 50, 0.9));
+        border: 1px solid rgba(100, 180, 220, 0.3);
+        box-shadow:
+            inset 0 2px 4px rgba(0, 0, 0, 0.3),
+            0 1px 2px rgba(255, 255, 255, 0.05);
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 2px;
+        bottom: 2px;
+        background-color: #fff;
+        transition: 0.3s;
+        border-radius: 50%;
+    }
+
+    .toggle-switch.modern .toggle-slider:before {
+        height: 22px;
+        width: 22px;
+        left: 2px;
+        bottom: 2px;
+        background: linear-gradient(145deg, #ffffff, #e0e0e0);
+        box-shadow:
+            0 2px 6px rgba(0, 0, 0, 0.3),
+            0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+        background-color: var(--accent-blue, #3b82f6);
+        border-color: var(--accent-blue, #3b82f6);
+    }
+
+    .toggle-switch.modern input:checked + .toggle-slider {
+        background: linear-gradient(145deg, #4ade80, #22c55e);
+        border-color: #22c55e;
+        box-shadow:
+            inset 0 2px 4px rgba(0, 0, 0, 0.1),
+            0 0 12px rgba(74, 222, 128, 0.4);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(20px);
+    }
+
+    .toggle-switch.modern input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+        background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    }
+
+    /* Small modern toggle knob adjustments */
+    .toggle-switch.modern.small .toggle-slider:before {
+        height: 18px;
+        width: 18px;
+        left: 2px;
+        bottom: 2px;
+    }
+
+    .toggle-switch.modern.small input:checked + .toggle-slider:before {
+        transform: translateX(20px);
+    }
+
+    .toggle-switch input:focus + .toggle-slider {
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    }
+
+    .toggle-switch.modern input:focus + .toggle-slider {
+        box-shadow: none;
+    }
+
+    .toggle-switch.modern:hover .toggle-slider {
+        border-color: rgba(100, 180, 220, 0.5);
+    }
+
+    .toggle-switch.modern:hover input:checked + .toggle-slider {
+        box-shadow:
+            inset 0 2px 4px rgba(0, 0, 0, 0.1),
+            0 0 16px rgba(74, 222, 128, 0.5);
+    }
+
+    /* Glow highlight animation for total crystals value */
+    @keyframes crystalGlow {
+        0%, 100% {
+            text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
+        }
+        50% {
+            text-shadow: 0 0 15px rgba(74, 222, 128, 1), 0 0 25px rgba(74, 222, 128, 0.7), 0 0 35px rgba(74, 222, 128, 0.4);
+        }
+    }
+
+    :global(.counter-value.glow-highlight) {
+        animation: crystalGlow 0.8s ease-in-out 3;
+        color: #4ade80;
     }
 
     /* ================================================
