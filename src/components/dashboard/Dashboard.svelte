@@ -6,20 +6,25 @@
     import HistoryPanel from './master_panel/HistoryPanel.svelte';
     import { fade } from 'svelte/transition';
 
+    const SUPER_ADMIN_ID = '285201373266575361';
+
     let user = null;
     let loading = true;
-    let currentView = ''; 
+    let currentView = '';
     let allowedViews = [];
-    
+
     let availableServers = [];
     let selectedServer = null;
-    let isServerDropdownOpen = false;
+    let isMobile = false;
 
     onMount(async () => {
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
         if (window.auth && typeof window.auth.init === 'function') {
             await window.auth.init('#auth-container-dashboard');
         }
-        
+
         const authHandler = (e) => {
             user = e.detail.user;
             determineAccess(user);
@@ -43,9 +48,17 @@
 
         return () => {
             document.removeEventListener('auth:loggedIn', authHandler);
-            document.removeEventListener('click', closeServerDropdown);
+            window.removeEventListener('resize', checkMobile);
         };
     });
+
+    function checkMobile() {
+        const userAgent = navigator.userAgent || navigator.vendor;
+        const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const isSmallScreen = window.innerWidth <= 768;
+        isMobile = mobileRegex.test(userAgent) || (isTouchDevice && isSmallScreen);
+    }
 
     function determineAccess(userData) {
         allowedViews = [];
@@ -56,7 +69,9 @@
         if (userData.is_master_admin) {
             allowedViews.push({ id: 'master', label: 'Master Panel', icon: 'fa-user-shield' });
             allowedViews.push({ id: 'changelog', label: 'Changelog', icon: 'fa-history' });
-            
+        }
+
+        if (userData.id === SUPER_ADMIN_ID) {
             allowedViews.push({ id: 'recovery', label: 'Recovery', icon: 'fa-database' });
         }
 
@@ -68,7 +83,7 @@
     function switchView(viewId) {
         currentView = viewId;
     }
-    
+
     async function fetchUserServers(user) {
         loading = true;
         try {
@@ -78,12 +93,11 @@
                 if (availableServers.length > 0) {
                     const storedId = localStorage.getItem('codex_last_server_id');
                     const previousSelection = availableServers.find(s => s.id === storedId);
-                    
+
                     if (previousSelection) {
                         selectServer(previousSelection);
                     } else {
                         selectedServer = null;
-                        isServerDropdownOpen = false;
                     }
                 } else {
                     selectedServer = null;
@@ -96,59 +110,60 @@
         }
     }
 
-    function toggleServerDropdown(event) {
-        event.stopPropagation();
-        isServerDropdownOpen = !isServerDropdownOpen;
-        if (isServerDropdownOpen) {
-            document.addEventListener('click', closeServerDropdown);
-        }
-    }
-
-    function closeServerDropdown() {
-        isServerDropdownOpen = false;
-        document.removeEventListener('click', closeServerDropdown);
-    }
-
     function selectServer(server) {
         selectedServer = server;
-        isServerDropdownOpen = false;
         localStorage.setItem('codex_last_server_id', server.id);
     }
 
-    function getIcon(server) {
-        if (server.icon) return `https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`;
-        return `https://ui-avatars.com/api/?name=${encodeURIComponent(server.name)}&background=2d2d2d&color=fff`;
+    function handleSelectServer(e) {
+        selectServer(e.detail);
     }
 </script>
 
-<div class="dashboard-wrapper">
-    {#if loading}
-        <div class="loading-container">
-            <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--accent-blue);"></i>
+{#if isMobile}
+    <div class="mobile-warning">
+        <div class="mobile-warning-content">
+            <div class="mobile-warning-icon">
+                <i class="fas fa-desktop"></i>
+            </div>
+            <h2 class="mobile-warning-title">Desktop Required</h2>
+            <p class="mobile-warning-text">
+                The Dashboard is not optimized for mobile devices due to its complex interactive interface.
+            </p>
+            <p class="mobile-warning-text">
+                For the best experience, please visit this page on a <strong>desktop computer</strong>, <strong>laptop</strong>, or <strong>tablet in landscape mode</strong>.
+            </p>
         </div>
-    {:else if !user}
-        <div class="unauthorized-container">
-            <h2>Login Required</h2>
-            <p>You must be logged in to access the dashboard.</p>
-            <div id="auth-container-dashboard"></div>
-        </div>
-    {:else if allowedViews.length === 0}
-        <div class="unauthorized-container">
-            <i class="fas fa-lock" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 20px;"></i>
-            <h2>Access Restricted</h2>
-            <p>You do not have the required permissions to view this dashboard.</p>
-            <p style="font-size: 0.9rem;">This area is restricted to active Patrons and Administrators.</p>
-            <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="btn-primary" style="margin-top: 20px;">
-                Subscribe on Patreon
-            </a>
-        </div>
-    {:else}
-        <div class="dashboard-container">
-            <nav class="dashboard-nav">
-                <div class="nav-left">
+    </div>
+{:else}
+    <div class="dashboard-wrapper">
+        {#if loading}
+            <div class="loading-container">
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--accent-blue);"></i>
+            </div>
+        {:else if !user}
+            <div class="unauthorized-container">
+                <h2>Login Required</h2>
+                <p>You must be logged in to access the dashboard.</p>
+                <div id="auth-container-dashboard"></div>
+            </div>
+        {:else if allowedViews.length === 0}
+            <div class="unauthorized-container">
+                <i class="fas fa-lock" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 20px;"></i>
+                <h2>Access Restricted</h2>
+                <p>You do not have the required permissions to view this dashboard.</p>
+                <p style="font-size: 0.9rem;">This area is restricted to active Patrons and Administrators.</p>
+                <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="btn-primary" style="margin-top: 20px;">
+                    Subscribe on Patreon
+                </a>
+            </div>
+        {:else}
+            <!-- Dashboard Sub-Nav (flush against the main navbar) -->
+            <div class="dashboard-subnav">
+                <div class="dashboard-subnav-inner">
                     {#each allowedViews as view}
-                        <button 
-                            class="nav-tab" 
+                        <button
+                            class="subnav-tab"
                             class:active={currentView === view.id}
                             on:click={() => switchView(view.id)}
                         >
@@ -157,243 +172,156 @@
                         </button>
                     {/each}
                 </div>
+            </div>
 
-                {#if currentView === 'config'}
-                    <div class="server-selector-container" transition:fade={{ duration: 200 }}>
-                        <button class="server-select-btn" on:click={toggleServerDropdown}>
-                            {#if selectedServer}
-                                <div class="server-btn-content">
-                                    <img src={getIcon(selectedServer)} alt="" class="server-icon-mini" />
-                                    <span class="server-name">{selectedServer.name}</span>
-                                </div>
-                            {:else}
-                                <span class="server-name">Select Server...</span>
-                            {/if}
-                            <i class="fas fa-chevron-down" style="font-size: 0.8em; opacity: 0.7;"></i>
-                        </button>
-
-                        {#if isServerDropdownOpen}
-                            <div class="server-dropdown">
-                                {#each availableServers as server}
-                                    <button class="server-option" on:click={() => selectServer(server)}>
-                                        <img src={getIcon(server)} alt="" class="server-icon-mini" />
-                                        <span>{server.name}</span>
-                                    </button>
-                                {/each}
-                                {#if availableServers.length === 0}
-                                    <div class="server-option empty">No common servers found</div>
-                                {/if}
-                            </div>
+            <!-- Full-width content area -->
+            <main class="dashboard-content">
+                {#key currentView}
+                    <div class="panel-transition" in:fade={{ duration: 150 }}>
+                        {#if currentView === 'master'}
+                            <MasterPanel {user} />
+                        {:else if currentView === 'config'}
+                            <BotConfigPanel
+                                {user}
+                                {selectedServer}
+                                {availableServers}
+                                on:selectServer={handleSelectServer}
+                            />
+                        {:else if currentView === 'changelog'}
+                             <ChangelogPanel {user} />
+                        {:else if currentView === 'recovery'}
+                             <HistoryPanel {user} />
                         {/if}
                     </div>
-                {/if}
-            </nav>
-
-            <main class="dashboard-content">
-                {#if currentView === 'master'}
-                    <MasterPanel {user} />
-                {:else if currentView === 'config'}
-                    <BotConfigPanel {user} {selectedServer} />
-                {:else if currentView === 'changelog'}
-                     <ChangelogPanel {user} /> 
-                {:else if currentView === 'recovery'}
-                     <HistoryPanel {user} />
-                {/if}
+                {/key}
             </main>
-        </div>
-    {/if}
-</div>
+        {/if}
+    </div>
+{/if}
 
 <style>
+    /* Mobile Warning */
+    .mobile-warning {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        padding: 40px 20px;
+    }
+
+    .mobile-warning-content {
+        text-align: center;
+        max-width: 400px;
+        padding: 30px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+    }
+
+    .mobile-warning-icon {
+        font-size: 3rem;
+        color: var(--accent-blue);
+        margin-bottom: 20px;
+    }
+
+    .mobile-warning-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 15px;
+    }
+
+    .mobile-warning-text {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .mobile-warning-text strong {
+        color: var(--accent-blue-bright);
+    }
+
+    /* Dashboard Wrapper - Full Page */
     .dashboard-wrapper {
         min-height: 100vh;
-        padding-top: 10px;
         background-color: var(--bg-primary);
         display: flex;
         flex-direction: column;
     }
 
-    .dashboard-container {
-        width: 100%;
-        max-width: 1600px;
+    /* Sub-Nav Bar - flush with the main navbar */
+    .dashboard-subnav {
+        background: rgba(30, 30, 35, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-top: none;
+        border-radius: 0 0 20px 20px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: var(--spacing-6);
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-    }
-
-    .dashboard-nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 0;
-        padding-left: var(--spacing-2);
-        padding-right: var(--spacing-2);
-        z-index: 10;
+        width: calc(100% - 2 * var(--spacing-4));
         position: relative;
-        top: 1px;
-        min-height: 55px;
-    }
-    
-    .nav-left {
-        display: flex;
-        gap: var(--spacing-2);
-    }
-
-    .nav-tab {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-bottom: none;
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        padding: var(--spacing-3) var(--spacing-6);
-        color: var(--text-secondary);
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-2);
-        transition: all 0.2s ease;
-        font-size: var(--font-size-base);
-        min-width: 160px;
-        justify-content: center;
-        opacity: 0.7;
-    }
-
-    .nav-tab:hover {
-        background: var(--bg-tertiary);
-        color: var(--text-primary);
-        opacity: 1;
-    }
-
-    .nav-tab.active {
-        background: var(--bg-card);
-        color: var(--accent-blue);
-        border-color: var(--border-color);
-        border-bottom: 1px solid var(--bg-card);
-        opacity: 1;
-    }
-
-    .server-selector-container {
-        position: relative;
-        margin-bottom: 5px;
-        z-index: 20;
-        min-width: 260px;
-    }
-
-    .server-select-btn {
-        background: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
-        color: var(--text-primary);
-        padding: 8px 16px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        width: 100%;
-        min-width: 260px; 
-        height: 50px;
-    }
-
-    .server-select-btn:hover {
-        background: var(--bg-secondary);
-        border-color: var(--text-secondary);
-    }
-    
-    .server-btn-content {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        z-index: 50;
+        margin-top: -1px;
         overflow: hidden;
     }
 
-    .server-name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 180px;
-        display: block;
-    }
-
-    .server-icon-mini {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        object-fit: cover;
-        flex-shrink: 0;
-    }
-
-    .server-dropdown {
-        position: absolute;
-        top: calc(100% + 5px);
-        right: 0;
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        width: 100%;
-        min-width: 260px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        z-index: 100;
-        overflow-y: auto;
-        max-height: 400px;
+    .dashboard-subnav-inner {
         display: flex;
-        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        width: 100%;
+        padding: 0 2rem;
     }
 
-    .server-option {
+    .subnav-tab {
         display: flex;
         align-items: center;
-        gap: 12px;
-        width: 100%;
-        padding: 12px 16px;
-        background: transparent;
+        gap: 8px;
+        padding: var(--spacing-3) var(--spacing-4);
+        background: none;
         border: none;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
         color: var(--text-secondary);
+        font-weight: 500;
+        font-size: var(--font-size-sm);
         cursor: pointer;
-        text-align: left;
-        transition: background 0.2s;
-        flex-shrink: 0;
-        height: 56px;
-    }
-
-    .server-option span {
+        transition: color 0.2s ease;
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        flex-grow: 1;
-    }
-    
-    .server-option:last-child {
-        border-bottom: none;
+        position: relative;
     }
 
-    .server-option:hover {
-        background: var(--bg-tertiary);
+    .subnav-tab:hover {
         color: var(--text-primary);
     }
-    
-    .server-option.empty {
-        cursor: default;
-        font-style: italic;
-        padding: 15px;
-        text-align: center;
+
+    .subnav-tab.active {
+        color: var(--text-primary);
     }
 
-    .dashboard-content {
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-lg);
-        padding: var(--spacing-8);
-        min-height: 600px;
-        position: relative;
-        z-index: 5;
+    .subnav-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--accent-blue);
     }
-    
+
+    .subnav-tab i {
+        font-size: 0.9em;
+    }
+
+    /* Full-width Content Area */
+    .dashboard-content {
+        flex: 1;
+        padding: var(--spacing-8) var(--spacing-6);
+        max-width: 1600px;
+        width: 100%;
+        margin: 0 auto;
+        min-height: 600px;
+    }
+
+    /* Loading & Auth States */
     .loading-container, .unauthorized-container {
         display: flex;
         flex-direction: column;
@@ -416,21 +344,33 @@
         margin-bottom: var(--spacing-6);
     }
 
+    .panel-transition {
+        width: 100%;
+    }
+
+    /* Responsive: match navbar margin changes */
+    @media (max-width: 1024px) {
+        .dashboard-subnav {
+            width: calc(100% - 2 * var(--spacing-2));
+        }
+    }
+
     @media (max-width: 768px) {
-        .dashboard-nav {
-            flex-direction: column-reverse;
-            align-items: stretch;
-            gap: 10px;
+        .dashboard-subnav {
+            width: calc(100% - 2 * var(--spacing-1));
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
         }
-        .nav-left {
-            overflow-x: auto;
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-subnav {
+            width: calc(100% - 2 * var(--spacing-1));
         }
-        .server-selector-container {
-            width: 100%;
-            margin-bottom: 10px;
+        .subnav-tab span {
+            display: none;
         }
-        .server-select-btn {
-            width: 100%;
+        .subnav-tab {
+            padding: var(--spacing-3) var(--spacing-2);
         }
     }
 </style>

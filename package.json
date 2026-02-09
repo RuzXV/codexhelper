@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "prelocal": "npx kill-port 4321 8788",
     "local": "concurrently \"npm run dev\" \"npx wrangler pages dev --proxy 4321\" --kill-others --names \"ASTRO,WRANGLER\""
   },
   "dependencies": {

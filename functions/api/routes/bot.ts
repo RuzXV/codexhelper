@@ -6,6 +6,17 @@ const bot = new Hono<{ Bindings: Bindings }>();
 
 bot.use('*', botAuthMiddleware);
 
+// SQL whitelist for the /query endpoint — only these prefixes are allowed.
+const ALLOWED_SQL_PREFIXES = [
+    'SELECT ', 'INSERT ', 'UPDATE ', 'DELETE ',
+    'INSERT OR REPLACE ', 'INSERT OR IGNORE ',
+];
+
+function isSqlAllowed(sql: string): boolean {
+    const trimmed = sql.trim().toUpperCase();
+    return ALLOWED_SQL_PREFIXES.some(prefix => trimmed.startsWith(prefix));
+}
+
 bot.get('/templates/list/:userId', async (c) => {
     const { userId } = c.req.param();
     const { results } = await c.env.DB.prepare(
@@ -78,8 +89,18 @@ bot.get('/settings/:userId', async (c) => {
 
 bot.post('/query', async (c) => {
     const { sql, params, method } = await c.req.json();
+
+    if (!sql || typeof sql !== 'string') {
+        return c.json({ error: 'Missing or invalid SQL statement' }, 400);
+    }
+
+    if (!isSqlAllowed(sql)) {
+        console.error(`Blocked disallowed SQL: ${sql.substring(0, 100)}`);
+        return c.json({ error: 'SQL statement not allowed. Only SELECT/INSERT/UPDATE/DELETE are permitted.' }, 403);
+    }
+
     try {
-        const stmt = c.env.BOT_DB.prepare(sql).bind(...(params || [])); 
+        const stmt = c.env.BOT_DB.prepare(sql).bind(...(params || []));
         if (method === 'execute') {
             const res = await stmt.run();
             return c.json({ rowcount: res.meta.changes, lastrowid: res.meta.last_row_id });
@@ -90,6 +111,7 @@ bot.post('/query', async (c) => {
             return c.json(results || []);
         }
     } catch (e) {
+        console.error(`SQL execution error: ${String(e)} | SQL: ${sql.substring(0, 200)}`);
         return c.json({ error: String(e) }, 500);
     }
 });
@@ -111,7 +133,14 @@ bot.post('/batch', async (c) => {
             return c.json({ error: 'Invalid batch format. Expected array in "batch" key.' }, 400);
         }
 
-        const statements = operations.map((op: any) => 
+        for (const op of operations) {
+            if (!op.sql || typeof op.sql !== 'string' || !isSqlAllowed(op.sql)) {
+                console.error(`Blocked disallowed batch SQL: ${String(op.sql).substring(0, 100)}`);
+                return c.json({ error: 'One or more SQL statements in the batch are not allowed.' }, 403);
+            }
+        }
+
+        const statements = operations.map((op: any) =>
             c.env.BOT_DB.prepare(op.sql).bind(...(op.params || []))
         );
 

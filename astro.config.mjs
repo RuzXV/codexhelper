@@ -14,6 +14,9 @@ export default defineConfig({
       lastmod: new Date(),
     }),
   ],
+  server: {
+    host: true,
+  },
   vite: {
     define: {
       'import.meta.env.PUBLIC_DISCORD_APP_ID': JSON.stringify(process.env.PUBLIC_DISCORD_APP_ID || '1434105087722258573'),

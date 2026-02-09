@@ -43,8 +43,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update the hero section with current slide info
     function updateHeroSection() {
         const currentSlide = slides[currentIndex];
-        const title = currentSlide.dataset.title || 'KvK Suite';
+        let title = currentSlide.dataset.title || 'KvK Suite';
         const description = currentSlide.dataset.description || '';
+
+        // Shorten titles on mobile
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            if (title === 'Crystal Tech Simulator') title = 'Crystal Tech Sim';
+            if (title === 'Flag Cost Calculator') title = 'Flag Costs';
+            if (title === 'Timers & Tracking') title = 'KvK Timers';
+        }
 
         const crystalIcon = window.kvkCrystalIcon || '';
         mainTitle.innerHTML = `<img src="${crystalIcon}" alt="Crystal" style="width: 32px; height: 32px; margin-right: 10px; vertical-align: middle;" />${title}`;

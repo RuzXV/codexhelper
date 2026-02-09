@@ -1059,6 +1059,15 @@
         return total + timeForLevels;
     }, 0);
 
+    $: totalSeasonCoinsUsed = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
+        const tech = allTechs[techKey];
+        if (!tech || level <= 0) return total;
+        const coinsForLevels = tech.levels.slice(0, level).reduce((sum: number, lvl: TechLevel) => {
+            return sum + (lvl.seasonCoins || 0);
+        }, 0);
+        return total + coinsForLevels;
+    }, 0);
+
     // Check if a tech requirement is met
     function checkTechRequirement(req: TechRequirement, targetLevel: number): { met: boolean; failedTech?: string; failedTechs?: string[]; requiredLevel?: number; isAnyOf?: boolean } {
         if (req.level > targetLevel) return { met: true }; // Requirement doesn't apply yet
@@ -2202,6 +2211,10 @@
                 {/each}
             </div>
         </div>
+        <div class="viewport-scroll-hint">
+            <i class="fas fa-arrows-alt-h"></i>
+            <span>Drag to scroll</span>
+        </div>
     </div>
 
     <!-- Click Tooltip -->
@@ -2312,16 +2325,17 @@
         </div>
     {/if}
 
-    <!-- Footer Bar with Counters and Scroll Hint -->
+    <!-- Footer Bar with Counters -->
     <div class="crystal-tech-footer">
         <div class="footer-counter speedups">
             <img src={researchSpeedupIcon.src} alt="Speedup" class="counter-icon" width="28" height="28" />
             <span class="counter-label">Total Speedups Spent:</span>
             <span class="counter-value">{formatSpeedups(totalSpeedupsUsed)}</span>
         </div>
-        <div class="scroll-hint">
-            <i class="fas fa-arrows-alt-h"></i>
-            <span>Drag to scroll</span>
+        <div class="footer-counter season-coins">
+            <img src={seasonCoinIcon.src} alt="Season Coins" class="counter-icon" width="28" height="28" />
+            <span class="counter-label">Total Season Coins:</span>
+            <span class="counter-value">{totalSeasonCoinsUsed.toLocaleString()}</span>
         </div>
         <div class="footer-counter crystals">
             <img src={crystalIcon.src} alt="Crystal" class="counter-icon" width="28" height="28" />
@@ -3074,7 +3088,9 @@
         font-weight: 700;
         color: #4a4a4a;
         font-family: 'NotoSansHans', sans-serif;
-        line-height: 1;
+        line-height: 26px;
+        text-transform: uppercase;
+        transform: translateY(1px);
     }
 
     .counter-value {
@@ -3082,7 +3098,7 @@
         font-weight: 900;
         color: #2a5a7a;
         font-family: 'NotoSansHans', sans-serif;
-        line-height: 1;
+        line-height: 26px;
     }
 
     .footer-counter.speedups .counter-value {
@@ -3094,18 +3110,13 @@
         text-align: right;
     }
 
-    .crystal-tech-footer .scroll-hint {
-        display: flex;
-        align-items: center;
+    .footer-counter.season-coins {
         justify-content: center;
-        gap: 6px;
-        color: #4a4a4a;
-        font-size: 0.7rem;
-        font-family: 'NotoSansHans', sans-serif;
-        background: none;
-        border: none;
-        padding: 0;
-        flex-shrink: 0;
+        flex: 0 0 auto;
+    }
+
+    .footer-counter.season-coins .counter-value {
+        color: #b8860b;
     }
 
     /* Main Panel - Tech Tree Viewport */
@@ -3121,6 +3132,22 @@
 
     .tech-tree-viewport:active {
         cursor: grabbing;
+    }
+
+    .viewport-scroll-hint {
+        position: absolute;
+        bottom: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 0.7rem;
+        font-family: 'NotoSansHans', sans-serif;
+        pointer-events: none;
+        z-index: 5;
     }
 
     /* Mode Selector - positioned in top right of viewport */
@@ -3951,7 +3978,7 @@
             font-size: 0.8rem;
         }
 
-        .crystal-tech-footer .scroll-hint {
+        .viewport-scroll-hint {
             font-size: 0.65rem;
         }
     }
@@ -4008,8 +4035,9 @@
             font-size: 0.7rem;
         }
 
-        .crystal-tech-footer .scroll-hint {
+        .viewport-scroll-hint {
             font-size: 0.6rem;
+            bottom: 4px;
         }
     }
 </style>

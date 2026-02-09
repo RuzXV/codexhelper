@@ -5,16 +5,25 @@
     export let teamNumber;
     export let teamData;
     export let signups = [];
+    export let roles = [];
 
     const dispatch = createEventDispatcher();
     let saving = false;
     let matchDateObj = new Date(teamData.match_timestamp * 1000);
     const offset = matchDateObj.getTimezoneOffset() * 60000;
     let localDateStr = new Date(matchDateObj.getTime() - offset).toISOString().slice(0, 16);
-    
+
     let editName = teamData.name;
     let editCap = teamData.cap;
     let newSignupName = "";
+
+    $: utcTimeStr = (() => {
+        const d = new Date(localDateStr);
+        return d.toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
+    })();
+    $: roleName = teamData.role_id && teamData.role_id !== '0' && teamData.role_id !== 0
+        ? (roles.find(r => r.id === String(teamData.role_id))?.name || null)
+        : null;
 
     async function saveTeam() {
         saving = true;
@@ -99,12 +108,19 @@
             <div class="field">
                 <label for="time-{allianceTag}-{teamNumber}"><i class="far fa-clock"></i> Local Match Time</label>
                 <input id="time-{allianceTag}-{teamNumber}" type="datetime-local" class="modern-input" bind:value={localDateStr} on:change={saveTeam} />
+                <span class="utc-time"><i class="fas fa-globe"></i> {utcTimeStr}</span>
             </div>
             <div class="field cap">
                 <label for="cap-{allianceTag}-{teamNumber}"><i class="fas fa-users"></i> Cap</label>
                 <input id="cap-{allianceTag}-{teamNumber}" type="number" class="modern-input center-text" bind:value={editCap} placeholder="∞" on:change={saveTeam} />
             </div>
         </div>
+
+        {#if roleName}
+            <div class="role-info">
+                <i class="fas fa-at"></i> Assigned Role: <strong>{roleName}</strong>
+            </div>
+        {/if}
 
         <div class="signup-container">
             <div class="list-header">
@@ -159,6 +175,10 @@
     .modern-input { background: var(--bg-primary); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-primary); font-size: 0.85rem; width: 100%; }
     .modern-input.center-text { text-align: center; }
     .modern-input:focus { border-color: var(--accent-blue); outline: none; }
+
+    .utc-time { font-size: 0.7rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+    .role-info { font-size: 0.8rem; color: var(--text-secondary); background: rgba(59, 130, 246, 0.08); padding: 6px 10px; border-radius: 4px; display: flex; align-items: center; gap: 6px; }
+    .role-info i { color: var(--accent-blue); font-size: 0.75rem; }
 
     .signup-container { 
         background: var(--bg-primary);

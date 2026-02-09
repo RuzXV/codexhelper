@@ -68,13 +68,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (description) {
                 description = description.replace(
-                    /(Cooldown:.*)/i, 
+                    /(Cooldown:.*)/i,
                     '<div style="margin-top: 8px; color: #ff8787;">$1</div>'
                 );
             }
 
             tooltip.innerHTML = `<strong>${name}</strong>${description}`;
             tooltip.style.display = 'block';
+            requestAnimationFrame(() => tooltip.classList.add('visible'));
 
             const tag = e.target.closest('.inscription-tag');
             const tierRow = e.target.closest('.tier-row');
@@ -110,15 +111,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tooltip.style.display === 'block') {
             const xOffset = 15;
             const yOffset = 15;
-            
+            const padding = 16;
+
             let left = e.clientX + xOffset;
             let top = e.clientY + yOffset;
-            
-            if (left + tooltip.offsetWidth > window.innerWidth) {
+
+            if (left + tooltip.offsetWidth > window.innerWidth - padding) {
                 left = e.clientX - tooltip.offsetWidth - xOffset;
             }
-            if (top + tooltip.offsetHeight > window.innerHeight) {
+            if (left < padding) {
+                left = padding;
+            }
+            if (top + tooltip.offsetHeight > window.innerHeight - padding) {
                 top = e.clientY - tooltip.offsetHeight - yOffset;
+            }
+            if (top < padding) {
+                top = padding;
             }
 
             tooltip.style.left = `${left}px`;
@@ -129,9 +137,104 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('mouseout', (e) => {
         const name = getInscriptionName(e.target);
         if (name) {
-             tooltip.style.display = 'none';
+            tooltip.classList.remove('visible');
+            setTimeout(() => {
+                if (!tooltip.classList.contains('visible')) {
+                    tooltip.style.display = 'none';
+                }
+            }, 200);
         }
     });
+
+    // Touch support for mobile tooltip
+    let activeTooltipTarget = null;
+
+    document.addEventListener('touchstart', (e) => {
+        const name = getInscriptionName(e.target);
+        if (name) {
+            // If tapping the same inscription, hide tooltip
+            if (activeTooltipTarget === e.target && tooltip.classList.contains('visible')) {
+                tooltip.classList.remove('visible');
+                setTimeout(() => {
+                    tooltip.style.display = 'none';
+                }, 200);
+                activeTooltipTarget = null;
+                return;
+            }
+
+            activeTooltipTarget = e.target;
+            let description = window.inscriptionDescriptions[name];
+
+            if (description) {
+                description = description.replace(
+                    /(Cooldown:.*)/i,
+                    '<div style="margin-top: 8px; color: #ff8787;">$1</div>'
+                );
+            }
+
+            tooltip.innerHTML = `<strong>${name}</strong>${description}`;
+            tooltip.style.display = 'block';
+
+            const tag = e.target.closest('.inscription-tag');
+            const tierRow = e.target.closest('.tier-row');
+
+            let activeColor = '#D1D5DB';
+            let titleColor = '#F3F4F6';
+
+            if (tag) {
+                if (tag.classList.contains('special')) {
+                    activeColor = '#fdd451';
+                    titleColor = '#fdd451';
+                } else if (tag.classList.contains('rare')) {
+                    activeColor = '#60a5fa';
+                    titleColor = '#60a5fa';
+                }
+            } else if (tierRow) {
+                activeColor = tierRow.style.borderColor || activeColor;
+                titleColor = activeColor;
+            }
+
+            tooltip.style.borderColor = activeColor;
+            tooltip.style.boxShadow = `0 4px 20px ${activeColor === '#D1D5DB' ? 'rgba(0,0,0,0.5)' : activeColor + '40'}`;
+
+            const strongTag = tooltip.querySelector('strong');
+            if (strongTag) {
+                strongTag.style.color = titleColor;
+                strongTag.style.borderBottomColor = activeColor;
+            }
+
+            // Position tooltip centered horizontally, above the touch point
+            const touch = e.touches[0];
+            const padding = 16;
+
+            // Force layout to get correct dimensions
+            tooltip.style.left = '0px';
+            tooltip.style.top = '0px';
+
+            requestAnimationFrame(() => {
+                let left = Math.max(padding, Math.min(
+                    touch.clientX - tooltip.offsetWidth / 2,
+                    window.innerWidth - tooltip.offsetWidth - padding
+                ));
+                let top = touch.clientY - tooltip.offsetHeight - 20;
+
+                if (top < padding) {
+                    top = touch.clientY + 30;
+                }
+
+                tooltip.style.left = `${left}px`;
+                tooltip.style.top = `${top}px`;
+                tooltip.classList.add('visible');
+            });
+        } else {
+            // Tapped outside inscription, hide tooltip
+            tooltip.classList.remove('visible');
+            setTimeout(() => {
+                tooltip.style.display = 'none';
+            }, 200);
+            activeTooltipTarget = null;
+        }
+    }, { passive: true });
 
     const moveToSlide = (targetIndex, updateUrl = true) => {
         if (!slides.length || !slides[targetIndex]) return;
@@ -182,6 +285,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nextButton && prevButton) {
         nextButton.addEventListener('click', () => { if (currentIndex < slides.length - 1) moveToSlide(currentIndex + 1); });
         prevButton.addEventListener('click', () => { if (currentIndex > 0) moveToSlide(currentIndex - 1); });
+    }
+
+    // Swipe support for mobile carousel
+    const carouselContainer = document.querySelector('.carousel-container');
+    if (carouselContainer) {
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const minSwipeDistance = 50;
+
+        carouselContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        carouselContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const swipeDistance = touchEndX - touchStartX;
+
+            if (Math.abs(swipeDistance) > minSwipeDistance) {
+                if (swipeDistance < 0 && currentIndex < slides.length - 1) {
+                    // Swipe left - next slide
+                    moveToSlide(currentIndex + 1);
+                } else if (swipeDistance > 0 && currentIndex > 0) {
+                    // Swipe right - previous slide
+                    moveToSlide(currentIndex - 1);
+                }
+            }
+        }, { passive: true });
     }
 
     if (quickNav) {

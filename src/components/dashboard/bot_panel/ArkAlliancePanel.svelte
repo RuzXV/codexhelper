@@ -18,6 +18,8 @@
     let saving = false;
     let openDropdownId = null;
     let dropdownSearch = "";
+    let refreshingEmbed = false;
+    let postingSignup = false;
 
     function secondsToTime(seconds) {
         const h = Math.floor(seconds / 3600);
@@ -68,6 +70,38 @@
             dispatch('deleted', { tag: allianceTag });
         } catch (e) {
             alert('Failed to delete alliance.');
+        }
+    }
+
+    async function refreshEmbed() {
+        refreshingEmbed = true;
+        try {
+            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/refresh-embed`, {
+                method: 'POST',
+                body: JSON.stringify({ alliance_tag: allianceTag })
+            });
+        } catch (e) {
+            alert('Failed to refresh embed.');
+            console.error(e);
+        } finally {
+            refreshingEmbed = false;
+        }
+    }
+
+    async function postNewSignup() {
+        if (!confirm(`Post a new signup embed for [${allianceTag}] to the configured channel?`)) return;
+        postingSignup = true;
+        try {
+            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/post-signup`, {
+                method: 'POST',
+                body: JSON.stringify({ alliance_tag: allianceTag })
+            });
+            dispatch('updated');
+        } catch (e) {
+            alert('Failed to post signup.');
+            console.error(e);
+        } finally {
+            postingSignup = false;
         }
     }
 
@@ -154,6 +188,12 @@
             </span>
         </div>
         <div class="header-actions">
+            <button class="btn-action" on:click={refreshEmbed} disabled={refreshingEmbed} title="Refresh Discord Embed">
+                <i class="fas fa-sync-alt" class:fa-spin={refreshingEmbed}></i> <span>{refreshingEmbed ? 'Refreshing...' : 'Refresh Embed'}</span>
+            </button>
+            <button class="btn-action primary" on:click={postNewSignup} disabled={postingSignup} title="Post New Signup Embed">
+                <i class="fas fa-paper-plane"></i> <span>{postingSignup ? 'Posting...' : 'Post Signup'}</span>
+            </button>
             <button class="btn-action success" on:click={exportToExcel} title="Download Excel">
                 <i class="fas fa-file-excel"></i> <span>Export Signup List</span>
             </button>
@@ -271,12 +311,13 @@
                 <div class="card-content">
                     <div class="teams-grid">
                         {#each Object.keys(data.teams).sort() as num}
-                            <ArkTeamCard 
+                            <ArkTeamCard
                                 {guildId}
                                 {allianceTag}
                                 teamNumber={num}
                                 teamData={data.teams[num]}
                                 signups={data.signups.filter(s => s.team_number == num)}
+                                {roles}
                                 on:updated={() => dispatch('updated')}
                             />
                         {/each}
@@ -334,9 +375,15 @@
     }
     .btn-action:hover { background: var(--bg-secondary); color: var(--text-primary); }
     
+    .btn-action.primary { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.3); }
+    .btn-action.primary:hover { background: var(--accent-blue); color: white; }
+
     .btn-action.success { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
     .btn-action.success:hover { background: #10b981; color: white; }
     
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-action:disabled:hover { background: var(--bg-tertiary); color: var(--text-secondary); }
+
     .btn-action.danger { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
     .btn-action.danger:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
 

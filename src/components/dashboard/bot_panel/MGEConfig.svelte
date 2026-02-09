@@ -1,9 +1,11 @@
 <script>
     import { onMount } from 'svelte';
     import { fade, fly } from 'svelte/transition';
+    import MGEApplicationsPanel from './MGEApplicationsPanel.svelte';
 
     export let guildId;
-    
+
+    let activeSubTab = 'settings';
     let loading = true;
     let saving = false;
     let settings = {};
@@ -15,10 +17,14 @@
 
     $: hasUnsavedChanges = JSON.stringify(settings) !== JSON.stringify(originalSettings);
 
+    $: activeMgeName = settings.current_mge_name || null;
+    $: mgeTroopType = settings.mge_troop_type || null;
+
     const FIELDS = [
-        { id: 'signup_channel_id', label: 'Application Channel', icon: 'fa-file-signature', type: 'channel' },
-        { id: 'log_channel_id', label: 'Application Log Channel', icon: 'fa-clipboard-list', type: 'channel' },
-        { id: 'admin_role_id', label: 'MGE Admin Role', icon: 'fa-user-shield', type: 'role' }
+        { id: 'signup_channel_id', label: 'Signup Channel', icon: 'fa-file-signature', type: 'channel' },
+        { id: 'posted_signups_channel_id', label: 'Application Threads Channel', icon: 'fa-comments', type: 'channel' },
+        { id: 'coordinator_role_id', label: 'Coordinator Role', icon: 'fa-user-cog', type: 'role' },
+        { id: 'ping_role_id', label: 'Ping Role', icon: 'fa-at', type: 'role' }
     ];
 
     onMount(async () => {
@@ -88,89 +94,196 @@
 
 <svelte:window on:click={handleWindowClick} />
 
-<div class="section-card" transition:fade={{ duration: 200 }}>
-    <div class="section-header">
-        <h3><i class="fas fa-crown"></i> Mightiest Governor (MGE)</h3>
-        <p class="section-desc">Configure MGE application channels and administrative access.</p>
+<div class="mge-container">
+    <div class="mge-subtabs">
+        <button class="subtab" class:active={activeSubTab === 'settings'} on:click={() => activeSubTab = 'settings'}>
+            <i class="fas fa-cog"></i> Settings
+        </button>
+        <button class="subtab" class:active={activeSubTab === 'applications'} on:click={() => activeSubTab = 'applications'}>
+            <i class="fas fa-file-alt"></i> Applications
+        </button>
     </div>
 
-    {#if loading}
-        <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading settings...</div>
-    {:else}
-        <div class="settings-grid">
-            {#each FIELDS as field}
-                <div class="setting-row">
-                    <div class="group-info">
-                        <div class="group-title-row">
-                            <i class="fas {field.icon} group-icon"></i>
-                            <span class="group-name">{field.label}</span>
-                        </div>
+    {#if activeSubTab === 'settings'}
+        {#if !loading && activeMgeName}
+            <div class="mge-status-banner active" transition:fade={{ duration: 150 }}>
+                <div class="status-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="status-info">
+                    <span class="status-label">Active MGE</span>
+                    <span class="status-value">{activeMgeName}{mgeTroopType ? ` (${mgeTroopType})` : ''}</span>
+                </div>
+                {#if settings.next_mge_date}
+                    <div class="status-extra">
+                        <span class="status-label">Next MGE</span>
+                        <span class="status-value">{settings.next_mge_date}</span>
                     </div>
-                    
-                    <div class="control-wrapper">
-                        <div class="custom-select-container">
-                            <button type="button" class="custom-select-trigger" on:click={(e) => toggleDropdown(field.id, e)} disabled={saving}>
-                                <span class="selected-text">{getItemName(settings[field.id], field.type)}</span>
-                                <i class="fas fa-chevron-down arrow" class:rotated={openDropdownId === field.id}></i>
-                            </button>
+                {/if}
+            </div>
+        {:else if !loading}
+            <div class="mge-status-banner inactive" transition:fade={{ duration: 150 }}>
+                <div class="status-icon"><i class="fas fa-moon"></i></div>
+                <div class="status-info">
+                    <span class="status-label">No Active MGE</span>
+                    <span class="status-value muted">No MGE cycle is currently running.</span>
+                </div>
+                {#if settings.next_mge_date}
+                    <div class="status-extra">
+                        <span class="status-label">Next MGE</span>
+                        <span class="status-value">{settings.next_mge_date}</span>
+                    </div>
+                {/if}
+            </div>
+        {/if}
 
-                            {#if openDropdownId === field.id}
-                                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                                <!-- svelte-ignore a11y_no_static_element_interactions -->
-                                <div class="custom-dropdown-menu" on:click|stopPropagation>
-                                    <div class="dropdown-search">
-                                        <input id="search-{field.id}" type="text" placeholder="Search..." bind:value={dropdownSearch} />
-                                    </div>
-                                    <div class="dropdown-options-list">
-                                        <button type="button" class="dropdown-option danger" 
-                                            class:selected={!settings[field.id]} 
-                                            on:click={() => selectItem(field.id, null)}>
-                                            ⛔ Disabled / Not Set
-                                        </button>
+        <div class="section-card" transition:fade={{ duration: 150 }}>
+            <div class="section-header">
+                <h3><i class="fas fa-crown"></i> Mightiest Governor (MGE)</h3>
+                <p class="section-desc">Configure MGE application channels and administrative access.</p>
+            </div>
 
-                                        {#if field.type === 'channel'}
-                                            {#each channels.filter(c => c.name.toLowerCase().includes(dropdownSearch.toLowerCase())) as item}
-                                                <button type="button" class="dropdown-option" 
-                                                    class:selected={settings[field.id] === item.id} 
-                                                    on:click={() => selectItem(field.id, item.id)}>
-                                                    <span class="channel-hash">#</span> {item.name}
-                                                </button>
-                                            {/each}
-                                        {:else}
-                                            {#each roles.filter(r => r.name.toLowerCase().includes(dropdownSearch.toLowerCase())) as item}
-                                                <button type="button" class="dropdown-option" 
-                                                    class:selected={settings[field.id] === item.id} 
-                                                    on:click={() => selectItem(field.id, item.id)}>
-                                                    <span class="role-dot" style="background-color: #{item.color ? item.color.toString(16) : '99aab5'}"></span> {item.name}
-                                                </button>
-                                            {/each}
-                                        {/if}
-                                    </div>
+            {#if loading}
+                <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading settings...</div>
+            {:else}
+                <div class="settings-grid">
+                    {#each FIELDS as field}
+                        <div class="setting-row">
+                            <div class="group-info">
+                                <div class="group-title-row">
+                                    <i class="fas {field.icon} group-icon"></i>
+                                    <span class="group-name">{field.label}</span>
                                 </div>
-                            {/if}
+                            </div>
+
+                            <div class="control-wrapper">
+                                <div class="custom-select-container">
+                                    <button type="button" class="custom-select-trigger" on:click={(e) => toggleDropdown(field.id, e)} disabled={saving}>
+                                        <span class="selected-text">{getItemName(settings[field.id], field.type)}</span>
+                                        <i class="fas fa-chevron-down arrow" class:rotated={openDropdownId === field.id}></i>
+                                    </button>
+
+                                    {#if openDropdownId === field.id}
+                                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                                        <!-- svelte-ignore a11y_no_static_element_interactions -->
+                                        <div class="custom-dropdown-menu" on:click|stopPropagation>
+                                            <div class="dropdown-search">
+                                                <input id="search-{field.id}" type="text" placeholder="Search..." bind:value={dropdownSearch} />
+                                            </div>
+                                            <div class="dropdown-options-list">
+                                                <button type="button" class="dropdown-option danger"
+                                                    class:selected={!settings[field.id]}
+                                                    on:click={() => selectItem(field.id, null)}>
+                                                    ⛔ Disabled / Not Set
+                                                </button>
+
+                                                {#if field.type === 'channel'}
+                                                    {#each channels.filter(c => c.name.toLowerCase().includes(dropdownSearch.toLowerCase())) as item}
+                                                        <button type="button" class="dropdown-option"
+                                                            class:selected={settings[field.id] === item.id}
+                                                            on:click={() => selectItem(field.id, item.id)}>
+                                                            <span class="channel-hash">#</span> {item.name}
+                                                        </button>
+                                                    {/each}
+                                                {:else}
+                                                    {#each roles.filter(r => r.name.toLowerCase().includes(dropdownSearch.toLowerCase())) as item}
+                                                        <button type="button" class="dropdown-option"
+                                                            class:selected={settings[field.id] === item.id}
+                                                            on:click={() => selectItem(field.id, item.id)}>
+                                                            <span class="role-dot" style="background-color: #{item.color ? item.color.toString(16) : '99aab5'}"></span> {item.name}
+                                                        </button>
+                                                    {/each}
+                                                {/if}
+                                            </div>
+                                        </div>
+                                    {/if}
+                                </div>
+                            </div>
                         </div>
+                    {/each}
+                </div>
+            {/if}
+        </div>
+
+        {#if hasUnsavedChanges}
+            <div class="save-bar" transition:fly={{ y: 50, duration: 300 }}>
+                <div class="save-bar-content">
+                    <span>You have unsaved changes.</span>
+                    <div class="save-actions">
+                        <button class="btn-discard" on:click={discardChanges} disabled={saving}>Discard</button>
+                        <button class="btn-calculate" on:click={saveSettings} disabled={saving}>
+                            {#if saving}<i class="fas fa-spinner fa-spin"></i>{:else}Save Changes{/if}
+                        </button>
                     </div>
                 </div>
-            {/each}
+            </div>
+        {/if}
+    {:else if activeSubTab === 'applications'}
+        <div transition:fade={{ duration: 150 }}>
+            <MGEApplicationsPanel {guildId} />
         </div>
     {/if}
 </div>
 
-{#if hasUnsavedChanges}
-    <div class="save-bar" transition:fly={{ y: 50, duration: 300 }}>
-        <div class="save-bar-content">
-            <span>You have unsaved changes.</span>
-            <div class="save-actions">
-                <button class="btn-discard" on:click={discardChanges} disabled={saving}>Discard</button>
-                <button class="btn-calculate" on:click={saveSettings} disabled={saving}>
-                    {#if saving}<i class="fas fa-spinner fa-spin"></i>{:else}Save Changes{/if}
-                </button>
-            </div>
-        </div>
-    </div>
-{/if}
-
 <style>
+    .mge-container { display: flex; flex-direction: column; gap: 20px; }
+
+    .mge-subtabs {
+        display: flex;
+        gap: 4px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0;
+    }
+    .subtab {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        padding: 10px 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        font-size: var(--font-size-sm);
+        position: relative;
+        transition: color 0.2s;
+        white-space: nowrap;
+    }
+    .subtab:hover { color: var(--text-primary); }
+    .subtab.active { color: var(--accent-blue); }
+    .subtab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--accent-blue);
+    }
+
+    .mge-status-banner {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 20px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+    }
+    .mge-status-banner.active {
+        background: rgba(16, 185, 129, 0.08);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    .mge-status-banner.inactive {
+        background: rgba(245, 158, 11, 0.06);
+        border-color: rgba(245, 158, 11, 0.2);
+    }
+    .status-icon { font-size: 1.4rem; }
+    .mge-status-banner.active .status-icon { color: #10b981; }
+    .mge-status-banner.inactive .status-icon { color: #f59e0b; }
+    .status-info, .status-extra { display: flex; flex-direction: column; gap: 2px; }
+    .status-extra { margin-left: auto; text-align: right; }
+    .status-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; }
+    .status-value { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); }
+    .status-value.muted { color: var(--text-muted); font-weight: 400; font-size: 0.85rem; }
+
     .section-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; overflow: visible; margin-bottom: 20px; }
     .section-header { padding: 20px; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.1); }
     .section-header h3 { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.1rem; }
@@ -202,7 +315,7 @@
     .save-actions { display: flex; gap: 10px; }
     .btn-calculate { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple, #8b5cf6)); color: white; border: none; padding: 8px 24px; border-radius: 20px; font-weight: 600; cursor: pointer; }
     .btn-discard { background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; }
-    
+
     @media (max-width: 768px) {
         .setting-row { flex-direction: column; align-items: flex-start; gap: 15px; }
         .control-wrapper { width: 100%; }

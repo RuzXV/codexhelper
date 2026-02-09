@@ -6,6 +6,12 @@
     font-display: block;
 }
 
+/* Prevent horizontal overflow on mobile */
+.tool-page-wrapper {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
 .calculator-main-title { 
     display: flex; 
     align-items: center; 
@@ -29,6 +35,19 @@
 .quick-access-btn.active { background: var(--accent-blue-light); border-color: var(--accent-blue); color: var(--text-primary); }
 .quick-access-btn img { width: 24px; height: 24px; }
 .quick-access-btn span { font-weight: 600; font-size: var(--font-size-sm); white-space: nowrap; }
+
+@media (max-width: 768px) {
+    .quick-access-btn span {
+        white-space: normal;
+        text-align: center;
+        line-height: 1.2;
+    }
+    .quick-access-btn {
+        padding: var(--spacing-2);
+        flex-direction: column;
+        min-width: 80px;
+    }
+}
 
 .tool-explanation {
     font-size: var(--font-size-sm);
@@ -483,13 +502,21 @@
     border-radius: 6px;
     z-index: 9999;
     pointer-events: none;
-    max-width: 300px;
+    max-width: min(300px, calc(100vw - 32px));
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     color: #e2e8f0;
     font-size: 0.9rem;
     line-height: 1.4;
     text-align: left;
     backdrop-filter: blur(4px);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#inscription-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 #inscription-tooltip strong {
@@ -502,11 +529,14 @@
 }
 
 @media (max-width: 768px) {
-    .carousel-slide { padding: 0 var(--spacing-8); }
-    .carousel-arrow { font-size: 2rem; }
-    .carousel-arrow.prev { left: -12px; }
-    .carousel-arrow.next { right: -12px; }
-    .quick-access-nav { overflow-x: auto; justify-content: flex-start; }
+    .carousel-slide { padding: 0 var(--spacing-4); }
+    .carousel-arrow { display: none; }
+    .quick-access-nav { overflow-x: auto; justify-content: flex-start; -webkit-overflow-scrolling: touch; }
+    .quick-access-container { padding: 0 var(--spacing-4); }
+    .calculator-island { padding: var(--spacing-4); max-width: 100%; box-sizing: border-box; }
+    .tool-hero-container { padding: 0 var(--spacing-4); max-width: 100%; box-sizing: border-box; }
+    .carousel-container { max-width: 100%; overflow-x: hidden; }
+    #calculator-main-description { white-space: normal; word-wrap: break-word; padding: 0 var(--spacing-2); }
     .button-selector {
         display: grid;
         grid-auto-flow: column;
@@ -527,7 +557,6 @@
     .button-selector::-webkit-scrollbar {
         display: none;
     }
-    #calculator-main-description { white-space: normal; }
     .tool-title { flex-direction: column; gap: var(--spacing-2); }
     .selectors-container { grid-template-columns: 1fr; min-height: auto; height: auto; }
     .pairing-selector { max-height: 280px; height: auto; }
