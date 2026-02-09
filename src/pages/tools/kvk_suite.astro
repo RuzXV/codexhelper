@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import '../../styles/kvk_suite.css';
 import TechSimulator from '../../components/kvk_suite/TechSimulator.svelte';
+import KvKTimers from '../../components/kvk_suite/KvKTimers.svelte';
 import crystalIcon from '../../assets/images/kvk_suite/crystal.webp';
 ---
 
@@ -34,7 +35,7 @@ import crystalIcon from '../../assets/images/kvk_suite/crystal.webp';
 
                         <!-- Timers & Tracking -->
                         <div class="carousel-slide" data-title="Timers & Tracking" data-description="Track important KvK & buff timers to stay ahead of your opponents.">
-                            <div class="coming-soon-simple">Coming soon!</div>
+                            <KvKTimers client:load />
                         </div>
 
                         <!-- Flag Cost Calculator -->
