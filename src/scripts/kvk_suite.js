@@ -54,8 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (title === 'Timers & Tracking') title = 'KvK Timers';
         }
 
-        const crystalIcon = window.kvkCrystalIcon || '';
-        mainTitle.innerHTML = `<img src="${crystalIcon}" alt="Crystal" style="width: 32px; height: 32px; margin-right: 10px; vertical-align: middle;" />${title}`;
+        mainTitle.textContent = title;
         mainDescription.textContent = description;
     }
 

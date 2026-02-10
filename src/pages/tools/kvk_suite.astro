@@ -4,7 +4,6 @@ import '../../styles/kvk_suite.css';
 import TechSimulator from '../../components/kvk_suite/TechSimulator.svelte';
 import KvKTimers from '../../components/kvk_suite/KvKTimers.svelte';
 import FlagCostCalculator from '../../components/kvk_suite/FlagCostCalculator.svelte';
-import crystalIcon from '../../assets/images/kvk_suite/crystal.webp';
 ---
 
 <Layout
@@ -50,9 +49,6 @@ import crystalIcon from '../../assets/images/kvk_suite/crystal.webp';
         </section>
     </main>
 
-    <script define:vars={{ crystalIconSrc: crystalIcon.src }}>
-        window.kvkCrystalIcon = crystalIconSrc;
-    </script>
     <script>
         import "../../scripts/kvk_suite.js";
     </script>
