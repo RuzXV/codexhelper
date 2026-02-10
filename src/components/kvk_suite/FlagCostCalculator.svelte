@@ -558,6 +558,7 @@
                                 </div>
                             {/each}
                         </div>
+                        <p class="resource-table-note">Status shows how much of each resource you still need to build all {result.flagsBuilt} flag{result.flagsBuilt !== 1 ? 's' : ''} your crystal allows.</p>
                     </div>
                 {/if}
 
@@ -762,8 +763,8 @@
         object-fit: contain;
     }
 
-    .resource-input-icon.food { color: #f97316; background: rgba(249, 115, 22, 0.12); }
-    .resource-input-icon.wood { color: #a3e635; background: rgba(163, 230, 53, 0.12); }
+    .resource-input-icon.food { color: #a3e635; background: rgba(163, 230, 53, 0.12); }
+    .resource-input-icon.wood { color: #f97316; background: rgba(249, 115, 22, 0.12); }
     .resource-input-icon.stone { color: #94a3b8; background: rgba(148, 163, 184, 0.12); }
     .resource-input-icon.gold { color: #fbbf24; background: rgba(251, 191, 36, 0.12); }
     .resource-input-icon.crystal-res { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
@@ -1024,8 +1025,8 @@
         object-fit: contain;
     }
 
-    .rt-icon.food { color: #f97316; background: rgba(249, 115, 22, 0.12); }
-    .rt-icon.wood { color: #a3e635; background: rgba(163, 230, 53, 0.12); }
+    .rt-icon.food { color: #a3e635; background: rgba(163, 230, 53, 0.12); }
+    .rt-icon.wood { color: #f97316; background: rgba(249, 115, 22, 0.12); }
     .rt-icon.stone { color: #94a3b8; background: rgba(148, 163, 184, 0.12); }
     .rt-icon.gold { color: #fbbf24; background: rgba(251, 191, 36, 0.12); }
     .rt-icon.crystal-res { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
@@ -1050,6 +1051,13 @@
 
     .status-surplus i {
         font-size: 0.7rem;
+    }
+
+    .resource-table-note {
+        font-size: var(--font-size-xs);
+        color: var(--text-muted);
+        margin-top: var(--spacing-2);
+        text-align: center;
     }
 
     /* ── Next Flag Info ── */
