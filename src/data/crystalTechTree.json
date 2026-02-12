@@ -988,7 +988,7 @@
       ],
       "totals": { "buff": "1", "time": "9d 15h", "crystals": 6000000, "seasonCoins": 4000 },
       "requirements": [
-        { "level": 1, "tech": "specialConcoctionsII", "techLevel": 8 }
+        { "level": 1, "tech": "specialConcoctionsII", "techLevel": 10 }
       ]
     },
     "infantryExpert": {

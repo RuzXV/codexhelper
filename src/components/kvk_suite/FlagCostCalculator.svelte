@@ -402,7 +402,7 @@
 
         <!-- Resource Inputs (always visible) -->
         <div class="resource-inputs-section">
-            <label class="section-label">Alliance Resources</label>
+            <span class="section-label">Alliance Resources</span>
             <div class="resource-inputs-grid">
                 {#each RESOURCES as res}
                     <div class="resource-input-row">
