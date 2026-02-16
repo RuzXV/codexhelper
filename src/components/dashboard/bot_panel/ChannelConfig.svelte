@@ -33,9 +33,9 @@
                 groupId => currentSettings[groupId] !== originalSettings[groupId]
             );
 
-            const promises = changedGroups.map(async groupId => {
+            for (const groupId of changedGroups) {
                 const channelId = currentSettings[groupId];
-                return window.auth.fetchWithAuth(`/api/guilds/${guildId}/settings/channels`, {
+                await window.auth.fetchWithAuth(`/api/guilds/${guildId}/settings/channels`, {
                     method: 'POST',
                     body: JSON.stringify({
                         command_group: groupId,
@@ -43,9 +43,7 @@
                         action: (channelId === 'none' || !channelId) ? 'Remove Channel' : 'Add Channel'
                     })
                 });
-            });
-
-            await Promise.all(promises);
+            }
             originalSettings = { ...currentSettings };
             dispatch('settingsUpdated', { settings: currentSettings });
         } catch (e) {

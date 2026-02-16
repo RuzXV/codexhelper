@@ -1,5 +1,8 @@
 <script>
     import { fade } from 'svelte/transition';
+    import { createEventDispatcher } from 'svelte';
+
+    const dispatch = createEventDispatcher();
 
     export let selectedServer;
     export let guildChannels = [];
@@ -16,6 +19,8 @@
 
     let loading = true;
     let patron = null;
+    let showDeauthConfirm = false;
+    let deauthorizing = false;
     let features = {
         ark: { enabled: false, channel_id: null },
         mge: { enabled: false, channel_id: null },
@@ -63,6 +68,22 @@
         }
         return `https://cdn.discordapp.com/embed/avatars/${parseInt(user.discriminator || 0) % 5}.png`;
     }
+
+    async function deauthorizeServer() {
+        deauthorizing = true;
+        try {
+            await window.auth.fetchWithAuth(`/api/guilds/${selectedServer.id}/authorization`, {
+                method: 'DELETE'
+            });
+            showDeauthConfirm = false;
+            dispatch('deauthorized');
+        } catch (e) {
+            console.error("Failed to deauthorize:", e);
+            alert("Failed to deauthorize server. Please try again.");
+        } finally {
+            deauthorizing = false;
+        }
+    }
 </script>
 
 <div class="overview-container" transition:fade={{ duration: 200 }}>
@@ -94,6 +115,11 @@
                         </span>
                     </div>
                 </div>
+                {#if !patron.is_bypass}
+                    <button class="btn-deauth" on:click={() => showDeauthConfirm = true} title="Deauthorize this server">
+                        <i class="fas fa-unlink"></i>
+                    </button>
+                {/if}
             {:else if !loading}
                 <div class="patron-badge warning">
                     <span class="patron-label">Authorization Unknown</span>
@@ -193,6 +219,29 @@
                             {/if}
                         </li>
                     </ul>
+                </div>
+            </div>
+        </div>
+    {/if}
+
+    {#if showDeauthConfirm}
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div class="modal-overlay" on:click={() => showDeauthConfirm = false} transition:fade={{ duration: 150 }}>
+            <div class="modal-card" on:click|stopPropagation>
+                <div class="modal-header">
+                    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                    <h3>Deauthorize Server</h3>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to deauthorize <strong>{selectedServer.name}</strong>?</p>
+                    <p class="modal-note">This will remove your Patreon authorization from this server. The bot's existing configuration (calendar, reminders, etc.) will be preserved, but the dashboard will no longer be accessible for this server until it is re-authorized.</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-modal-cancel" on:click={() => showDeauthConfirm = false} disabled={deauthorizing}>Cancel</button>
+                    <button class="btn-modal-confirm" on:click={deauthorizeServer} disabled={deauthorizing}>
+                        {#if deauthorizing}<i class="fas fa-spinner fa-spin"></i>{:else}Deauthorize{/if}
+                    </button>
                 </div>
             </div>
         </div>
@@ -306,6 +355,84 @@
     .error-text { color: var(--text-muted); font-style: italic; }
 
     .loading-state { padding: 40px; text-align: center; color: var(--text-secondary); font-size: 1.1rem; }
+
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .btn-deauth {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 0.85rem;
+    }
+    .btn-deauth:hover { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(4px);
+    }
+    .modal-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .modal-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .modal-header h3 { margin: 0; font-size: 1.1rem; color: var(--text-primary); }
+    .modal-body { padding: 16px 20px; }
+    .modal-body p { margin: 0 0 10px 0; color: var(--text-primary); font-size: 0.95rem; }
+    .modal-body p:last-child { margin-bottom: 0; }
+    .modal-note { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; }
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 12px 20px;
+        border-top: 1px solid var(--border-color);
+    }
+    .btn-modal-cancel {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        padding: 8px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    .btn-modal-cancel:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .btn-modal-confirm {
+        background: #ef4444;
+        border: none;
+        color: white;
+        padding: 8px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .btn-modal-confirm:hover { background: #dc2626; }
+    .btn-modal-confirm:disabled, .btn-modal-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
 
     @media (max-width: 768px) {
         .overview-header { flex-direction: column; align-items: flex-start; gap: 15px; }

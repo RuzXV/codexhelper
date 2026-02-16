@@ -78,6 +78,8 @@ guilds.post('/:guildId/calendar', async (c) => {
         await c.env.BOT_DB.prepare("UPDATE event_calendar_setups SET is_active = 0 WHERE guild_id = ?").bind(guildId).run();
     }
 
+    const calendarAction = (channel_id && channel_id !== 'none') ? 'refresh_calendar' : 'deactivate';
+
     if (is_personalized && reference_date) {
         const inputDate = new Date(reference_date);
         let anchorDate = new Date(inputDate);
@@ -97,12 +99,22 @@ guilds.post('/:guildId/calendar', async (c) => {
                 anchor_cycle_id = excluded.anchor_cycle_id
         `).bind(guildId, anchorDateStr, anchorCycleId).run();
 
+        // Also sync to the user's personal settings so the public calendar page reflects the rotation
+        const user = c.get('user');
+        if (user?.id) {
+            const userSettings = JSON.stringify({ anchorDate: anchorDateStr, anchorCycleId });
+            await c.env.DB.prepare(
+                `INSERT INTO user_settings (user_id, settings) VALUES (?, ?)
+                 ON CONFLICT(user_id) DO UPDATE SET settings = excluded.settings`
+            ).bind(user.id, userSettings).run();
+        }
+
     } else if (!is_personalized) {
         await c.env.BOT_DB.prepare("DELETE FROM egg_hammer_personalization WHERE guild_id = ?").bind(guildId).run();
         await c.env.BOT_DB.prepare("DELETE FROM guild_event_sequence WHERE guild_id = ?").bind(guildId).run();
     }
 
-    const payload = JSON.stringify({ guild_id: guildId, action: "refresh_calendar" });
+    const payload = JSON.stringify({ guild_id: guildId, action: calendarAction });
     await c.env.BOT_DB.prepare(
         "INSERT INTO system_events (type, payload, created_at) VALUES ('CALENDAR_UPDATE', ?, ?)"
     ).bind(payload, now).run();
@@ -274,84 +286,114 @@ guilds.post('/:guildId/reminders', async (c) => {
     }
 
     const now = Date.now() / 1000;
+    const statements: any[] = [];
 
     for (const r of reminders) {
-        await c.env.BOT_DB.prepare(`
-            INSERT INTO reminder_setups (
-                guild_id, reminder_type, channel_id, is_active,
-                first_instance_ts, last_instance_ts, create_discord_event,
-                reminder_intervals_seconds
+        const intervals = r.reminder_intervals_seconds || '14400';
+        statements.push(
+            c.env.BOT_DB.prepare(`
+                INSERT INTO reminder_setups (
+                    guild_id, reminder_type, channel_id, is_active,
+                    first_instance_ts, last_instance_ts, create_discord_event,
+                    reminder_intervals_seconds
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(guild_id, reminder_type) DO UPDATE SET
+                    channel_id = excluded.channel_id,
+                    is_active = excluded.is_active,
+                    first_instance_ts = excluded.first_instance_ts,
+                    last_instance_ts = excluded.last_instance_ts,
+                    create_discord_event = excluded.create_discord_event,
+                    reminder_intervals_seconds = excluded.reminder_intervals_seconds
+            `).bind(
+                guildId,
+                r.reminder_type,
+                r.channel_id || null,
+                r.is_active ? 1 : 0,
+                r.first_instance_ts || null,
+                r.last_instance_ts || null,
+                r.create_discord_event ? 1 : 0,
+                intervals
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, '14400')
-            ON CONFLICT(guild_id, reminder_type) DO UPDATE SET
-                channel_id = excluded.channel_id,
-                is_active = excluded.is_active,
-                first_instance_ts = excluded.first_instance_ts,
-                last_instance_ts = excluded.last_instance_ts,
-                create_discord_event = excluded.create_discord_event
-        `).bind(
-            guildId,
-            r.reminder_type,
-            r.channel_id,
-            r.is_active ? 1 : 0,
-            r.first_instance_ts,
-            r.last_instance_ts,
-            r.create_discord_event ? 1 : 0
-        ).run();
+        );
     }
 
     if (deletedCustomIds && deletedCustomIds.length > 0) {
         const placeholders = deletedCustomIds.map(() => '?').join(',');
-        await c.env.BOT_DB.prepare(
-            `DELETE FROM custom_reminders WHERE guild_id = ? AND reminder_id IN (${placeholders})`
-        ).bind(guildId, ...deletedCustomIds).run();
+        statements.push(
+            c.env.BOT_DB.prepare(
+                `DELETE FROM custom_reminders WHERE guild_id = ? AND reminder_id IN (${placeholders})`
+            ).bind(guildId, ...deletedCustomIds)
+        );
     }
 
     if (customReminders && Array.isArray(customReminders)) {
         for (const cr of customReminders) {
             if (cr.reminder_id) {
-                await c.env.BOT_DB.prepare(`
-                    UPDATE custom_reminders SET
-                        channel_id = ?,
-                        title = ?,
-                        message = ?,
-                        role_id = ?,
-                        repeat_interval_seconds = ?,
-                        first_instance_ts = ?
-                    WHERE guild_id = ? AND reminder_id = ?
-                `).bind(
-                    cr.channel_id,
-                    cr.title,
-                    cr.message || '',
-                    cr.role_id || null,
-                    cr.repeat_interval_seconds,
-                    cr.first_instance_ts,
-                    guildId,
-                    cr.reminder_id
-                ).run();
+                statements.push(
+                    c.env.BOT_DB.prepare(`
+                        UPDATE custom_reminders SET
+                            channel_id = ?,
+                            title = ?,
+                            message = ?,
+                            role_id = ?,
+                            repeat_interval_seconds = ?,
+                            first_instance_ts = ?
+                        WHERE guild_id = ? AND reminder_id = ?
+                    `).bind(
+                        cr.channel_id,
+                        cr.title,
+                        cr.message || '',
+                        cr.role_id || null,
+                        cr.repeat_interval_seconds,
+                        cr.first_instance_ts,
+                        guildId,
+                        cr.reminder_id
+                    )
+                );
             } else {
-                await c.env.BOT_DB.prepare(`
-                    INSERT INTO custom_reminders (
-                        guild_id, created_by_user_id, channel_id, title, message, role_id,
-                        repeat_interval_seconds, first_instance_ts, reminder_intervals_seconds, is_active, create_discord_event
-                    ) VALUES (?, 0, ?, ?, ?, ?, ?, ?, '300', 1, 0)
-                `).bind(
-                    guildId,
-                    cr.channel_id,
-                    cr.title,
-                    cr.message || '',
-                    cr.role_id || null,
-                    cr.repeat_interval_seconds,
-                    cr.first_instance_ts
-                ).run();
+                statements.push(
+                    c.env.BOT_DB.prepare(`
+                        INSERT INTO custom_reminders (
+                            guild_id, created_by_user_id, channel_id, title, message, role_id,
+                            repeat_interval_seconds, first_instance_ts, reminder_intervals_seconds, is_active, create_discord_event
+                        ) VALUES (?, 0, ?, ?, ?, ?, ?, ?, '300', 1, 0)
+                    `).bind(
+                        guildId,
+                        cr.channel_id,
+                        cr.title,
+                        cr.message || '',
+                        cr.role_id || null,
+                        cr.repeat_interval_seconds,
+                        cr.first_instance_ts
+                    )
+                );
             }
         }
     }
 
+    // Check if any reminders need initial setup (role + role menu creation by the bot)
+    const setupTypes = reminders
+        .filter((r: any) => r.is_new_setup && r.is_active)
+        .map((r: any) => r.reminder_type);
+
+    if (setupTypes.length > 0) {
+        const setupPayload = JSON.stringify({ guild_id: guildId, setup_types: setupTypes });
+        statements.push(
+            c.env.BOT_DB.prepare(
+                "INSERT INTO system_events (type, payload, created_at) VALUES ('REMINDER_SETUP', ?, ?)"
+            ).bind(setupPayload, now)
+        );
+    }
+
     const payload = JSON.stringify({ guild_id: guildId, action: "refresh_reminders" });
-    await c.env.BOT_DB.prepare(
-        "INSERT INTO system_events (type, payload, created_at) VALUES ('REMINDER_UPDATE', ?, ?)"
-    ).bind(payload, now).run();
+    statements.push(
+        c.env.BOT_DB.prepare(
+            "INSERT INTO system_events (type, payload, created_at) VALUES ('REMINDER_UPDATE', ?, ?)"
+        ).bind(payload, now)
+    );
+
+    await c.env.BOT_DB.batch(statements);
 
     return c.json({ success: true });
 });
@@ -816,6 +858,27 @@ guilds.post('/:guildId/ark/post-signup', async (c) => {
     ).bind(payload, Date.now() / 1000).run();
 
     return c.json({ success: true });
+});
+
+guilds.delete('/:guildId/authorization', async (c) => {
+    const { guildId } = c.req.param();
+
+    if (!await verifyGuildPatreonAccess(c, guildId)) {
+        return c.json({
+            error: 'Unauthorized: Only the Patreon subscriber who authorized this server can deauthorize it.'
+        }, 403);
+    }
+
+    try {
+        await c.env.BOT_DB.prepare(
+            "DELETE FROM guild_authorizations WHERE guild_id = ?"
+        ).bind(guildId).run();
+
+        return c.json({ success: true });
+    } catch (e) {
+        console.error("Failed to deauthorize guild:", e);
+        return c.json({ error: 'Failed to deauthorize server' }, 500);
+    }
 });
 
 export default guilds;

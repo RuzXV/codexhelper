@@ -16,6 +16,9 @@
     let hasUnsavedChanges = false;
     let openDropdownId = null;
 
+    // Setup form state for new ruins/altar reminders
+    let setupForms = { ruins: null, altar: null };
+
     onMount(async () => {
         await loadData();
     });
@@ -37,11 +40,31 @@
 
             roles = rolesRes.roles || [];
 
-            reminders = (res.reminders || []).map(r => ({
+            const loadedReminders = (res.reminders || []).map(r => ({
                 ...r,
                 is_active: !!r.is_active,
                 create_discord_event: !!r.create_discord_events
             }));
+
+            // Ensure both ruins and altar entries always exist
+            const types = ['ruins', 'altar'];
+            reminders = types.map(type => {
+                const existing = loadedReminders.find(r => r.reminder_type === type);
+                if (existing) return existing;
+                // Create a placeholder entry for reminders that don't exist yet
+                return {
+                    reminder_type: type,
+                    channel_id: null,
+                    is_active: false,
+                    create_discord_event: false,
+                    role_id: null,
+                    role_menu_message_id: null,
+                    first_instance_ts: 0,
+                    last_instance_ts: 0,
+                    reminder_intervals_seconds: '14400',
+                    _placeholder: true
+                };
+            });
 
             customReminders = (res.customReminders || []).map(c => {
                 let unit = 'h';
@@ -200,6 +223,111 @@
         event.stopPropagation();
         openDropdownId = openDropdownId === id ? null : id;
     }
+
+    function initSetupForm(type) {
+        const now = new Date();
+        const tomorrow = new Date(now.getTime() + 86400000);
+        const threeMonths = new Date(now.getTime() + 90 * 86400000);
+
+        setupForms[type] = {
+            channel_id: channels[0]?.id || 'none',
+            first_instance_date: formatDateInput(tomorrow),
+            first_instance_time: '00:00',
+            last_instance_date: formatDateInput(threeMonths),
+            last_instance_time: '00:00',
+            reminder_1h: false,
+            reminder_4h: true,
+            reminder_8h: false,
+            create_discord_event: false
+        };
+        setupForms = setupForms;
+    }
+
+    function cancelSetupForm(type) {
+        setupForms[type] = null;
+        setupForms = setupForms;
+    }
+
+    function formatDateInput(date) {
+        const y = date.getUTCFullYear();
+        const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const d = String(date.getUTCDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function getSetupIntervals(form) {
+        const intervals = [];
+        if (form.reminder_1h) intervals.push(3600);
+        if (form.reminder_4h) intervals.push(14400);
+        if (form.reminder_8h) intervals.push(28800);
+        if (intervals.length === 0) intervals.push(14400);
+        return intervals.sort((a, b) => a - b).join(',');
+    }
+
+    async function submitSetup(type) {
+        const form = setupForms[type];
+        if (!form) return;
+        if (!form.channel_id || form.channel_id === 'none') {
+            alert('Please select a destination channel.');
+            return;
+        }
+
+        const firstTs = new Date(`${form.first_instance_date}T${form.first_instance_time}:00Z`).getTime() / 1000;
+        const lastTs = new Date(`${form.last_instance_date}T${form.last_instance_time}:00Z`).getTime() / 1000;
+
+        if (isNaN(firstTs) || isNaN(lastTs)) {
+            alert('Invalid date/time. Please check your inputs.');
+            return;
+        }
+        if (lastTs <= firstTs) {
+            alert('Last instance must be after first instance.');
+            return;
+        }
+
+        saving = true;
+        try {
+            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/reminders`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    reminders: [{
+                        reminder_type: type,
+                        channel_id: form.channel_id,
+                        is_active: true,
+                        first_instance_ts: firstTs,
+                        last_instance_ts: lastTs,
+                        create_discord_event: form.create_discord_event,
+                        reminder_intervals_seconds: getSetupIntervals(form),
+                        is_new_setup: true
+                    }],
+                    customReminders: [],
+                    deletedCustomIds: []
+                })
+            });
+            setupForms[type] = null;
+            setupForms = setupForms;
+            await loadData();
+        } catch (e) {
+            console.error("Failed to setup reminder:", e);
+            alert("Failed to set up reminder. Please try again.");
+        } finally {
+            saving = false;
+        }
+    }
+
+    function formatIntervalLabel(seconds) {
+        if (seconds === 3600) return '1 hour';
+        if (seconds === 14400) return '4 hours';
+        if (seconds === 28800) return '8 hours';
+        return `${seconds / 3600}h`;
+    }
+
+    function getReminderIntervals(reminder) {
+        if (!reminder.reminder_intervals_seconds) return '4 hours';
+        return reminder.reminder_intervals_seconds
+            .split(',')
+            .map(s => formatIntervalLabel(parseInt(s)))
+            .join(', ');
+    }
 </script>
 
 <svelte:window on:click={() => openDropdownId = null} />
@@ -227,11 +355,11 @@
 
                 {#if reminder.is_active}
                     <div transition:slide|local>
-                        {#if (!reminder.role_id || !reminder.role_menu_message_id)}
+                        {#if (!reminder.role_id || !reminder.role_menu_message_id) && !reminder._placeholder}
                             <div class="warning-banner">
                                 <i class="fas fa-exclamation-triangle"></i>
                                 <div class="warning-text">
-                                    <strong>Setup Incomplete:</strong> Role or Menu missing. Run <code>/reminder setup</code> in Discord.
+                                    <strong>Syncing:</strong> The bot is creating roles and the role menu. This may take a moment.
                                 </div>
                             </div>
                         {/if}
@@ -269,13 +397,20 @@
                                         </div>
                                     </div>
 
+                                    <div class="sub-setting-row" style="margin-top: 10px;">
+                                        <div class="text-info">
+                                            <span class="sub-label">Reminder Intervals</span>
+                                            <p class="sub-text">{getReminderIntervals(reminder)} before each event</p>
+                                        </div>
+                                    </div>
+
                                     <div class="shift-controls" style="margin-top: 20px;">
                                         <p class="shift-help">Shift the schedule for all future events:</p>
                                         <div class="shift-buttons">
-                                            <button class="btn-shift" on:click={() => shiftTime(custom, -60)}>-1 Hour</button>
-                                            <button class="btn-shift" on:click={() => shiftTime(custom, -1)}>-1 Minute</button>
-                                            <button class="btn-shift" on:click={() => shiftTime(custom, 1)}>+1 Minute</button>
-                                            <button class="btn-shift" on:click={() => shiftTime(custom, 60)}>+1 Hour</button>
+                                            <button class="btn-shift" on:click={() => shiftTime(reminder, -60)}>-1 Hour</button>
+                                            <button class="btn-shift" on:click={() => shiftTime(reminder, -1)}>-1 Minute</button>
+                                            <button class="btn-shift" on:click={() => shiftTime(reminder, 1)}>+1 Minute</button>
+                                            <button class="btn-shift" on:click={() => shiftTime(reminder, 60)}>+1 Hour</button>
                                         </div>
                                     </div>
                                 </div>
@@ -295,6 +430,104 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                {:else}
+                    <div transition:slide|local>
+                        {#if setupForms[reminder.reminder_type]}
+                            {@const form = setupForms[reminder.reminder_type]}
+                            <div class="setup-form">
+                                <div class="setup-form-header">
+                                    <i class="fas fa-magic"></i>
+                                    <span>Set up {reminder.reminder_type === 'ruins' ? 'Ancient Ruins' : 'Altar of Darkness'} reminders</span>
+                                </div>
+
+                                <div class="setup-form-body">
+                                    <div class="setup-row">
+                                        <div class="setup-group">
+                                            <label>Destination Channel</label>
+                                            <div class="custom-select-container">
+                                                <button type="button" class="custom-select-trigger small" on:click={(e) => toggleDropdown(`setup-ch-${reminder.reminder_type}`, e)}>
+                                                    <span>{getChannelName(form.channel_id)}</span>
+                                                    <i class="fas fa-chevron-down arrow"></i>
+                                                </button>
+                                                {#if openDropdownId === `setup-ch-${reminder.reminder_type}`}
+                                                    <div class="custom-dropdown-menu" transition:slide={{ duration: 150 }}>
+                                                        {#each channels as ch}
+                                                            <button class="dropdown-option" on:click={() => {form.channel_id = ch.id; openDropdownId = null; setupForms = setupForms;}}>
+                                                                <span class="hash">#</span> {ch.name}
+                                                            </button>
+                                                        {/each}
+                                                    </div>
+                                                {/if}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="setup-row">
+                                        <div class="setup-group">
+                                            <label>First Instance (UTC)</label>
+                                            <div class="datetime-row">
+                                                <input type="date" bind:value={form.first_instance_date} on:change={() => setupForms = setupForms} />
+                                                <input type="time" bind:value={form.first_instance_time} on:change={() => setupForms = setupForms} />
+                                            </div>
+                                        </div>
+                                        <div class="setup-group">
+                                            <label>Last Instance (UTC)</label>
+                                            <div class="datetime-row">
+                                                <input type="date" bind:value={form.last_instance_date} on:change={() => setupForms = setupForms} />
+                                                <input type="time" bind:value={form.last_instance_time} on:change={() => setupForms = setupForms} />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="setup-row">
+                                        <div class="setup-group">
+                                            <label>Reminder Intervals</label>
+                                            <div class="interval-checkboxes">
+                                                <label class="interval-checkbox">
+                                                    <input type="checkbox" bind:checked={form.reminder_1h} on:change={() => setupForms = setupForms} />
+                                                    <span>1 hour before</span>
+                                                </label>
+                                                <label class="interval-checkbox">
+                                                    <input type="checkbox" bind:checked={form.reminder_4h} on:change={() => setupForms = setupForms} />
+                                                    <span>4 hours before</span>
+                                                </label>
+                                                <label class="interval-checkbox">
+                                                    <input type="checkbox" bind:checked={form.reminder_8h} on:change={() => setupForms = setupForms} />
+                                                    <span>8 hours before</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="setup-group">
+                                            <label>Options</label>
+                                            <label class="interval-checkbox">
+                                                <input type="checkbox" bind:checked={form.create_discord_event} on:change={() => setupForms = setupForms} />
+                                                <span>Create Discord Events</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="setup-info">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>The bot will automatically create the required roles and a role selection menu in the chosen channel. Events repeat every {reminder.reminder_type === 'ruins' ? '40' : '86'} hours.</span>
+                                    </div>
+
+                                    <div class="setup-actions">
+                                        <button class="btn-setup-cancel" on:click={() => cancelSetupForm(reminder.reminder_type)} disabled={saving}>Cancel</button>
+                                        <button class="btn-setup-confirm" on:click={() => submitSetup(reminder.reminder_type)} disabled={saving}>
+                                            {#if saving}<i class="fas fa-spinner fa-spin"></i>{:else}<i class="fas fa-check"></i> Activate{/if}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {:else}
+                            <div class="setup-prompt">
+                                <p>Reminders are not set up for this event type.</p>
+                                <button class="btn-begin-setup" on:click={() => initSetupForm(reminder.reminder_type)}>
+                                    <i class="fas fa-plus-circle"></i> Set Up Reminders
+                                </button>
+                            </div>
+                        {/if}
                     </div>
                 {/if}
             </div>
@@ -569,7 +802,126 @@
     .dropdown-option { width: 100%; text-align: left; background: transparent; border: none; padding: 10px 16px; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; }
     .dropdown-option:hover { background: var(--bg-tertiary); color: var(--text-primary); }
 
-    .warning-banner { background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; padding: 10px 15px; margin-bottom: 15px; border-radius: 4px; display: flex; gap: 10px; align-items: start; font-size: 0.85rem; color: #fbbf24; }
+    .warning-banner { background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; padding: 10px 15px; margin: 15px 20px 0; border-radius: 4px; display: flex; gap: 10px; align-items: start; font-size: 0.85rem; color: #fbbf24; }
+
+    .sub-label { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
+
+    .setup-prompt {
+        padding: 25px;
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    .setup-prompt p { margin: 0 0 12px 0; }
+    .btn-begin-setup {
+        background: var(--accent-blue);
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.2s;
+    }
+    .btn-begin-setup:hover { opacity: 0.9; }
+
+    .setup-form { border-top: 1px solid var(--border-color); }
+    .setup-form-header {
+        padding: 12px 20px;
+        background: rgba(59, 130, 246, 0.08);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: var(--accent-blue);
+        font-size: 0.9rem;
+    }
+    .setup-form-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .setup-row { display: flex; gap: 20px; }
+    .setup-group { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .setup-group label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
+
+    .datetime-row { display: flex; gap: 8px; }
+    .datetime-row input {
+        flex: 1;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        padding: 8px 10px;
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-size: 0.85rem;
+        color-scheme: dark;
+    }
+
+    .interval-checkboxes { display: flex; flex-direction: column; gap: 6px; }
+    .interval-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+    }
+    .interval-checkbox input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent-blue);
+        cursor: pointer;
+    }
+
+    .setup-info {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 10px 12px;
+        background: rgba(59, 130, 246, 0.06);
+        border-radius: 6px;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+    }
+    .setup-info i { color: var(--accent-blue); margin-top: 2px; flex-shrink: 0; }
+
+    .setup-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border-color);
+    }
+    .btn-setup-cancel {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    .btn-setup-cancel:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+    .btn-setup-confirm {
+        background: var(--accent-blue);
+        border: none;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.2s;
+    }
+    .btn-setup-confirm:hover { opacity: 0.9; }
+    .btn-setup-confirm:disabled, .btn-setup-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .toggle-wrapper { position: relative; width: 44px; height: 24px; }
     .toggle-wrapper input { opacity: 0; width: 0; height: 0; }

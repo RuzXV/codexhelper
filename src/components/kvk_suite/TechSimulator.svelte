@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { slide } from 'svelte/transition';
     import techTreeData from '../../data/crystalTechTree.json';
 
     // Import tech icons
@@ -462,6 +463,8 @@
             selectedVersion?: string;
             researchOrder?: { techKey: string; level: number; cc1AtTime: number; cc2AtTime: number }[];
             includeRCCrystalCost?: boolean;
+            helpsPerResearch?: number;
+            researchSpeedBonus?: number;
         } | null;
     }
 
@@ -551,7 +554,9 @@
                     researchCenterLevel,
                     selectedVersion,
                     researchOrder,
-                    includeRCCrystalCost
+                    includeRCCrystalCost,
+                    helpsPerResearch,
+                    researchSpeedBonus
                 };
                 win.saveUserData(TECH_SIMULATOR_CACHE_KEY, state);
             }
@@ -586,6 +591,12 @@
                     }
                     if (savedState.includeRCCrystalCost !== undefined) {
                         includeRCCrystalCost = savedState.includeRCCrystalCost;
+                    }
+                    if (savedState.helpsPerResearch !== undefined) {
+                        helpsPerResearch = savedState.helpsPerResearch;
+                    }
+                    if (savedState.researchSpeedBonus !== undefined) {
+                        researchSpeedBonus = savedState.researchSpeedBonus;
                     }
                 }
             }
@@ -683,6 +694,11 @@
     let isRCDropdownOpen = false;
     let includeRCCrystalCost = false;
 
+    // Footer expansion panel state
+    let expandedFooterPanel: 'speedups' | 'crystals' | null = null;
+    let helpsPerResearch = 30;
+    let researchSpeedBonus = 0;
+
     // Research Center crystal costs per level (cumulative cost to reach that level)
     // Level 1 is free, costs start from level 2
     const rcCrystalCosts: Record<number, number> = {
@@ -757,7 +773,7 @@
     $: totalCostReduction = getRCCostReduction(researchCenterLevel) + getCuttingCornersReduction();
 
     // Auto-save when state changes
-    $: if (userTechLevels || researchCenterLevel || selectedVersion) {
+    $: if (userTechLevels || researchCenterLevel || selectedVersion || helpsPerResearch || researchSpeedBonus) {
         debouncedSave();
     }
 
@@ -1038,26 +1054,64 @@
     // Total crystals including optional RC cost
     $: totalCrystalsUsed = techTreeCrystalCost + (includeRCCrystalCost ? getTotalRCCrystalCost(researchCenterLevel) : 0);
 
-    $: totalSpeedupsUsed = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
+    // Raw crystal cost (no CC/RC reduction) for achievement tracking
+    $: rawCrystalCost = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
         const tech = allTechs[techKey];
         if (!tech || level <= 0) return total;
-        // Sum time for all levels up to current level (convert to days)
+        const rawSum = tech.levels.slice(0, level).reduce((sum: number, lvl: TechLevel) => sum + lvl.crystals, 0);
+        return total + rawSum;
+    }, 0) + (includeRCCrystalCost ? getTotalRCCrystalCost(researchCenterLevel) : 0);
+
+    // Savings from cost reduction (RC + CC)
+    $: crystalSavings = rawCrystalCost - totalCrystalsUsed;
+
+    // Parse time string to seconds
+    function parseTimeToSeconds(timeStr: string): number {
+        let seconds = 0;
+        const dayMatch = timeStr.match(/(\d+)d/);
+        const hourMatch = timeStr.match(/(\d+)h/);
+        const minMatch = timeStr.match(/(\d+)m/);
+        const secMatch = timeStr.match(/(\d+)s/);
+        if (dayMatch) seconds += parseInt(dayMatch[1]) * 86400;
+        if (hourMatch) seconds += parseInt(hourMatch[1]) * 3600;
+        if (minMatch) seconds += parseInt(minMatch[1]) * 60;
+        if (secMatch) seconds += parseInt(secMatch[1]);
+        return seconds;
+    }
+
+    // Base time in seconds (raw sum of all research times, no reductions)
+    $: baseTimeSeconds = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
+        const tech = allTechs[techKey];
+        if (!tech || level <= 0) return total;
         const timeForLevels = tech.levels.slice(0, level).reduce((sum: number, lvl: TechLevel) => {
-            // Parse time string like "1d 2h 30m" or "12h 30m" or "8d 4h"
-            const timeStr = lvl.time;
-            let days = 0;
-            const dayMatch = timeStr.match(/(\d+)d/);
-            const hourMatch = timeStr.match(/(\d+)h/);
-            const minMatch = timeStr.match(/(\d+)m/);
-            const secMatch = timeStr.match(/(\d+)s/);
-            if (dayMatch) days += parseInt(dayMatch[1]);
-            if (hourMatch) days += parseInt(hourMatch[1]) / 24;
-            if (minMatch) days += parseInt(minMatch[1]) / 1440;
-            if (secMatch) days += parseInt(secMatch[1]) / 86400;
-            return sum + days;
+            return sum + parseTimeToSeconds(lvl.time);
         }, 0);
         return total + timeForLevels;
     }, 0);
+
+    // After research speed bonus (applied first, same as healing calc: base / (1 + bonus/100))
+    $: timeAfterSpeedBonus = researchSpeedBonus > 0
+        ? baseTimeSeconds / (1 + researchSpeedBonus / 100)
+        : baseTimeSeconds;
+
+    // After helps (applied second, iterative: each help removes max(180s, 1% of remaining))
+    $: timeAfterHelps = (() => {
+        let remaining = timeAfterSpeedBonus;
+        const helpCount = Math.min(Math.max(helpsPerResearch, 0), 30);
+        for (let i = 0; i < helpCount; i++) {
+            if (remaining <= 0) break;
+            const reduction = Math.max(180, remaining * 0.01);
+            remaining = Math.max(0, remaining - reduction);
+        }
+        return remaining;
+    })();
+
+    // Final speedup value (in days for display)
+    $: totalSpeedupsUsed = timeAfterHelps / 86400;
+    // Base time in days (for panel display)
+    $: baseTimeDays = baseTimeSeconds / 86400;
+    // After speed bonus in days (for panel display)
+    $: timeAfterSpeedBonusDays = timeAfterSpeedBonus / 86400;
 
     $: totalSeasonCoinsUsed = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
         const tech = allTechs[techKey];
@@ -1509,7 +1563,7 @@
 
     // Format speedups display
     function formatSpeedups(days: number): string {
-        if (days === 0) return '0d';
+        if (days === 0) return '0 Days';
         if (days < 1) {
             const hours = days * 24;
             if (hours < 1) {
@@ -1518,7 +1572,29 @@
             }
             return `${hours.toFixed(1)}h`;
         }
-        return `${days.toFixed(1)}d`;
+        return `${days.toFixed(1)} Days`;
+    }
+
+    // Toggle footer expansion panels
+    function toggleFooterPanel(panel: 'speedups' | 'crystals') {
+        expandedFooterPanel = expandedFooterPanel === panel ? null : panel;
+    }
+
+    // Clamp input values
+    function clampHelps(e: Event) {
+        const input = e.target as HTMLInputElement;
+        let val = parseInt(input.value) || 0;
+        if (val < 0) val = 0;
+        if (val > 30) val = 30;
+        helpsPerResearch = val;
+    }
+
+    function clampSpeedBonus(e: Event) {
+        const input = e.target as HTMLInputElement;
+        let val = parseInt(input.value) || 0;
+        if (val < 0) val = 0;
+        if (val > 999) val = 999;
+        researchSpeedBonus = val;
     }
 
     // Build placeholder nodes for visualization
@@ -1658,7 +1734,8 @@
 
     function handleWheel(e: WheelEvent): void {
         e.preventDefault();
-        const delta = e.deltaY || e.deltaX;
+        // Support both vertical scroll (mouse wheel) and horizontal swipe (touchpad)
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
         setTransform(currentTranslateX - delta);
     }
 
@@ -2327,22 +2404,96 @@
 
     <!-- Footer Bar with Counters -->
     <div class="crystal-tech-footer">
-        <div class="footer-counter speedups">
+        <button class="footer-counter speedups clickable" class:active={expandedFooterPanel === 'speedups'} on:click={() => toggleFooterPanel('speedups')} aria-label="Toggle speedup details">
+            <span class="icon-chevron" class:open={expandedFooterPanel === 'speedups'}><i class="fas fa-chevron-down"></i></span>
             <img src={researchSpeedupIcon.src} alt="Speedup" class="counter-icon" width="28" height="28" />
             <span class="counter-label">Total Speedups Spent:</span>
             <span class="counter-value">{formatSpeedups(totalSpeedupsUsed)}</span>
-        </div>
+        </button>
         <div class="footer-counter season-coins">
             <img src={seasonCoinIcon.src} alt="Season Coins" class="counter-icon" width="28" height="28" />
             <span class="counter-label">Total Season Coins:</span>
             <span class="counter-value">{totalSeasonCoinsUsed.toLocaleString()}</span>
         </div>
-        <div class="footer-counter crystals">
+        <button class="footer-counter crystals clickable" class:active={expandedFooterPanel === 'crystals'} on:click={() => toggleFooterPanel('crystals')} aria-label="Toggle crystal details">
+            <span class="icon-chevron" class:open={expandedFooterPanel === 'crystals'}><i class="fas fa-chevron-down"></i></span>
             <img src={crystalIcon.src} alt="Crystal" class="counter-icon" width="28" height="28" />
             <span class="counter-label">Total Crystals Used:</span>
             <span class="counter-value" id="total-crystals-value">{totalCrystalsUsed.toLocaleString()}</span>
-        </div>
+        </button>
     </div>
+
+    <!-- Footer Expansion Panel (opens downward below footer) -->
+    {#if expandedFooterPanel === 'speedups'}
+        <div class="footer-expansion-panel" transition:slide={{ duration: 200 }}>
+            <div class="expansion-content">
+                <div class="expansion-inputs">
+                    <div class="expansion-input-group">
+                        <label for="research-speed-bonus">Research Speed Bonus</label>
+                        <div class="input-with-suffix">
+                            <input
+                                type="number"
+                                id="research-speed-bonus"
+                                min="0"
+                                max="999"
+                                bind:value={researchSpeedBonus}
+                                on:change={clampSpeedBonus}
+                            />
+                            <span class="input-suffix">%</span>
+                        </div>
+                    </div>
+                    <div class="expansion-input-group">
+                        <label for="helps-per-research">Helps per Research</label>
+                        <div class="input-with-suffix">
+                            <input
+                                type="number"
+                                id="helps-per-research"
+                                min="0"
+                                max="30"
+                                bind:value={helpsPerResearch}
+                                on:change={clampHelps}
+                            />
+                            <span class="input-suffix">/ 30</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="expansion-stats">
+                    <div class="expansion-stat-row">
+                        <span class="stat-label">Base Time</span>
+                        <span class="stat-value">{formatSpeedups(baseTimeDays)}</span>
+                    </div>
+                    <div class="expansion-stat-row">
+                        <span class="stat-label">After Speed Bonus</span>
+                        <span class="stat-value">{formatSpeedups(timeAfterSpeedBonusDays)}</span>
+                    </div>
+                    <div class="expansion-stat-row">
+                        <span class="stat-label">After {helpsPerResearch} Helps</span>
+                        <span class="stat-value">{formatSpeedups(totalSpeedupsUsed)}</span>
+                    </div>
+                    <div class="expansion-stat-row final">
+                        <span class="stat-label">Speedups Needed</span>
+                        <span class="stat-value highlight">{formatSpeedups(totalSpeedupsUsed)}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/if}
+    {#if expandedFooterPanel === 'crystals'}
+        <div class="footer-expansion-panel" transition:slide={{ duration: 200 }}>
+            <div class="expansion-content crystals-layout">
+                <div class="expansion-crystal-card">
+                    <span class="crystal-card-label">Without Reduction</span>
+                    <span class="crystal-card-value">{rawCrystalCost.toLocaleString()}</span>
+                    <span class="crystal-card-note">Raw cost (no RC / CC)</span>
+                </div>
+                <div class="expansion-crystal-card savings">
+                    <span class="crystal-card-label">Reduction Savings</span>
+                    <span class="crystal-card-value">{crystalSavings.toLocaleString()}</span>
+                    <span class="crystal-card-note">Saved by RC + CC levels</span>
+                </div>
+            </div>
+        </div>
+    {/if}
 </div>
 {/if}
 
@@ -3076,6 +3227,10 @@
         justify-content: flex-end;
     }
 
+    .footer-counter.clickable {
+        flex: 0 0 auto;
+    }
+
     .counter-icon {
         width: 26px;
         height: 26px;
@@ -3106,6 +3261,13 @@
         min-width: 70px;
     }
 
+    .counter-note {
+        font-size: 0.65rem;
+        color: #6a8a9a;
+        font-style: italic;
+        white-space: nowrap;
+    }
+
     .footer-counter.crystals .counter-value {
         text-align: right;
     }
@@ -3117,6 +3279,212 @@
 
     .footer-counter.season-coins .counter-value {
         color: #b8860b;
+    }
+
+    /* Clickable footer counters */
+    .footer-counter.clickable {
+        cursor: pointer;
+        border: none;
+        background: none;
+        padding: 4px 10px;
+        margin: -4px 0;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        font-family: inherit;
+    }
+
+    .footer-counter.clickable:hover {
+        background: rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 8px rgba(100, 180, 220, 0.25);
+    }
+
+    .footer-counter.clickable.active {
+        background: rgba(0, 0, 0, 0.15);
+        box-shadow: 0 0 10px rgba(100, 180, 220, 0.35);
+    }
+
+    .icon-chevron {
+        font-size: 0.75rem;
+        color: #5a7a8a;
+        transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .icon-chevron.open {
+        color: #2a5a7a;
+    }
+
+    /* Footer Expansion Panel */
+    .footer-expansion-panel {
+        background: linear-gradient(135deg, #1a2f4a 0%, #0d1b2a 100%);
+        border-top: 1px solid rgba(100, 180, 220, 0.15);
+        border-bottom: 1px solid rgba(100, 180, 220, 0.2);
+        padding: 16px 24px;
+        overflow: hidden;
+    }
+
+    .expansion-content {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .expansion-inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex: 0 0 auto;
+        min-width: 200px;
+    }
+
+    .expansion-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .expansion-input-group label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .input-with-suffix {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .input-with-suffix input {
+        width: 70px;
+        padding: 6px 10px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(100, 180, 220, 0.25);
+        border-radius: 6px;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 600;
+        font-family: 'NotoSansHans', sans-serif;
+        text-align: center;
+    }
+
+    .input-with-suffix input:focus {
+        outline: none;
+        border-color: rgba(100, 180, 220, 0.5);
+        box-shadow: 0 0 8px rgba(100, 180, 220, 0.2);
+    }
+
+    /* Hide number input spinners */
+    .input-with-suffix input[type="number"]::-webkit-outer-spin-button,
+    .input-with-suffix input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .input-with-suffix input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
+    .input-suffix {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 600;
+    }
+
+    .expansion-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .expansion-stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 3px 0;
+    }
+
+    .expansion-stat-row .stat-label {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.55);
+        font-weight: 500;
+    }
+
+    .expansion-stat-row .stat-value {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 700;
+        font-family: 'NotoSansHans', sans-serif;
+    }
+
+    .expansion-stat-row.final {
+        border-top: 1px solid rgba(100, 180, 220, 0.2);
+        padding-top: 6px;
+        margin-top: 2px;
+    }
+
+    .expansion-stat-row.final .stat-label {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 700;
+    }
+
+    .expansion-stat-row .stat-value.highlight {
+        color: #7dd3fc;
+        font-size: 0.9rem;
+    }
+
+    /* Crystals expansion layout */
+    .expansion-content.crystals-layout {
+        justify-content: center;
+        gap: 40px;
+    }
+
+    .expansion-crystal-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 12px 24px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(100, 180, 220, 0.15);
+        border-radius: 8px;
+        min-width: 180px;
+    }
+
+    .expansion-crystal-card.savings {
+        border-color: rgba(74, 222, 128, 0.2);
+        background: rgba(74, 222, 128, 0.05);
+    }
+
+    .crystal-card-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .crystal-card-value {
+        font-size: 1.1rem;
+        font-weight: 900;
+        color: #7dd3fc;
+        font-family: 'NotoSansHans', sans-serif;
+    }
+
+    .expansion-crystal-card.savings .crystal-card-value {
+        color: #4ade80;
+    }
+
+    .crystal-card-note {
+        font-size: 0.65rem;
+        color: rgba(255, 255, 255, 0.35);
+        font-style: italic;
     }
 
     /* Main Panel - Tech Tree Viewport */
@@ -3310,7 +3678,9 @@
             0 3px 6px rgba(0, 0, 0, 0.25);
         font-family: 'NotoSansHans', sans-serif;
         text-align: left;
-        overflow: hidden;
+        overflow: visible;
+        user-select: none;
+        -webkit-user-select: none;
     }
 
     .tech-node:hover {
@@ -3479,10 +3849,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 20px;
+        height: 16px;
         width: 100%;
-        max-width: 100px;
-        border-radius: 10px;
+        max-width: 85px;
+        border-radius: 8px;
         overflow: hidden;
         background: #AFC3D2;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -3495,7 +3865,7 @@
         left: 0;
         height: 100%;
         width: var(--progress, 0%);
-        border-radius: 9px;
+        border-radius: 7px;
         background: linear-gradient(to top, #014e80, #007cb0);
         box-shadow: 0 0 4px rgba(0, 124, 176, 0.4);
         transition: width 0.3s ease;
@@ -3504,15 +3874,19 @@
     .tech-level span {
         position: relative;
         z-index: 1;
-        font-size: 0.85rem;
+        font-size: 0.7rem;
         font-weight: 900;
         font-family: 'NotoSansHans', sans-serif;
         color: #FFFFFF;
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
     }
 
+    .tech-node.locked .tech-level {
+        background: #7a8d9e;
+    }
+
     .tech-node.locked .tech-level::before {
-        background: linear-gradient(to top, #5a6a76, #7a8a96);
+        background: linear-gradient(to top, #4a5a66, #5a6a76);
         box-shadow: none;
     }
 
@@ -3522,17 +3896,17 @@
 
     .info-btn {
         position: absolute;
-        bottom: 1px;
-        right: 1px;
-        width: 24px !important;
-        height: 24px !important;
-        min-width: 24px !important;
-        min-height: 24px !important;
-        max-width: 24px !important;
-        max-height: 24px !important;
+        top: -8px;
+        right: -8px;
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        min-height: 28px !important;
+        max-width: 28px !important;
+        max-height: 28px !important;
         border-radius: 50%;
-        background: linear-gradient(135deg, rgba(100, 180, 220, 0.9) 0%, rgba(60, 140, 180, 0.9) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: linear-gradient(135deg, rgba(74, 222, 128, 0.9) 0%, rgba(34, 170, 90, 0.9) 100%);
+        border: 2px solid rgba(255, 255, 255, 0.4);
         color: #fff;
         cursor: pointer;
         display: flex;
@@ -3540,16 +3914,16 @@
         justify-content: center;
         transition: all 0.2s ease;
         z-index: 5;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         padding: 0;
-        font-size: 12px !important;
+        font-size: 14px !important;
         line-height: 1;
     }
 
     .info-btn:hover {
         transform: scale(1.15);
-        background: linear-gradient(135deg, rgba(120, 200, 240, 1) 0%, rgba(80, 160, 200, 1) 100%);
-        box-shadow: 0 2px 4px rgba(100, 180, 220, 0.4);
+        background: linear-gradient(135deg, rgba(100, 240, 160, 1) 0%, rgba(50, 200, 110, 1) 100%);
+        box-shadow: 0 2px 4px rgba(74, 222, 128, 0.4);
     }
 
     .info-btn.active {
@@ -3559,7 +3933,7 @@
     }
 
     .info-btn :global(i) {
-        font-size: 12px !important;
+        font-size: 14px !important;
         line-height: 1;
     }
 
@@ -3981,6 +4355,31 @@
         .viewport-scroll-hint {
             font-size: 0.65rem;
         }
+
+        .footer-expansion-panel {
+            padding: 12px 16px;
+        }
+
+        .expansion-content {
+            gap: 20px;
+        }
+
+        .expansion-inputs {
+            min-width: 170px;
+        }
+
+        .expansion-crystal-card {
+            min-width: 140px;
+            padding: 10px 16px;
+        }
+
+        .crystal-card-value {
+            font-size: 0.95rem;
+        }
+
+        .icon-chevron {
+            display: none;
+        }
     }
 
     @media (max-width: 480px) {
@@ -4038,6 +4437,36 @@
         .viewport-scroll-hint {
             font-size: 0.6rem;
             bottom: 4px;
+        }
+
+        .footer-expansion-panel {
+            padding: 10px 10px;
+        }
+
+        .expansion-content {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .expansion-inputs {
+            flex-direction: row;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        .expansion-content.crystals-layout {
+            flex-direction: row;
+            gap: 12px;
+        }
+
+        .expansion-crystal-card {
+            min-width: 0;
+            flex: 1;
+            padding: 8px 12px;
+        }
+
+        .crystal-card-value {
+            font-size: 0.85rem;
         }
     }
 </style>

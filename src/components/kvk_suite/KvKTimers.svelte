@@ -29,11 +29,8 @@
     function formatDateLocal(date: Date): string {
         const day = ordinal(date.getDate());
         const month = shortMonths[date.getMonth()];
-        let hours = date.getHours();
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12;
-        return `${day} of ${month}, ${hours}:${minutes} ${ampm}`;
+        const time = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+        return `${day} of ${month}, ${time}`;
     }
 
     /** Parse an HP string that may contain , or . as thousand separators */
@@ -68,12 +65,21 @@
         const days = Math.floor(totalSec / 86400);
         const hours = Math.floor((totalSec % 86400) / 3600);
         const mins = Math.floor((totalSec % 3600) / 60);
+        const secs = totalSec % 60;
 
         let parts: string[] = [];
-        if (days > 0) parts.push(`${days}d`);
-        if (hours > 0) parts.push(`${hours}h`);
-        if (mins > 0) parts.push(`${mins}m`);
-        if (parts.length === 0) parts.push('< 1m');
+        if (days > 0) {
+            parts.push(`${days}d`);
+            if (hours > 0) parts.push(`${hours}h`);
+        } else if (hours > 0) {
+            parts.push(`${hours}h`);
+            parts.push(`${mins}m`);
+        } else if (mins > 0) {
+            parts.push(`${mins}m`);
+            parts.push(`${secs}s`);
+        } else {
+            parts.push(`${secs}s`);
+        }
         const str = parts.join(' ');
         return past ? `${str} ago` : `in ${str}`;
     }
@@ -112,7 +118,7 @@
     }
 
     onMount(() => {
-        tickInterval = setInterval(() => { tick++; }, 15000);
+        tickInterval = setInterval(() => { tick++; }, 1000);
         document.addEventListener('click', handleClickOutside);
         return () => {
             clearInterval(tickInterval);

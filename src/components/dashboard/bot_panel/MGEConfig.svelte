@@ -143,6 +143,14 @@
 
             {#if loading}
                 <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Loading settings...</div>
+            {:else if !settings.signup_channel_id && !settings.posted_signups_channel_id && !settings.coordinator_role_id && !settings.ping_role_id && !activeMgeName}
+                <div class="mge-not-setup">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>MGE Not Set Up</strong>
+                        <p>The MGE system hasn't been initialized for this server yet. Use the <code>/mge setup</code> command in Discord to create your first MGE cycle, then return here to configure channels and roles.</p>
+                    </div>
+                </div>
             {:else}
                 <div class="settings-grid">
                     {#each FIELDS as field}
@@ -310,6 +318,19 @@
     .dropdown-option.selected { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); font-weight: 600; }
     .dropdown-option.danger { color: #ef4444; }
     .role-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .mge-not-setup {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 20px;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    .mge-not-setup i { color: var(--accent-blue); margin-top: 3px; font-size: 1.1rem; }
+    .mge-not-setup strong { color: var(--text-primary); display: block; margin-bottom: 4px; }
+    .mge-not-setup p { margin: 0; }
+    .mge-not-setup code { background: var(--bg-primary); padding: 1px 6px; border-radius: 4px; font-size: 0.85em; }
     .save-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card, #1f2937); border: 1px solid var(--border-color); padding: 12px 24px; border-radius: 50px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); z-index: 1000; min-width: 350px; }
     .save-bar-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
     .save-actions { display: flex; gap: 10px; }

@@ -153,7 +153,7 @@
                     <i class="fas fa-spinner fa-spin"></i> Loading configuration...
                 </div>
             {:else if activeTab === 'overview'}
-                <OverviewConfig {selectedServer} {guildChannels} channelSettings={currentSettings} />
+                <OverviewConfig {selectedServer} {guildChannels} channelSettings={currentSettings} on:deauthorized={() => dispatch('selectServer', null)} />
 
             {:else if activeTab === 'channels'}
                 <ChannelConfig 
