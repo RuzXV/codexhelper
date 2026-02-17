@@ -68,11 +68,19 @@
         const bulletHtml = bulletEntry ? `<img src="${getEmojiUrl(bulletEntry.emoji)}" class="emoji bullet">` : '•';
 
         if (row.type === 'custom') {
-            // Sanitize custom text: escape first, then convert Discord emoji syntax back to img tags
-            const safeText = escapeHtml(row.customText).replace(
-                /&lt;:([^:]+):(\d+)&gt;/g,
-                '<img src="https://cdn.discordapp.com/emojis/$2.png" class="emoji inline" alt="$1">',
-            );
+            // Check if the custom text already contains pre-built HTML (e.g. from sub-template preview)
+            const hasHtml = /<img\s/.test(row.customText);
+            let safeText;
+            if (hasHtml) {
+                // Already contains trusted HTML img tags from the editor — pass through directly
+                safeText = row.customText;
+            } else {
+                // Sanitize custom text: escape first, then convert Discord emoji syntax back to img tags
+                safeText = escapeHtml(row.customText).replace(
+                    /&lt;:([^:]+):(\d+)&gt;/g,
+                    '<img src="https://cdn.discordapp.com/emojis/$2.png" class="emoji inline" alt="$1">',
+                );
+            }
             return `<div class="embed-line">${bulletHtml}<span class="content-text">${safeText}</span></div>`;
         }
 

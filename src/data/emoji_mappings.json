@@ -33,7 +33,7 @@
         { "name": "Line", "emoji": "1362669136076869743", "key": "line" }
     ],
     "buttons": [
-        { "name": "OpenField", "emoji": "1315897850579910688", "key": "btn_field" },
+        { "name": "Open Field", "emoji": "1315897850579910688", "key": "btn_field" },
         { "name": "Peacekeeping", "emoji": "1318913740099420260", "key": "btn_peacekeeping" },
         { "name": "Rally", "emoji": "1315897878169911339", "key": "btn_rally" },
         { "name": "Garrison", "emoji": "1315897824977879111", "key": "btn_garrison" },

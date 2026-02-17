@@ -362,12 +362,21 @@
     }
 
     function deleteButton(btnIdx) {
+        const btn = activeButtons[btnIdx];
+        const label = btn.label || 'this build';
         if (
             confirm(
-                'Deleting this button will unlink the build, but the sub-template data may remain until manually removed. Continue?',
+                `Delete the "${label}" button and its sub-template? This cannot be undone.`,
             )
         ) {
+            // Remove the associated sub-template from commanderData
+            const customId = btn.custom_id;
+            if (customId) {
+                commanderData = commanderData.filter((t) => t.name !== customId);
+            }
+
             activeButtons = activeButtons.filter((_, i) => i !== btnIdx);
+            sortAndLoad();
         }
     }
 
@@ -931,7 +940,7 @@
                 <div class="form-group">
                     <label>
                         Button Label (Optional)
-                        <input type="text" bind:value={newBuildLabel} placeholder="e.g. OpenField" />
+                        <input type="text" bind:value={newBuildLabel} placeholder="e.g. Open Field" />
                     </label>
                 </div>
                 <div class="modal-actions">
