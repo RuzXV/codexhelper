@@ -1,23 +1,26 @@
-import { Hono } from 'hono';
+import { Hono, Context } from 'hono';
 import { getCookie } from 'hono/cookie';
-import { Bindings, Variables, OnlineUser } from '../_types';
+import { Bindings, Variables, OnlineUser, BackupEntry, ChangelogEntry, DiscordUser, KVListKey, CalendarEventInput } from '../_types';
+import { errors } from '../_errors';
 import { authMiddleware, masterAdminMiddleware } from '../_middleware';
 import { EVENT_INTERVALS, TROOP_CYCLE, EVENT_COLOR_MAP, parseAdminIds } from '../_constants';
 import { GoogleCalendarService, addDays } from '../services/googleCalendar';
 
 const admin = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
-async function manageBackups(c: any, key: string, oldData: string | null) {
+type AdminContext = Context<{ Bindings: Bindings; Variables: Variables }>;
+
+async function manageBackups(c: AdminContext, key: string, oldData: string | null) {
     if (!oldData) return;
-    
+
     const BACKUP_KEY = `backup_history:${key}`;
     const RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
     const now = Date.now();
 
-    let history = await c.env.BOT_DATA.get(BACKUP_KEY, 'json');
+    let history: BackupEntry[] = await c.env.BOT_DATA.get(BACKUP_KEY, 'json') || [];
     if (!Array.isArray(history)) history = [];
 
-    let parsedData = oldData;
+    let parsedData: unknown = oldData;
     try {
         parsedData = JSON.parse(oldData);
     } catch (e) {
@@ -29,14 +32,14 @@ async function manageBackups(c: any, key: string, oldData: string | null) {
         data: parsedData
     });
 
-    const cleanHistory = history.filter((entry: any) => (now - entry.timestamp) < RETENTION_MS);
+    const cleanHistory = history.filter((entry) => (now - entry.timestamp) < RETENTION_MS);
 
     await c.env.BOT_DATA.put(BACKUP_KEY, JSON.stringify(cleanHistory));
 }
 
 admin.post('/internal/update-cache', async (c) => {
     const secret = c.req.header('X-Internal-Secret');
-    if (secret !== c.env.BOT_SECRET_KEY) return c.json({ error: 'Unauthorized' }, 401);
+    if (secret !== c.env.BOT_SECRET_KEY) return errors.unauthorized(c);
 
     const { top_servers, bot_stats, active_patrons } = await c.req.json();
     
@@ -51,7 +54,7 @@ admin.post('/internal/update-cache', async (c) => {
 
 admin.post('/internal/extend-events', async (c) => {
     const secret = c.req.header('X-Internal-Secret');
-    if (secret !== c.env.BOT_SECRET_KEY) return c.json({ error: 'Unauthorized' }, 401);
+    if (secret !== c.env.BOT_SECRET_KEY) return errors.unauthorized(c);
 
     try {
         const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
@@ -105,12 +108,12 @@ admin.post('/internal/extend-events', async (c) => {
 
                 gcalPromises.push(gcal.createEvent({
                     title: series.title as string,
-                    type: series.type,
+                    type: series.type as string | null,
                     troop_type: nextTroop || null,
                     start_date: newStartDate,
-                    duration: series.duration,
+                    duration: series.duration as number,
                     colorId: colorId
-                }, newEventId));
+                } as CalendarEventInput, newEventId));
 
                 totalCreated++;
             }
@@ -128,7 +131,7 @@ admin.post('/internal/extend-events', async (c) => {
 
     } catch (e) {
         console.error("Auto-extend error:", e);
-        return c.json({ error: 'Failed to extend events', details: String(e) }, 500);
+        return errors.internal(c, e);
     }
 });
 
@@ -155,12 +158,12 @@ admin.get('/data/:key', async (c) => {
     const isBot = secret === c.env.BOT_SECRET_KEY;
     if (!isBot) {
         const sessionToken = getCookie(c, 'session_token');
-        if (!sessionToken) return c.json({ error: 'Unauthorized' }, 401);
-        
+        if (!sessionToken) return errors.unauthorized(c);
+
         const session = await c.env.DB.prepare('SELECT user_id FROM user_sessions WHERE session_token = ?').bind(sessionToken).first();
         const masterAdminIds = parseAdminIds(c.env.MASTER_ADMIN_IDS);
         if (!session || !masterAdminIds.includes(session.user_id as string)) {
-             return c.json({ error: 'Unauthorized' }, 401);
+             return errors.unauthorized(c);
         }
     }
 
@@ -224,7 +227,7 @@ admin.post('/admin/data/:key', async (c) => {
         const userRes = await fetch('https://discord.com/api/users/@me', {
             headers: { 'Authorization': `Bearer ${c.get('user').accessToken}` }
         });
-        const uData = await userRes.json() as any;
+        const uData = await userRes.json() as DiscordUser;
         username = uData.username || uData.global_name || c.get('user').id;
         adminId = uData.id;
         adminAvatar = uData.avatar;
@@ -234,8 +237,10 @@ admin.post('/admin/data/:key', async (c) => {
     
     c.executionCtx.waitUntil(manageBackups(c, key, currentData));
 
-    await c.env.BOT_DATA.put(key, JSON.stringify(bodyData));
-    await c.env.BOT_DATA.put('data_version', Date.now().toString());
+    await Promise.all([
+        c.env.BOT_DATA.put(key, JSON.stringify(bodyData)),
+        c.env.BOT_DATA.put('data_version', Date.now().toString())
+    ]);
 
     const logEntry = {
         timestamp: Date.now(),
@@ -246,7 +251,7 @@ admin.post('/admin/data/:key', async (c) => {
         details: details
     };
 
-    let logs: any[] = await c.env.BOT_DATA.get('system_changelog', 'json') || [];
+    let logs: ChangelogEntry[] = await c.env.BOT_DATA.get('system_changelog', 'json') || [];
     logs.unshift(logEntry);
     if (logs.length > 200) logs = logs.slice(0, 200); 
     await c.env.BOT_DATA.put('system_changelog', JSON.stringify(logs));
@@ -286,13 +291,13 @@ admin.post('/admin/gcal/reset', async (c) => {
                 const createPromises = eventsToCreate.map(ev => {
                     const colorId = EVENT_COLOR_MAP[ev.type as string] || "8";
                     return gcal.createEvent({
-                        title: ev.title,
-                        type: ev.type,
-                        troop_type: ev.troop_type,
-                        start_date: ev.start_date,
-                        duration: ev.duration,
+                        title: ev.title as string,
+                        type: ev.type as string | null,
+                        troop_type: ev.troop_type as string | null,
+                        start_date: ev.start_date as string,
+                        duration: ev.duration as number,
                         colorId: colorId
-                    }, ev.id as string);
+                    } as CalendarEventInput, ev.id as string);
                 });
                 await Promise.all(createPromises);
                 return c.json({ status: 'partial', phase: 'create', offset: offset + eventsToCreate.length, message: `Created batch of ${eventsToCreate.length} events.` });
@@ -300,10 +305,10 @@ admin.post('/admin/gcal/reset', async (c) => {
                 return c.json({ status: 'complete', message: 'Full reset and sync completed successfully.' });
             }
         }
-        return c.json({ error: 'Invalid phase' }, 400);
+        return errors.badRequest(c, 'Invalid phase');
     } catch(e) {
         console.error("GCal Sync Error", e);
-        return c.json({ error: 'Sync failed', details: String(e) }, 500);
+        return errors.internal(c, e);
     }
 });
 
@@ -311,7 +316,7 @@ admin.get('/admin/backups/:key', async (c) => {
     const key = c.req.param('key');
     const list = await c.env.BOT_DATA.list({ prefix: `backup:${key}:` });
     
-    const backups = list.keys.map((k: any) => {
+    const backups = list.keys.map((k: KVListKey) => {
         const parts = k.name.split(':');
         const ts = parseInt(parts[parts.length - 1]);
         return {
@@ -328,15 +333,13 @@ admin.post('/admin/restore', async (c) => {
     const user = c.get('user');
 
     if (user.id !== c.env.MASTER_OVERRIDE_ID) {
-        return c.json({
-            error: 'Forbidden: Only the Master Admin can perform restores.'
-        }, 403);
+        return errors.forbidden(c, 'Only the Master Admin can perform restores.');
     }
 
     const { targetKey, backupKey } = await c.req.json();
-    
+
     const backupData = await c.env.BOT_DATA.get(backupKey);
-    if (!backupData) return c.json({ error: 'Backup not found' }, 404);
+    if (!backupData) return errors.notFound(c, 'Backup');
 
     const currentBrokenState = await c.env.BOT_DATA.get(targetKey);
     if (currentBrokenState) {

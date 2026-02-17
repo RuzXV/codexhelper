@@ -1,35 +1,55 @@
 import { Hono, Context } from 'hono';
-import { Bindings, Variables } from '../_types';
+import type { D1PreparedStatement } from '@cloudflare/workers-types';
+import { Bindings, Variables, DiscordUser, DiscordChannel, DiscordRole, AllowedChannelRow, ArkSetupRow, ArkTeamRow, ArkSignupRow, MgeSettingsRow, MgeApplicationRow, ReminderSetupRow } from '../_types';
+import { errors } from '../_errors';
 import { authMiddleware } from '../_middleware';
-import { verifyGuildPatreonAccess } from '../services/discord';
+import { verifyGuildPatreonAccess, verifyGuildAdmin } from '../services/discord';
+import { CalendarSettingsSchema, ChannelActionSchema, ReminderBulkSchema, ArkAllianceSchema, ArkTeamSchema, ArkSignupSchema, ArkTagSchema, MgeSettingsSchema, MgeAcceptSchema, validateBody } from '../_validation';
 
 const guilds = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
 guilds.use('*', authMiddleware);
 
-/**
- * Verify that the guild_id param is a valid Discord snowflake
- * and that the bot is actually present in that guild.
- */
-async function verifyGuildExists(c: Context<{ Bindings: Bindings, Variables: Variables }>, guildId: string): Promise<boolean> {
-    if (!/^\d{17,20}$/.test(guildId)) return false;
+/** Validate that a guildId is a valid Discord snowflake format */
+function isValidSnowflake(id: string): boolean {
+    return /^\d{17,20}$/.test(id);
+}
 
-    const response = await fetch(`https://discord.com/api/guilds/${guildId}`, {
-        headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` }
-    });
-    return response.ok;
+/** Guild ID validation middleware — rejects requests with invalid snowflakes early */
+guilds.use('/:guildId/*', async (c, next) => {
+    const { guildId } = c.req.param();
+    if (!isValidSnowflake(guildId)) {
+        return c.json({ error: 'Invalid guild ID format' }, 400);
+    }
+    await next();
+});
+
+// Also validate bare /:guildId routes (no trailing path)
+guilds.use('/:guildId', async (c, next) => {
+    const { guildId } = c.req.param();
+    if (!isValidSnowflake(guildId)) {
+        return c.json({ error: 'Invalid guild ID format' }, 400);
+    }
+    await next();
+});
+
+/** Verify the authenticated user is an admin of the requested guild (for read endpoints) */
+async function verifyGuildReadAccess(c: Context<{ Bindings: Bindings, Variables: Variables }>, guildId: string): Promise<boolean> {
+    return verifyGuildAdmin(c, guildId);
 }
 
 guilds.get('/:guildId/calendar', async (c) => {
     const { guildId } = c.req.param();
-    
-    const setup = await c.env.BOT_DB.prepare(
-        "SELECT channel_id, create_discord_events FROM event_calendar_setups WHERE guild_id = ?"
-    ).bind(guildId).first();
+    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
 
-    const personalization = await c.env.BOT_DB.prepare(
-        "SELECT anchor_date, anchor_cycle_id FROM egg_hammer_personalization WHERE guild_id = ?"
-    ).bind(guildId).first();
+    const [setup, personalization] = await Promise.all([
+        c.env.BOT_DB.prepare(
+            "SELECT channel_id, create_discord_events FROM event_calendar_setups WHERE guild_id = ?"
+        ).bind(guildId).first(),
+        c.env.BOT_DB.prepare(
+            "SELECT anchor_date, anchor_cycle_id FROM egg_hammer_personalization WHERE guild_id = ?"
+        ).bind(guildId).first()
+    ]);
 
     const config = {
         channel_id: setup?.channel_id ? String(setup.channel_id) : 'none',
@@ -47,21 +67,23 @@ guilds.get('/:guildId/calendar', async (c) => {
 guilds.post('/:guildId/calendar', async (c) => {
     const { guildId } = c.req.param();
     const body = await c.req.json();
+    const validation = validateBody(CalendarSettingsSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
 
     if (!await verifyGuildPatreonAccess(c, guildId)) {
-        return c.json({ 
-             error: 'Unauthorized: Only the Patreon subscriber who authorized this server can modify settings.' 
+        return c.json({
+             error: 'Unauthorized: Only the Patreon subscriber who authorized this server can modify settings.'
         }, 403);
     }
 
-    const { 
-        channel_id, 
-        create_discord_events, 
-        is_personalized, 
-        reference_date, 
-        reference_type, 
-        reference_cycle_id 
-    } = body;
+    const {
+        channel_id,
+        create_discord_events,
+        is_personalized,
+        reference_date,
+        reference_type,
+        reference_cycle_id
+    } = validation.data;
 
     const now = Date.now() / 1000;
 
@@ -124,6 +146,7 @@ guilds.post('/:guildId/calendar', async (c) => {
 
 guilds.get('/:guildId/settings/channels', async (c) => {
     const { guildId } = c.req.param();
+    if (!await verifyGuildReadAccess(c, guildId)) return errors.forbidden(c);
     try {
         const { results } = await c.env.BOT_DB.prepare(
             "SELECT command_group, channel_id FROM allowed_channels WHERE guild_id = ?"
@@ -131,29 +154,31 @@ guilds.get('/:guildId/settings/channels', async (c) => {
 
         const settings: Record<string, string> = {};
         if (results) {
-            results.forEach((row: any) => {
-                settings[row.command_group] = row.channel_id ? String(row.channel_id) : row.channel_id;
+            results.forEach((row) => {
+                const r = row as unknown as AllowedChannelRow;
+                settings[r.command_group] = r.channel_id ? String(r.channel_id) : '';
             });
         }
         return c.json({ settings });
     } catch (e) {
         console.error(`Failed to fetch channel settings for guild ${guildId}:`, e);
-        return c.json({ error: 'Failed to load channel settings', settings: {} }, 500);
+        return errors.internal(c, e);
     }
 });
 
 guilds.post('/:guildId/settings/channels', async (c) => {
     const { guildId } = c.req.param();
+    const body = await c.req.json();
+    const validation = validateBody(ChannelActionSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
 
     if (!await verifyGuildPatreonAccess(c, guildId)) {
-        return c.json({ 
-            error: 'Unauthorized: Only the Patreon subscriber who authorized this server can modify settings.' 
+        return c.json({
+            error: 'Unauthorized: Only the Patreon subscriber who authorized this server can modify settings.'
         }, 403);
     }
 
-    const { command_group, channel_id, action } = await c.req.json();
-    
-    if (!command_group || typeof command_group !== 'string') return c.json({ error: 'Invalid command group' }, 400);
+    const { command_group, channel_id, action } = validation.data;
 
     const now = Date.now() / 1000;
     const eventPayload = JSON.stringify({ guild_id: guildId });
@@ -183,7 +208,8 @@ guilds.post('/:guildId/settings/channels', async (c) => {
 
 guilds.get('/:guildId/channels', async (c) => {
     const { guildId } = c.req.param();
-    
+    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+
     const response = await fetch(`https://discord.com/api/guilds/${guildId}/channels`, {
         headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` } 
     });
@@ -193,19 +219,20 @@ guilds.get('/:guildId/channels', async (c) => {
         return c.json({ channels: [] });
     }
 
-    const channels = await response.json() as any[];
-    
+    const channels = await response.json() as DiscordChannel[];
+
     const validChannels = channels
-        .filter((ch: any) => [0, 5, 15].includes(ch.type))
-        .map((ch: any) => ({ id: ch.id, name: ch.name, type: ch.type, position: ch.position }))
-        .sort((a: any, b: any) => a.position - b.position);
+        .filter((ch) => [0, 5, 15].includes(ch.type))
+        .map((ch) => ({ id: ch.id, name: ch.name, type: ch.type, position: ch.position }))
+        .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
 
     return c.json({ channels: validChannels });
 });
 
 guilds.get('/:guildId/features', async (c) => {
     const { guildId } = c.req.param();
-    
+    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+
     const [ark, mge, ruins, altar, bypassRecord, authRecord] = await Promise.all([
         c.env.BOT_DB.prepare("SELECT channel_id FROM ark_of_osiris_setups WHERE guild_id = ?").bind(guildId).first(),
         c.env.BOT_DB.prepare("SELECT signup_channel_id FROM mge_settings WHERE guild_id = ?").bind(guildId).first(),
@@ -232,7 +259,7 @@ guilds.get('/:guildId/features', async (c) => {
                 headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` }
             });
             if (discordRes.ok) {
-                const user = await discordRes.json() as any;
+                const user = await discordRes.json() as DiscordUser;
                 patron = {
                     id: user.id,
                     username: user.username,
@@ -246,7 +273,7 @@ guilds.get('/:guildId/features', async (c) => {
         }
     }
 
-    const toStr = (v: any) => v ? String(v) : null;
+    const toStr = (v: unknown) => v ? String(v) : null;
     const features = {
         ark: { enabled: !!ark, channel_id: toStr(ark?.channel_id) },
         mge: { enabled: !!mge, channel_id: toStr(mge?.signup_channel_id) },
@@ -259,13 +286,14 @@ guilds.get('/:guildId/features', async (c) => {
 
 guilds.get('/:guildId/reminders', async (c) => {
     const { guildId } = c.req.param();
-    
+    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+
     const [reminders, customReminders] = await Promise.all([
         c.env.BOT_DB.prepare("SELECT * FROM reminder_setups WHERE guild_id = ?").bind(guildId).all(),
         c.env.BOT_DB.prepare("SELECT * FROM custom_reminders WHERE guild_id = ?").bind(guildId).all()
     ]);
 
-    const castIds = (rows: any[]) => rows.map((r: any) => ({
+    const castIds = (rows: Record<string, unknown>[]) => rows.map((r) => ({
         ...r,
         channel_id: r.channel_id ? String(r.channel_id) : r.channel_id,
         role_id: r.role_id ? String(r.role_id) : r.role_id
@@ -279,14 +307,18 @@ guilds.get('/:guildId/reminders', async (c) => {
 
 guilds.post('/:guildId/reminders', async (c) => {
     const { guildId } = c.req.param();
-    const { reminders, customReminders, deletedCustomIds } = await c.req.json();
+    const body = await c.req.json();
+    const validation = validateBody(ReminderBulkSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
 
     if (!await verifyGuildPatreonAccess(c, guildId)) {
         return c.json({ error: 'Unauthorized: Patreon access required.' }, 403);
     }
 
+    const { reminders, customReminders, deletedCustomIds } = validation.data;
+
     const now = Date.now() / 1000;
-    const statements: any[] = [];
+    const statements: D1PreparedStatement[] = [];
 
     for (const r of reminders) {
         const intervals = r.reminder_intervals_seconds || '14400';
@@ -374,8 +406,8 @@ guilds.post('/:guildId/reminders', async (c) => {
 
     // Check if any reminders need initial setup (role + role menu creation by the bot)
     const setupTypes = reminders
-        .filter((r: any) => r.is_new_setup && r.is_active)
-        .map((r: any) => r.reminder_type);
+        .filter((r: Record<string, unknown>) => r.is_new_setup && r.is_active)
+        .map((r: Record<string, unknown>) => r.reminder_type);
 
     if (setupTypes.length > 0) {
         const setupPayload = JSON.stringify({ guild_id: guildId, setup_types: setupTypes });
@@ -400,40 +432,48 @@ guilds.post('/:guildId/reminders', async (c) => {
 
 guilds.get('/:guildId/roles', async (c) => {
     const { guildId } = c.req.param();
+    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
     const response = await fetch(`https://discord.com/api/guilds/${guildId}/roles`, {
         headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` }
     });
     if (!response.ok) return c.json({ roles: [] });
-    const roles = await response.json() as any[];
-    return c.json({ roles: roles.map((r: any) => ({ id: r.id, name: r.name, color: r.color })) });
+    const roles = await response.json() as DiscordRole[];
+    return c.json({ roles: roles.map((r) => ({ id: r.id, name: r.name, color: r.color })) });
 });
 
 guilds.get('/:guildId/ark/all', async (c) => {
     const { guildId } = c.req.param();
+    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
     try {
-        const { results: setups } = await c.env.BOT_DB.prepare(
-            "SELECT * FROM ark_of_osiris_setups WHERE guild_id = ?"
-        ).bind(guildId).all();
+        const [{ results: setups }, { results: teams }, { results: signups }] = await Promise.all([
+            c.env.BOT_DB.prepare(
+                "SELECT * FROM ark_of_osiris_setups WHERE guild_id = ?"
+            ).bind(guildId).all(),
+            c.env.BOT_DB.prepare(
+                "SELECT * FROM ark_of_osiris_teams WHERE guild_id = ? ORDER BY team_number ASC"
+            ).bind(guildId).all(),
+            c.env.BOT_DB.prepare(
+                "SELECT * FROM ark_of_osiris_signups WHERE guild_id = ? ORDER BY signup_timestamp ASC"
+            ).bind(guildId).all()
+        ]);
 
-        const { results: teams } = await c.env.BOT_DB.prepare(
-            "SELECT * FROM ark_of_osiris_teams WHERE guild_id = ? ORDER BY team_number ASC"
-        ).bind(guildId).all();
-
-        const { results: signups } = await c.env.BOT_DB.prepare(
-            "SELECT * FROM ark_of_osiris_signups WHERE guild_id = ? ORDER BY signup_timestamp ASC"
-        ).bind(guildId).all();
-
-        const alliances: Record<string, any> = {};
+        interface AllianceData {
+            config: { channel_id: string | null; admin_role_id: string | null; notification_role_id: string | null; reminder_interval: unknown; is_active: unknown };
+            teams: Record<number, { name: unknown; match_timestamp: unknown; cap: unknown; role_id: string | null }>;
+            signups: Record<string, unknown>[];
+        }
+        const alliances: Record<string, AllianceData> = {};
 
         if (setups) {
-            setups.forEach((s: any) => {
-                alliances[s.alliance_tag] = {
+            setups.forEach((s) => {
+                const row = s as unknown as ArkSetupRow;
+                alliances[row.alliance_tag] = {
                     config: {
-                        channel_id: s.channel_id ? String(s.channel_id) : null,
-                        admin_role_id: s.admin_role_id ? String(s.admin_role_id) : null,
-                        notification_role_id: s.tag_role_id ? String(s.tag_role_id) : null,
-                        reminder_interval: s.reminder_interval_seconds,
-                        is_active: s.is_active
+                        channel_id: row.channel_id ? String(row.channel_id) : null,
+                        admin_role_id: row.admin_role_id ? String(row.admin_role_id) : null,
+                        notification_role_id: row.tag_role_id ? String(row.tag_role_id) : null,
+                        reminder_interval: row.reminder_interval_seconds,
+                        is_active: row.is_active
                     },
                     teams: {},
                     signups: []
@@ -442,22 +482,24 @@ guilds.get('/:guildId/ark/all', async (c) => {
         }
 
         if (teams) {
-            teams.forEach((t: any) => {
-                if (alliances[t.alliance_tag]) {
-                    alliances[t.alliance_tag].teams[t.team_number] = {
-                        name: t.team_name,
-                        match_timestamp: t.next_match_timestamp,
-                        cap: t.signup_cap,
-                        role_id: t.role_id ? String(t.role_id) : null
+            teams.forEach((t) => {
+                const row = t as unknown as ArkTeamRow;
+                if (alliances[row.alliance_tag]) {
+                    alliances[row.alliance_tag].teams[row.team_number] = {
+                        name: row.team_name,
+                        match_timestamp: row.next_match_timestamp,
+                        cap: row.signup_cap,
+                        role_id: row.role_id ? String(row.role_id) : null
                     };
                 }
             });
         }
 
         if (signups) {
-            signups.forEach((su: any) => {
-                if (alliances[su.alliance_tag]) {
-                    alliances[su.alliance_tag].signups.push(su);
+            signups.forEach((su) => {
+                const row = su as unknown as ArkSignupRow;
+                if (alliances[row.alliance_tag]) {
+                    alliances[row.alliance_tag].signups.push(su as unknown as Record<string, unknown>);
                 }
             });
         }
@@ -465,15 +507,19 @@ guilds.get('/:guildId/ark/all', async (c) => {
         return c.json({ alliances });
     } catch (e) {
         console.error("Failed to fetch Ark data:", e);
-        return c.json({ error: 'Failed to load Ark of Osiris data', alliances: {} }, 500);
+        return errors.internal(c, e);
     }
 });
 
 guilds.post('/:guildId/ark/alliance', async (c) => {
     const { guildId } = c.req.param();
+    const body = await c.req.json();
+    const validation = validateBody(ArkAllianceSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
     if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
 
-    const { alliance_tag, channel_id, admin_role_id, notification_role_id, reminder_interval } = await c.req.json();
+    const { alliance_tag, channel_id, admin_role_id, notification_role_id, reminder_interval } = validation.data;
 
     try {
         await c.env.BOT_DB.batch([
@@ -500,7 +546,7 @@ guilds.post('/:guildId/ark/alliance', async (c) => {
 
         return c.json({ success: true });
     } catch (e) {
-        return c.json({ error: String(e) }, 500);
+        return errors.internal(c, e);
     }
 });
 
@@ -522,9 +568,13 @@ guilds.delete('/:guildId/ark/alliance/:tag', async (c) => {
 
 guilds.post('/:guildId/ark/team', async (c) => {
     const { guildId } = c.req.param();
+    const body = await c.req.json();
+    const validation = validateBody(ArkTeamSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
     if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
 
-    const { alliance_tag, team_number, team_name, match_timestamp, signup_cap } = await c.req.json();
+    const { alliance_tag, team_number, team_name, match_timestamp, signup_cap } = validation.data;
 
     const teamNum = parseInt(team_number);
     const cap = signup_cap ? parseInt(signup_cap) : null;
@@ -555,7 +605,7 @@ guilds.post('/:guildId/ark/team', async (c) => {
         return c.json({ success: true });
     } catch (e) {
         console.error("Failed to update ark team:", e);
-        return c.json({ error: String(e) }, 500);
+        return errors.internal(c, e);
     }
 });
 
@@ -601,13 +651,13 @@ guilds.delete('/:guildId/ark/team/:alliance_tag/:team_number', async (c) => {
 
 guilds.post('/:guildId/ark/signup', async (c) => {
     const { guildId } = c.req.param();
+    const body = await c.req.json();
+    const validation = validateBody(ArkSignupSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
     if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
 
-    const { alliance_tag, team_number, in_game_name } = await c.req.json();
-
-    if (!alliance_tag || !in_game_name) {
-        return c.json({ error: 'alliance_tag and in_game_name are required' }, 400);
-    }
+    const { alliance_tag, team_number, in_game_name } = validation.data;
 
     const placeholderUserId = `web_${Date.now()}`;
     const nowTs = Date.now() / 1000;
@@ -632,11 +682,12 @@ guilds.post('/:guildId/ark/signup', async (c) => {
 
 guilds.get('/:guildId/mge', async (c) => {
     const { guildId } = c.req.param();
+    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
     try {
         // Cast coordinator_role_id to TEXT in SQL to avoid JavaScript integer precision loss on Discord snowflake IDs
         const setup = await c.env.BOT_DB.prepare(
             "SELECT *, CAST(coordinator_role_id AS TEXT) as coordinator_role_id FROM mge_settings WHERE guild_id = ?"
-        ).bind(guildId).first() as any;
+        ).bind(guildId).first() as Record<string, unknown> | null;
 
         if (setup) {
             // Cast remaining Discord IDs to strings to match Discord API format
@@ -649,17 +700,21 @@ guilds.get('/:guildId/mge', async (c) => {
         return c.json({ config: setup || {} });
     } catch (e) {
         console.error("Failed to load MGE settings:", e);
-        return c.json({ error: 'Failed to load MGE settings', config: {} }, 500);
+        return errors.internal(c, e);
     }
 });
 
 guilds.post('/:guildId/mge', async (c) => {
     const { guildId } = c.req.param();
+    const body = await c.req.json();
+    const validation = validateBody(MgeSettingsSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
     if (!await verifyGuildPatreonAccess(c, guildId)) {
         return c.json({ error: 'Unauthorized' }, 403);
     }
 
-    const body = await c.req.json();
+    const { signup_channel_id, posted_signups_channel_id, ping_role_id, coordinator_role_id } = validation.data;
 
     const mgePayload = JSON.stringify({ guild_id: guildId });
     await c.env.BOT_DB.batch([
@@ -671,10 +726,10 @@ guilds.post('/:guildId/mge', async (c) => {
                 coordinator_role_id = ?
             WHERE guild_id = ?
         `).bind(
-            body.signup_channel_id || null,
-            body.posted_signups_channel_id || null,
-            body.ping_role_id || null,
-            body.coordinator_role_id || null,
+            signup_channel_id || null,
+            posted_signups_channel_id || null,
+            ping_role_id || null,
+            coordinator_role_id || null,
             guildId
         ),
         c.env.BOT_DB.prepare(
@@ -689,10 +744,11 @@ guilds.post('/:guildId/mge', async (c) => {
 
 guilds.get('/:guildId/mge/applications', async (c) => {
     const { guildId } = c.req.param();
+    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
     try {
         const settings = await c.env.BOT_DB.prepare(
             "SELECT current_mge_name, placement_points FROM mge_settings WHERE guild_id = ?"
-        ).bind(guildId).first() as any;
+        ).bind(guildId).first() as MgeSettingsRow | null;
 
         if (!settings || !settings.current_mge_name) {
             return c.json({ mge_name: null, placement_points: '', applications: [], questions: [], rankings: [] });
@@ -721,32 +777,35 @@ guilds.get('/:guildId/mge/applications', async (c) => {
         });
     } catch (e) {
         console.error("Failed to fetch MGE applications:", e);
-        return c.json({ error: 'Failed to load MGE applications', mge_name: null, placement_points: '', applications: [], questions: [], rankings: [] }, 500);
+        return errors.internal(c, e);
     }
 });
 
 guilds.post('/:guildId/mge/applications/:appId/accept', async (c) => {
     const { guildId, appId } = c.req.param();
+    const body = await c.req.json();
+    const validation = validateBody(MgeAcceptSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
     if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
 
-    const { rank_spot } = await c.req.json();
-    if (!rank_spot || rank_spot < 1) return c.json({ error: 'Invalid rank_spot' }, 400);
+    const { rank_spot } = validation.data;
 
     try {
         const settings = await c.env.BOT_DB.prepare(
             "SELECT current_mge_name FROM mge_settings WHERE guild_id = ?"
-        ).bind(guildId).first() as any;
-        if (!settings?.current_mge_name) return c.json({ error: 'No active MGE' }, 400);
+        ).bind(guildId).first() as MgeSettingsRow | null;
+        if (!settings?.current_mge_name) return errors.badRequest(c, 'No active MGE');
 
         const app = await c.env.BOT_DB.prepare(
             "SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?"
-        ).bind(appId, guildId).first() as any;
-        if (!app) return c.json({ error: 'Application not found' }, 404);
+        ).bind(appId, guildId).first() as MgeApplicationRow | null;
+        if (!app) return errors.notFound(c, 'Application');
 
         const taken = await c.env.BOT_DB.prepare(
             "SELECT ingame_name FROM mge_rankings WHERE guild_id = ? AND mge_name = ? AND rank_spot = ?"
-        ).bind(guildId, settings.current_mge_name, rank_spot).first() as any;
-        if (taken) return c.json({ error: `Rank ${rank_spot} is already taken by ${taken.ingame_name}` }, 409);
+        ).bind(guildId, settings.current_mge_name, rank_spot).first() as { ingame_name: string } | null;
+        if (taken) return errors.conflict(c, `Rank ${rank_spot} is already taken by ${taken.ingame_name}`);
 
         const acceptPayload = JSON.stringify({ guild_id: guildId, application_id: parseInt(appId), rank_spot });
         await c.env.BOT_DB.batch([
@@ -764,7 +823,7 @@ guilds.post('/:guildId/mge/applications/:appId/accept', async (c) => {
         return c.json({ success: true });
     } catch (e) {
         console.error("MGE accept error:", e);
-        return c.json({ error: String(e) }, 500);
+        return errors.internal(c, e);
     }
 });
 
@@ -776,7 +835,7 @@ guilds.post('/:guildId/mge/applications/:appId/reject', async (c) => {
         const app = await c.env.BOT_DB.prepare(
             "SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?"
         ).bind(appId, guildId).first();
-        if (!app) return c.json({ error: 'Application not found' }, 404);
+        if (!app) return errors.notFound(c, 'Application');
 
         const rejectPayload = JSON.stringify({ guild_id: guildId, application_id: parseInt(appId) });
         await c.env.BOT_DB.batch([
@@ -794,7 +853,7 @@ guilds.post('/:guildId/mge/applications/:appId/reject', async (c) => {
         return c.json({ success: true });
     } catch (e) {
         console.error("MGE reject error:", e);
-        return c.json({ error: String(e) }, 500);
+        return errors.internal(c, e);
     }
 });
 
@@ -806,7 +865,7 @@ guilds.post('/:guildId/mge/applications/:appId/restore', async (c) => {
         const app = await c.env.BOT_DB.prepare(
             "SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?"
         ).bind(appId, guildId).first();
-        if (!app) return c.json({ error: 'Application not found' }, 404);
+        if (!app) return errors.notFound(c, 'Application');
 
         const restorePayload = JSON.stringify({ guild_id: guildId, application_id: parseInt(appId) });
         await c.env.BOT_DB.batch([
@@ -824,7 +883,7 @@ guilds.post('/:guildId/mge/applications/:appId/restore', async (c) => {
         return c.json({ success: true });
     } catch (e) {
         console.error("MGE restore error:", e);
-        return c.json({ error: String(e) }, 500);
+        return errors.internal(c, e);
     }
 });
 
@@ -832,10 +891,13 @@ guilds.post('/:guildId/mge/applications/:appId/restore', async (c) => {
 
 guilds.post('/:guildId/ark/refresh-embed', async (c) => {
     const { guildId } = c.req.param();
+    const body = await c.req.json();
+    const validation = validateBody(ArkTagSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
     if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
 
-    const { alliance_tag } = await c.req.json();
-    if (!alliance_tag) return c.json({ error: 'alliance_tag required' }, 400);
+    const { alliance_tag } = validation.data;
 
     const payload = JSON.stringify({ guild_id: guildId, alliance_tag });
     await c.env.BOT_DB.prepare(
@@ -847,10 +909,13 @@ guilds.post('/:guildId/ark/refresh-embed', async (c) => {
 
 guilds.post('/:guildId/ark/post-signup', async (c) => {
     const { guildId } = c.req.param();
+    const body = await c.req.json();
+    const validation = validateBody(ArkTagSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
     if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
 
-    const { alliance_tag } = await c.req.json();
-    if (!alliance_tag) return c.json({ error: 'alliance_tag required' }, 400);
+    const { alliance_tag } = validation.data;
 
     const payload = JSON.stringify({ guild_id: guildId, alliance_tag });
     await c.env.BOT_DB.prepare(
@@ -877,7 +942,7 @@ guilds.delete('/:guildId/authorization', async (c) => {
         return c.json({ success: true });
     } catch (e) {
         console.error("Failed to deauthorize guild:", e);
-        return c.json({ error: 'Failed to deauthorize server' }, 500);
+        return errors.internal(c, e);
     }
 });
 

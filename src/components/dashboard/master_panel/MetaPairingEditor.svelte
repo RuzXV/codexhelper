@@ -92,7 +92,10 @@
     function formatDiscordText(text) {
         if (!text) return "";
         return text
-            .replace(/<:([^:]+):(\d+)>/g, '<img src="https://cdn.discordapp.com/emojis/$2.png" class="emoji-preview" alt="$1">')
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/&lt;:([^:]+):(\d+)&gt;/g, '<img src="https://cdn.discordapp.com/emojis/$2.png" class="emoji-preview" alt="$1">')
             .replace(/\n/g, '<br>');
     }
 

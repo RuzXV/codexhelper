@@ -8,7 +8,6 @@ export default defineConfig({
   integrations: [
     svelte(),
     sitemap({
-      // Customize sitemap options
       changefreq: 'weekly',
       priority: 0.7,
       lastmod: new Date(),
@@ -20,6 +19,17 @@ export default defineConfig({
   vite: {
     define: {
       'import.meta.env.PUBLIC_DISCORD_APP_ID': JSON.stringify(process.env.PUBLIC_DISCORD_APP_ID || '1434105087722258573'),
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/xlsx')) return 'vendor-xlsx';
+            if (id.includes('node_modules/svelte')) return 'vendor-svelte';
+          }
+        }
+      },
+      chunkSizeWarningLimit: 600,
     }
   }
 });

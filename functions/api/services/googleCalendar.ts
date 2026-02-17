@@ -4,18 +4,20 @@ export function addDays(dateStr: string, days: number): string {
     return date.toISOString().split('T')[0];
 }
 
+import type { GoogleServiceAccountCredentials, GoogleTokenResponse, CalendarEventInput, GoogleCalendarEvent, GoogleCalendarListResponse } from '../_types';
+
 export class GoogleCalendarService {
-    private creds: any;
+    private creds: GoogleServiceAccountCredentials;
     private calendarId: string;
     private token: string | null = null;
     private tokenExpiry: number = 0;
 
     constructor(jsonKey: string, calendarId: string) {
         try {
-            this.creds = JSON.parse(jsonKey);
+            this.creds = JSON.parse(jsonKey) as GoogleServiceAccountCredentials;
         } catch (e) {
             console.error("Failed to parse Google Service Account JSON");
-            this.creds = {};
+            this.creds = { client_email: '', private_key: '' };
         }
         this.calendarId = calendarId;
     }
@@ -56,7 +58,7 @@ export class GoogleCalendarService {
             }),
         });
 
-        const data = await response.json() as any;
+        const data = await response.json() as GoogleTokenResponse;
         this.token = data.access_token;
         this.tokenExpiry = Date.now() + (data.expires_in * 1000) - 60000;
         return this.token!;
@@ -104,7 +106,7 @@ export class GoogleCalendarService {
         return id;
     }
 
-    async createEvent(eventData: any, customId: string) {
+    async createEvent(eventData: CalendarEventInput, customId: string) {
         const token = await this.getAccessToken();
         const gcalId = this.formatEventId(customId);
         
@@ -173,7 +175,7 @@ export class GoogleCalendarService {
     async listEvents(maxResults = 2500) {
         try {
             const token = await this.getAccessToken();
-            let events: any[] = [];
+            let events: GoogleCalendarEvent[] = [];
             let pageToken = '';
 
             do {
@@ -184,9 +186,9 @@ export class GoogleCalendarService {
                 const res = await fetch(url.toString(), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                const data = await res.json() as any;
+                const data = await res.json() as GoogleCalendarListResponse;
                 if (data.items) events = events.concat(data.items);
-                pageToken = data.nextPageToken;
+                pageToken = data.nextPageToken || '';
             } while (pageToken && events.length < maxResults);
 
             return events;

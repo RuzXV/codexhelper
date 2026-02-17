@@ -1,15 +1,9 @@
 <script>
     import { createEventDispatcher } from 'svelte';
+    import { getIconSrc } from './calendarIcons';
     export let isOpen = false;
     export let eventConfigs = {};
     const dispatch = createEventDispatcher();
-    const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', { eager: true });
-    
-    function getIconSrc(filename) {
-        if (!filename) return null;
-        const path = `../../assets/images/calendar/event_icons/${filename}`;
-        return iconModules[path]?.default?.src || iconModules[path]?.default || null;
-    }
 
     let preset = '';
     let troopType = '';

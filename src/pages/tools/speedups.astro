@@ -49,7 +49,6 @@ for (const path in allImages) {
     <main class="tool-page-wrapper">
         <section class="tool-hero">
             <div class="tool-hero-container">
-                
                 <h1 class="calculator-main-title">
                    <img src={imageMap['universal_speedup.webp']} alt="" style="height: 40px; margin-right: 10px;" />
                     Speedup Costs
@@ -62,7 +61,7 @@ for (const path in allImages) {
 
         <section class="tool-content">
             <div class="tool-container">
-                <SpeedupsHub client:load images={imageMap} />
+                <SpeedupsHub client:visible images={imageMap} />
             </div>
         </section>
     </main>

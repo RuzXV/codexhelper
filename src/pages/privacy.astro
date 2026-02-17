@@ -7,49 +7,117 @@ import Layout from '../layouts/Layout.astro';
             <div class="faq-hero-container">
                 <h1>Privacy Policy</h1>
                 <p>Learn how we collect, use, and protect your information when you use Codex Helper.</p>
+                <div class="legal-tabs">
+                    <button class="legal-tab-btn active" data-tab="bot">Discord Bot</button>
+                    <button class="legal-tab-btn" data-tab="website">Website</button>
+                </div>
             </div>
         </section>
-    
+
         <section class="faq-content">
             <div class="faq-container">
                 <div class="faq-grid">
-                    <div class="faq-category">
-                        <div class="faq-items">
-                            <div class="faq-item">
-                                <div class="faq-question"><h2>Welcome to Codex Helper</h2></div>
-                                <div class="faq-answer" style="max-height: none;"><p>Welcome to Codex Helper ("the Bot"). This Privacy Policy explains how we collect, use, store, and disclose information when you use the Bot. By adding or using the Bot, you agree to the terms of this Privacy Policy.</p></div>
+                    <!-- ======================== BOT TAB ======================== -->
+                    <div id="legal-tab-bot" class="legal-tab-content active">
+                        <div class="faq-category">
+                            <div class="faq-items">
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>Welcome to Codex Helper</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>Welcome to Codex Helper ("the Bot"). This Privacy Policy explains how we collect, use, store, and disclose information when you use the Bot. By adding or using the Bot, you agree to the terms of this Privacy Policy.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>1. Information We Collect</h2></div>
+                                    <div class="faq-answer" style="max-height: none;">
+                                        <p>We are committed to data minimization. We collect information by fair and lawful means to provide and improve the Bot's functionality.</p>
+                                        <p><strong>1.1. Information Automatically Collected from Discord:</strong><br>- Discord User, Server, and Channel IDs: We collect your User ID to verify your Patreon subscription and manage access. We collect Server IDs to manage server-specific configurations and authorizations. We store Channel IDs when you configure channel restrictions with the /channel command.</p>
+                                        <p><strong>1.2. Information You and Server Admins Provide:</strong><br>- Ark of Osiris Signup Data: When you use the /ark signup commands, we collect and store your in-game name and link it to your Discord User ID. This information is necessary to create and display public signup lists within your server.<br>- MGE Application Data: When you submit an MGE application, we store your in-game name, application responses, placement points, and application status. This data is used to manage the competitive event within your server.<br>- Server Configurations: When an administrator sets up features like the Event Calendar, Ark of Osiris Signups, MGE, or Ruins/Altar Reminders, we store the configuration choices for that server (e.g., designated channels, roles, event personalization settings) to ensure the feature functions as requested.<br>- Egg/Hammer Personalization: When you configure calendar personalization, we store an anchor date and cycle ID to calculate your server's egg/hammer rotation.<br>- Anonymous Command Usage Data: We log general, non-personally identifiable information about which commands are used (e.g., total /commander uses). This data is used for analytical purposes to understand usage patterns and does not track who used a specific command.</p>
+                                        <p><strong>1.3. Information from Third-Party Services (Patreon):</strong><br>- To verify your subscription, we receive your Discord User ID from Patreon when you link your accounts. We store Patreon access and refresh tokens solely for verifying and maintaining your subscription status. We perform a daily sync to keep patron data current. We do not receive or store any payment information from Patreon. Patreon's own Privacy Policy governs the data they collect.</p>
+                                        <p><strong>1.4. Data Flow to Website:</strong><br>- Certain aggregated data from the Bot is shared with the Codex Helper website for display purposes, including: server count, member counts, patron IDs (for access verification), and command usage statistics. No personal message content is ever transmitted.</p>
+                                    </div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>2. How We Use Your Information</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>- To provide the core functionality of the Bot.<br>- To verify and manage your subscription access through Patreon.<br>- To create and publicly display signup sheets for features like Ark of Osiris, using the in-game names provided.<br>- To manage MGE applications, rankings, and placement within your server.<br>- To enable and manage server-specific configurations and reminders.<br>- To monitor and analyze anonymous usage patterns to improve the Bot.<br>- To provide support and enforce our Terms of Service.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>3. How We Share Your Information</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>We do not sell, rent, or trade your personal information.</p><p>- Within Your Discord Server: Information you provide for features like Ark of Osiris signups (i.e., your in-game name) will be displayed publicly in embeds within the configured channel in your server.<br>- Service Providers: We share your Discord User ID with Patreon for the sole purpose of verifying your subscription status. Our infrastructure is hosted on Cloudflare, which processes requests on our behalf.<br>- Legal Requirements: We may disclose your information if required by law.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>4. Data Retention</h2></div>
+                                    <div class="faq-answer" style="max-height: none;">
+                                        <p>- We retain your information only as long as necessary.</p>
+                                        <p>- Server configurations are retained as long as the Bot is in your server and the feature is active.<br>- Ark of Osiris signup data is retained until the feature is deactivated or the signup cycle is reset by an administrator.<br>- MGE application data and rankings are retained for the duration of the MGE event and may persist for historical reference.<br>- Command usage statistics are retained indefinitely in aggregate (non-identifiable) form.<br>- If the Bot is removed from a server, all associated configuration and authorization data will be removed within a reasonable timeframe.</p>
+                                    </div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>5. Your Rights</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>Under data protection laws, you may have certain rights regarding your personal data. These may include:</p><p>- Right to Access: You can request access to the personal data we hold about you.<br>- Right to Rectification: You can request that we correct any inaccurate or incomplete data we hold about you.<br>- Right to Erasure (Right to Be Forgotten): You can request that we delete your personal data. Please note that fulfilling this request may result in the inability to use the Bot's services.<br>- Right to Object: You can object to the processing of your personal data in certain circumstances.<br>- Right to Restriction: You can request that we restrict the processing of your personal data in certain circumstances.</p><p>To exercise any of these rights, please contact us at <a href="mailto:thekingscodex@gmail.com">thekingscodex@gmail.com</a><br>or via our Discord support server: <a href="https://discord.gg/kingscodex" target="_blank">https://discord.gg/kingscodex</a>.</p><p>We will respond to your request within a reasonable timeframe.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>6. Data Security</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>We implement reasonable security measures to protect your information from unauthorized access, alteration, disclosure, or destruction. All data is stored on Cloudflare's infrastructure with encryption at rest and in transit. However, no internet transmission or electronic storage is 100% secure, and we cannot guarantee absolute security.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>7. Changes to this Privacy Policy</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>We may update this Privacy Policy from time to time. We will notify you of any significant changes by posting the new Privacy Policy on this page and updating the "Effective Date" at the top. We encourage you to review this Privacy Policy periodically for any changes. Your continued use of the Bot after any modifications constitutes your acceptance of the revised Privacy Policy.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>8. Contact Us</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>If you have any questions about this Privacy Policy or our data practices, please contact us:</p><p>Email: <a href="mailto:thekingscodex@gmail.com">thekingscodex@gmail.com</a><br>Discord Support Server: <a href="https://discord.gg/kingscodex" target="_blank">https://discord.gg/kingscodex</a></p></div>
+                                </div>
                             </div>
-                            <div class="faq-item">
-                                <div class="faq-question"><h2>1. Information We Collect</h2></div>
-                                <div class="faq-answer" style="max-height: none;"><p>We are committed to data minimization. We collect information by fair and lawful means to provide and improve the Bot's functionality.</p><p><strong>1.1. Information Automatically Collected from Discord:</strong><br>- Discord User, Server, and Channel IDs: We collect your User ID to verify your Patreon subscription and manage access. We collect Server IDs to manage server-specific configurations and authorizations. We store Channel IDs when you configure channel restrictions with the /channel command.</p><p><strong>1.2. Information You and Server Admins Provide:</strong><br>- Ark of Osiris Signup Data: When you use the /ark signup commands, we collect and store your in-game name and link it to your Discord User ID. This information is necessary to create and display public signup lists within your server.<br>- Server Configurations: When an administrator sets up features like the Event Calendar, Ark of Osiris Signups, or Ruins/Altar Reminders, we store the configuration choices for that server (e.g., designated channels, roles, event personalization settings) to ensure the feature functions as requested.<br>- Anonymous Command Usage Data: We log general, non-personally identifiable information about which commands are used (e.g., total /commander uses). This data is used for analytical purposes to understand usage patterns and does not track who used a specific command.</p><p><strong>1.3. Information from Third-Party Services (Patreon):</strong><br>- To verify your subscription, we receive your Discord User ID from Patreon when you link your accounts. We do not receive or store any payment information or other sensitive personal data from Patreon. Patreon's own Privacy Policy governs the data they collect.</p></div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question"><h2>2. How We Use Your Information</h2></div>
-                                <div class="faq-answer" style="max-height: none;"><p>- To provide the core functionality of the Bot.<br>- To verify and manage your subscription access through Patreon.<br>- To create and publicly display signup sheets for features like Ark of Osiris, using the in-game names provided.<br>- To enable and manage server-specific configurations and reminders.<br>- To monitor and analyze anonymous usage patterns to improve the Bot.<br>- To provide support and enforce our Terms of Service.</p></div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question"><h2>3. How We Share Your Information</h2></div>
-                                <div class="faq-answer" style="max-height: none;"><p>We do not sell, rent, or trade your personal information.</p><p>- Within Your Discord Server: Information you provide for features like Ark of Osiris signups (i.e., your in-game name) will be displayed publicly in embeds within the configured channel in your server.<br>- Service Providers: We share your Discord User ID with Patreon for the sole purpose of verifying your subscription status.<br>- Legal Requirements: We may disclose your information if required by law.</p></div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question"><h2>4. Data Retention</h2></div>
-                                <div class="faq-answer" style="max-height: none;"><p>- We retain your information only as long as necessary.<br>- Server configurations are retained as long as the Bot is in your server and the feature is active.<br>- Data related to specific event signups, such as Ark of Osiris in-game names, is retained until the feature is deactivated for your alliance or until the signup cycle is reset by an administrator.<br>- If the Bot is removed from a server, all associated configuration and authorization data will be removed within a reasonable timeframe.</p></div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question"><h2>5. Your Rights</h2></div>
-                                <div class="faq-answer" style="max-height: none;"><p>Under data protection laws, you may have certain rights regarding your personal data. These may include:</p><p>- Right to Access: You can request access to the personal data we hold about you.<br>- Right to Rectification: You can request that we correct any inaccurate or incomplete data we hold about you.<br>- Right to Erasure (Right to Be Forgotten): You can request that we delete your personal data. Please note that fulfilling this request may result in the inability to use the Bot's services.<br>- Right to Object: You can object to the processing of your personal data in certain circumstances.<br>- Right to Restriction: You can request that we restrict the processing of your personal data in certain circumstances.</p><p>To exercise any of these rights, please contact us at <a href="mailto:thekingscodex@gmail.com">thekingscodex@gmail.com</a><br>or via our Discord support server: <a href="https://discord.gg/kingscodex" target="_blank">https://discord.gg/kingscodex</a>.</p><p>We will respond to your request within a reasonable timeframe.</p></div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question"><h2>6. Data Security</h2></div>
-                                <div class="faq-answer" style="max-height: none;"><p>We implement reasonable security measures to protect your information from unauthorized access, alteration, disclosure, or destruction. However, no internet transmission or electronic storage is 100% secure, and we cannot guarantee absolute security.</p></div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question"><h2>7. Changes to this Privacy Policy</h2></div>
-                                <div class="faq-answer" style="max-height: none;"><p>We may update this Privacy Policy from time to time. We will notify you of any significant changes by posting the new Privacy Policy on this page and updating the "Effective Date" at the top. We encourage you to review this Privacy Policy periodically for any changes. Your continued use of the Bot after any modifications constitutes your acceptance of the revised Privacy Policy.</p></div>
-                            </div>
-                            <div class="faq-item">
-                                <div class="faq-question"><h2>8. Contact Us</h2></div>
-                                <div class="faq-answer" style="max-height: none;"><p>If you have any questions about this Privacy Policy or our data practices, please contact us:</p><p>Email: <a href="mailto:thekingscodex@gmail.com">thekingscodex@gmail.com</a><br>Discord Support Server: <a href="https://discord.gg/kingscodex" target="_blank">https://discord.gg/kingscodex</a></p></div>
+                        </div>
+                    </div>
+
+                    <!-- ======================== WEBSITE TAB ======================== -->
+                    <div id="legal-tab-website" class="legal-tab-content">
+                        <div class="faq-category">
+                            <div class="faq-items">
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>Welcome</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>This Privacy Policy explains how Codex Helper ("the Website", codexhelper.com) collects, uses, stores, and protects your information when you use our website and its tools. By using the Website, you agree to the terms of this Privacy Policy.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>1. Information We Collect</h2></div>
+                                    <div class="faq-answer" style="max-height: none;">
+                                        <p><strong>1.1. Discord OAuth2 Authentication:</strong><br>When you log in via Discord, we receive your Discord User ID, username, avatar, and basic profile information through Discord's OAuth2 flow. We store an encrypted session token in our database with a 30-day expiry to maintain your login session. We do not access your Discord messages, friends list, or any other private Discord data.</p>
+                                        <p><strong>1.2. User-Provided Data:</strong><br>- <strong>Saved Mail Templates:</strong> If you use the Mail Generator tool and save templates, we store your template name and content linked to your Discord User ID.<br>- <strong>Saved Armament Scores:</strong> If you use the Davor's Toolkit and save scores, we store your pairing, formation, inscriptions, stats, and total score linked to your Discord User ID.<br>- <strong>User Preferences/Settings:</strong> We store your personalization settings (such as calendar rotation preferences) as JSON data linked to your Discord User ID.</p>
+                                        <p><strong>1.3. Automatically Collected Data:</strong><br>- <strong>Google Analytics (G-156DRH9ZB0):</strong> We use Google Analytics to understand how visitors use our site. This collects page views, session duration, device information, browser type, and approximate geographic location. Google Analytics uses cookies to identify returning visitors. Google's Privacy Policy governs their data handling.<br>- <strong>Cloudflare Analytics:</strong> As our hosting provider, Cloudflare collects basic request-level analytics including page load performance and geographic distribution of traffic.</p>
+                                    </div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>2. Cookies and Local Storage</h2></div>
+                                    <div class="faq-answer" style="max-height: none;">
+                                        <p><strong>Cookies:</strong><br>- <strong>session_token:</strong> A 30-day HttpOnly secure cookie that maintains your login session. Essential for authentication.<br>- <strong>oauth_state:</strong> A 10-minute cookie used during the Discord login process for CSRF protection. Deleted after use.</p>
+                                        <p><strong>Local Storage:</strong><br>- Authentication cache (5-minute TTL) for performance optimization.<br>- Calculator and tool state data (up to 1-year TTL) so your settings persist between visits.<br>- Tool-specific preferences and configurations.</p>
+                                        <p><strong>Session Storage:</strong><br>- Pre-login state (e.g., which tool page you were on before logging in). This is temporary and deleted after use.</p>
+                                    </div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>3. How We Use Your Information</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>- To authenticate your identity and manage your session.<br>- To provide Dashboard access for managing your bot configurations.<br>- To save and load your mail templates, armament scores, and preferences.<br>- To personalize your calendar rotation display.<br>- To analyze website traffic and improve user experience.<br>- To maintain website security and prevent abuse.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>4. How We Share Your Information</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>We do not sell, rent, or trade your personal information. Data is shared only with:</p><p>- <strong>Cloudflare:</strong> Our hosting and CDN provider, which processes all requests.<br>- <strong>Google:</strong> Through Google Analytics, for website usage statistics.<br>- <strong>Discord:</strong> Through OAuth2, solely for authentication purposes.<br>- <strong>Legal Requirements:</strong> We may disclose your information if required by law.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>5. Data Retention</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>- Session tokens expire after 30 days of inactivity.<br>- Saved templates, scores, and preferences are retained until you delete them or request account data deletion.<br>- Local storage data persists on your device until you clear it.<br>- Analytics data is retained per Google's and Cloudflare's respective retention policies.<br>- Cached data (online users, bot stats) is transient and refreshed frequently (60-second to 5-minute TTL).</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>6. Your Rights</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>You have the right to:</p><p>- Access the personal data we hold about you.<br>- Request correction of inaccurate data.<br>- Request deletion of your data (note: this may affect your ability to use the Website's features).<br>- Object to or restrict processing of your data.<br>- Clear local storage and cookies from your browser at any time.</p><p>To exercise any of these rights, please contact us at <a href="mailto:thekingscodex@gmail.com">thekingscodex@gmail.com</a><br>or via our Discord support server: <a href="https://discord.gg/kingscodex" target="_blank">https://discord.gg/kingscodex</a>.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>7. Data Security</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>We implement reasonable security measures including encrypted session tokens, HTTPS-only connections, HttpOnly and Secure cookie flags, CSRF protection on authentication flows, and Cloudflare's infrastructure security. However, no internet transmission is 100% secure.</p></div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question"><h2>8. Contact Us</h2></div>
+                                    <div class="faq-answer" style="max-height: none;"><p>If you have any questions about this Privacy Policy, please contact us:</p><p>Email: <a href="mailto:thekingscodex@gmail.com">thekingscodex@gmail.com</a><br>Discord Support Server: <a href="https://discord.gg/kingscodex" target="_blank">https://discord.gg/kingscodex</a></p></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -57,4 +125,25 @@ import Layout from '../layouts/Layout.astro';
             </div>
         </section>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.legal-tab-btn');
+            const contents = document.querySelectorAll('.legal-tab-content');
+
+            function switchTab(tabName) {
+                tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+                contents.forEach(c => c.classList.toggle('active', c.id === `legal-tab-${tabName}`));
+                const url = new URL(window.location.href);
+                if (tabName === 'bot') { url.searchParams.delete('tab'); } else { url.searchParams.set('tab', tabName); }
+                history.replaceState(null, '', url.toString());
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const initialTab = params.get('tab') || 'bot';
+            switchTab(initialTab);
+
+            tabs.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+        });
+    </script>
 </Layout>

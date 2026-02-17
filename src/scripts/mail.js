@@ -119,6 +119,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let historyIndex = -1;
     let inputTimeout = null;
     
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     function populateFilters() {
         if (!filterOptionsContainer) return;
 
@@ -145,11 +150,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     categoryDiv.classList.add('has-divider');
                 }
 
-                categoryDiv.innerHTML = `<h5>${category.replace(/_/g, ' ')}</h5>`;
+                categoryDiv.innerHTML = `<h5>${escapeHtml(category.replace(/_/g, ' '))}</h5>`;
                 Array.from(filters[category]).sort().forEach(value => {
                      const label = document.createElement('label');
                      label.className = 'filter-option';
-                     label.innerHTML = `<input type="checkbox" data-category="${category}" value="${value}"> ${value}`;
+                     label.innerHTML = `<input type="checkbox" data-category="${escapeHtml(category)}" value="${escapeHtml(value)}"> ${escapeHtml(value)}`;
                      categoryDiv.appendChild(label);
                 });
                 filterOptionsContainer.appendChild(categoryDiv);
@@ -170,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 item.className = 'template-item';
                 item.dataset.index = index;
 
-                item.innerHTML = `<img src="${template.image}" alt="${template.title} preview" loading="lazy" width="200" height="125"><h4>${template.title}</h4>`;
+                item.innerHTML = `<img src="${escapeHtml(template.image)}" alt="${escapeHtml(template.title)} preview" loading="lazy" width="200" height="125"><h4>${escapeHtml(template.title)}</h4>`;
     
                 item.addEventListener('click', () => {
                     const isAlreadySelected = item.classList.contains('selected');

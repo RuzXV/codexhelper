@@ -1,8 +1,8 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-@font-face { font-family: 'NotoSansHans DemiLight'; src: url('/fonts/NotoSansHans-DemiLight.otf') format('opentype'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'NotoSansHans DemiLight'; src: url('/fonts/NotoSansHans-DemiLight.woff2') format('woff2'), url('/fonts/NotoSansHans-DemiLight.otf') format('opentype'); font-weight: normal; font-style: normal; font-display: swap; }
 
-@font-face { font-family: 'NotoSansHans Bold'; src: url('/fonts/NotoSansHans-Bold.otf') format('opentype'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'NotoSansHans Bold'; src: url('/fonts/NotoSansHans-Bold.woff2') format('woff2'), url('/fonts/NotoSansHans-Bold.otf') format('opentype'); font-weight: normal; font-style: normal; font-display: swap; }
 
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 
@@ -688,3 +688,10 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 .sub-nav-link:hover { color: var(--text-primary); }
 .sub-nav-link.active { color: var(--text-primary); }
 .sub-nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--accent-blue); }
+
+.legal-tabs { display: inline-flex; align-items: center; gap: 4px; margin-top: var(--spacing-8); padding: 4px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.legal-tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-secondary); padding: 10px 28px; border-radius: 11px; font-size: var(--font-size-sm); font-weight: 500; cursor: pointer; transition: all 0.25s ease; min-height: 40px; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.01em; }
+.legal-tab-btn:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.05); }
+.legal-tab-btn.active { background: var(--accent-blue); border-color: transparent; color: #fff; box-shadow: 0 2px 12px rgba(59, 130, 246, 0.35); }
+.legal-tab-content { display: none; }
+.legal-tab-content.active { display: block; animation: fadeInUp 0.4s ease-out; }

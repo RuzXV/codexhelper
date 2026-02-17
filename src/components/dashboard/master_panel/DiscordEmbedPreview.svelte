@@ -56,17 +56,22 @@
         return `https://cdn.discordapp.com/emojis/${emojiId}.png`;
     }
 
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     function formatRowHtml(row) {
         const bulletEntry = allEmojis.find(e => e.key === 'bullet_point');
-        const bulletHtml = bulletEntry 
-            ? `<img src="${getEmojiUrl(bulletEntry.emoji)}" class="emoji bullet">` 
+        const bulletHtml = bulletEntry
+            ? `<img src="${getEmojiUrl(bulletEntry.emoji)}" class="emoji bullet">`
             : '•';
 
         if (row.type === 'custom') {
-            if (row.customText && row.customText.includes('<img')) {
-                 return `<div class="embed-line">${bulletHtml}<span class="content-text">${row.customText}</span></div>`;
-            }
-            return `<div class="embed-line">${bulletHtml}<span class="content-text">${row.customText}</span></div>`;
+            // Sanitize custom text: escape first, then convert Discord emoji syntax back to img tags
+            const safeText = escapeHtml(row.customText)
+                .replace(/&lt;:([^:]+):(\d+)&gt;/g, '<img src="https://cdn.discordapp.com/emojis/$2.png" class="emoji inline" alt="$1">');
+            return `<div class="embed-line">${bulletHtml}<span class="content-text">${safeText}</span></div>`;
         }
 
         let html = `<div class="embed-line">${bulletHtml}`;

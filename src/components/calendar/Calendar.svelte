@@ -6,13 +6,7 @@
     import ShiftModal from './ShiftModal.svelte';
     import RemoveModal from './RemoveModal.svelte';
     import CycleConfigModal from './CycleConfigModal.svelte';
-    const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', { eager: true });
-
-    function getIconSrc(filename) {
-        if (!filename) return null;
-        const path = `../../assets/images/calendar/event_icons/${filename}`;
-        return iconModules[path]?.default?.src || iconModules[path]?.default || null;
-    }
+    import { getIconSrc } from './calendarIcons';
 
     let viewDate = new Date();
     let events = [];

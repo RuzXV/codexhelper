@@ -8,6 +8,11 @@
     let currentUser = null;
     let authContainerSelector = null;
 
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     function getLoggedInUser() {
         return currentUser;
     }
@@ -74,7 +79,7 @@
         container.innerHTML = `
             <div class="user-profile relative-container" style="position: relative; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 5px 12px 5px 5px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
                 <img src="${avatarUrl}" alt="Profile" class="profile-pic" style="width: 32px; height: 32px; border-radius: 50%;">
-                <span class="username" style="font-weight: 600; font-size: 0.9rem;">${user.display_name || user.global_name || user.username}</span>
+                <span class="username" style="font-weight: 600; font-size: 0.9rem;">${escapeHtml(user.display_name || user.global_name || user.username)}</span>
                 <i class="fas fa-chevron-down dropdown-arrow" style="font-size: 0.8rem; opacity: 0.7; transition: transform 0.2s;"></i>
                 
                 <div class="user-dropdown hidden" style="position: absolute; top: 115%; right: 0; background: #1a1b1e; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; min-width: 160px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 1000; display: none;">
@@ -181,9 +186,8 @@
             }
         }
 
-        const scope = 'identify guilds'; 
-        const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${WEBSITE_APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
-        window.location.href = authUrl;
+        // Redirect to server-side login endpoint which generates a CSRF-safe state parameter
+        window.location.href = `${API_BASE_URL}/api/auth/login`;
     }
 
     async function logout() {

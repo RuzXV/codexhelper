@@ -3033,23 +3033,26 @@
     /* Font face for NotoSansHans */
     @font-face {
         font-family: 'NotoSansHans';
-        src: url('/fonts/NotoSansHans-Black.otf') format('opentype');
+        src: url('/fonts/NotoSansHans-Black.woff2') format('woff2'), url('/fonts/NotoSansHans-Black.otf') format('opentype');
         font-weight: 900;
         font-style: normal;
+        font-display: swap;
     }
 
     @font-face {
         font-family: 'NotoSansHans';
-        src: url('/fonts/NotoSansHans-Bold.otf') format('opentype');
+        src: url('/fonts/NotoSansHans-Bold.woff2') format('woff2'), url('/fonts/NotoSansHans-Bold.otf') format('opentype');
         font-weight: 700;
         font-style: normal;
+        font-display: swap;
     }
 
     @font-face {
         font-family: 'NotoSansHans';
-        src: url('/fonts/NotoSansHans-DemiLight.otf') format('opentype');
+        src: url('/fonts/NotoSansHans-DemiLight.woff2') format('woff2'), url('/fonts/NotoSansHans-DemiLight.otf') format('opentype');
         font-weight: 300;
         font-style: normal;
+        font-display: swap;
     }
 
     .crystal-tech-container {

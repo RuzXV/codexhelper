@@ -1,7 +1,7 @@
 <script>
     import { createEventDispatcher, tick } from 'svelte';
     import { slide, fly, fade } from 'svelte/transition';
-    import * as XLSX from 'xlsx';
+    // xlsx is dynamically imported in exportToExcel() to avoid 880KB in the initial bundle
     import ArkTeamCard from './ArkTeamCard.svelte';
 
     export let guildId;
@@ -129,7 +129,7 @@
         }
     }
 
-    function exportToExcel() {
+    async function exportToExcel() {
         const teamNums = Object.keys(data.teams).sort();
         const rows = [];
         teamNums.forEach(num => {
@@ -146,6 +146,7 @@
             });
             rows.push(['']); 
         });
+        const XLSX = await import('xlsx');
         const ws = XLSX.utils.aoa_to_sheet(rows);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Signups");

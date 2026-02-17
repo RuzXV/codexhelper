@@ -12,6 +12,20 @@ import FlagCostCalculator from '../../components/kvk_suite/FlagCostCalculator.sv
     keywords="Rise of Kingdoms KvK, ROK KvK calculator, crystal tech simulator, flag calculator, KvK timer, Kingdom vs Kingdom, ROK KvK tools, Rise of Kingdoms war"
     bodyClass="has-sub-nav"
 >
+    <script type="application/ld+json" slot="head-scripts">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ROK KvK Suite",
+        "description": "Crystal Tech simulator, KvK timers, and flag cost calculator for Rise of Kingdoms",
+        "url": "https://codexhelper.com/tools/kvk_suite/",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": { "@type": "Organization", "name": "Codex Helper" }
+    }
+    </script>
+
     <main class="tool-page-wrapper">
         <section class="tool-hero">
             <div class="tool-hero-container">
@@ -30,17 +44,17 @@ import FlagCostCalculator from '../../components/kvk_suite/FlagCostCalculator.sv
 
                         <!-- Crystal Tech Simulator -->
                         <div class="carousel-slide" data-title="Crystal Tech Simulator" data-description="Simulate and plan your Crystal Technology research for maximum efficiency in your upcoming KvK.">
-                            <TechSimulator client:load />
+                            <TechSimulator client:visible />
                         </div>
 
                         <!-- Timers & Tracking -->
                         <div class="carousel-slide" data-title="Timers & Tracking" data-description="Track important KvK & buff timers to stay ahead of your opponents.">
-                            <KvKTimers client:load />
+                            <KvKTimers client:visible />
                         </div>
 
                         <!-- Flag Cost Calculator -->
                         <div class="carousel-slide" data-title="Flag Cost Calculator" data-description="Calculate the resource costs for placing flags in KvK.">
-                            <FlagCostCalculator client:load />
+                            <FlagCostCalculator client:visible />
                         </div>
 
                     </div>

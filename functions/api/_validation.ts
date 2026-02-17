@@ -52,6 +52,118 @@ export const TemplateSchema = z.object({
 });
 
 // ============================================
+// Ark of Osiris Validation Schemas
+// ============================================
+
+const discordSnowflake = z.string().regex(/^\d{17,20}$/, 'Invalid Discord snowflake ID');
+
+export const ArkAllianceSchema = z.object({
+    alliance_tag: z.string().min(1, 'Alliance tag is required').max(10, 'Alliance tag must be 10 characters or less'),
+    channel_id: discordSnowflake.nullable().optional(),
+    admin_role_id: discordSnowflake.nullable().optional(),
+    notification_role_id: discordSnowflake.nullable().optional(),
+    reminder_interval: z.number().int().nonnegative().optional(),
+});
+
+export const ArkTeamSchema = z.object({
+    alliance_tag: z.string().min(1),
+    team_number: z.union([z.number().int().positive(), z.string().regex(/^\d+$/)]),
+    team_name: z.string().min(1, 'Team name is required').max(50, 'Team name must be 50 characters or less'),
+    match_timestamp: z.number().nullable().optional(),
+    signup_cap: z.union([z.number().int().positive(), z.string().regex(/^\d+$/), z.null()]).optional(),
+});
+
+export const ArkSignupSchema = z.object({
+    alliance_tag: z.string().min(1, 'Alliance tag is required'),
+    team_number: z.number().int(),
+    in_game_name: z.string().min(1, 'In-game name is required').max(50, 'In-game name must be 50 characters or less'),
+});
+
+// ============================================
+// MGE Validation Schemas
+// ============================================
+
+export const MgeSettingsSchema = z.object({
+    signup_channel_id: discordSnowflake.nullable().optional(),
+    posted_signups_channel_id: discordSnowflake.nullable().optional(),
+    ping_role_id: discordSnowflake.nullable().optional(),
+    coordinator_role_id: discordSnowflake.nullable().optional(),
+});
+
+export const MgeAcceptSchema = z.object({
+    rank_spot: z.number().int().positive('Rank spot must be a positive integer'),
+});
+
+// ============================================
+// Calendar & Reminder Bulk Schemas
+// ============================================
+
+export const CalendarSettingsSchema = z.object({
+    channel_id: z.string().max(20).optional(),
+    create_discord_events: z.boolean().optional(),
+    is_personalized: z.boolean().optional(),
+    reference_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Reference date must be YYYY-MM-DD').optional().nullable(),
+    reference_type: z.enum(['egg', 'hammer']).optional().nullable(),
+    reference_cycle_id: z.union([z.number().int().nonnegative(), z.string().regex(/^\d+$/)]).optional().nullable(),
+});
+
+export const ChannelActionSchema = z.object({
+    command_group: z.string().min(1, 'Command group is required'),
+    channel_id: discordSnowflake.optional().nullable(),
+    action: z.string().optional(),
+});
+
+export const ReminderBulkSchema = z.object({
+    reminders: z.array(z.object({
+        reminder_type: z.string().min(1),
+        channel_id: z.string().nullable().optional(),
+        is_active: z.boolean().optional(),
+        first_instance_ts: z.number().nullable().optional(),
+        last_instance_ts: z.number().nullable().optional(),
+        create_discord_event: z.boolean().optional(),
+        reminder_intervals_seconds: z.string().optional(),
+        is_new_setup: z.boolean().optional(),
+    })),
+    customReminders: z.array(z.object({
+        reminder_id: z.number().int().optional(),
+        channel_id: z.string().nullable().optional(),
+        title: z.string().max(200).optional(),
+        message: z.string().max(2000).optional(),
+        role_id: z.string().nullable().optional(),
+        repeat_interval_seconds: z.number().optional(),
+        first_instance_ts: z.number().optional(),
+    })).optional().default([]),
+    deletedCustomIds: z.array(z.number().int()).optional().default([]),
+});
+
+export const ArkTagSchema = z.object({
+    alliance_tag: z.string().min(1, 'Alliance tag is required'),
+});
+
+// ============================================
+// Bot Validation Schemas
+// ============================================
+
+export const BotBatchSchema = z.object({
+    batch: z.array(z.object({
+        sql: z.string().min(1),
+        params: z.array(z.unknown()).optional(),
+    })),
+});
+
+export const BotQuerySchema = z.object({
+    sql: z.string().min(1, 'SQL statement is required'),
+    params: z.array(z.unknown()).optional(),
+    method: z.enum(['execute', 'one', 'all']).optional(),
+});
+
+// ============================================
+// User Settings Validation Schemas
+// ============================================
+
+export const UserSettingsSchema = z.record(z.string(), z.unknown());
+
+// ============================================
 // Validation Helper
 // ============================================
 

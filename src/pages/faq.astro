@@ -2,6 +2,47 @@
 import Layout from '../layouts/Layout.astro';
 ---
 <Layout title="FAQ" description="Find answers to frequently asked questions about Codex Helper, including setup instructions, subscription details, and how to get support.">
+    <script type="application/ld+json" slot="head-scripts">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How do I setup the bot on my discord server?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Subscribe to our Patreon page, follow the invite link, link your Discord to Patreon, then run /patreon verify in your server. Use /help for a list of commands."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do the higher membership tiers of the Patreon page unlock other features?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No, the only tier required to use the bot is the lowest tier ($3 USD/month). Higher tiers are for extra support to The King's Codex."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I activate the Codex Helper bot in multiple servers after subscribing?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, the subscription is tied per person. As long as you are an Administrator or have Manage Server permissions, you can freely add the bot to multiple servers."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "I'm having issues with the Codex Helper bot, where can I find support?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "You can open a ticket in the King's Codex Discord Server in the discord.support channel, or leave feedback in the feedback channel."
+                }
+            }
+        ]
+    }
+    </script>
+
     <main class="faq-page-wrapper">
         <section class="faq-hero">
             <div class="faq-hero-container">

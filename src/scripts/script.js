@@ -57,19 +57,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 const navbar = document.querySelector('.navbar');
-let lastScrollY = window.scrollY;
-
-window.addEventListener('scroll', () => {
-    const currentScrollY = window.scrollY;
-    
-    if (currentScrollY > 100) {
-        navbar.style.background = 'rgba(30, 30, 35, 0.4)';
-    } else {
-        navbar.style.background = 'rgba(30, 30, 35, 0.4)';
-    }
-    
-    lastScrollY = currentScrollY;
-});
 
 const observerOptions = {
     threshold: 0.1,
@@ -265,14 +252,22 @@ function renderTopServers(servers) {
     const serversRow1 = servers.slice(0, 10);
     const serversRow2 = servers.slice(10, 20);
     
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     function createServerItem(server) {
         const serverItem = document.createElement('li');
         serverItem.className = 'server-item';
-        
+
+        const safeName = escapeHtml(server.name);
+        const safeIconUrl = escapeHtml(server.icon_url);
+
         serverItem.innerHTML = `
-            <img src="${server.icon_url}" alt="${server.name} Icon" class="server-logo" onerror="this.src='/images/global/logo-new.webp'">
+            <img src="${safeIconUrl}" alt="${safeName} Icon" class="server-logo" onerror="this.src='/images/global/logo-new.webp'">
             <div class="server-info">
-                <p class="server-name">${server.name}</p>
+                <p class="server-name">${safeName}</p>
                 <span class="server-members">
                     <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="6" cy="6" r="6" fill="#43b581"></circle>
@@ -281,7 +276,7 @@ function renderTopServers(servers) {
                 </span>
             </div>
         `;
-        
+
         return serverItem;
     }
     
@@ -579,18 +574,6 @@ document.addEventListener('touchstart', function(e) {
         e.preventDefault();
     }
 }, { passive: false });
-
-let ticking = false;
-function updateScrollPosition() {
-    ticking = false;
-}
-
-window.addEventListener('scroll', () => {
-    if (!ticking) {
-        requestAnimationFrame(updateScrollPosition);
-        ticking = true;
-    }
-}, { passive: true });
 
 function getStorageKey(key) {
     const user = window.auth ? window.auth.getLoggedInUser() : null;

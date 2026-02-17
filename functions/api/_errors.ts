@@ -1,7 +1,9 @@
 import { Context } from 'hono';
+import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import { Bindings, Variables, ApiErrorResponse } from './_types';
 
-type AppContext = Context<{ Bindings: Bindings; Variables: Variables }>;
+// Use a broad context type so error helpers work in both user-auth and bot-auth routes
+type AppContext = Context<{ Bindings: Bindings; Variables?: Variables }>;
 
 const ERROR_MESSAGES: Record<number, string> = {
     400: 'Bad Request',
@@ -39,7 +41,7 @@ export function apiError(
         response.details = details;
     }
 
-    return c.json(response, status as any);
+    return c.json(response, status as ContentfulStatusCode);
 }
 
 export const errors = {

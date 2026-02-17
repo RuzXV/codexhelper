@@ -47,6 +47,11 @@
         expandedRowId = expandedRowId === id ? null : id;
     }
 
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     function prettyVal(val) {
         if (val === undefined) return '';
         if (typeof val === 'object') return JSON.stringify(val, null, 2);
@@ -54,8 +59,8 @@
     }
 
     function getDiffHtml(oldVal, newVal) {
-        const s1 = prettyVal(oldVal);
-        const s2 = prettyVal(newVal);
+        const s1 = escapeHtml(prettyVal(oldVal));
+        const s2 = escapeHtml(prettyVal(newVal));
 
         if (s1 === s2) return { left: s1, right: s2 };
 

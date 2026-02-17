@@ -112,3 +112,143 @@ export interface ApiSuccessResponse {
     status: 'success';
     message?: string;
 }
+
+// Admin types
+export interface BackupEntry {
+    timestamp: number;
+    date: string;
+    data: unknown;
+}
+
+export interface ChangelogEntry {
+    timestamp: number;
+    user: string;
+    userId: string;
+    userAvatar: string | null;
+    action: string;
+    details: string;
+}
+
+// Google Calendar types
+export interface GoogleServiceAccountCredentials {
+    client_email: string;
+    private_key: string;
+    project_id?: string;
+    token_uri?: string;
+}
+
+export interface GoogleTokenResponse {
+    access_token: string;
+    expires_in: number;
+    token_type: string;
+}
+
+export interface CalendarEventInput {
+    title: string;
+    type: string | null;
+    troop_type: string | null;
+    start_date: string;
+    duration: number;
+    colorId: string;
+}
+
+export interface GoogleCalendarEvent {
+    id: string;
+    summary?: string;
+    start?: { date?: string; dateTime?: string };
+    end?: { date?: string; dateTime?: string };
+    status?: string;
+}
+
+export interface GoogleCalendarListResponse {
+    items?: GoogleCalendarEvent[];
+    nextPageToken?: string;
+}
+
+// Guild / Ark / MGE types
+export interface AllowedChannelRow {
+    command_group: string;
+    channel_id: string | number;
+}
+
+export interface ArkSetupRow {
+    guild_id: string;
+    alliance_tag: string;
+    channel_id: string | number | null;
+    admin_role_id: string | number | null;
+    tag_role_id: string | number | null;
+    reminder_interval_seconds: number | null;
+    is_active: number;
+}
+
+export interface ArkTeamRow {
+    guild_id: string;
+    alliance_tag: string;
+    team_number: number;
+    team_name: string;
+    next_match_timestamp: number | null;
+    signup_cap: number | null;
+    role_id: string | number | null;
+}
+
+export interface ArkSignupRow {
+    guild_id: string;
+    alliance_tag: string;
+    team_number: number;
+    user_id: string;
+    in_game_name: string;
+    signup_timestamp: number;
+}
+
+export interface MgeSettingsRow {
+    guild_id: string;
+    current_mge_name: string | null;
+    placement_points: string | null;
+    signup_channel_id: string | number | null;
+    posted_signups_channel_id: string | number | null;
+    ping_role_id: string | number | null;
+    coordinator_role_id: string | number | null;
+    signup_message_id: string | number | null;
+}
+
+export interface MgeApplicationRow {
+    application_id: number;
+    guild_id: string;
+    mge_name: string;
+    ingame_name: string;
+    application_status: string;
+    rank_spot: number | null;
+    submitted_at: number;
+}
+
+export interface DiscordRole {
+    id: string;
+    name: string;
+    color: number;
+    position?: number;
+}
+
+export interface ReminderSetupRow {
+    guild_id: string;
+    reminder_type: string;
+    channel_id: string | number | null;
+    is_active: number;
+    first_instance_ts: number | null;
+    last_instance_ts: number | null;
+    create_discord_event: number;
+    reminder_intervals_seconds: string;
+    role_id?: string | number | null;
+}
+
+// Bot types
+export interface BatchOperation {
+    sql: string;
+    params?: unknown[];
+}
+
+// KV key types
+export interface KVListKey {
+    name: string;
+    expiration?: number;
+    metadata?: unknown;
+}

@@ -4,6 +4,7 @@ import { Bindings, Variables, DiscordUser, DiscordGuild } from '../_types';
 import { authMiddleware } from '../_middleware';
 import { parseAdminIds } from '../_constants';
 import { errors } from '../_errors';
+import { UserSettingsSchema, validateBody } from '../_validation';
 
 interface GuildIdRecord {
     guild_id: string | number;
@@ -65,11 +66,13 @@ users.get('/settings', async (c) => {
 users.post('/settings', async (c) => {
     const user = c.get('user');
     const body = await c.req.json();
-    
+    const validation = validateBody(UserSettingsSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
     await c.env.DB.prepare(
         `INSERT INTO user_settings (user_id, settings) VALUES (?, ?)
          ON CONFLICT(user_id) DO UPDATE SET settings = excluded.settings`
-    ).bind(user.id, JSON.stringify(body)).run();
+    ).bind(user.id, JSON.stringify(validation.data)).run();
 
     return c.json({ status: 'success' });
 });
@@ -96,14 +99,15 @@ users.get('/guilds', async (c) => {
     let activeBotGuildIds = new Set<string>();
 
     try {
-        const { results: authResults } = await c.env.BOT_DB.prepare(
-            `SELECT guild_id FROM guild_authorizations WHERE is_active = 1`
-        ).all();
+        const [{ results: authResults }, { results: bypassResults }] = await Promise.all([
+            c.env.BOT_DB.prepare(
+                `SELECT guild_id FROM guild_authorizations WHERE is_active = 1`
+            ).all(),
+            c.env.BOT_DB.prepare(
+                `SELECT guild_id FROM guild_bypass`
+            ).all()
+        ]);
         if (authResults) (authResults as GuildIdRecord[]).forEach((r) => activeBotGuildIds.add(r.guild_id.toString()));
-
-        const { results: bypassResults } = await c.env.BOT_DB.prepare(
-            `SELECT guild_id FROM guild_bypass`
-        ).all();
         if (bypassResults) (bypassResults as GuildIdRecord[]).forEach((r) => activeBotGuildIds.add(r.guild_id.toString()));
 
     } catch (e) {

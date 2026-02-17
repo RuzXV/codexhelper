@@ -74,25 +74,94 @@ const fullTitle = `${title} - Codex Helper | Rise of Kingdoms Tools`;
     <slot name="head-scripts" />
 </head>
 <body class={bodyClass}>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     {isToolPage && (
         <div class="global-tool-bg" style={`background-image: url(${toolBgImage.src})`}></div>
     )}
 
     <Navbar client:load {currentPath} />
 
-    <slot />
+    <div id="main-content">
+        <slot />
+    </div>
 
     <Footer />
-    
+
+    <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
     <script>
         import "../scripts/utils.js";
         import "../scripts/auth.js";
         import "../scripts/script.js";
     </script>
 
+    <script>
+        const btn = document.getElementById('back-to-top');
+        if (btn) {
+            window.addEventListener('scroll', () => {
+                btn.classList.toggle('visible', window.scrollY > 400);
+            }, { passive: true });
+            btn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    </script>
+
     <slot name="body-scripts" />
 
     <style>
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-blue);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0 0 8px 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 10000;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .back-to-top:hover {
+            background: var(--accent-blue);
+            color: #fff;
+            border-color: var(--accent-blue);
+        }
         .global-tool-bg {
             position: fixed;
             top: 0;
