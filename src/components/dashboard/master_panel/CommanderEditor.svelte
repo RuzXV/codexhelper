@@ -389,7 +389,11 @@
 
         let tmpl = commanderData[dataIndex];
         const embed = tmpl.json.embeds[0];
-        embed.image = { url: imageUrl };
+        if (imageUrl && imageUrl.trim()) {
+            embed.image = { url: imageUrl.trim() };
+        } else {
+            delete embed.image;
+        }
 
         if (isMainTemplate) {
             embed.title = displayName;
@@ -512,7 +516,6 @@
                     {
                         title: `${displayName} ${newBuildLabel || btnConfig.name}`,
                         color: FIXED_SUB_COLOR,
-                        image: { url: '' },
                         fields: [],
                     },
                 ],
