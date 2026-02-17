@@ -41,23 +41,40 @@ const ALLOWED_TABLES = [
     'guild_event_sequence',
 ];
 
+// SQL keywords that can appear after UPDATE/FROM/INTO/JOIN but are NOT table names
+const SQL_KEYWORDS = new Set([
+    'set', 'where', 'select', 'from', 'into', 'values', 'on', 'and', 'or',
+    'not', 'null', 'as', 'in', 'is', 'like', 'between', 'exists', 'case',
+    'when', 'then', 'else', 'end', 'order', 'group', 'by', 'having', 'limit',
+    'offset', 'union', 'all', 'distinct', 'conflict', 'do', 'nothing',
+    'excluded', 'replace', 'ignore', 'abort', 'rollback', 'fail',
+]);
+
 function isSqlAllowed(sql: string): boolean {
     const trimmed = sql.trim().toUpperCase();
     if (!ALLOWED_SQL_PREFIXES.some((prefix) => trimmed.startsWith(prefix))) return false;
 
     // Verify the SQL only references allowed tables
     // Extract table names from common SQL patterns (FROM, INTO, UPDATE, JOIN, etc.)
-    const tablePattern = /(?:FROM|INTO|UPDATE|JOIN|TABLE)\s+(\w+)/gi;
+    // Handles both bare names and backtick-quoted names (e.g. `table_name`)
+    const tablePattern = /(?:FROM|INTO|UPDATE|JOIN|TABLE)\s+`?(\w+)`?/gi;
     let match;
     const referencedTables: string[] = [];
     while ((match = tablePattern.exec(sql)) !== null) {
-        referencedTables.push(match[1].toLowerCase());
+        const name = match[1].toLowerCase();
+        // Skip SQL keywords that appear after UPDATE/FROM etc. (e.g. "DO UPDATE SET")
+        if (!SQL_KEYWORDS.has(name)) {
+            referencedTables.push(name);
+        }
     }
 
     // Also check DELETE FROM pattern
-    const deletePattern = /DELETE\s+FROM\s+(\w+)/gi;
+    const deletePattern = /DELETE\s+FROM\s+`?(\w+)`?/gi;
     while ((match = deletePattern.exec(sql)) !== null) {
-        referencedTables.push(match[1].toLowerCase());
+        const name = match[1].toLowerCase();
+        if (!SQL_KEYWORDS.has(name)) {
+            referencedTables.push(name);
+        }
     }
 
     // If we found table references, verify they're all allowed
