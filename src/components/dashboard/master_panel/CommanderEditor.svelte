@@ -2,6 +2,8 @@
     import { createEventDispatcher, onMount, tick } from 'svelte';
     import { fly } from 'svelte/transition';
     import DiscordEmbedPreview from './DiscordEmbedPreview.svelte';
+    import PairingGroupEditor from './commander_editor/PairingGroupEditor.svelte';
+    import SubTemplateEditor from './commander_editor/SubTemplateEditor.svelte';
 
     export let commanderId;
     export let commanderData;
@@ -302,10 +304,8 @@
 
         let text = `${BULLET_POINT} `;
 
-        // Use optional chaining for safe access
         if (row.cmd1 && emojiData?.commanders) {
             const c1 = emojiData.commanders.find((e) => e.key === row.cmd1);
-            // Count full emoji ID string for limits
             if (c1) text += `${c1.name} <:${c1.key}:${c1.emoji}>`;
         }
         if (row.cmd2 && emojiData?.commanders) {
@@ -320,6 +320,23 @@
         const item = list.find((i) => i.key === key);
         if (!item) return 'Unknown';
         return `${item.name} <:${item.key}:${item.emoji}>`;
+    }
+
+    function getAccessoryIcon(key) {
+        const a = accessoriesList.find((i) => i.key === key);
+        return a ? `https://cdn.discordapp.com/emojis/${a.emoji}.png` : '';
+    }
+    function getAccessoryName(key) {
+        const a = accessoriesList.find((i) => i.key === key);
+        return a ? a.name : 'Select Accessory';
+    }
+    function getFormationIcon(key) {
+        const f = formationsList.find((i) => i.key === key);
+        return f ? `https://cdn.discordapp.com/emojis/${f.emoji}.png` : '';
+    }
+    function getFormationName(key) {
+        const f = formationsList.find((i) => i.key === key);
+        return f ? f.name : 'Select Formation';
     }
 
     function handleButtonTypeChange(btnIdx, newTypeKey) {
@@ -551,30 +568,22 @@
         }
     }
 
-    function getCmdIcon(key) {
-        const c = emojiData?.commanders?.find((e) => e.key === key);
-        return c ? `https://cdn.discordapp.com/emojis/${c.emoji}.png` : null;
-    }
-    function getCmdName(key) {
-        const c = emojiData?.commanders?.find((e) => e.key === key);
-        return c ? c.name : 'Select...';
+    function handleGroupDropdown(event) {
+        openDropdownId = event.detail.id;
     }
 
-    function getAccessoryIcon(key) {
-        const a = accessoriesList.find((i) => i.key === key);
-        return a ? `https://cdn.discordapp.com/emojis/${a.emoji}.png` : '';
+    function handleGroupChange() {
+        pairingGroups = pairingGroups;
     }
-    function getAccessoryName(key) {
-        const a = accessoriesList.find((i) => i.key === key);
-        return a ? a.name : 'Select Accessory';
+
+    function handleSubTemplateChange(event) {
+        sub_recAccessories = event.detail.recAccessories;
+        sub_optAccessories = event.detail.optAccessories;
+        sub_formations = event.detail.formations;
     }
-    function getFormationIcon(key) {
-        const f = formationsList.find((i) => i.key === key);
-        return f ? `https://cdn.discordapp.com/emojis/${f.emoji}.png` : '';
-    }
-    function getFormationName(key) {
-        const f = formationsList.find((i) => i.key === key);
-        return f ? f.name : 'Select Formation';
+
+    function handleSubTemplateDropdown(event) {
+        openDropdownId = event.detail.id;
     }
 
     let previewPairingGroups = [];
@@ -704,268 +713,18 @@
                     {#if isMainTemplate}
                         <div class="groups-container">
                             {#each pairingGroups as group, gIdx (group.id)}
-                                <div class="pairing-group">
-                                    <div class="group-header">
-                                        <div style="flex:1; display: flex; flex-direction: column;">
-                                            <input
-                                                type="text"
-                                                aria-label="Group Title"
-                                                class="group-title-input"
-                                                bind:value={group.title}
-                                                maxlength={LIMITS.FIELD_NAME}
-                                            />
-                                            <span
-                                                class="char-mini"
-                                                class:error={group.title.length > LIMITS.FIELD_NAME}
-                                                style="text-align:right; margin-right: 10px;"
-                                                >{group.title.length}/{LIMITS.FIELD_NAME}</span
-                                            >
-                                        </div>
-                                        <button
-                                            class="btn-icon danger"
-                                            aria-label="Delete Group"
-                                            on:click={() =>
-                                                (pairingGroups = pairingGroups.filter((_, i) => i !== gIdx))}
-                                            ><i class="fas fa-trash"></i></button
-                                        >
-                                    </div>
-                                    <div class="rows-container">
-                                        {#each group.rows as row, rIdx (row.id)}
-                                            <div class="pairing-row">
-                                                <div class="row-type-toggle">
-                                                    <button
-                                                        aria-label="Pair Mode"
-                                                        class:active={row.type === 'pair'}
-                                                        on:click={() => (row.type = 'pair')}
-                                                        ><i class="fas fa-user-friends"></i></button
-                                                    >
-                                                    <button
-                                                        aria-label="Custom Text Mode"
-                                                        class:active={row.type === 'custom'}
-                                                        on:click={() => (row.type = 'custom')}
-                                                        ><i class="fas fa-quote-right"></i></button
-                                                    >
-                                                </div>
-
-                                                <div class="row-content">
-                                                    {#if row.type === 'pair'}
-                                                        <div class="custom-select">
-                                                            <div
-                                                                class="select-trigger"
-                                                                role="button"
-                                                                tabindex="0"
-                                                                on:keydown={(e) =>
-                                                                    handleKeyEnter(e, (ev) =>
-                                                                        toggleDropdown(`g${gIdx}r${rIdx}s1`, ev),
-                                                                    )}
-                                                                on:click={(e) =>
-                                                                    toggleDropdown(`g${gIdx}r${rIdx}s1`, e)}
-                                                            >
-                                                                {#if row.cmd1}
-                                                                    <div class="trigger-content">
-                                                                        <img
-                                                                            src={getCmdIcon(row.cmd1)}
-                                                                            alt=""
-                                                                            class="select-icon"
-                                                                        />
-                                                                        <span>{getCmdName(row.cmd1)}</span>
-                                                                    </div>
-                                                                {:else}
-                                                                    <span class="placeholder">Select...</span>
-                                                                {/if}
-                                                            </div>
-
-                                                            {#if openDropdownId === `g${gIdx}r${rIdx}s1`}
-                                                                <div class="select-options">
-                                                                    <div
-                                                                        class="search-container"
-                                                                        role="button"
-                                                                        tabindex="0"
-                                                                        on:click={handleSearchClick}
-                                                                        on:keydown={handleSearchClick}
-                                                                    >
-                                                                        <input
-                                                                            type="text"
-                                                                            class="dropdown-search-input"
-                                                                            placeholder="Search Commander..."
-                                                                            bind:value={dropdownSearch}
-                                                                            on:keydown|stopPropagation
-                                                                        />
-                                                                    </div>
-
-                                                                    {#each sortedCommanders.filter((c) => c.name
-                                                                            .toLowerCase()
-                                                                            .includes(dropdownSearch.toLowerCase())) as c}
-                                                                        <div
-                                                                            class="option"
-                                                                            role="button"
-                                                                            tabindex="0"
-                                                                            on:keydown={(e) =>
-                                                                                handleKeyEnter(e, () => {
-                                                                                    row.cmd1 = c.key;
-                                                                                    openDropdownId = null;
-                                                                                    pairingGroups = pairingGroups;
-                                                                                })}
-                                                                            on:click={() => {
-                                                                                row.cmd1 = c.key;
-                                                                                openDropdownId = null;
-                                                                                pairingGroups = pairingGroups;
-                                                                            }}
-                                                                        >
-                                                                            <img
-                                                                                src={`https://cdn.discordapp.com/emojis/${c.emoji}.png`}
-                                                                                alt=""
-                                                                                class="select-icon"
-                                                                            />
-                                                                            {c.name}
-                                                                        </div>
-                                                                    {/each}
-                                                                    {#if sortedCommanders.filter((c) => c.name
-                                                                            .toLowerCase()
-                                                                            .includes(dropdownSearch.toLowerCase())).length === 0}
-                                                                        <div
-                                                                            class="option disabled"
-                                                                            style="opacity: 0.6; cursor: default;"
-                                                                        >
-                                                                            No results
-                                                                        </div>
-                                                                    {/if}
-                                                                </div>
-                                                            {/if}
-                                                        </div>
-
-                                                        <span class="sep">|</span>
-
-                                                        <div class="custom-select">
-                                                            <div
-                                                                class="select-trigger"
-                                                                role="button"
-                                                                tabindex="0"
-                                                                on:keydown={(e) =>
-                                                                    handleKeyEnter(e, (ev) =>
-                                                                        toggleDropdown(`g${gIdx}r${rIdx}s2`, ev),
-                                                                    )}
-                                                                on:click={(e) =>
-                                                                    toggleDropdown(`g${gIdx}r${rIdx}s2`, e)}
-                                                            >
-                                                                {#if row.cmd2}
-                                                                    <div class="trigger-content">
-                                                                        <img
-                                                                            src={getCmdIcon(row.cmd2)}
-                                                                            alt=""
-                                                                            class="select-icon"
-                                                                        />
-                                                                        <span>{getCmdName(row.cmd2)}</span>
-                                                                    </div>
-                                                                {:else}
-                                                                    <span class="placeholder">Select...</span>
-                                                                {/if}
-                                                            </div>
-
-                                                            {#if openDropdownId === `g${gIdx}r${rIdx}s2`}
-                                                                <div class="select-options">
-                                                                    <div
-                                                                        class="search-container"
-                                                                        role="button"
-                                                                        tabindex="0"
-                                                                        on:click={handleSearchClick}
-                                                                        on:keydown={handleSearchClick}
-                                                                    >
-                                                                        <input
-                                                                            type="text"
-                                                                            class="dropdown-search-input"
-                                                                            placeholder="Search Commander..."
-                                                                            bind:value={dropdownSearch}
-                                                                            on:keydown|stopPropagation
-                                                                        />
-                                                                    </div>
-
-                                                                    {#each sortedCommanders.filter((c) => c.name
-                                                                            .toLowerCase()
-                                                                            .includes(dropdownSearch.toLowerCase())) as c}
-                                                                        <div
-                                                                            class="option"
-                                                                            role="button"
-                                                                            tabindex="0"
-                                                                            on:keydown={(e) =>
-                                                                                handleKeyEnter(e, () => {
-                                                                                    row.cmd2 = c.key;
-                                                                                    openDropdownId = null;
-                                                                                    pairingGroups = pairingGroups;
-                                                                                })}
-                                                                            on:click={() => {
-                                                                                row.cmd2 = c.key;
-                                                                                openDropdownId = null;
-                                                                                pairingGroups = pairingGroups;
-                                                                            }}
-                                                                        >
-                                                                            <img
-                                                                                src={`https://cdn.discordapp.com/emojis/${c.emoji}.png`}
-                                                                                alt=""
-                                                                                class="select-icon"
-                                                                            />
-                                                                            {c.name}
-                                                                        </div>
-                                                                    {/each}
-                                                                    {#if sortedCommanders.filter((c) => c.name
-                                                                            .toLowerCase()
-                                                                            .includes(dropdownSearch.toLowerCase())).length === 0}
-                                                                        <div
-                                                                            class="option disabled"
-                                                                            style="opacity: 0.6; cursor: default;"
-                                                                        >
-                                                                            No results
-                                                                        </div>
-                                                                    {/if}
-                                                                </div>
-                                                            {/if}
-                                                        </div>
-                                                    {:else}
-                                                        <input
-                                                            type="text"
-                                                            aria-label="Custom text"
-                                                            class="custom-text-input"
-                                                            bind:value={row.customText}
-                                                        />
-                                                    {/if}
-                                                </div>
-                                                <button
-                                                    class="btn-icon"
-                                                    aria-label="Remove Row"
-                                                    on:click={() => {
-                                                        group.rows = group.rows.filter((_, i) => i !== rIdx);
-                                                        pairingGroups = pairingGroups;
-                                                    }}><i class="fas fa-minus"></i></button
-                                                >
-                                            </div>
-                                        {/each}
-
-                                        <button
-                                            class="add-btn-modern"
-                                            on:click={() => {
-                                                group.rows = [
-                                                    ...group.rows,
-                                                    { id: Date.now(), type: 'pair', cmd1: null, cmd2: null },
-                                                ];
-                                                pairingGroups = pairingGroups;
-                                            }}>+ Add Row</button
-                                        >
-                                    </div>
-                                    {#each pairingGroups as group, gIdx (group.id)}
-                                        {@const currentLen = getGroupValueLength(group)}
-                                        <div class="pairing-group">
-                                            <div class="group-footer-info">
-                                                <span
-                                                    class="char-count"
-                                                    class:warning={currentLen > LIMITS.FIELD_VALUE * 0.9}
-                                                    class:error={currentLen > LIMITS.FIELD_VALUE}
-                                                >
-                                                    Field Value: {currentLen} / {LIMITS.FIELD_VALUE}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    {/each}
-                                </div>
+                                <PairingGroupEditor
+                                    {group}
+                                    groupIndex={gIdx}
+                                    commanders={sortedCommanders}
+                                    {emojiData}
+                                    {openDropdownId}
+                                    on:change={handleGroupChange}
+                                    on:remove={() => {
+                                        pairingGroups = pairingGroups.filter((_, i) => i !== gIdx);
+                                    }}
+                                    on:dropdown={handleGroupDropdown}
+                                />
                             {/each}
                             <button
                                 class="add-btn-modern group-add"
@@ -1061,360 +820,16 @@
                             {/if}
                         </div>
                     {:else}
-                        <div class="sub-field-group">
-                            <div class="group-label">Recommended Accessories</div>
-                            <div class="row">
-                                <div class="custom-select">
-                                    <div
-                                        class="select-trigger"
-                                        role="button"
-                                        tabindex="0"
-                                        on:keydown={(e) => handleKeyEnter(e, (ev) => toggleDropdown('recAcc1', ev))}
-                                        on:click={(e) => toggleDropdown('recAcc1', e)}
-                                    >
-                                        <div class="trigger-content">
-                                            {#if sub_recAccessories[0]}
-                                                {getAccessoryName(sub_recAccessories[0])}
-                                                <img
-                                                    src={getAccessoryIcon(sub_recAccessories[0])}
-                                                    alt=""
-                                                    class="select-icon"
-                                                />
-                                            {:else}
-                                                <span class="placeholder">Accessory 1</span>
-                                            {/if}
-                                        </div>
-                                        <i class="fas fa-chevron-down"></i>
-                                    </div>
-                                    {#if openDropdownId === 'recAcc1'}
-                                        <div class="select-options">
-                                            <div
-                                                class="search-container"
-                                                role="button"
-                                                tabindex="0"
-                                                on:click={handleSearchClick}
-                                                on:keydown={handleSearchClick}
-                                            >
-                                                <input
-                                                    type="text"
-                                                    class="dropdown-search-input"
-                                                    placeholder="Search Accessory..."
-                                                    bind:value={dropdownSearch}
-                                                    on:keydown|stopPropagation
-                                                />
-                                            </div>
-
-                                            <div
-                                                class="option"
-                                                role="button"
-                                                tabindex="0"
-                                                on:keydown={(e) =>
-                                                    handleKeyEnter(e, () => {
-                                                        sub_recAccessories[0] = null;
-                                                        openDropdownId = null;
-                                                        sub_recAccessories = sub_recAccessories;
-                                                    })}
-                                                on:click={() => {
-                                                    sub_recAccessories[0] = null;
-                                                    openDropdownId = null;
-                                                    sub_recAccessories = sub_recAccessories;
-                                                }}
-                                            >
-                                                None
-                                            </div>
-                                            {#each accessoriesList.filter((a) => a.name
-                                                    .toLowerCase()
-                                                    .includes(dropdownSearch.toLowerCase())) as a}
-                                                <div
-                                                    class="option"
-                                                    role="button"
-                                                    tabindex="0"
-                                                    on:keydown={(e) =>
-                                                        handleKeyEnter(e, () => {
-                                                            sub_recAccessories[0] = a.key;
-                                                            openDropdownId = null;
-                                                            sub_recAccessories = sub_recAccessories;
-                                                        })}
-                                                    on:click={() => {
-                                                        sub_recAccessories[0] = a.key;
-                                                        openDropdownId = null;
-                                                        sub_recAccessories = sub_recAccessories;
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={`https://cdn.discordapp.com/emojis/${a.emoji}.png`}
-                                                        alt=""
-                                                        class="select-icon"
-                                                    />
-                                                    {a.name}
-                                                </div>
-                                            {/each}
-                                        </div>
-                                    {/if}
-                                </div>
-                                <span class="sep">+</span>
-
-                                <div class="custom-select">
-                                    <div
-                                        class="select-trigger"
-                                        role="button"
-                                        tabindex="0"
-                                        on:keydown={(e) => handleKeyEnter(e, (ev) => toggleDropdown('recAcc2', ev))}
-                                        on:click={(e) => toggleDropdown('recAcc2', e)}
-                                    >
-                                        <div class="trigger-content">
-                                            {#if sub_recAccessories[1]}
-                                                {getAccessoryName(sub_recAccessories[1])}
-                                                <img
-                                                    src={getAccessoryIcon(sub_recAccessories[1])}
-                                                    alt=""
-                                                    class="select-icon"
-                                                />
-                                            {:else}
-                                                <span class="placeholder">Accessory 2</span>
-                                            {/if}
-                                        </div>
-                                        <i class="fas fa-chevron-down"></i>
-                                    </div>
-
-                                    {#if openDropdownId === 'recAcc2'}
-                                        <div class="select-options">
-                                            <div
-                                                class="search-container"
-                                                role="button"
-                                                tabindex="0"
-                                                on:click={handleSearchClick}
-                                                on:keydown={handleSearchClick}
-                                            >
-                                                <input
-                                                    type="text"
-                                                    class="dropdown-search-input"
-                                                    placeholder="Search Accessory..."
-                                                    bind:value={dropdownSearch}
-                                                    on:keydown|stopPropagation
-                                                />
-                                            </div>
-
-                                            <div
-                                                class="option"
-                                                role="button"
-                                                tabindex="0"
-                                                on:keydown={(e) =>
-                                                    handleKeyEnter(e, () => {
-                                                        sub_recAccessories[1] = null;
-                                                        openDropdownId = null;
-                                                        sub_recAccessories = sub_recAccessories;
-                                                    })}
-                                                on:click={() => {
-                                                    sub_recAccessories[1] = null;
-                                                    openDropdownId = null;
-                                                    sub_recAccessories = sub_recAccessories;
-                                                }}
-                                            >
-                                                None
-                                            </div>
-                                            {#each accessoriesList.filter((a) => a.name
-                                                    .toLowerCase()
-                                                    .includes(dropdownSearch.toLowerCase())) as a}
-                                                <div
-                                                    class="option"
-                                                    role="button"
-                                                    tabindex="0"
-                                                    on:keydown={(e) =>
-                                                        handleKeyEnter(e, () => {
-                                                            sub_recAccessories[1] = a.key;
-                                                            openDropdownId = null;
-                                                            sub_recAccessories = sub_recAccessories;
-                                                        })}
-                                                    on:click={() => {
-                                                        sub_recAccessories[1] = a.key;
-                                                        openDropdownId = null;
-                                                        sub_recAccessories = sub_recAccessories;
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={`https://cdn.discordapp.com/emojis/${a.emoji}.png`}
-                                                        alt=""
-                                                        class="select-icon"
-                                                    />
-                                                    {a.name}
-                                                </div>
-                                            {/each}
-                                        </div>
-                                    {/if}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="sub-field-group">
-                            <div class="group-label">Optional Accessories</div>
-                            {#each sub_optAccessories as accKey, idx}
-                                <div class="pairing-row">
-                                    <div class="custom-select">
-                                        <div
-                                            class="select-trigger"
-                                            role="button"
-                                            tabindex="0"
-                                            on:keydown={(e) =>
-                                                handleKeyEnter(e, (ev) => toggleDropdown(`optAcc${idx}`, ev))}
-                                            on:click={(e) => toggleDropdown(`optAcc${idx}`, e)}
-                                        >
-                                            <div class="trigger-content">
-                                                {getAccessoryName(accKey)}
-                                                <img src={getAccessoryIcon(accKey)} alt="" class="select-icon" />
-                                            </div>
-                                        </div>
-
-                                        {#if openDropdownId === `optAcc${idx}`}
-                                            <div class="select-options">
-                                                <div
-                                                    class="search-container"
-                                                    role="button"
-                                                    tabindex="0"
-                                                    on:click={handleSearchClick}
-                                                    on:keydown={handleSearchClick}
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        class="dropdown-search-input"
-                                                        placeholder="Search Accessory..."
-                                                        bind:value={dropdownSearch}
-                                                        on:keydown|stopPropagation
-                                                    />
-                                                </div>
-
-                                                {#each accessoriesList.filter((a) => a.name
-                                                        .toLowerCase()
-                                                        .includes(dropdownSearch.toLowerCase())) as a}
-                                                    <div
-                                                        class="option"
-                                                        role="button"
-                                                        tabindex="0"
-                                                        on:keydown={(e) =>
-                                                            handleKeyEnter(e, () => {
-                                                                sub_optAccessories[idx] = a.key;
-                                                                openDropdownId = null;
-                                                                sub_optAccessories = sub_optAccessories;
-                                                            })}
-                                                        on:click={() => {
-                                                            sub_optAccessories[idx] = a.key;
-                                                            openDropdownId = null;
-                                                            sub_optAccessories = sub_optAccessories;
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={`https://cdn.discordapp.com/emojis/${a.emoji}.png`}
-                                                            alt=""
-                                                            class="select-icon"
-                                                        />
-                                                        {a.name}
-                                                    </div>
-                                                {/each}
-                                            </div>
-                                        {/if}
-                                    </div>
-
-                                    <button
-                                        class="btn-icon"
-                                        aria-label="Delete Accessory"
-                                        on:click={() => {
-                                            sub_optAccessories = sub_optAccessories.filter((_, i) => i !== idx);
-                                        }}><i class="fas fa-trash"></i></button
-                                    >
-                                </div>
-                            {/each}
-
-                            <button
-                                class="add-btn-modern"
-                                on:click={() => (sub_optAccessories = [...sub_optAccessories, accessoriesList[0].key])}
-                                >+ Add Accessory</button
-                            >
-                        </div>
-
-                        <div class="sub-field-group">
-                            <div class="group-label">Recommended Formations</div>
-                            {#each sub_formations as formKey, idx}
-                                <div class="pairing-row">
-                                    <div class="custom-select">
-                                        <div
-                                            class="select-trigger"
-                                            role="button"
-                                            tabindex="0"
-                                            on:keydown={(e) =>
-                                                handleKeyEnter(e, (ev) => toggleDropdown(`form${idx}`, ev))}
-                                            on:click={(e) => toggleDropdown(`form${idx}`, e)}
-                                        >
-                                            <div class="trigger-content">
-                                                {getFormationName(formKey)}
-                                                <img src={getFormationIcon(formKey)} alt="" class="select-icon" />
-                                            </div>
-                                        </div>
-
-                                        {#if openDropdownId === `form${idx}`}
-                                            <div class="select-options">
-                                                <div
-                                                    class="search-container"
-                                                    role="button"
-                                                    tabindex="0"
-                                                    on:click={handleSearchClick}
-                                                    on:keydown={handleSearchClick}
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        class="dropdown-search-input"
-                                                        placeholder="Search Formation..."
-                                                        bind:value={dropdownSearch}
-                                                        on:keydown|stopPropagation
-                                                    />
-                                                </div>
-
-                                                {#each formationsList.filter((f) => f.name
-                                                        .toLowerCase()
-                                                        .includes(dropdownSearch.toLowerCase())) as f}
-                                                    <div
-                                                        class="option"
-                                                        role="button"
-                                                        tabindex="0"
-                                                        on:keydown={(e) =>
-                                                            handleKeyEnter(e, () => {
-                                                                sub_formations[idx] = f.key;
-                                                                openDropdownId = null;
-                                                                sub_formations = sub_formations;
-                                                            })}
-                                                        on:click={() => {
-                                                            sub_formations[idx] = f.key;
-                                                            openDropdownId = null;
-                                                            sub_formations = sub_formations;
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={`https://cdn.discordapp.com/emojis/${f.emoji}.png`}
-                                                            alt=""
-                                                            class="select-icon"
-                                                        />
-                                                        {f.name}
-                                                    </div>
-                                                {/each}
-                                            </div>
-                                        {/if}
-                                    </div>
-
-                                    <button
-                                        class="btn-icon"
-                                        aria-label="Delete Formation"
-                                        on:click={() => {
-                                            sub_formations = sub_formations.filter((_, i) => i !== idx);
-                                        }}><i class="fas fa-trash"></i></button
-                                    >
-                                </div>
-                            {/each}
-
-                            <button
-                                class="add-btn-modern"
-                                on:click={() => (sub_formations = [...sub_formations, formationsList[0].key])}
-                                >+ Add Formation</button
-                            >
-                        </div>
+                        <SubTemplateEditor
+                            recAccessories={sub_recAccessories}
+                            optAccessories={sub_optAccessories}
+                            formations={sub_formations}
+                            {accessoriesList}
+                            {formationsList}
+                            {openDropdownId}
+                            on:change={handleSubTemplateChange}
+                            on:dropdown={handleSubTemplateDropdown}
+                        />
                     {/if}
 
                     <div class="total-count-bar" class:error={isTotalOverLimit}>
@@ -1754,32 +1169,6 @@
         overflow: hidden;
         white-space: nowrap;
     }
-    .placeholder {
-        color: var(--text-muted);
-        font-size: 0.85rem;
-    }
-    .pairing-group {
-        background: rgba(0, 0, 0, 0.1);
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    .group-header {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    .group-title-input {
-        flex: 1;
-        font-weight: bold;
-        background: transparent;
-        border: none;
-        border-bottom: 1px dashed var(--border-color);
-        border-radius: 0;
-        padding-left: 0;
-    }
     .pairing-row {
         display: flex;
         align-items: center;
@@ -1790,38 +1179,8 @@
         border-radius: 4px;
         border: 1px solid var(--border-color);
     }
-    .row-type-toggle {
-        display: flex;
-        background: var(--bg-tertiary);
-        border-radius: 4px;
-        border: 1px solid var(--border-color);
-    }
-    .row-type-toggle button {
-        background: none;
-        border: none;
-        color: var(--text-secondary);
-        padding: 5px 8px;
-        cursor: pointer;
-        opacity: 0.5;
-    }
-    .row-type-toggle button.active {
-        background: var(--accent-blue);
-        color: white;
-        opacity: 1;
-    }
-    .row-content {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        min-width: 0;
-    }
     .custom-text-input {
         width: 100%;
-    }
-    .sep {
-        color: var(--text-secondary);
-        opacity: 0.5;
     }
     .add-btn-modern {
         width: 100%;
@@ -1839,6 +1198,9 @@
         color: var(--accent-blue);
         border-color: var(--accent-blue);
     }
+    .group-add {
+        margin-top: 10px;
+    }
     .btn-icon {
         background: transparent;
         border: none;
@@ -1851,17 +1213,6 @@
     }
     .btn-icon.danger:hover {
         color: #ff4444;
-    }
-    .sub-field-group {
-        margin-bottom: 20px;
-    }
-    .sub-field-group .group-label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: var(--accent-blue);
-        border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-        padding-bottom: 4px;
     }
     .spacer {
         height: 10px;
@@ -2008,54 +1359,15 @@
         gap: 10px;
         margin-top: 20px;
     }
-    .search-container {
-        padding: 8px;
-        background: var(--bg-secondary);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        border-bottom: 1px solid var(--border-color);
-    }
-    .dropdown-search-input {
-        width: 100%;
-        background: var(--bg-primary);
-        border: 1px solid var(--border-color);
-        padding: 6px 8px;
-        border-radius: 4px;
-        color: var(--text-primary);
-        font-size: 0.85rem;
-    }
-    .dropdown-search-input:focus {
-        outline: none;
-        border-color: var(--accent-blue);
-    }
 
     .char-count {
         font-size: 0.7rem;
         color: var(--text-secondary);
         transition: color 0.2s;
     }
-    .char-count.warning {
-        color: #eab308;
-    }
     .char-count.error {
         color: #ef4444;
         font-weight: bold;
-    }
-    .char-mini {
-        font-size: 0.7rem;
-        color: var(--text-secondary);
-        pointer-events: none;
-    }
-    .char-mini.error {
-        color: #ef4444;
-        font-weight: bold;
-    }
-
-    .group-footer-info {
-        display: flex;
-        justify-content: flex-end;
-        padding-top: 5px;
     }
 
     .total-count-bar {

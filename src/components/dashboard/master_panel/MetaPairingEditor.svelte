@@ -1,6 +1,7 @@
 <script>
     import { createEventDispatcher, onMount, tick } from 'svelte';
     import { fly, fade, scale } from 'svelte/transition';
+    import MetaFieldEditor from './meta_editor/MetaFieldEditor.svelte';
 
     export let metaId;
     export let metaData;
@@ -16,7 +17,6 @@
 
     const BULLET_ID = '1366755663056867389';
     const BULLET_STRING = `<:bullet_point3:${BULLET_ID}>`;
-    const BULLET_IMG_URL = `https://cdn.discordapp.com/emojis/${BULLET_ID}.png`;
     const SEPARATOR = '\u3021';
 
     const LIMITS = {
@@ -34,7 +34,6 @@
     let openDropdownId = null;
     let saveState = 'idle';
     let showDiscardModal = false;
-    let dropdownSearch = '';
     let lightboxImage = null;
 
     $: sortedCommanders = (emojiData?.commanders || []).sort((a, b) => a.name.localeCompare(b.name));
@@ -164,14 +163,6 @@
         fields = fields.filter((_, i) => i !== idx);
     }
 
-    function addRow(fieldIdx) {
-        fields[fieldIdx].rows = [...fields[fieldIdx].rows, { id: Date.now(), cmd1: null, cmd2: null }];
-    }
-
-    function removeRow(fieldIdx, rowIdx) {
-        fields[fieldIdx].rows = fields[fieldIdx].rows.filter((_, i) => i !== rowIdx);
-    }
-
     function save() {
         if (isTotalOverLimit) {
             alert('Cannot save: Embed exceeds character limits.');
@@ -236,40 +227,16 @@
         }
     }
 
-    function toggleDropdown(id, event) {
-        event.stopPropagation();
-        dropdownSearch = '';
-        openDropdownId = openDropdownId === id ? null : id;
-        if (openDropdownId) {
-            setTimeout(() => {
-                const input = document.querySelector('.dropdown-search-input');
-                if (input) input.focus();
-            }, 50);
-        }
-    }
-
-    function handleSearchClick(event) {
-        event.stopPropagation();
-    }
-
     function handleWindowClick() {
         openDropdownId = null;
     }
 
-    function handleEnter(event, callback) {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            callback(event);
-        }
+    function handleFieldDropdown(event) {
+        openDropdownId = event.detail.id;
     }
 
-    function getCmdIcon(key) {
-        const c = sortedCommanders.find((e) => e.key === key);
-        return c ? `https://cdn.discordapp.com/emojis/${c.emoji}.png` : null;
-    }
-    function getCmdName(key) {
-        const c = sortedCommanders.find((e) => e.key === key);
-        return c ? c.name : 'Select...';
+    function handleFieldChange() {
+        fields = fields;
     }
 </script>
 
@@ -313,212 +280,15 @@
                 <div class="section-box" style="flex: 1;">
                     <h3>Pairing Groups</h3>
                     {#each fields as field, fIdx (field.id)}
-                        <div class="pairing-group">
-                            <div class="group-header">
-                                <div style="flex: 1; display: flex; flex-direction: column;">
-                                    <input
-                                        type="text"
-                                        class="group-title-input"
-                                        bind:value={field.name}
-                                        aria-label="Category Name"
-                                        placeholder="Category Name"
-                                        maxlength={LIMITS.FIELD_NAME}
-                                    />
-                                    <span
-                                        class="char-mini"
-                                        style="position: relative; right: auto; text-align: right; margin-top: 2px;"
-                                        class:error={field.name.length >= LIMITS.FIELD_NAME}
-                                        >{field.name.length}/{LIMITS.FIELD_NAME}</span
-                                    >
-                                </div>
-                                <button
-                                    class="btn-icon danger"
-                                    aria-label="Delete Category"
-                                    on:click={() => removeField(fIdx)}><i class="fas fa-trash"></i></button
-                                >
-                            </div>
-                            <div class="rows-container">
-                                {#each field.rows as row, rIdx}
-                                    <div class="pairing-row">
-                                        <div class="bullet-wrapper">
-                                            <img src={BULLET_IMG_URL} class="bullet-icon-static" alt="•" />
-                                        </div>
-
-                                        <div class="custom-select">
-                                            <div
-                                                class="select-trigger"
-                                                role="button"
-                                                tabindex="0"
-                                                on:click={(e) => toggleDropdown(`f${fIdx}r${rIdx}c1`, e)}
-                                                on:keydown={(e) =>
-                                                    handleEnter(e, () => toggleDropdown(`f${fIdx}r${rIdx}c1`, e))}
-                                            >
-                                                {#if row.cmd1}
-                                                    <div class="trigger-content">
-                                                        <img src={getCmdIcon(row.cmd1)} alt="" class="select-icon" />
-                                                        <span>{getCmdName(row.cmd1)}</span>
-                                                    </div>
-                                                {:else}
-                                                    <span class="placeholder">Select...</span>
-                                                {/if}
-                                            </div>
-
-                                            {#if openDropdownId === `f${fIdx}r${rIdx}c1`}
-                                                <div class="select-options">
-                                                    <div
-                                                        class="search-container"
-                                                        role="button"
-                                                        tabindex="0"
-                                                        on:click={handleSearchClick}
-                                                        on:keydown={handleSearchClick}
-                                                    >
-                                                        <input
-                                                            type="text"
-                                                            class="dropdown-search-input"
-                                                            placeholder="Search..."
-                                                            bind:value={dropdownSearch}
-                                                            on:keydown|stopPropagation
-                                                        />
-                                                    </div>
-
-                                                    {#each sortedCommanders.filter((c) => c.name
-                                                            .toLowerCase()
-                                                            .includes(dropdownSearch.toLowerCase())) as c}
-                                                        <div
-                                                            class="option"
-                                                            role="button"
-                                                            tabindex="0"
-                                                            on:click|stopPropagation={() => {
-                                                                row.cmd1 = c.key;
-                                                                openDropdownId = null;
-                                                            }}
-                                                            on:keydown|stopPropagation={(e) =>
-                                                                handleEnter(e, () => {
-                                                                    row.cmd1 = c.key;
-                                                                    openDropdownId = null;
-                                                                })}
-                                                        >
-                                                            <img
-                                                                src={`https://cdn.discordapp.com/emojis/${c.emoji}.png`}
-                                                                alt=""
-                                                                class="select-icon"
-                                                            />
-                                                            {c.name}
-                                                        </div>
-                                                    {/each}
-
-                                                    {#if sortedCommanders.filter((c) => c.name
-                                                            .toLowerCase()
-                                                            .includes(dropdownSearch.toLowerCase())).length === 0}
-                                                        <div
-                                                            class="option disabled"
-                                                            style="opacity: 0.5; cursor: default;"
-                                                        >
-                                                            No results
-                                                        </div>
-                                                    {/if}
-                                                </div>
-                                            {/if}
-                                        </div>
-
-                                        <span class="sep">|</span>
-
-                                        <div class="custom-select">
-                                            <div
-                                                class="select-trigger"
-                                                role="button"
-                                                tabindex="0"
-                                                on:click={(e) => toggleDropdown(`f${fIdx}r${rIdx}c2`, e)}
-                                                on:keydown={(e) =>
-                                                    handleEnter(e, () => toggleDropdown(`f${fIdx}r${rIdx}c2`, e))}
-                                            >
-                                                {#if row.cmd2}
-                                                    <div class="trigger-content">
-                                                        <img src={getCmdIcon(row.cmd2)} alt="" class="select-icon" />
-                                                        <span>{getCmdName(row.cmd2)}</span>
-                                                    </div>
-                                                {:else}
-                                                    <span class="placeholder">Select...</span>
-                                                {/if}
-                                            </div>
-
-                                            {#if openDropdownId === `f${fIdx}r${rIdx}c2`}
-                                                <div class="select-options">
-                                                    <div
-                                                        class="search-container"
-                                                        role="button"
-                                                        tabindex="0"
-                                                        on:click={handleSearchClick}
-                                                        on:keydown={handleSearchClick}
-                                                    >
-                                                        <input
-                                                            type="text"
-                                                            class="dropdown-search-input"
-                                                            placeholder="Search..."
-                                                            bind:value={dropdownSearch}
-                                                            on:keydown|stopPropagation
-                                                        />
-                                                    </div>
-
-                                                    {#each sortedCommanders.filter((c) => c.name
-                                                            .toLowerCase()
-                                                            .includes(dropdownSearch.toLowerCase())) as c}
-                                                        <div
-                                                            class="option"
-                                                            role="button"
-                                                            tabindex="0"
-                                                            on:click|stopPropagation={() => {
-                                                                row.cmd2 = c.key;
-                                                                openDropdownId = null;
-                                                            }}
-                                                            on:keydown|stopPropagation={(e) =>
-                                                                handleEnter(e, () => {
-                                                                    row.cmd2 = c.key;
-                                                                    openDropdownId = null;
-                                                                })}
-                                                        >
-                                                            <img
-                                                                src={`https://cdn.discordapp.com/emojis/${c.emoji}.png`}
-                                                                alt=""
-                                                                class="select-icon"
-                                                            />
-                                                            {c.name}
-                                                        </div>
-                                                    {/each}
-
-                                                    {#if sortedCommanders.filter((c) => c.name
-                                                            .toLowerCase()
-                                                            .includes(dropdownSearch.toLowerCase())).length === 0}
-                                                        <div
-                                                            class="option disabled"
-                                                            style="opacity: 0.5; cursor: default;"
-                                                        >
-                                                            No results
-                                                        </div>
-                                                    {/if}
-                                                </div>
-                                            {/if}
-                                        </div>
-
-                                        <button
-                                            class="btn-icon"
-                                            aria-label="Delete Row"
-                                            on:click={() => removeRow(fIdx, rIdx)}><i class="fas fa-minus"></i></button
-                                        >
-                                    </div>
-                                {/each}
-                                <button class="add-btn-modern" on:click={() => addRow(fIdx)}>+ Add Row</button>
-                            </div>
-                            <div class="group-footer-info">
-                                <span
-                                    class="char-count"
-                                    class:warning={getFieldLength(field) > LIMITS.FIELD_VALUE * 0.9}
-                                    class:error={getFieldLength(field) > LIMITS.FIELD_VALUE}
-                                >
-                                    Field Value: {getFieldLength(field)} / {LIMITS.FIELD_VALUE}
-                                </span>
-                            </div>
-                        </div>
+                        <MetaFieldEditor
+                            {field}
+                            fieldIndex={fIdx}
+                            commanders={sortedCommanders}
+                            {openDropdownId}
+                            on:change={handleFieldChange}
+                            on:remove={() => removeField(fIdx)}
+                            on:dropdown={handleFieldDropdown}
+                        />
                     {/each}
                     <button class="add-btn-modern group-add" on:click={addField}>+ Add Category</button>
 
@@ -542,7 +312,7 @@
                         <img src={BOT_ICON} alt="Bot" class="bot-avatar" />
                         <div class="header-info">
                             <span class="bot-name">{BOT_NAME}</span>
-                            <span class="bot-tag"><span class="bot-tag-check">✔</span>APP</span>
+                            <span class="bot-tag"><span class="bot-tag-check">&#10004;</span>APP</span>
                             <span class="timestamp">Today at 10:30 AM</span>
                         </div>
                     </div>
@@ -767,26 +537,11 @@
         font-size: 0.7rem;
         color: var(--text-secondary);
     }
-    .char-count.warning {
-        color: #eab308;
-    }
     .char-count.error {
         color: #ef4444;
         font-weight: bold;
     }
-    .char-mini {
-        font-size: 0.7rem;
-        color: var(--text-secondary);
-    }
-    .char-mini.error {
-        color: #ef4444;
-    }
 
-    .group-footer-info {
-        display: flex;
-        justify-content: flex-end;
-        padding-top: 5px;
-    }
     .total-count-bar {
         background: var(--bg-tertiary);
         padding: 10px 15px;
@@ -804,6 +559,23 @@
         border-color: #ef4444;
         background: rgba(239, 68, 68, 0.1);
         color: #ef4444;
+    }
+
+    .add-btn-modern {
+        width: 100%;
+        background: var(--bg-tertiary);
+        border: 1px dashed var(--border-color);
+        color: var(--text-secondary);
+        padding: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .add-btn-modern:hover {
+        color: var(--accent-blue);
+        border-color: var(--accent-blue);
+    }
+    .group-add {
+        margin-top: 10px;
     }
 
     .discord-preview {
@@ -1000,152 +772,6 @@
         transform: scale(1.01);
     }
 
-    .pairing-group {
-        background: rgba(0, 0, 0, 0.1);
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    .group-header {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    .group-title-input {
-        flex: 1;
-        font-weight: bold;
-        background: transparent;
-        border: none;
-        border-bottom: 1px dashed var(--border-color);
-        border-radius: 0;
-        padding-left: 0;
-    }
-
-    .pairing-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-        background: var(--bg-primary);
-        padding: 5px;
-        border-radius: 4px;
-        border: 1px solid var(--border-color);
-    }
-    .bullet-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-    }
-    .bullet-icon-static {
-        width: 18px;
-        height: 18px;
-        opacity: 0.5;
-        filter: grayscale(100%);
-    }
-
-    .custom-select {
-        position: relative;
-        flex: 1;
-        min-width: 0;
-    }
-    .select-trigger {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        background: var(--bg-tertiary);
-        border: 1px solid var(--border-color);
-        padding: 6px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        color: var(--text-primary);
-        font-size: 0.9rem;
-    }
-    .select-trigger:focus {
-        border-color: var(--accent-blue);
-        outline: none;
-    }
-    .select-options {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        z-index: 50;
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        max-height: 200px;
-        overflow-y: auto;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        margin-top: 4px;
-    }
-    .option {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px;
-        cursor: pointer;
-        color: var(--text-secondary);
-        font-size: 0.9rem;
-    }
-    .option:hover,
-    .option:focus {
-        background: var(--accent-blue-light);
-        color: white;
-        outline: none;
-    }
-    .select-icon {
-        width: 20px;
-        height: 20px;
-        object-fit: contain;
-    }
-    .trigger-content {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-    .placeholder {
-        color: var(--text-muted);
-        font-size: 0.85rem;
-    }
-    .sep {
-        color: var(--text-secondary);
-        opacity: 0.5;
-        margin: 0 5px;
-    }
-
-    .add-btn-modern {
-        width: 100%;
-        background: var(--bg-tertiary);
-        border: 1px dashed var(--border-color);
-        color: var(--text-secondary);
-        padding: 8px;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .add-btn-modern:hover {
-        color: var(--accent-blue);
-        border-color: var(--accent-blue);
-    }
-    .group-add {
-        margin-top: 10px;
-    }
-
-    .btn-icon {
-        background: transparent;
-        border: none;
-        color: var(--text-secondary);
-        cursor: pointer;
-    }
-    .btn-icon:hover {
-        color: #ef4444;
-    }
-
     .save-bar {
         position: fixed;
         bottom: 20px;
@@ -1258,28 +884,6 @@
         padding: 8px 16px;
         border-radius: 4px;
         cursor: pointer;
-    }
-
-    .search-container {
-        padding: 8px;
-        background: var(--bg-secondary);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        border-bottom: 1px solid var(--border-color);
-    }
-    .dropdown-search-input {
-        width: 100%;
-        background: var(--bg-primary);
-        border: 1px solid var(--border-color);
-        padding: 6px 8px;
-        border-radius: 4px;
-        color: var(--text-primary);
-        font-size: 0.85rem;
-    }
-    .dropdown-search-input:focus {
-        outline: none;
-        border-color: var(--accent-blue);
     }
 
     .lightbox-overlay {

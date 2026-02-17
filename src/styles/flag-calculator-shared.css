@@ -1,0 +1,83 @@
+/* ================================================
+   FLAG CALCULATOR — SHARED STYLES
+   Used by FlagInputSection, FlagResultSection, and parent FlagCostCalculator
+   ================================================ */
+
+/* ── Input Groups ── */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.input-group.compact {
+    gap: 4px;
+}
+
+.input-group.compact label {
+    font-size: 10px;
+}
+
+.input-group label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: var(--spacing-3);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+.input-group.compact input {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-xs);
+}
+
+.input-group input::placeholder {
+    color: var(--text-muted);
+}
+
+.input-group input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* ── Resource Icon Colors ── */
+.resource-input-icon.food,
+.rt-icon.food {
+    color: #a3e635;
+    background: rgba(163, 230, 53, 0.12);
+}
+.resource-input-icon.wood,
+.rt-icon.wood {
+    color: #f97316;
+    background: rgba(249, 115, 22, 0.12);
+}
+.resource-input-icon.stone,
+.rt-icon.stone {
+    color: #94a3b8;
+    background: rgba(148, 163, 184, 0.12);
+}
+.resource-input-icon.gold,
+.rt-icon.gold {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.12);
+}
+.resource-input-icon.crystal-res,
+.rt-icon.crystal-res {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+}
