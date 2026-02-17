@@ -10,15 +10,15 @@ interface GuildIdRecord {
     guild_id: string | number;
 }
 
-const users = new Hono<{ Bindings: Bindings, Variables: Variables }>();
+const users = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 users.use('*', authMiddleware);
 
 users.get('/@me', async (c) => {
     const user = c.get('user');
-    
+
     const userResponse = await fetch('https://discord.com/api/users/@me', {
-        headers: { 'Authorization': `Bearer ${user.accessToken}` }
+        headers: { Authorization: `Bearer ${user.accessToken}` },
     });
 
     if (userResponse.status === 401) {
@@ -31,8 +31,8 @@ users.get('/@me', async (c) => {
     if (!userResponse.ok) {
         return errors.internal(c, 'Failed to fetch user data from Discord');
     }
-    const userData = await userResponse.json() as DiscordUser;
-    
+    const userData = (await userResponse.json()) as DiscordUser;
+
     const activePatrons: string[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
 
     const calendarAdminIds = parseAdminIds(c.env.CALENDAR_ADMIN_IDS);
@@ -50,16 +50,14 @@ users.get('/@me', async (c) => {
         ...userData,
         is_active_patron: isActivePatron,
         is_calendar_admin: isCalendarAdmin,
-        is_master_admin: isMasterAdmin
+        is_master_admin: isMasterAdmin,
     });
 });
 
 users.get('/settings', async (c) => {
     const user = c.get('user');
-    const result = await c.env.DB.prepare(
-        'SELECT settings FROM user_settings WHERE user_id = ?'
-    ).bind(user.id).first();
-    
+    const result = await c.env.DB.prepare('SELECT settings FROM user_settings WHERE user_id = ?').bind(user.id).first();
+
     return c.json(result ? JSON.parse(result.settings as string) : {});
 });
 
@@ -71,8 +69,10 @@ users.post('/settings', async (c) => {
 
     await c.env.DB.prepare(
         `INSERT INTO user_settings (user_id, settings) VALUES (?, ?)
-         ON CONFLICT(user_id) DO UPDATE SET settings = excluded.settings`
-    ).bind(user.id, JSON.stringify(validation.data)).run();
+         ON CONFLICT(user_id) DO UPDATE SET settings = excluded.settings`,
+    )
+        .bind(user.id, JSON.stringify(validation.data))
+        .run();
 
     return c.json({ status: 'success' });
 });
@@ -81,7 +81,7 @@ users.get('/guilds', async (c) => {
     const user = c.get('user');
 
     const response = await fetch('https://discord.com/api/users/@me/guilds', {
-        headers: { 'Authorization': `Bearer ${user.accessToken}` }
+        headers: { Authorization: `Bearer ${user.accessToken}` },
     });
 
     if (response.status === 401) {
@@ -95,28 +95,24 @@ users.get('/guilds', async (c) => {
         return errors.internal(c, 'Failed to fetch guilds from Discord');
     }
 
-    const discordGuilds = await response.json() as DiscordGuild[];
-    let activeBotGuildIds = new Set<string>();
+    const discordGuilds = (await response.json()) as DiscordGuild[];
+    const activeBotGuildIds = new Set<string>();
 
     try {
         const [{ results: authResults }, { results: bypassResults }] = await Promise.all([
-            c.env.BOT_DB.prepare(
-                `SELECT guild_id FROM guild_authorizations WHERE is_active = 1`
-            ).all(),
-            c.env.BOT_DB.prepare(
-                `SELECT guild_id FROM guild_bypass`
-            ).all()
+            c.env.BOT_DB.prepare(`SELECT guild_id FROM guild_authorizations WHERE is_active = 1`).all(),
+            c.env.BOT_DB.prepare(`SELECT guild_id FROM guild_bypass`).all(),
         ]);
         if (authResults) (authResults as GuildIdRecord[]).forEach((r) => activeBotGuildIds.add(r.guild_id.toString()));
-        if (bypassResults) (bypassResults as GuildIdRecord[]).forEach((r) => activeBotGuildIds.add(r.guild_id.toString()));
-
+        if (bypassResults)
+            (bypassResults as GuildIdRecord[]).forEach((r) => activeBotGuildIds.add(r.guild_id.toString()));
     } catch (e) {
-        console.error("Database error fetching guilds:", e);
+        console.error('Database error fetching guilds:', e);
         return errors.internal(c, e);
     }
 
     if (user.id === c.env.MASTER_OVERRIDE_ID) {
-        const discordGuildMap = new Map(discordGuilds.map(g => [g.id, g]));
+        const discordGuildMap = new Map(discordGuilds.map((g) => [g.id, g]));
         const allBotGuilds = Array.from(activeBotGuildIds);
 
         const promises = allBotGuilds.map(async (gid) => {
@@ -126,13 +122,15 @@ users.get('/guilds', async (c) => {
             }
             try {
                 const res = await fetch(`https://discord.com/api/guilds/${gid}`, {
-                    headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` }
+                    headers: { Authorization: `Bot ${c.env.DISCORD_BOT_TOKEN}` },
                 });
                 if (res.ok) {
-                    const g = await res.json() as DiscordGuild;
+                    const g = (await res.json()) as DiscordGuild;
                     return { id: g.id, name: g.name, icon: g.icon };
                 }
-            } catch { /* Guild fetch failed, use fallback */ }
+            } catch {
+                /* Guild fetch failed, use fallback */
+            }
             return { id: gid, name: `Unknown Server (${gid})`, icon: null };
         });
 
@@ -141,7 +139,7 @@ users.get('/guilds', async (c) => {
         return c.json(fullList);
     }
 
-    const adminGuilds = discordGuilds.filter(g => {
+    const adminGuilds = discordGuilds.filter((g) => {
         const perms = BigInt(g.permissions);
         const ADMIN = 0x8n;
         const MANAGE_GUILD = 0x20n;
@@ -149,8 +147,8 @@ users.get('/guilds', async (c) => {
     });
 
     const validServers = adminGuilds
-        .filter(g => activeBotGuildIds.has(g.id))
-        .map(g => ({ id: g.id, name: g.name, icon: g.icon }));
+        .filter((g) => activeBotGuildIds.has(g.id))
+        .map((g) => ({ id: g.id, name: g.name, icon: g.icon }));
 
     validServers.sort((a, b) => a.name.localeCompare(b.name));
     return c.json(validServers);

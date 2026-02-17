@@ -1,8 +1,8 @@
 <script>
     import { onMount } from 'svelte';
-    
+
     export let user;
-    
+
     const MASTER_ID = '285201373266575361';
     $: isMasterUser = user && user.id === MASTER_ID;
 
@@ -11,9 +11,9 @@
         { id: 'events', label: 'Events', icon: 'fa-calendar-alt' },
         { id: 'bundles', label: 'Bundles', icon: 'fa-box-open' },
         { id: 'meta_lineups', label: 'Meta Pairings', icon: 'fa-users' },
-        { id: 'aliases', label: 'Aliases', icon: 'fa-id-badge' }
+        { id: 'aliases', label: 'Aliases', icon: 'fa-id-badge' },
     ];
-    
+
     let activeSource = 'commanders';
     let backups = [];
     let loading = false;
@@ -28,35 +28,40 @@
         backups = [];
         try {
             const history = await window.auth.fetchWithAuth(`/api/admin/data/backup_history:${source}`);
-            
+
             if (Array.isArray(history)) {
                 backups = history.sort((a, b) => b.timestamp - a.timestamp);
             }
         } catch (e) {
             console.error(e);
-            error = "Failed to load backup history.";
+            error = 'Failed to load backup history.';
         } finally {
             loading = false;
         }
     }
 
     async function handleRestore(backup) {
-        if (!confirm(`🚨 DANGER: RESTORE ${activeSource.toUpperCase()}?\n\nTarget Date: ${backup.date}\n\nThis will overwrite the CURRENT LIVE data. The current state will be saved as a safety backup before this happens.`)) return;
-        
+        if (
+            !confirm(
+                `🚨 DANGER: RESTORE ${activeSource.toUpperCase()}?\n\nTarget Date: ${backup.date}\n\nThis will overwrite the CURRENT LIVE data. The current state will be saved as a safety backup before this happens.`,
+            )
+        )
+            return;
+
         restoring = true;
         try {
             await window.auth.fetchWithAuth(`/api/admin/data/${activeSource}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     data: backup.data,
-                    logDetails: `Restored ${activeSource} from backup dated ${backup.date}`
-                })
+                    logDetails: `Restored ${activeSource} from backup dated ${backup.date}`,
+                }),
             });
 
-            alert("✅ Restoration successful.");
+            alert('✅ Restoration successful.');
             loadBackups(activeSource);
         } catch (e) {
-            alert("❌ Restore failed. Check console.");
+            alert('❌ Restore failed. Check console.');
             console.error(e);
         } finally {
             restoring = false;
@@ -67,7 +72,7 @@
 <div class="panel-container">
     <div class="dashboard-header">
         <h1><i class="fas fa-history"></i> Data Recovery</h1>
-        
+
         {#if !isMasterUser}
             <div class="locked-badge"><i class="fas fa-lock"></i> Master Admin Only</div>
         {/if}
@@ -83,21 +88,28 @@
     {:else}
         <div class="source-tabs">
             {#each DATA_SOURCES as source}
-                <button 
-                    class="tab-btn" 
+                <button
+                    class="tab-btn"
                     class:active={activeSource === source.id}
-                    on:click={() => activeSource = source.id}
+                    on:click={() => (activeSource = source.id)}
                 >
-                    <i class="fas {source.icon}"></i> {source.label}
+                    <i class="fas {source.icon}"></i>
+                    {source.label}
                 </button>
             {/each}
         </div>
 
         <div class="panel-content">
             {#if loading}
-                <div class="state-msg"><i class="fas fa-circle-notch fa-spin"></i><p>Loading history for {activeSource}...</p></div>
+                <div class="state-msg">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                    <p>Loading history for {activeSource}...</p>
+                </div>
             {:else if error}
-                <div class="state-msg error"><i class="fas fa-exclamation-triangle"></i><p>{error}</p></div>
+                <div class="state-msg error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>{error}</p>
+                </div>
             {:else if backups.length === 0}
                 <div class="state-msg">
                     <i class="fas fa-folder-open"></i>
@@ -119,8 +131,12 @@
                                 <tr>
                                     <td class="date-cell">
                                         <div class="date-wrapper">
-                                            <span class="date-main">{new Date(backup.timestamp).toLocaleDateString()}</span>
-                                            <span class="date-sub">{new Date(backup.timestamp).toLocaleTimeString()}</span>
+                                            <span class="date-main"
+                                                >{new Date(backup.timestamp).toLocaleDateString()}</span
+                                            >
+                                            <span class="date-sub"
+                                                >{new Date(backup.timestamp).toLocaleTimeString()}</span
+                                            >
                                         </div>
                                     </td>
                                     <td class="key-cell">
@@ -131,8 +147,8 @@
                                         {/if}
                                     </td>
                                     <td class="action-cell">
-                                        <button 
-                                            class="restore-btn" 
+                                        <button
+                                            class="restore-btn"
                                             disabled={restoring}
                                             on:click={() => handleRestore(backup)}
                                         >
@@ -154,32 +170,175 @@
 </div>
 
 <style>
-    .key-cell code { background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; color: var(--text-secondary); font-size: 0.85rem; font-family: monospace; }
-    
-    .panel-container { height: 100%; display: flex; flex-direction: column; gap: 20px; }
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
-    .dashboard-header h1 { margin: 0; font-size: 1.8rem; color: var(--text-primary); display: flex; align-items: center; gap: 12px; }
-    .locked-badge { background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; border: 1px solid rgba(239, 68, 68, 0.2); }
-    .access-denied { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); opacity: 0.7; }
-    .access-denied i { font-size: 4rem; margin-bottom: 20px; color: #ef4444; }
-    .access-denied h2 { margin: 0 0 10px 0; color: var(--text-primary); }
-    .source-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
-    .tab-btn { background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; transition: all 0.2s; }
-    .tab-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
-    .tab-btn.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
-    .table-wrapper { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
-    .backup-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .backup-table th { background: var(--bg-tertiary); padding: 15px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
-    .backup-table td { padding: 15px; border-top: 1px solid var(--border-color); color: var(--text-primary); }
-    .backup-table tr:hover td { background: var(--bg-tertiary); }
-    .date-wrapper { display: flex; flex-direction: column; }
-    .date-main { font-weight: 600; }
-    .date-sub { font-size: 0.8rem; color: var(--text-secondary); }
-    .tag-rescue { background: #eab308; color: black; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 8px; }
-    .restore-btn { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
-    .restore-btn:hover { background: #ef4444; color: white; }
-    .restore-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 15px; }
-    .state-msg i { font-size: 3rem; opacity: 0.5; }
-    .sub-text { font-size: 0.9rem; opacity: 0.7; }
+    .key-cell code {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 4px 8px;
+        border-radius: 4px;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        font-family: monospace;
+    }
+
+    .panel-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 15px;
+    }
+    .dashboard-header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .locked-badge {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .access-denied {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        opacity: 0.7;
+    }
+    .access-denied i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #ef4444;
+    }
+    .access-denied h2 {
+        margin: 0 0 10px 0;
+        color: var(--text-primary);
+    }
+    .source-tabs {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .tab-btn {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .tab-btn:hover {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+    .tab-btn.active {
+        background: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+    .table-wrapper {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .backup-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    .backup-table th {
+        background: var(--bg-tertiary);
+        padding: 15px;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+    .backup-table td {
+        padding: 15px;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-primary);
+    }
+    .backup-table tr:hover td {
+        background: var(--bg-tertiary);
+    }
+    .date-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+    .date-main {
+        font-weight: 600;
+    }
+    .date-sub {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+    .tag-rescue {
+        background: #eab308;
+        color: black;
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-left: 8px;
+    }
+    .restore-btn {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid #ef4444;
+        padding: 6px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .restore-btn:hover {
+        background: #ef4444;
+        color: white;
+    }
+    .restore-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .state-msg {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 300px;
+        color: var(--text-secondary);
+        gap: 15px;
+    }
+    .state-msg i {
+        font-size: 3rem;
+        opacity: 0.5;
+    }
+    .sub-text {
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
 </style>

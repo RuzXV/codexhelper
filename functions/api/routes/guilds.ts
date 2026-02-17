@@ -1,12 +1,35 @@
 import { Hono, Context } from 'hono';
 import type { D1PreparedStatement } from '@cloudflare/workers-types';
-import { Bindings, Variables, DiscordUser, DiscordChannel, DiscordRole, AllowedChannelRow, ArkSetupRow, ArkTeamRow, ArkSignupRow, MgeSettingsRow, MgeApplicationRow, ReminderSetupRow } from '../_types';
+import {
+    Bindings,
+    Variables,
+    DiscordUser,
+    DiscordChannel,
+    DiscordRole,
+    AllowedChannelRow,
+    ArkSetupRow,
+    ArkTeamRow,
+    ArkSignupRow,
+    MgeSettingsRow,
+    MgeApplicationRow,
+} from '../_types';
 import { errors } from '../_errors';
 import { authMiddleware } from '../_middleware';
 import { verifyGuildPatreonAccess, verifyGuildAdmin } from '../services/discord';
-import { CalendarSettingsSchema, ChannelActionSchema, ReminderBulkSchema, ArkAllianceSchema, ArkTeamSchema, ArkSignupSchema, ArkTagSchema, MgeSettingsSchema, MgeAcceptSchema, validateBody } from '../_validation';
+import {
+    CalendarSettingsSchema,
+    ChannelActionSchema,
+    ReminderBulkSchema,
+    ArkAllianceSchema,
+    ArkTeamSchema,
+    ArkSignupSchema,
+    ArkTagSchema,
+    MgeSettingsSchema,
+    MgeAcceptSchema,
+    validateBody,
+} from '../_validation';
 
-const guilds = new Hono<{ Bindings: Bindings, Variables: Variables }>();
+const guilds = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 guilds.use('*', authMiddleware);
 
@@ -34,21 +57,24 @@ guilds.use('/:guildId', async (c, next) => {
 });
 
 /** Verify the authenticated user is an admin of the requested guild (for read endpoints) */
-async function verifyGuildReadAccess(c: Context<{ Bindings: Bindings, Variables: Variables }>, guildId: string): Promise<boolean> {
+async function verifyGuildReadAccess(
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    guildId: string,
+): Promise<boolean> {
     return verifyGuildAdmin(c, guildId);
 }
 
 guilds.get('/:guildId/calendar', async (c) => {
     const { guildId } = c.req.param();
-    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const [setup, personalization] = await Promise.all([
-        c.env.BOT_DB.prepare(
-            "SELECT channel_id, create_discord_events FROM event_calendar_setups WHERE guild_id = ?"
-        ).bind(guildId).first(),
-        c.env.BOT_DB.prepare(
-            "SELECT anchor_date, anchor_cycle_id FROM egg_hammer_personalization WHERE guild_id = ?"
-        ).bind(guildId).first()
+        c.env.BOT_DB.prepare('SELECT channel_id, create_discord_events FROM event_calendar_setups WHERE guild_id = ?')
+            .bind(guildId)
+            .first(),
+        c.env.BOT_DB.prepare('SELECT anchor_date, anchor_cycle_id FROM egg_hammer_personalization WHERE guild_id = ?')
+            .bind(guildId)
+            .first(),
     ]);
 
     const config = {
@@ -58,7 +84,7 @@ guilds.get('/:guildId/calendar', async (c) => {
         anchor_date: personalization?.anchor_date || null,
         anchor_cycle_id: personalization?.anchor_cycle_id ?? 0,
         last_event: 'egg',
-        last_egg_pattern: ''
+        last_egg_pattern: '',
     };
 
     return c.json({ config });
@@ -70,41 +96,44 @@ guilds.post('/:guildId/calendar', async (c) => {
     const validation = validateBody(CalendarSettingsSchema, body);
     if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) {
-        return c.json({
-             error: 'Unauthorized: Only the Patreon subscriber who authorized this server can modify settings.'
-        }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) {
+        return c.json(
+            {
+                error: 'Unauthorized: Only the Patreon subscriber who authorized this server can modify settings.',
+            },
+            403,
+        );
     }
 
-    const {
-        channel_id,
-        create_discord_events,
-        is_personalized,
-        reference_date,
-        reference_type,
-        reference_cycle_id
-    } = validation.data;
+    const { channel_id, create_discord_events, is_personalized, reference_date, reference_type, reference_cycle_id } =
+        validation.data;
 
     const now = Date.now() / 1000;
 
     if (channel_id && channel_id !== 'none') {
-        await c.env.BOT_DB.prepare(`
+        await c.env.BOT_DB.prepare(
+            `
             INSERT INTO event_calendar_setups (guild_id, channel_id, message_id, create_discord_events, is_active)
             VALUES (?, ?, 0, ?, 1)
             ON CONFLICT(guild_id) DO UPDATE SET
                 channel_id = excluded.channel_id,
                 create_discord_events = excluded.create_discord_events,
                 is_active = 1
-        `).bind(guildId, channel_id, create_discord_events ? 1 : 0).run();
+        `,
+        )
+            .bind(guildId, channel_id, create_discord_events ? 1 : 0)
+            .run();
     } else {
-        await c.env.BOT_DB.prepare("UPDATE event_calendar_setups SET is_active = 0 WHERE guild_id = ?").bind(guildId).run();
+        await c.env.BOT_DB.prepare('UPDATE event_calendar_setups SET is_active = 0 WHERE guild_id = ?')
+            .bind(guildId)
+            .run();
     }
 
-    const calendarAction = (channel_id && channel_id !== 'none') ? 'refresh_calendar' : 'deactivate';
+    const calendarAction = channel_id && channel_id !== 'none' ? 'refresh_calendar' : 'deactivate';
 
     if (is_personalized && reference_date) {
         const inputDate = new Date(reference_date);
-        let anchorDate = new Date(inputDate);
+        const anchorDate = new Date(inputDate);
 
         if (reference_type === 'hammer') {
             anchorDate.setUTCDate(anchorDate.getUTCDate() - 14);
@@ -113,13 +142,17 @@ guilds.post('/:guildId/calendar', async (c) => {
         const anchorDateStr = anchorDate.toISOString().split('T')[0];
         const anchorCycleId = reference_cycle_id ?? 0;
 
-        await c.env.BOT_DB.prepare(`
+        await c.env.BOT_DB.prepare(
+            `
             INSERT INTO egg_hammer_personalization (guild_id, anchor_date, anchor_cycle_id)
             VALUES (?, ?, ?)
             ON CONFLICT(guild_id) DO UPDATE SET
                 anchor_date = excluded.anchor_date,
                 anchor_cycle_id = excluded.anchor_cycle_id
-        `).bind(guildId, anchorDateStr, anchorCycleId).run();
+        `,
+        )
+            .bind(guildId, anchorDateStr, anchorCycleId)
+            .run();
 
         // Also sync to the user's personal settings so the public calendar page reflects the rotation
         const user = c.get('user');
@@ -127,30 +160,33 @@ guilds.post('/:guildId/calendar', async (c) => {
             const userSettings = JSON.stringify({ anchorDate: anchorDateStr, anchorCycleId });
             await c.env.DB.prepare(
                 `INSERT INTO user_settings (user_id, settings) VALUES (?, ?)
-                 ON CONFLICT(user_id) DO UPDATE SET settings = excluded.settings`
-            ).bind(user.id, userSettings).run();
+                 ON CONFLICT(user_id) DO UPDATE SET settings = excluded.settings`,
+            )
+                .bind(user.id, userSettings)
+                .run();
         }
-
     } else if (!is_personalized) {
-        await c.env.BOT_DB.prepare("DELETE FROM egg_hammer_personalization WHERE guild_id = ?").bind(guildId).run();
-        await c.env.BOT_DB.prepare("DELETE FROM guild_event_sequence WHERE guild_id = ?").bind(guildId).run();
+        await c.env.BOT_DB.prepare('DELETE FROM egg_hammer_personalization WHERE guild_id = ?').bind(guildId).run();
+        await c.env.BOT_DB.prepare('DELETE FROM guild_event_sequence WHERE guild_id = ?').bind(guildId).run();
     }
 
     const payload = JSON.stringify({ guild_id: guildId, action: calendarAction });
-    await c.env.BOT_DB.prepare(
-        "INSERT INTO system_events (type, payload, created_at) VALUES ('CALENDAR_UPDATE', ?, ?)"
-    ).bind(payload, now).run();
+    await c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('CALENDAR_UPDATE', ?, ?)")
+        .bind(payload, now)
+        .run();
 
     return c.json({ success: true });
 });
 
 guilds.get('/:guildId/settings/channels', async (c) => {
     const { guildId } = c.req.param();
-    if (!await verifyGuildReadAccess(c, guildId)) return errors.forbidden(c);
+    if (!(await verifyGuildReadAccess(c, guildId))) return errors.forbidden(c);
     try {
         const { results } = await c.env.BOT_DB.prepare(
-            "SELECT command_group, channel_id FROM allowed_channels WHERE guild_id = ?"
-        ).bind(guildId).all();
+            'SELECT command_group, channel_id FROM allowed_channels WHERE guild_id = ?',
+        )
+            .bind(guildId)
+            .all();
 
         const settings: Record<string, string> = {};
         if (results) {
@@ -172,10 +208,13 @@ guilds.post('/:guildId/settings/channels', async (c) => {
     const validation = validateBody(ChannelActionSchema, body);
     if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) {
-        return c.json({
-            error: 'Unauthorized: Only the Patreon subscriber who authorized this server can modify settings.'
-        }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) {
+        return c.json(
+            {
+                error: 'Unauthorized: Only the Patreon subscriber who authorized this server can modify settings.',
+            },
+            403,
+        );
     }
 
     const { command_group, channel_id, action } = validation.data;
@@ -183,23 +222,24 @@ guilds.post('/:guildId/settings/channels', async (c) => {
     const now = Date.now() / 1000;
     const eventPayload = JSON.stringify({ guild_id: guildId });
     const notifyStmt = c.env.BOT_DB.prepare(
-        "INSERT INTO system_events (type, payload, created_at) VALUES ('CHANNEL_UPDATE', ?, ?)"
+        "INSERT INTO system_events (type, payload, created_at) VALUES ('CHANNEL_UPDATE', ?, ?)",
     ).bind(eventPayload, now);
 
     if (action === 'Add Channel') {
         if (!channel_id || typeof channel_id !== 'string') return c.json({ error: 'Invalid channel ID' }, 400);
         await c.env.BOT_DB.batch([
             c.env.BOT_DB.prepare(
-                "INSERT OR REPLACE INTO allowed_channels (guild_id, command_group, channel_id) VALUES (?, ?, ?)"
+                'INSERT OR REPLACE INTO allowed_channels (guild_id, command_group, channel_id) VALUES (?, ?, ?)',
             ).bind(guildId, command_group, channel_id),
-            notifyStmt
+            notifyStmt,
         ]);
     } else {
         await c.env.BOT_DB.batch([
-            c.env.BOT_DB.prepare(
-                "DELETE FROM allowed_channels WHERE guild_id = ? AND command_group = ?"
-            ).bind(guildId, command_group),
-            notifyStmt
+            c.env.BOT_DB.prepare('DELETE FROM allowed_channels WHERE guild_id = ? AND command_group = ?').bind(
+                guildId,
+                command_group,
+            ),
+            notifyStmt,
         ]);
     }
 
@@ -208,10 +248,10 @@ guilds.post('/:guildId/settings/channels', async (c) => {
 
 guilds.get('/:guildId/channels', async (c) => {
     const { guildId } = c.req.param();
-    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const response = await fetch(`https://discord.com/api/guilds/${guildId}/channels`, {
-        headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` } 
+        headers: { Authorization: `Bot ${c.env.DISCORD_BOT_TOKEN}` },
     });
 
     if (!response.ok) {
@@ -219,7 +259,7 @@ guilds.get('/:guildId/channels', async (c) => {
         return c.json({ channels: [] });
     }
 
-    const channels = await response.json() as DiscordChannel[];
+    const channels = (await response.json()) as DiscordChannel[];
 
     const validChannels = channels
         .filter((ch) => [0, 5, 15].includes(ch.type))
@@ -231,15 +271,25 @@ guilds.get('/:guildId/channels', async (c) => {
 
 guilds.get('/:guildId/features', async (c) => {
     const { guildId } = c.req.param();
-    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const [ark, mge, ruins, altar, bypassRecord, authRecord] = await Promise.all([
-        c.env.BOT_DB.prepare("SELECT channel_id FROM ark_of_osiris_setups WHERE guild_id = ?").bind(guildId).first(),
-        c.env.BOT_DB.prepare("SELECT signup_channel_id FROM mge_settings WHERE guild_id = ?").bind(guildId).first(),
-        c.env.BOT_DB.prepare("SELECT channel_id, is_active FROM reminder_setups WHERE guild_id = ? AND reminder_type = 'ruins'").bind(guildId).first(),
-        c.env.BOT_DB.prepare("SELECT channel_id, is_active FROM reminder_setups WHERE guild_id = ? AND reminder_type = 'altar'").bind(guildId).first(),
-        c.env.BOT_DB.prepare("SELECT 1 FROM guild_bypass WHERE guild_id = ?").bind(guildId).first(),
-        c.env.BOT_DB.prepare("SELECT authorized_by_discord_user_id FROM guild_authorizations WHERE guild_id = ?").bind(guildId).first()
+        c.env.BOT_DB.prepare('SELECT channel_id FROM ark_of_osiris_setups WHERE guild_id = ?').bind(guildId).first(),
+        c.env.BOT_DB.prepare('SELECT signup_channel_id FROM mge_settings WHERE guild_id = ?').bind(guildId).first(),
+        c.env.BOT_DB.prepare(
+            "SELECT channel_id, is_active FROM reminder_setups WHERE guild_id = ? AND reminder_type = 'ruins'",
+        )
+            .bind(guildId)
+            .first(),
+        c.env.BOT_DB.prepare(
+            "SELECT channel_id, is_active FROM reminder_setups WHERE guild_id = ? AND reminder_type = 'altar'",
+        )
+            .bind(guildId)
+            .first(),
+        c.env.BOT_DB.prepare('SELECT 1 FROM guild_bypass WHERE guild_id = ?').bind(guildId).first(),
+        c.env.BOT_DB.prepare('SELECT authorized_by_discord_user_id FROM guild_authorizations WHERE guild_id = ?')
+            .bind(guildId)
+            .first(),
     ]);
 
     let discordUserIdToFetch = null;
@@ -256,29 +306,29 @@ guilds.get('/:guildId/features', async (c) => {
     if (discordUserIdToFetch) {
         try {
             const discordRes = await fetch(`https://discord.com/api/users/${discordUserIdToFetch}`, {
-                headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` }
+                headers: { Authorization: `Bot ${c.env.DISCORD_BOT_TOKEN}` },
             });
             if (discordRes.ok) {
-                const user = await discordRes.json() as DiscordUser;
+                const user = (await discordRes.json()) as DiscordUser;
                 patron = {
                     id: user.id,
                     username: user.username,
                     discriminator: user.discriminator,
                     avatar: user.avatar,
-                    is_bypass: isBypass
+                    is_bypass: isBypass,
                 };
             }
         } catch (e) {
-            console.error("Failed to fetch user details", e);
+            console.error('Failed to fetch user details', e);
         }
     }
 
-    const toStr = (v: unknown) => v ? String(v) : null;
+    const toStr = (v: unknown) => (v ? String(v) : null);
     const features = {
         ark: { enabled: !!ark, channel_id: toStr(ark?.channel_id) },
         mge: { enabled: !!mge, channel_id: toStr(mge?.signup_channel_id) },
         ruins: { enabled: !!(ruins && ruins.is_active), channel_id: toStr(ruins?.channel_id) },
-        altar: { enabled: !!(altar && altar.is_active), channel_id: toStr(altar?.channel_id) }
+        altar: { enabled: !!(altar && altar.is_active), channel_id: toStr(altar?.channel_id) },
     };
 
     return c.json({ features, patron });
@@ -286,22 +336,23 @@ guilds.get('/:guildId/features', async (c) => {
 
 guilds.get('/:guildId/reminders', async (c) => {
     const { guildId } = c.req.param();
-    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const [reminders, customReminders] = await Promise.all([
-        c.env.BOT_DB.prepare("SELECT * FROM reminder_setups WHERE guild_id = ?").bind(guildId).all(),
-        c.env.BOT_DB.prepare("SELECT * FROM custom_reminders WHERE guild_id = ?").bind(guildId).all()
+        c.env.BOT_DB.prepare('SELECT * FROM reminder_setups WHERE guild_id = ?').bind(guildId).all(),
+        c.env.BOT_DB.prepare('SELECT * FROM custom_reminders WHERE guild_id = ?').bind(guildId).all(),
     ]);
 
-    const castIds = (rows: Record<string, unknown>[]) => rows.map((r) => ({
-        ...r,
-        channel_id: r.channel_id ? String(r.channel_id) : r.channel_id,
-        role_id: r.role_id ? String(r.role_id) : r.role_id
-    }));
+    const castIds = (rows: Record<string, unknown>[]) =>
+        rows.map((r) => ({
+            ...r,
+            channel_id: r.channel_id ? String(r.channel_id) : r.channel_id,
+            role_id: r.role_id ? String(r.role_id) : r.role_id,
+        }));
 
     return c.json({
         reminders: castIds(reminders.results || []),
-        customReminders: castIds(customReminders.results || [])
+        customReminders: castIds(customReminders.results || []),
     });
 });
 
@@ -311,7 +362,7 @@ guilds.post('/:guildId/reminders', async (c) => {
     const validation = validateBody(ReminderBulkSchema, body);
     if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) {
+    if (!(await verifyGuildPatreonAccess(c, guildId))) {
         return c.json({ error: 'Unauthorized: Patreon access required.' }, 403);
     }
 
@@ -323,7 +374,8 @@ guilds.post('/:guildId/reminders', async (c) => {
     for (const r of reminders) {
         const intervals = r.reminder_intervals_seconds || '14400';
         statements.push(
-            c.env.BOT_DB.prepare(`
+            c.env.BOT_DB.prepare(
+                `
                 INSERT INTO reminder_setups (
                     guild_id, reminder_type, channel_id, is_active,
                     first_instance_ts, last_instance_ts, create_discord_event,
@@ -337,7 +389,8 @@ guilds.post('/:guildId/reminders', async (c) => {
                     last_instance_ts = excluded.last_instance_ts,
                     create_discord_event = excluded.create_discord_event,
                     reminder_intervals_seconds = excluded.reminder_intervals_seconds
-            `).bind(
+            `,
+            ).bind(
                 guildId,
                 r.reminder_type,
                 r.channel_id || null,
@@ -345,8 +398,8 @@ guilds.post('/:guildId/reminders', async (c) => {
                 r.first_instance_ts || null,
                 r.last_instance_ts || null,
                 r.create_discord_event ? 1 : 0,
-                intervals
-            )
+                intervals,
+            ),
         );
     }
 
@@ -354,8 +407,8 @@ guilds.post('/:guildId/reminders', async (c) => {
         const placeholders = deletedCustomIds.map(() => '?').join(',');
         statements.push(
             c.env.BOT_DB.prepare(
-                `DELETE FROM custom_reminders WHERE guild_id = ? AND reminder_id IN (${placeholders})`
-            ).bind(guildId, ...deletedCustomIds)
+                `DELETE FROM custom_reminders WHERE guild_id = ? AND reminder_id IN (${placeholders})`,
+            ).bind(guildId, ...deletedCustomIds),
         );
     }
 
@@ -363,7 +416,8 @@ guilds.post('/:guildId/reminders', async (c) => {
         for (const cr of customReminders) {
             if (cr.reminder_id) {
                 statements.push(
-                    c.env.BOT_DB.prepare(`
+                    c.env.BOT_DB.prepare(
+                        `
                         UPDATE custom_reminders SET
                             channel_id = ?,
                             title = ?,
@@ -372,7 +426,8 @@ guilds.post('/:guildId/reminders', async (c) => {
                             repeat_interval_seconds = ?,
                             first_instance_ts = ?
                         WHERE guild_id = ? AND reminder_id = ?
-                    `).bind(
+                    `,
+                    ).bind(
                         cr.channel_id,
                         cr.title,
                         cr.message || '',
@@ -380,25 +435,27 @@ guilds.post('/:guildId/reminders', async (c) => {
                         cr.repeat_interval_seconds,
                         cr.first_instance_ts,
                         guildId,
-                        cr.reminder_id
-                    )
+                        cr.reminder_id,
+                    ),
                 );
             } else {
                 statements.push(
-                    c.env.BOT_DB.prepare(`
+                    c.env.BOT_DB.prepare(
+                        `
                         INSERT INTO custom_reminders (
                             guild_id, created_by_user_id, channel_id, title, message, role_id,
                             repeat_interval_seconds, first_instance_ts, reminder_intervals_seconds, is_active, create_discord_event
                         ) VALUES (?, 0, ?, ?, ?, ?, ?, ?, '300', 1, 0)
-                    `).bind(
+                    `,
+                    ).bind(
                         guildId,
                         cr.channel_id,
                         cr.title,
                         cr.message || '',
                         cr.role_id || null,
                         cr.repeat_interval_seconds,
-                        cr.first_instance_ts
-                    )
+                        cr.first_instance_ts,
+                    ),
                 );
             }
         }
@@ -413,16 +470,16 @@ guilds.post('/:guildId/reminders', async (c) => {
         const setupPayload = JSON.stringify({ guild_id: guildId, setup_types: setupTypes });
         statements.push(
             c.env.BOT_DB.prepare(
-                "INSERT INTO system_events (type, payload, created_at) VALUES ('REMINDER_SETUP', ?, ?)"
-            ).bind(setupPayload, now)
+                "INSERT INTO system_events (type, payload, created_at) VALUES ('REMINDER_SETUP', ?, ?)",
+            ).bind(setupPayload, now),
         );
     }
 
-    const payload = JSON.stringify({ guild_id: guildId, action: "refresh_reminders" });
+    const payload = JSON.stringify({ guild_id: guildId, action: 'refresh_reminders' });
     statements.push(
         c.env.BOT_DB.prepare(
-            "INSERT INTO system_events (type, payload, created_at) VALUES ('REMINDER_UPDATE', ?, ?)"
-        ).bind(payload, now)
+            "INSERT INTO system_events (type, payload, created_at) VALUES ('REMINDER_UPDATE', ?, ?)",
+        ).bind(payload, now),
     );
 
     await c.env.BOT_DB.batch(statements);
@@ -432,33 +489,37 @@ guilds.post('/:guildId/reminders', async (c) => {
 
 guilds.get('/:guildId/roles', async (c) => {
     const { guildId } = c.req.param();
-    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
     const response = await fetch(`https://discord.com/api/guilds/${guildId}/roles`, {
-        headers: { 'Authorization': `Bot ${c.env.DISCORD_BOT_TOKEN}` }
+        headers: { Authorization: `Bot ${c.env.DISCORD_BOT_TOKEN}` },
     });
     if (!response.ok) return c.json({ roles: [] });
-    const roles = await response.json() as DiscordRole[];
+    const roles = (await response.json()) as DiscordRole[];
     return c.json({ roles: roles.map((r) => ({ id: r.id, name: r.name, color: r.color })) });
 });
 
 guilds.get('/:guildId/ark/all', async (c) => {
     const { guildId } = c.req.param();
-    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
     try {
         const [{ results: setups }, { results: teams }, { results: signups }] = await Promise.all([
-            c.env.BOT_DB.prepare(
-                "SELECT * FROM ark_of_osiris_setups WHERE guild_id = ?"
-            ).bind(guildId).all(),
-            c.env.BOT_DB.prepare(
-                "SELECT * FROM ark_of_osiris_teams WHERE guild_id = ? ORDER BY team_number ASC"
-            ).bind(guildId).all(),
-            c.env.BOT_DB.prepare(
-                "SELECT * FROM ark_of_osiris_signups WHERE guild_id = ? ORDER BY signup_timestamp ASC"
-            ).bind(guildId).all()
+            c.env.BOT_DB.prepare('SELECT * FROM ark_of_osiris_setups WHERE guild_id = ?').bind(guildId).all(),
+            c.env.BOT_DB.prepare('SELECT * FROM ark_of_osiris_teams WHERE guild_id = ? ORDER BY team_number ASC')
+                .bind(guildId)
+                .all(),
+            c.env.BOT_DB.prepare('SELECT * FROM ark_of_osiris_signups WHERE guild_id = ? ORDER BY signup_timestamp ASC')
+                .bind(guildId)
+                .all(),
         ]);
 
         interface AllianceData {
-            config: { channel_id: string | null; admin_role_id: string | null; notification_role_id: string | null; reminder_interval: unknown; is_active: unknown };
+            config: {
+                channel_id: string | null;
+                admin_role_id: string | null;
+                notification_role_id: string | null;
+                reminder_interval: unknown;
+                is_active: unknown;
+            };
             teams: Record<number, { name: unknown; match_timestamp: unknown; cap: unknown; role_id: string | null }>;
             signups: Record<string, unknown>[];
         }
@@ -473,10 +534,10 @@ guilds.get('/:guildId/ark/all', async (c) => {
                         admin_role_id: row.admin_role_id ? String(row.admin_role_id) : null,
                         notification_role_id: row.tag_role_id ? String(row.tag_role_id) : null,
                         reminder_interval: row.reminder_interval_seconds,
-                        is_active: row.is_active
+                        is_active: row.is_active,
                     },
                     teams: {},
-                    signups: []
+                    signups: [],
                 };
             });
         }
@@ -489,7 +550,7 @@ guilds.get('/:guildId/ark/all', async (c) => {
                         name: row.team_name,
                         match_timestamp: row.next_match_timestamp,
                         cap: row.signup_cap,
-                        role_id: row.role_id ? String(row.role_id) : null
+                        role_id: row.role_id ? String(row.role_id) : null,
                     };
                 }
             });
@@ -506,7 +567,7 @@ guilds.get('/:guildId/ark/all', async (c) => {
 
         return c.json({ alliances });
     } catch (e) {
-        console.error("Failed to fetch Ark data:", e);
+        console.error('Failed to fetch Ark data:', e);
         return errors.internal(c, e);
     }
 });
@@ -517,13 +578,14 @@ guilds.post('/:guildId/ark/alliance', async (c) => {
     const validation = validateBody(ArkAllianceSchema, body);
     if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const { alliance_tag, channel_id, admin_role_id, notification_role_id, reminder_interval } = validation.data;
 
     try {
         await c.env.BOT_DB.batch([
-            c.env.BOT_DB.prepare(`
+            c.env.BOT_DB.prepare(
+                `
                 INSERT INTO ark_of_osiris_setups (guild_id, alliance_tag, channel_id, admin_role_id, tag_role_id, reminder_interval_seconds, is_active)
                 VALUES (?, ?, ?, ?, ?, ?, 1)
                 ON CONFLICT(guild_id, alliance_tag) DO UPDATE SET
@@ -532,16 +594,18 @@ guilds.post('/:guildId/ark/alliance', async (c) => {
                     tag_role_id = excluded.tag_role_id,
                     reminder_interval_seconds = excluded.reminder_interval_seconds,
                     is_active = 1
-            `).bind(
-                guildId, alliance_tag,
+            `,
+            ).bind(
+                guildId,
+                alliance_tag,
                 channel_id || null,
                 admin_role_id || null,
                 notification_role_id || null,
-                reminder_interval || 3600
+                reminder_interval || 3600,
             ),
             c.env.BOT_DB.prepare(
-                "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)"
-            ).bind(JSON.stringify({ guild_id: guildId }), Date.now() / 1000)
+                "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)",
+            ).bind(JSON.stringify({ guild_id: guildId }), Date.now() / 1000),
         ]);
 
         return c.json({ success: true });
@@ -552,15 +616,25 @@ guilds.post('/:guildId/ark/alliance', async (c) => {
 
 guilds.delete('/:guildId/ark/alliance/:tag', async (c) => {
     const { guildId, tag } = c.req.param();
-    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     await c.env.BOT_DB.batch([
-        c.env.BOT_DB.prepare("DELETE FROM ark_of_osiris_setups WHERE guild_id = ? AND alliance_tag = ?").bind(guildId, tag),
-        c.env.BOT_DB.prepare("DELETE FROM ark_of_osiris_teams WHERE guild_id = ? AND alliance_tag = ?").bind(guildId, tag),
-        c.env.BOT_DB.prepare("DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ?").bind(guildId, tag),
-        c.env.BOT_DB.prepare(
-            "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)"
-        ).bind(JSON.stringify({ guild_id: guildId }), Date.now() / 1000)
+        c.env.BOT_DB.prepare('DELETE FROM ark_of_osiris_setups WHERE guild_id = ? AND alliance_tag = ?').bind(
+            guildId,
+            tag,
+        ),
+        c.env.BOT_DB.prepare('DELETE FROM ark_of_osiris_teams WHERE guild_id = ? AND alliance_tag = ?').bind(
+            guildId,
+            tag,
+        ),
+        c.env.BOT_DB.prepare('DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ?').bind(
+            guildId,
+            tag,
+        ),
+        c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)").bind(
+            JSON.stringify({ guild_id: guildId }),
+            Date.now() / 1000,
+        ),
     ]);
 
     return c.json({ success: true });
@@ -572,7 +646,7 @@ guilds.post('/:guildId/ark/team', async (c) => {
     const validation = validateBody(ArkTeamSchema, body);
     if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const { alliance_tag, team_number, team_name, match_timestamp, signup_cap } = validation.data;
 
@@ -581,47 +655,54 @@ guilds.post('/:guildId/ark/team', async (c) => {
 
     try {
         const existing = await c.env.BOT_DB.prepare(
-            "SELECT 1 FROM ark_of_osiris_teams WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?"
-        ).bind(guildId, alliance_tag, teamNum).first();
+            'SELECT 1 FROM ark_of_osiris_teams WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?',
+        )
+            .bind(guildId, alliance_tag, teamNum)
+            .first();
 
         const teamStmt = existing
-            ? c.env.BOT_DB.prepare(`
+            ? c.env.BOT_DB.prepare(
+                  `
                 UPDATE ark_of_osiris_teams
                 SET team_name = ?, next_match_timestamp = ?, signup_cap = ?
                 WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?
-            `).bind(team_name, match_timestamp, cap, guildId, alliance_tag, teamNum)
-            : c.env.BOT_DB.prepare(`
+            `,
+              ).bind(team_name, match_timestamp, cap, guildId, alliance_tag, teamNum)
+            : c.env.BOT_DB.prepare(
+                  `
                 INSERT INTO ark_of_osiris_teams (guild_id, alliance_tag, team_number, team_name, next_match_timestamp, signup_cap, role_id)
                 VALUES (?, ?, ?, ?, ?, ?, 0)
-            `).bind(guildId, alliance_tag, teamNum, team_name, match_timestamp, cap);
+            `,
+              ).bind(guildId, alliance_tag, teamNum, team_name, match_timestamp, cap);
 
         await c.env.BOT_DB.batch([
             teamStmt,
             c.env.BOT_DB.prepare(
-                "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)"
-            ).bind(JSON.stringify({ guild_id: guildId }), Date.now() / 1000)
+                "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)",
+            ).bind(JSON.stringify({ guild_id: guildId }), Date.now() / 1000),
         ]);
 
         return c.json({ success: true });
     } catch (e) {
-        console.error("Failed to update ark team:", e);
+        console.error('Failed to update ark team:', e);
         return errors.internal(c, e);
     }
 });
 
 guilds.delete('/:guildId/ark/signup', async (c) => {
     const { guildId } = c.req.param();
-    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const { alliance_tag, in_game_name } = await c.req.json();
 
     await c.env.BOT_DB.batch([
         c.env.BOT_DB.prepare(
-            "DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ? AND in_game_name = ?"
+            'DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ? AND in_game_name = ?',
         ).bind(guildId, alliance_tag, in_game_name),
-        c.env.BOT_DB.prepare(
-            "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)"
-        ).bind(JSON.stringify({ guild_id: guildId }), Date.now() / 1000)
+        c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)").bind(
+            JSON.stringify({ guild_id: guildId }),
+            Date.now() / 1000,
+        ),
     ]);
 
     return c.json({ success: true });
@@ -630,20 +711,21 @@ guilds.delete('/:guildId/ark/signup', async (c) => {
 guilds.delete('/:guildId/ark/team/:alliance_tag/:team_number', async (c) => {
     const { guildId, alliance_tag, team_number } = c.req.param();
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) {
+    if (!(await verifyGuildPatreonAccess(c, guildId))) {
         return c.json({ error: 'Unauthorized' }, 403);
     }
 
     await c.env.BOT_DB.batch([
         c.env.BOT_DB.prepare(
-            "DELETE FROM ark_of_osiris_teams WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?"
+            'DELETE FROM ark_of_osiris_teams WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?',
         ).bind(guildId, alliance_tag, team_number),
         c.env.BOT_DB.prepare(
-            "DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?"
+            'DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ? AND team_number = ?',
         ).bind(guildId, alliance_tag, team_number),
-        c.env.BOT_DB.prepare(
-            "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)"
-        ).bind(JSON.stringify({ guild_id: guildId }), Date.now() / 1000)
+        c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)").bind(
+            JSON.stringify({ guild_id: guildId }),
+            Date.now() / 1000,
+        ),
     ]);
 
     return c.json({ success: true });
@@ -655,7 +737,7 @@ guilds.post('/:guildId/ark/signup', async (c) => {
     const validation = validateBody(ArkSignupSchema, body);
     if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const { alliance_tag, team_number, in_game_name } = validation.data;
 
@@ -667,14 +749,15 @@ guilds.post('/:guildId/ark/signup', async (c) => {
     // Then insert the new signup + system event atomically via batch.
     await c.env.BOT_DB.batch([
         c.env.BOT_DB.prepare(
-            "DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ? AND in_game_name = ?"
+            'DELETE FROM ark_of_osiris_signups WHERE guild_id = ? AND alliance_tag = ? AND in_game_name = ?',
         ).bind(guildId, alliance_tag, in_game_name),
         c.env.BOT_DB.prepare(
-            "INSERT INTO ark_of_osiris_signups (guild_id, alliance_tag, team_number, user_id, in_game_name, signup_timestamp) VALUES (?, ?, ?, ?, ?, ?)"
+            'INSERT INTO ark_of_osiris_signups (guild_id, alliance_tag, team_number, user_id, in_game_name, signup_timestamp) VALUES (?, ?, ?, ?, ?, ?)',
         ).bind(guildId, alliance_tag, team_number, placeholderUserId, in_game_name, nowTs),
-        c.env.BOT_DB.prepare(
-            "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)"
-        ).bind(JSON.stringify({ guild_id: guildId }), nowTs)
+        c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)").bind(
+            JSON.stringify({ guild_id: guildId }),
+            nowTs,
+        ),
     ]);
 
     return c.json({ success: true });
@@ -682,12 +765,14 @@ guilds.post('/:guildId/ark/signup', async (c) => {
 
 guilds.get('/:guildId/mge', async (c) => {
     const { guildId } = c.req.param();
-    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
     try {
         // Cast coordinator_role_id to TEXT in SQL to avoid JavaScript integer precision loss on Discord snowflake IDs
-        const setup = await c.env.BOT_DB.prepare(
-            "SELECT *, CAST(coordinator_role_id AS TEXT) as coordinator_role_id FROM mge_settings WHERE guild_id = ?"
-        ).bind(guildId).first() as Record<string, unknown> | null;
+        const setup = (await c.env.BOT_DB.prepare(
+            'SELECT *, CAST(coordinator_role_id AS TEXT) as coordinator_role_id FROM mge_settings WHERE guild_id = ?',
+        )
+            .bind(guildId)
+            .first()) as Record<string, unknown> | null;
 
         if (setup) {
             // Cast remaining Discord IDs to strings to match Discord API format
@@ -699,7 +784,7 @@ guilds.get('/:guildId/mge', async (c) => {
 
         return c.json({ config: setup || {} });
     } catch (e) {
-        console.error("Failed to load MGE settings:", e);
+        console.error('Failed to load MGE settings:', e);
         return errors.internal(c, e);
     }
 });
@@ -710,7 +795,7 @@ guilds.post('/:guildId/mge', async (c) => {
     const validation = validateBody(MgeSettingsSchema, body);
     if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) {
+    if (!(await verifyGuildPatreonAccess(c, guildId))) {
         return c.json({ error: 'Unauthorized' }, 403);
     }
 
@@ -718,23 +803,26 @@ guilds.post('/:guildId/mge', async (c) => {
 
     const mgePayload = JSON.stringify({ guild_id: guildId });
     await c.env.BOT_DB.batch([
-        c.env.BOT_DB.prepare(`
+        c.env.BOT_DB.prepare(
+            `
             UPDATE mge_settings SET
                 signup_channel_id = ?,
                 posted_signups_channel_id = ?,
                 ping_role_id = ?,
                 coordinator_role_id = ?
             WHERE guild_id = ?
-        `).bind(
+        `,
+        ).bind(
             signup_channel_id || null,
             posted_signups_channel_id || null,
             ping_role_id || null,
             coordinator_role_id || null,
-            guildId
+            guildId,
         ),
-        c.env.BOT_DB.prepare(
-            "INSERT INTO system_events (type, payload, created_at) VALUES ('MGE_UPDATE', ?, ?)"
-        ).bind(mgePayload, Date.now() / 1000)
+        c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('MGE_UPDATE', ?, ?)").bind(
+            mgePayload,
+            Date.now() / 1000,
+        ),
     ]);
 
     return c.json({ success: true });
@@ -744,11 +832,13 @@ guilds.post('/:guildId/mge', async (c) => {
 
 guilds.get('/:guildId/mge/applications', async (c) => {
     const { guildId } = c.req.param();
-    if (!await verifyGuildReadAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
     try {
-        const settings = await c.env.BOT_DB.prepare(
-            "SELECT current_mge_name, placement_points FROM mge_settings WHERE guild_id = ?"
-        ).bind(guildId).first() as MgeSettingsRow | null;
+        const settings = (await c.env.BOT_DB.prepare(
+            'SELECT current_mge_name, placement_points FROM mge_settings WHERE guild_id = ?',
+        )
+            .bind(guildId)
+            .first()) as MgeSettingsRow | null;
 
         if (!settings || !settings.current_mge_name) {
             return c.json({ mge_name: null, placement_points: '', applications: [], questions: [], rankings: [] });
@@ -758,14 +848,20 @@ guilds.get('/:guildId/mge/applications', async (c) => {
 
         const [appsResult, questionsResult, rankingsResult] = await Promise.all([
             c.env.BOT_DB.prepare(
-                "SELECT * FROM mge_applications WHERE guild_id = ? AND mge_name = ? ORDER BY submitted_at DESC"
-            ).bind(guildId, mgeName).all(),
+                'SELECT * FROM mge_applications WHERE guild_id = ? AND mge_name = ? ORDER BY submitted_at DESC',
+            )
+                .bind(guildId, mgeName)
+                .all(),
             c.env.BOT_DB.prepare(
-                "SELECT question_key, question_text, input_type, display_order, is_enabled FROM mge_questions WHERE guild_id = ? ORDER BY display_order ASC"
-            ).bind(guildId).all(),
+                'SELECT question_key, question_text, input_type, display_order, is_enabled FROM mge_questions WHERE guild_id = ? ORDER BY display_order ASC',
+            )
+                .bind(guildId)
+                .all(),
             c.env.BOT_DB.prepare(
-                "SELECT rank_spot, application_id, ingame_name, is_published, custom_score FROM mge_rankings WHERE guild_id = ? AND mge_name = ? ORDER BY rank_spot ASC"
-            ).bind(guildId, mgeName).all()
+                'SELECT rank_spot, application_id, ingame_name, is_published, custom_score FROM mge_rankings WHERE guild_id = ? AND mge_name = ? ORDER BY rank_spot ASC',
+            )
+                .bind(guildId, mgeName)
+                .all(),
         ]);
 
         return c.json({
@@ -773,10 +869,10 @@ guilds.get('/:guildId/mge/applications', async (c) => {
             placement_points: settings.placement_points || '',
             applications: appsResult.results || [],
             questions: questionsResult.results || [],
-            rankings: rankingsResult.results || []
+            rankings: rankingsResult.results || [],
         });
     } catch (e) {
-        console.error("Failed to fetch MGE applications:", e);
+        console.error('Failed to fetch MGE applications:', e);
         return errors.internal(c, e);
     }
 });
@@ -787,102 +883,106 @@ guilds.post('/:guildId/mge/applications/:appId/accept', async (c) => {
     const validation = validateBody(MgeAcceptSchema, body);
     if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const { rank_spot } = validation.data;
 
     try {
-        const settings = await c.env.BOT_DB.prepare(
-            "SELECT current_mge_name FROM mge_settings WHERE guild_id = ?"
-        ).bind(guildId).first() as MgeSettingsRow | null;
+        const settings = (await c.env.BOT_DB.prepare('SELECT current_mge_name FROM mge_settings WHERE guild_id = ?')
+            .bind(guildId)
+            .first()) as MgeSettingsRow | null;
         if (!settings?.current_mge_name) return errors.badRequest(c, 'No active MGE');
 
-        const app = await c.env.BOT_DB.prepare(
-            "SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?"
-        ).bind(appId, guildId).first() as MgeApplicationRow | null;
+        const app = (await c.env.BOT_DB.prepare(
+            'SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?',
+        )
+            .bind(appId, guildId)
+            .first()) as MgeApplicationRow | null;
         if (!app) return errors.notFound(c, 'Application');
 
-        const taken = await c.env.BOT_DB.prepare(
-            "SELECT ingame_name FROM mge_rankings WHERE guild_id = ? AND mge_name = ? AND rank_spot = ?"
-        ).bind(guildId, settings.current_mge_name, rank_spot).first() as { ingame_name: string } | null;
+        const taken = (await c.env.BOT_DB.prepare(
+            'SELECT ingame_name FROM mge_rankings WHERE guild_id = ? AND mge_name = ? AND rank_spot = ?',
+        )
+            .bind(guildId, settings.current_mge_name, rank_spot)
+            .first()) as { ingame_name: string } | null;
         if (taken) return errors.conflict(c, `Rank ${rank_spot} is already taken by ${taken.ingame_name}`);
 
         const acceptPayload = JSON.stringify({ guild_id: guildId, application_id: parseInt(appId), rank_spot });
         await c.env.BOT_DB.batch([
             c.env.BOT_DB.prepare(
-                "UPDATE mge_applications SET application_status = 'ACCEPTED', rank_spot = ? WHERE application_id = ?"
+                "UPDATE mge_applications SET application_status = 'ACCEPTED', rank_spot = ? WHERE application_id = ?",
             ).bind(rank_spot, appId),
             c.env.BOT_DB.prepare(
-                "INSERT INTO mge_rankings (guild_id, rank_spot, application_id, mge_name, ingame_name, is_published) VALUES (?, ?, ?, ?, ?, 0)"
+                'INSERT INTO mge_rankings (guild_id, rank_spot, application_id, mge_name, ingame_name, is_published) VALUES (?, ?, ?, ?, ?, 0)',
             ).bind(guildId, rank_spot, appId, settings.current_mge_name, app.ingame_name),
             c.env.BOT_DB.prepare(
-                "INSERT INTO system_events (type, payload, created_at) VALUES ('MGE_APP_ACCEPT', ?, ?)"
-            ).bind(acceptPayload, Date.now() / 1000)
+                "INSERT INTO system_events (type, payload, created_at) VALUES ('MGE_APP_ACCEPT', ?, ?)",
+            ).bind(acceptPayload, Date.now() / 1000),
         ]);
 
         return c.json({ success: true });
     } catch (e) {
-        console.error("MGE accept error:", e);
+        console.error('MGE accept error:', e);
         return errors.internal(c, e);
     }
 });
 
 guilds.post('/:guildId/mge/applications/:appId/reject', async (c) => {
     const { guildId, appId } = c.req.param();
-    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     try {
         const app = await c.env.BOT_DB.prepare(
-            "SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?"
-        ).bind(appId, guildId).first();
+            'SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?',
+        )
+            .bind(appId, guildId)
+            .first();
         if (!app) return errors.notFound(c, 'Application');
 
         const rejectPayload = JSON.stringify({ guild_id: guildId, application_id: parseInt(appId) });
         await c.env.BOT_DB.batch([
             c.env.BOT_DB.prepare(
-                "UPDATE mge_applications SET application_status = 'REJECTED', rank_spot = NULL WHERE application_id = ?"
+                "UPDATE mge_applications SET application_status = 'REJECTED', rank_spot = NULL WHERE application_id = ?",
             ).bind(appId),
+            c.env.BOT_DB.prepare('DELETE FROM mge_rankings WHERE application_id = ?').bind(appId),
             c.env.BOT_DB.prepare(
-                "DELETE FROM mge_rankings WHERE application_id = ?"
-            ).bind(appId),
-            c.env.BOT_DB.prepare(
-                "INSERT INTO system_events (type, payload, created_at) VALUES ('MGE_APP_REJECT', ?, ?)"
-            ).bind(rejectPayload, Date.now() / 1000)
+                "INSERT INTO system_events (type, payload, created_at) VALUES ('MGE_APP_REJECT', ?, ?)",
+            ).bind(rejectPayload, Date.now() / 1000),
         ]);
 
         return c.json({ success: true });
     } catch (e) {
-        console.error("MGE reject error:", e);
+        console.error('MGE reject error:', e);
         return errors.internal(c, e);
     }
 });
 
 guilds.post('/:guildId/mge/applications/:appId/restore', async (c) => {
     const { guildId, appId } = c.req.param();
-    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     try {
         const app = await c.env.BOT_DB.prepare(
-            "SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?"
-        ).bind(appId, guildId).first();
+            'SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?',
+        )
+            .bind(appId, guildId)
+            .first();
         if (!app) return errors.notFound(c, 'Application');
 
         const restorePayload = JSON.stringify({ guild_id: guildId, application_id: parseInt(appId) });
         await c.env.BOT_DB.batch([
             c.env.BOT_DB.prepare(
-                "UPDATE mge_applications SET application_status = 'PENDING', rank_spot = NULL WHERE application_id = ?"
+                "UPDATE mge_applications SET application_status = 'PENDING', rank_spot = NULL WHERE application_id = ?",
             ).bind(appId),
+            c.env.BOT_DB.prepare('DELETE FROM mge_rankings WHERE application_id = ?').bind(appId),
             c.env.BOT_DB.prepare(
-                "DELETE FROM mge_rankings WHERE application_id = ?"
-            ).bind(appId),
-            c.env.BOT_DB.prepare(
-                "INSERT INTO system_events (type, payload, created_at) VALUES ('MGE_APP_RESTORE', ?, ?)"
-            ).bind(restorePayload, Date.now() / 1000)
+                "INSERT INTO system_events (type, payload, created_at) VALUES ('MGE_APP_RESTORE', ?, ?)",
+            ).bind(restorePayload, Date.now() / 1000),
         ]);
 
         return c.json({ success: true });
     } catch (e) {
-        console.error("MGE restore error:", e);
+        console.error('MGE restore error:', e);
         return errors.internal(c, e);
     }
 });
@@ -895,14 +995,14 @@ guilds.post('/:guildId/ark/refresh-embed', async (c) => {
     const validation = validateBody(ArkTagSchema, body);
     if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const { alliance_tag } = validation.data;
 
     const payload = JSON.stringify({ guild_id: guildId, alliance_tag });
-    await c.env.BOT_DB.prepare(
-        "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)"
-    ).bind(payload, Date.now() / 1000).run();
+    await c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_UPDATE', ?, ?)")
+        .bind(payload, Date.now() / 1000)
+        .run();
 
     return c.json({ success: true });
 });
@@ -913,14 +1013,14 @@ guilds.post('/:guildId/ark/post-signup', async (c) => {
     const validation = validateBody(ArkTagSchema, body);
     if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) return c.json({ error: 'Unauthorized' }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const { alliance_tag } = validation.data;
 
     const payload = JSON.stringify({ guild_id: guildId, alliance_tag });
-    await c.env.BOT_DB.prepare(
-        "INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_POST_SIGNUP', ?, ?)"
-    ).bind(payload, Date.now() / 1000).run();
+    await c.env.BOT_DB.prepare("INSERT INTO system_events (type, payload, created_at) VALUES ('ARK_POST_SIGNUP', ?, ?)")
+        .bind(payload, Date.now() / 1000)
+        .run();
 
     return c.json({ success: true });
 });
@@ -928,20 +1028,21 @@ guilds.post('/:guildId/ark/post-signup', async (c) => {
 guilds.delete('/:guildId/authorization', async (c) => {
     const { guildId } = c.req.param();
 
-    if (!await verifyGuildPatreonAccess(c, guildId)) {
-        return c.json({
-            error: 'Unauthorized: Only the Patreon subscriber who authorized this server can deauthorize it.'
-        }, 403);
+    if (!(await verifyGuildPatreonAccess(c, guildId))) {
+        return c.json(
+            {
+                error: 'Unauthorized: Only the Patreon subscriber who authorized this server can deauthorize it.',
+            },
+            403,
+        );
     }
 
     try {
-        await c.env.BOT_DB.prepare(
-            "DELETE FROM guild_authorizations WHERE guild_id = ?"
-        ).bind(guildId).run();
+        await c.env.BOT_DB.prepare('DELETE FROM guild_authorizations WHERE guild_id = ?').bind(guildId).run();
 
         return c.json({ success: true });
     } catch (e) {
-        console.error("Failed to deauthorize guild:", e);
+        console.error('Failed to deauthorize guild:', e);
         return errors.internal(c, e);
     }
 });

@@ -1,16 +1,19 @@
 ---
 import { Image } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
-import '../../styles/mail.css'; 
+import '../../styles/mail.css';
 import templatesData from '../../data/templates.json';
 
-type ImageModule = { default: { src: string; } };
+type ImageModule = { default: { src: string } };
 
 import colourwheel from '../../assets/images/mail/icons/colourwheel.webp';
 import copyIcon from '../../assets/images/mail/icons/tools_copy_icon.webp';
 import loadIcon from '../../assets/images/mail/icons/tools_load_icon.webp';
 
-const allTemplatePreviews: Record<string, unknown> = import.meta.glob('../../assets/images/mail/template_previews/*.webp', { eager: true });
+const allTemplatePreviews: Record<string, unknown> = import.meta.glob(
+    '../../assets/images/mail/template_previews/*.webp',
+    { eager: true },
+);
 
 const previewPathMap: Record<string, string> = {};
 for (const path in allTemplatePreviews) {
@@ -21,20 +24,21 @@ for (const path in allTemplatePreviews) {
     }
 }
 
-const processedTemplatesData = templatesData.map(template => {
-    const originalImagePath = template.image; 
+const processedTemplatesData = templatesData.map((template) => {
+    const originalImagePath = template.image;
     const filename = originalImagePath.split('/').pop();
-    
+
     if (filename && previewPathMap[filename]) {
         return {
             ...template,
-            image: previewPathMap[filename]
+            image: previewPathMap[filename],
         };
     }
     console.warn(`Template preview image not found for: ${filename}`);
     return template;
 });
 ---
+
 <Layout
     title="Alliance Mail Generator"
     description="Create formatted in-game alliance mails for Rise of Kingdoms. Use templates, custom colors, gradients, and styling to make professional looking mails."
@@ -42,24 +46,24 @@ const processedTemplatesData = templatesData.map(template => {
     bodyClass="has-sub-nav"
 >
     <script type="application/ld+json" slot="head-scripts">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "ROK Alliance Mail Generator",
-        "description": "Create formatted in-game alliance mails for Rise of Kingdoms with templates and styling",
-        "url": "https://codexhelper.com/tools/mail/",
-        "applicationCategory": "GameApplication",
-        "operatingSystem": "Any",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "author": {
-            "@type": "Organization",
-            "name": "Codex Helper"
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "ROK Alliance Mail Generator",
+            "description": "Create formatted in-game alliance mails for Rise of Kingdoms with templates and styling",
+            "url": "https://codexhelper.com/tools/mail/",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "author": {
+                "@type": "Organization",
+                "name": "Codex Helper"
+            }
         }
-    }
     </script>
 
     <script define:vars={{ templatesData: processedTemplatesData }}>
@@ -73,16 +77,15 @@ const processedTemplatesData = templatesData.map(template => {
                 <p>Create formatted in-game mails for your alliance with ease.</p>
             </div>
         </section>
-    
+
         <section class="tool-content">
             <div class="tool-container">
-    
                 <div class="generator-tabs">
                     <button class="generator-tab-btn active" data-tab="generator">Mail Generator</button>
                     <button class="generator-tab-btn" data-tab="templates">Template Gallery</button>
                     <button class="generator-tab-btn" data-tab="saved">Saved Templates</button>
                 </div>
-    
+
                 <div id="generator-view" class="generator-view active">
                     <div class="generator-layout">
                         <div class="generator-panel">
@@ -90,51 +93,112 @@ const processedTemplatesData = templatesData.map(template => {
                                 <div class="toolbar">
                                     <div class="toolbar-section">
                                         <div class="toolbar-item">
-                                            <button id="bold-btn" class="toolbar-btn" aria-label="Bold"><i class="fas fa-bold"></i></button>
+                                            <button id="bold-btn" class="toolbar-btn" aria-label="Bold"
+                                                ><i class="fas fa-bold"></i></button
+                                            >
                                             <span class="toolbar-label">Bold</span>
                                         </div>
                                         <div class="toolbar-item">
-                                            <button id="italic-btn" class="toolbar-btn" aria-label="Italic"><i class="fas fa-italic"></i></button>
+                                            <button id="italic-btn" class="toolbar-btn" aria-label="Italic"
+                                                ><i class="fas fa-italic"></i></button
+                                            >
                                             <span class="toolbar-label">Italic</span>
                                         </div>
                                         <div id="bold-italic-item" class="toolbar-item">
-                                            <button id="bold-italic-btn" class="toolbar-btn" aria-label="Bold & Italic"><i class="fas fa-bold"></i><i class="fas fa-italic"></i></button>
+                                            <button id="bold-italic-btn" class="toolbar-btn" aria-label="Bold & Italic"
+                                                ><i class="fas fa-bold"></i><i class="fas fa-italic"></i></button
+                                            >
                                             <span class="toolbar-label">B+I</span>
                                         </div>
                                         <div class="toolbar-item">
                                             <div id="custom-size-dropdown" class="custom-dropdown">
-                                                <button id="custom-size-toggle" class="toolbar-btn" aria-label="Change text size">
+                                                <button
+                                                    id="custom-size-toggle"
+                                                    class="toolbar-btn"
+                                                    aria-label="Change text size"
+                                                >
                                                     <i class="fas fa-text-height"></i>
                                                 </button>
                                                 <div id="custom-size-options" class="custom-dropdown-options">
-                                                    <div class="custom-option" data-value="12"><i class="fas fa-font fa-xs"></i><span>12</span></div>
-                                                    <div class="custom-option" data-value="16"><i class="fas fa-font fa-sm"></i><span>16</span></div>
-                                                    <div class="custom-option" data-value="20"><i class="fas fa-font"></i><span>20</span></div>
-                                                    <div class="custom-option" data-value="24"><i class="fas fa-font fa-lg"></i><span>24</span></div>
-                                                    <div class="custom-option" data-value="30"><i class="fas fa-font fa-xl"></i><span>30</span></div>
-                                                    <div class="custom-option" data-value="36"><i class="fas fa-font fa-2xl"></i><span>36</span></div>
-                                                    <div class="custom-option" data-value="custom"><i class="fas fa-edit"></i><span>Custom...</span></div>
+                                                    <div class="custom-option" data-value="12">
+                                                        <i class="fas fa-font fa-xs"></i><span>12</span>
+                                                    </div>
+                                                    <div class="custom-option" data-value="16">
+                                                        <i class="fas fa-font fa-sm"></i><span>16</span>
+                                                    </div>
+                                                    <div class="custom-option" data-value="20">
+                                                        <i class="fas fa-font"></i><span>20</span>
+                                                    </div>
+                                                    <div class="custom-option" data-value="24">
+                                                        <i class="fas fa-font fa-lg"></i><span>24</span>
+                                                    </div>
+                                                    <div class="custom-option" data-value="30">
+                                                        <i class="fas fa-font fa-xl"></i><span>30</span>
+                                                    </div>
+                                                    <div class="custom-option" data-value="36">
+                                                        <i class="fas fa-font fa-2xl"></i><span>36</span>
+                                                    </div>
+                                                    <div class="custom-option" data-value="custom">
+                                                        <i class="fas fa-edit"></i><span>Custom...</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <span class="toolbar-label">Size</span>
                                         </div>
                                         <div class="toolbar-item">
                                             <div id="custom-color-dropdown" class="custom-dropdown">
-                                                <button id="custom-color-toggle" class="toolbar-btn" aria-label="Change text color"><i class="fas fa-palette"></i></button>
+                                                <button
+                                                    id="custom-color-toggle"
+                                                    class="toolbar-btn"
+                                                    aria-label="Change text color"
+                                                    ><i class="fas fa-palette"></i></button
+                                                >
                                                 <div id="custom-color-options" class="custom-dropdown-options">
-                                                    <div class="custom-option" data-value="red"><span class="color-swatch" style="background:red;"></span>Red</div>
-                                                    <div class="custom-option" data-value="green"><span class="color-swatch" style="background:green;"></span>Green</div>
-                                                    <div class="custom-option" data-value="blue"><span class="color-swatch" style="background:blue;"></span>Blue</div>
-                                                    <div class="custom-option" data-value="yellow"><span class="color-swatch" style="background:yellow;"></span>Yellow</div>
-                                                    <div class="custom-option" data-value="orange"><span class="color-swatch" style="background:orange;"></span>Orange</div>
-                                                    <div class="custom-option" data-value="purple"><span class="color-swatch" style="background:purple;"></span>Purple</div>
-                                                    <div class="custom-option" data-value="custom-toggle"><Image src={colourwheel} alt="Custom Color" class="color-wheel-icon" width="48" height="48" quality={100} />Custom...</div>
+                                                    <div class="custom-option" data-value="red">
+                                                        <span class="color-swatch" style="background:red;"></span>Red
+                                                    </div>
+                                                    <div class="custom-option" data-value="green">
+                                                        <span class="color-swatch" style="background:green;"
+                                                        ></span>Green
+                                                    </div>
+                                                    <div class="custom-option" data-value="blue">
+                                                        <span class="color-swatch" style="background:blue;"></span>Blue
+                                                    </div>
+                                                    <div class="custom-option" data-value="yellow">
+                                                        <span class="color-swatch" style="background:yellow;"
+                                                        ></span>Yellow
+                                                    </div>
+                                                    <div class="custom-option" data-value="orange">
+                                                        <span class="color-swatch" style="background:orange;"
+                                                        ></span>Orange
+                                                    </div>
+                                                    <div class="custom-option" data-value="purple">
+                                                        <span class="color-swatch" style="background:purple;"
+                                                        ></span>Purple
+                                                    </div>
+                                                    <div class="custom-option" data-value="custom-toggle">
+                                                        <Image
+                                                            src={colourwheel}
+                                                            alt="Custom Color"
+                                                            class="color-wheel-icon"
+                                                            width="48"
+                                                            height="48"
+                                                            quality={100}
+                                                        />Custom...
+                                                    </div>
                                                     <div id="custom-color-picker-container">
                                                         <div class="color-input-group">
                                                             <label for="custom-color-input">Pick</label>
-                                                            <input type="color" id="custom-color-input" value="#3b82f6">
+                                                            <input
+                                                                type="color"
+                                                                id="custom-color-input"
+                                                                value="#3b82f6"
+                                                            />
                                                         </div>
-                                                        <button id="apply-custom-color-btn" class="btn-primary btn-primary-small">Apply</button>
+                                                        <button
+                                                            id="apply-custom-color-btn"
+                                                            class="btn-primary btn-primary-small">Apply</button
+                                                        >
                                                     </div>
                                                 </div>
                                             </div>
@@ -142,38 +206,67 @@ const processedTemplatesData = templatesData.map(template => {
                                         </div>
                                         <div class="toolbar-item">
                                             <div id="custom-gradient-dropdown" class="custom-dropdown">
-                                                <button id="custom-gradient-toggle" class="toolbar-btn" aria-label="Apply gradient">
+                                                <button
+                                                    id="custom-gradient-toggle"
+                                                    class="toolbar-btn"
+                                                    aria-label="Apply gradient"
+                                                >
                                                     <i class="fas fa-brush"></i>
                                                 </button>
                                                 <div id="custom-gradient-options" class="custom-dropdown-options">
                                                     <div class="gradient-picker-dropdown">
                                                         <div class="color-input-group">
                                                             <label for="gradient-color-1">Start</label>
-                                                            <input type="color" id="gradient-color-1" value="#3b82f6">
+                                                            <input type="color" id="gradient-color-1" value="#3b82f6" />
                                                         </div>
                                                         <div class="color-input-group">
                                                             <label for="gradient-color-2">End</label>
-                                                            <input type="color" id="gradient-color-2" value="#ffffff">
+                                                            <input type="color" id="gradient-color-2" value="#ffffff" />
                                                         </div>
                                                     </div>
                                                     <div class="gradient-strength-container">
-                                                        <label for="gradient-strength-slider" class="gradient-control-label">Strength</label>
+                                                        <label
+                                                            for="gradient-strength-slider"
+                                                            class="gradient-control-label">Strength</label
+                                                        >
                                                         <div class="slider-wrapper">
                                                             <span>Low</span>
-                                                            <input type="range" id="gradient-strength-slider" min="1" max="10" value="1" step="1">
+                                                            <input
+                                                                type="range"
+                                                                id="gradient-strength-slider"
+                                                                min="1"
+                                                                max="10"
+                                                                value="1"
+                                                                step="1"
+                                                            />
                                                             <span>High</span>
                                                         </div>
                                                     </div>
                                                     <div class="gradient-slider-container">
-                                                        <label for="gradient-bias-slider" class="gradient-control-label">Bias</label>
+                                                        <label for="gradient-bias-slider" class="gradient-control-label"
+                                                            >Bias</label
+                                                        >
                                                         <div class="slider-wrapper">
-                                                            <div id="gradient-preview-bar" class="gradient-preview-bar"></div>
-                                                            <input type="range" id="gradient-bias-slider" min="0.25" max="4" value="1" step="0.01">
+                                                            <div id="gradient-preview-bar" class="gradient-preview-bar">
+                                                            </div>
+                                                            <input
+                                                                type="range"
+                                                                id="gradient-bias-slider"
+                                                                min="0.25"
+                                                                max="4"
+                                                                value="1"
+                                                                step="0.01"
+                                                            />
                                                         </div>
                                                     </div>
                                                     <div class="dropdown-actions">
-                                                        <span id="gradient-char-counter" class="gradient-char-counter">+0 chars</span>
-                                                        <button id="apply-gradient-btn" class="btn-primary btn-primary-small">Apply</button>
+                                                        <span id="gradient-char-counter" class="gradient-char-counter"
+                                                            >+0 chars</span
+                                                        >
+                                                        <button
+                                                            id="apply-gradient-btn"
+                                                            class="btn-primary btn-primary-small">Apply</button
+                                                        >
                                                     </div>
                                                 </div>
                                             </div>
@@ -182,16 +275,21 @@ const processedTemplatesData = templatesData.map(template => {
                                     </div>
                                     <div class="toolbar-section">
                                         <div class="toolbar-item">
-                                            <button id="undo-btn" class="toolbar-btn" aria-label="Undo"><i class="fas fa-undo"></i></button>
+                                            <button id="undo-btn" class="toolbar-btn" aria-label="Undo"
+                                                ><i class="fas fa-undo"></i></button
+                                            >
                                             <span class="toolbar-label">Undo</span>
                                         </div>
                                         <div class="toolbar-item">
-                                            <button id="clear-btn" class="toolbar-btn" aria-label="Clear All"><i class="fas fa-trash"></i></button>
+                                            <button id="clear-btn" class="toolbar-btn" aria-label="Clear All"
+                                                ><i class="fas fa-trash"></i></button
+                                            >
                                             <span class="toolbar-label">Clear</span>
                                         </div>
                                     </div>
                                 </div>
-                                <textarea id="mail-input" placeholder="Enter the content you wish to format here..."></textarea>
+                                <textarea id="mail-input" placeholder="Enter the content you wish to format here..."
+                                ></textarea>
                                 <div id="char-counter" class="char-counter">0/2000</div>
                             </div>
                         </div>
@@ -218,13 +316,15 @@ const processedTemplatesData = templatesData.map(template => {
                         </div>
                     </div>
                 </div>
-    
+
                 <div id="templates-view" class="generator-view">
                     <div class="template-layout">
                         <div class="template-gallery-wrapper">
                             <div class="template-gallery-header">
-                                <button id="filter-toggle-btn" class="btn-secondary"><i class="fas fa-filter"></i> Filters</button>
-                                <input type="search" id="template-search-input" placeholder="Search templates...">
+                                <button id="filter-toggle-btn" class="btn-secondary"
+                                    ><i class="fas fa-filter"></i> Filters</button
+                                >
+                                <input type="search" id="template-search-input" placeholder="Search templates..." />
                                 <div id="filter-panel" class="filter-panel">
                                     <div class="filter-panel-header">
                                         <h3>Filter Templates</h3>
@@ -236,13 +336,18 @@ const processedTemplatesData = templatesData.map(template => {
                             <div id="template-gallery" class="template-gallery"></div>
                             <div class="template-credits">
                                 <h4>Community Contributions</h4>
-                                <p>A special thank you to the governors who helped build & consolidate this collection of templates:</p>
+                                <p>
+                                    A special thank you to the governors who helped build & consolidate this collection
+                                    of templates:
+                                </p>
                                 <ul>
                                     <li>[1049] SECHSkies</li>
                                     <li>[1215] Kat</li>
                                     <li>[3542] Daysii</li>
                                 </ul>
-                                <p class="secondary-thanks">Another thank you to the governors who helped contribute templates to our gallery:</p>
+                                <p class="secondary-thanks">
+                                    Another thank you to the governors who helped contribute templates to our gallery:
+                                </p>
                                 <ul class="contributors-secondary">
                                     <li>[2308] Nemo</li>
                                     <li>[3104] Eldest</li>
@@ -252,12 +357,27 @@ const processedTemplatesData = templatesData.map(template => {
                         </div>
                         <div class="template-preview-wrapper">
                             <button id="load-template-btn" class="btn-primary" disabled>
-                                <Image src={loadIcon} alt="Load Icon" width="48" height="48" loading="eager" quality={100}/>
+                                <Image
+                                    src={loadIcon}
+                                    alt="Load Icon"
+                                    width="48"
+                                    height="48"
+                                    loading="eager"
+                                    quality={100}
+                                />
                                 <span>Load Template</span>
                             </button>
                             <div id="magnified-preview-container" class="magnified-preview-container">
-                                <p id="magnified-placeholder">Hover or tap on a template to view its design & content</p>
-                                <img id="magnified-image" src="" alt="Magnified Template Preview" width="0" height="0">
+                                <p id="magnified-placeholder">
+                                    Hover or tap on a template to view its design & content
+                                </p>
+                                <img
+                                    id="magnified-image"
+                                    src=""
+                                    alt="Magnified Template Preview"
+                                    width="0"
+                                    height="0"
+                                />
                             </div>
                             <h4 id="magnified-title">&nbsp;</h4>
                         </div>
@@ -273,7 +393,6 @@ const processedTemplatesData = templatesData.map(template => {
                         </div>
                     </div>
                 </div>
-
             </div>
         </section>
     </main>
@@ -290,7 +409,7 @@ const processedTemplatesData = templatesData.map(template => {
     <div id="custom-size-modal" class="simple-modal-overlay" style="display: none;">
         <div class="simple-modal-content">
             <h3>Enter Custom Size</h3>
-            <input type="number" id="custom-size-input" placeholder="e.g., 22" min="1">
+            <input type="number" id="custom-size-input" placeholder="e.g., 22" min="1" />
             <div class="simple-modal-actions">
                 <button id="custom-size-cancel-btn" class="btn-secondary">Cancel</button>
                 <button id="custom-size-apply-btn" class="btn-primary">Apply</button>
@@ -300,7 +419,7 @@ const processedTemplatesData = templatesData.map(template => {
     <div id="save-template-modal" class="simple-modal-overlay" style="display: none;">
         <div class="simple-modal-content">
             <h3>Save Template</h3>
-            <input type="text" id="save-template-name-input" placeholder="Enter a name for your template">
+            <input type="text" id="save-template-name-input" placeholder="Enter a name for your template" />
             <div class="simple-modal-actions">
                 <button id="save-template-cancel-btn" class="btn-secondary">Cancel</button>
                 <button id="save-template-confirm-btn" class="btn-primary">Save</button>
@@ -316,11 +435,11 @@ const processedTemplatesData = templatesData.map(template => {
             </div>
         </div>
     </div>
-    
+
     <script>
-        import "../../scripts/utils.js";
-        import "../../scripts/auth.js";
-        import "../../scripts/mail.js";
+        import '../../scripts/utils.js';
+        import '../../scripts/auth.js';
+        import '../../scripts/mail.js';
     </script>
 </Layout>
 <style>

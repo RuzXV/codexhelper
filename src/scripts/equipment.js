@@ -1,10 +1,10 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     function getImagePath(filename) {
         if (window.EQUIPMENT_IMAGE_PATHS && window.EQUIPMENT_IMAGE_PATHS[filename]) {
             return window.EQUIPMENT_IMAGE_PATHS[filename];
         }
         console.warn(`Image path for "${filename}" not found in map. Using a fallback path.`);
-        
+
         if (filename.includes('slot')) {
             return `/images/materials/slots/${filename}`;
         }
@@ -24,12 +24,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const tabs = { 'crafting-calculator': craftingTabBtn, 'compare-sets': compareTabBtn };
         for (const key in views) {
             const isActive = key === tabName;
-            if(views[key]) views[key].classList.toggle('active', isActive);
-            if(tabs[key]) tabs[key].classList.toggle('active', isActive);
+            if (views[key]) views[key].classList.toggle('active', isActive);
+            if (tabs[key]) tabs[key].classList.toggle('active', isActive);
         }
     }
-    if(craftingTabBtn) craftingTabBtn.addEventListener('click', () => switchView('crafting-calculator'));
-    if(compareTabBtn) compareTabBtn.addEventListener('click', () => switchView('compare-sets'));
+    if (craftingTabBtn) craftingTabBtn.addEventListener('click', () => switchView('crafting-calculator'));
+    if (compareTabBtn) compareTabBtn.addEventListener('click', () => switchView('compare-sets'));
 
     const compareLoadoutASlots = document.querySelectorAll('#compare-a-loadout-grid .loadout-slot');
     const compareLoadoutBSlots = document.querySelectorAll('#compare-b-loadout-grid .loadout-slot');
@@ -103,32 +103,41 @@ document.addEventListener('DOMContentLoaded', function() {
         legs: getImagePath('leggings_slot.webp'),
         boots: getImagePath('boots_slot.webp'),
         accessory1: getImagePath('accessory1_slot.webp'),
-        accessory2: getImagePath('accessory2_slot.webp')
+        accessory2: getImagePath('accessory2_slot.webp'),
     };
-    
+
     const compareLoadoutADetailsList = document.getElementById('details-list-a');
     const compareLoadoutBDetailsList = document.getElementById('details-list-b');
 
     const RARITY_MULTIPLIERS = { common: 1, advanced: 4, elite: 16, epic: 64, legendary: 256 };
 
     let craftingList = {};
-    let selectedLoadoutSlots = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
+    let selectedLoadoutSlots = {
+        helmet: null,
+        chest: null,
+        weapon: null,
+        gloves: null,
+        legs: null,
+        boots: null,
+        accessory1: null,
+        accessory2: null,
+    };
     let activeSlotElement = null;
-    
-    window.getPreLoginState = function() {
+
+    window.getPreLoginState = function () {
         const state = {};
         let hasInput = false;
-    
-        document.querySelectorAll('.material-input').forEach(input => {
+
+        document.querySelectorAll('.material-input').forEach((input) => {
             state[input.id] = input.value;
             if (input.value) hasInput = true;
         });
-        
+
         state.craftingList = craftingList;
         state.selectedLoadoutSlots = selectedLoadoutSlots;
-    
+
         if (Object.keys(craftingList).length > 0) hasInput = true;
-    
+
         return hasInput ? state : null;
     };
 
@@ -136,39 +145,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const saveCalculatorState = debounce(() => {
         const state = {};
-        document.querySelectorAll('.material-input').forEach(input => {
+        document.querySelectorAll('.material-input').forEach((input) => {
             state[input.id] = input.value;
         });
-        
+
         state.craftingList = craftingList;
         state.selectedLoadoutSlots = selectedLoadoutSlots;
         state.compareLoadoutA = compareLoadoutA;
         state.compareLoadoutB = compareLoadoutB;
         state.kvkSeason = currentKvkSeason;
-    
+
         window.saveUserData(MATERIALS_CACHE_KEY, state);
     }, 500);
-    
+
     function loadCalculatorState(stateToLoad = null) {
         const savedState = stateToLoad || window.loadUserData(MATERIALS_CACHE_KEY);
         if (!savedState) return;
-    
-        document.querySelectorAll('.material-input').forEach(input => {
+
+        document.querySelectorAll('.material-input').forEach((input) => {
             if (savedState[input.id]) {
                 input.value = savedState[input.id];
             }
         });
-        
+
         if (savedState.craftingList) {
             craftingList = savedState.craftingList;
         }
-        
+
         if (savedState.selectedLoadoutSlots) {
             selectedLoadoutSlots = savedState.selectedLoadoutSlots;
-            Object.keys(selectedLoadoutSlots).forEach(slotKey => {
+            Object.keys(selectedLoadoutSlots).forEach((slotKey) => {
                 const itemId = selectedLoadoutSlots[slotKey];
                 if (itemId) {
-                    const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+                    const itemData = EQUIPMENT_DATA.find((item) => item.id === itemId);
                     const slotElement = document.getElementById(`slot-${slotKey}`);
                     if (itemData && slotElement) {
                         slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
@@ -176,28 +185,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-        
+
         updateUIDisplays();
-    
-        if(savedState.compareLoadoutA) {
+
+        if (savedState.compareLoadoutA) {
             compareLoadoutA = savedState.compareLoadoutA;
-             Object.keys(compareLoadoutA).forEach(slotKey => {
+            Object.keys(compareLoadoutA).forEach((slotKey) => {
                 const item = compareLoadoutA[slotKey];
-                if(item && item.id) {
-                    const itemData = EQUIPMENT_DATA.find(i => i.id === item.id);
+                if (item && item.id) {
+                    const itemData = EQUIPMENT_DATA.find((i) => i.id === item.id);
                     const slotElement = document.getElementById(`slot-a-${slotKey}`);
-                    if(itemData && slotElement) slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
+                    if (itemData && slotElement)
+                        slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
                 }
             });
         }
-        if(savedState.compareLoadoutB) {
+        if (savedState.compareLoadoutB) {
             compareLoadoutB = savedState.compareLoadoutB;
-             Object.keys(compareLoadoutB).forEach(slotKey => {
+            Object.keys(compareLoadoutB).forEach((slotKey) => {
                 const item = compareLoadoutB[slotKey];
-                if(item && item.id) {
-                    const itemData = EQUIPMENT_DATA.find(i => i.id === item.id);
+                if (item && item.id) {
+                    const itemData = EQUIPMENT_DATA.find((i) => i.id === item.id);
                     const slotElement = document.getElementById(`slot-b-${slotKey}`);
-                    if(itemData && slotElement) slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
+                    if (itemData && slotElement)
+                        slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
                 }
             });
         }
@@ -220,11 +231,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return getImagePath(`${iconName}_${rarityName}.webp`);
     };
-    
+
     const formatStatName = (key) => {
-        return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
     };
-    
+
     const getTroopTypeFromStat = (statKey) => {
         if (statKey.startsWith('cavalry')) return 'cavalry';
         if (statKey.startsWith('infantry')) return 'infantry';
@@ -232,13 +243,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (statKey.startsWith('siege')) return 'siege';
         if (statKey.startsWith('troop')) return 'troop';
         return 'general';
-    }
+    };
 
     function getHighestSelectedRarity() {
         let highestRarityIndex = -1;
         for (const itemId in craftingList) {
             if (craftingList[itemId] > 0) {
-                const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+                const itemData = EQUIPMENT_DATA.find((item) => item.id === itemId);
                 if (itemData) {
                     const currentIndex = RARITIES_ORDERED.indexOf(itemData.quality);
                     if (currentIndex > highestRarityIndex) {
@@ -252,19 +263,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function performCalculation() {
         const playerMaterialsCommon = {};
-        MATERIALS.forEach(mat => playerMaterialsCommon[mat] = calculateTotalForMaterial(mat));
+        MATERIALS.forEach((mat) => (playerMaterialsCommon[mat] = calculateTotalForMaterial(mat)));
         const playerChestsCommon = calculateTotalForMaterial(CHEST_MATERIAL);
 
         const totalCostCommon = { iron: 0, leather: 0, ebony: 0, bone: 0 };
         let totalGoldCost = 0;
-        let equipmentIsSelected = Object.values(craftingList).some(qty => qty > 0);
+        const equipmentIsSelected = Object.values(craftingList).some((qty) => qty > 0);
 
         for (const itemId in craftingList) {
             const quantity = craftingList[itemId];
             if (quantity > 0) {
-                const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+                const itemData = EQUIPMENT_DATA.find((item) => item.id === itemId);
                 if (itemData && itemData.cost) {
-                    
                     let qualityKey = (itemData.quality || 'Normal').toLowerCase();
                     if (qualityKey === 'normal') {
                         qualityKey = 'common';
@@ -281,27 +291,34 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        let displayRarity = getHighestSelectedRarity();
-        
-        const materialsAreInput = Object.values(playerMaterialsCommon).some(val => val > 0) || playerChestsCommon > 0;
+        const displayRarity = getHighestSelectedRarity();
+
+        const materialsAreInput = Object.values(playerMaterialsCommon).some((val) => val > 0) || playerChestsCommon > 0;
 
         if (materialsAreInput && !equipmentIsSelected) {
             displayMaterialTotals(playerMaterialsCommon, playerChestsCommon, displayRarity);
         } else if (!materialsAreInput && equipmentIsSelected) {
             displayEquipmentCost(totalCostCommon, totalGoldCost, displayRarity);
         } else if (materialsAreInput && equipmentIsSelected) {
-            analyzeAndDisplayCrafting(playerMaterialsCommon, playerChestsCommon, totalCostCommon, totalGoldCost, displayRarity);
+            analyzeAndDisplayCrafting(
+                playerMaterialsCommon,
+                playerChestsCommon,
+                totalCostCommon,
+                totalGoldCost,
+                displayRarity,
+            );
         } else {
-            resultDiv.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">Enter your materials or select equipment to begin.</p>';
+            resultDiv.innerHTML =
+                '<p style="text-align:center; color: var(--text-secondary);">Enter your materials or select equipment to begin.</p>';
             resultDiv.style.display = 'block';
         }
     }
 
     function calculateTotalForMaterial(material) {
         let commonEquivalent = 0;
-        RARITIES.forEach(rarity => {
+        RARITIES.forEach((rarity) => {
             const input = document.getElementById(`${material}-${rarity}`);
-            if(input && input.value) {
+            if (input && input.value) {
                 const count = parseInt(input.value.replace(/,/g, ''), 10) || 0;
                 commonEquivalent += count * RARITY_MULTIPLIERS[rarity];
             }
@@ -316,10 +333,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let html = `<h3 class="result-status">Your Available Materials</h3>`;
         let resultGridItems = '';
-        MATERIALS.forEach(mat => {
+        MATERIALS.forEach((mat) => {
             const total = Math.floor(playerMaterialsCommon[mat] / divisor);
             if (total > 0) {
-                 resultGridItems += `
+                resultGridItems += `
                     <div class="result-item">
                         <img src="${getMaterialIconPath(mat, displayRarity)}" alt="${mat}">
                         <div class="label">Total ${rarityName}:</div>
@@ -337,7 +354,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="value">${totalChests.toLocaleString()}</span>
                 </div>`;
         }
-        if (!resultGridItems) resultGridItems = `<p style="grid-column: 1 / -1; color: var(--text-secondary);">No materials entered.</p>`;
+        if (!resultGridItems)
+            resultGridItems = `<p style="grid-column: 1 / -1; color: var(--text-secondary);">No materials entered.</p>`;
         html += `<div class="result-grid">${resultGridItems}</div>`;
         resultDiv.innerHTML = html;
         triggerSuccessAnimation(resultDiv);
@@ -351,10 +369,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let html = `<h3 class="result-status">Selected Equipment Cost</h3>`;
         let resultGridItems = '';
-        MATERIALS.forEach(mat => {
+        MATERIALS.forEach((mat) => {
             const total = Math.ceil(totalCostCommon[mat] / divisor);
             if (total > 0) {
-                 resultGridItems += `
+                resultGridItems += `
                     <div class="result-item">
                         <img src="${getMaterialIconPath(mat, displayRarity)}" alt="${mat}">
                         <div class="label">Total ${rarityName} Needed:</div>
@@ -362,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>`;
             }
         });
-         if (totalGoldCost > 0) {
+        if (totalGoldCost > 0) {
             resultGridItems += `
                 <div class="result-item">
                     <img src="${getImagePath('gold_icon.webp')}" alt="Gold">
@@ -370,13 +388,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="value">${totalGoldCost.toLocaleString()}</span>
                 </div>`;
         }
-        if (!resultGridItems) resultGridItems = `<p style="grid-column: 1 / -1; color: var(--text-secondary);">No equipment selected.</p>`;
+        if (!resultGridItems)
+            resultGridItems = `<p style="grid-column: 1 / -1; color: var(--text-secondary);">No equipment selected.</p>`;
         html += `<div class="result-grid">${resultGridItems}</div>`;
         resultDiv.innerHTML = html;
         triggerSuccessAnimation(resultDiv);
     }
 
-    function analyzeAndDisplayCrafting(playerMaterialsCommon, playerChestsCommon, totalCostCommon, totalGoldCost, displayRarity) {
+    function analyzeAndDisplayCrafting(
+        playerMaterialsCommon,
+        playerChestsCommon,
+        totalCostCommon,
+        totalGoldCost,
+        displayRarity,
+    ) {
         const divisor = RARITY_MULTIPLIERS[displayRarity.toLowerCase()];
         const rarityName = formatStatName(displayRarity);
         const rarityClass = `text-${displayRarity.toLowerCase()}`;
@@ -384,24 +409,24 @@ document.addEventListener('DOMContentLoaded', function() {
         let neededFromChestsCommon = 0;
         let totalMaterialOwnedCommon = 0;
         let totalMaterialCostCommon = 0;
-    
-        MATERIALS.forEach(mat => {
+
+        MATERIALS.forEach((mat) => {
             const deficit = totalCostCommon[mat] - playerMaterialsCommon[mat];
             if (deficit > 0) neededFromChestsCommon += deficit;
             totalMaterialCostCommon += totalCostCommon[mat];
             totalMaterialOwnedCommon += playerMaterialsCommon[mat];
         });
-    
+
         const totalOwnedWithChestsCommon = totalMaterialOwnedCommon + playerChestsCommon;
         const canCraft = neededFromChestsCommon <= playerChestsCommon;
-        
+
         resultDiv.style.display = 'block';
-        let html = canCraft 
+        let html = canCraft
             ? `<h3 class="result-status craftable"><i class="fas fa-check-circle"></i> Loadout is Craftable</h3>`
             : `<h3 class="result-status not-craftable"><i class="fas fa-times-circle"></i> Insufficient Materials</h3>`;
-    
+
         let materialItemsHtml = '';
-        MATERIALS.forEach(mat => {
+        MATERIALS.forEach((mat) => {
             const have = Math.floor(playerMaterialsCommon[mat] / divisor);
             const needed = Math.ceil(totalCostCommon[mat] / divisor);
             if (have === 0 && needed === 0) return;
@@ -409,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const totalAfterCraft = playerMaterialsCommon[mat] - totalCostCommon[mat];
             const leftover = totalAfterCraft > 0 ? Math.floor(totalAfterCraft / divisor) : 0;
             const shortBy = totalAfterCraft < 0 ? Math.ceil(Math.abs(totalAfterCraft) / divisor) : 0;
-    
+
             materialItemsHtml += `
                 <div class="result-item">
                     <img src="${getMaterialIconPath(mat, displayRarity)}" alt="${mat}">
@@ -419,9 +444,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${shortBy > 0 ? `<div class="label">Short by: <span class="value shortage">${shortBy.toLocaleString()}</span></div>` : ''}
                 </div>`;
         });
-        
+
         const leftoverChests = Math.floor((playerChestsCommon - neededFromChestsCommon) / divisor);
-        
+
         const neededChests = Math.ceil(neededFromChestsCommon / divisor);
         const haveChests = Math.floor(playerChestsCommon / divisor);
 
@@ -442,8 +467,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const totalMatCostDisplay = Math.ceil(totalMaterialCostCommon / divisor);
         const totalMatOwnedDisplay = Math.floor(totalOwnedWithChestsCommon / divisor);
-    
-        let summaryHtml = `
+
+        const summaryHtml = `
             <div class="summary-items">
                 <div class="result-item">
                     <img src="${getImagePath('materials_icon.webp')}" alt="Total Materials">
@@ -455,12 +480,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="label">Total ${rarityName} Mats Owned:</div>
                     <span class="value">${totalMatOwnedDisplay.toLocaleString()}</span>
                 </div>
-                ${totalGoldCost > 0 ? `
+                ${
+                    totalGoldCost > 0
+                        ? `
                 <div class="result-item">
                     <img src="${getImagePath('gold_icon.webp')}" alt="Gold">
                     <div class="label">Total Gold Cost:</div>
                     <span class="value">${totalGoldCost.toLocaleString()}</span>
-                </div>` : ''}
+                </div>`
+                        : ''
+                }
             </div>
         `;
 
@@ -472,51 +501,53 @@ document.addEventListener('DOMContentLoaded', function() {
         resultDiv.innerHTML = html;
         triggerSuccessAnimation(resultDiv);
     }
-    
+
     function populateModalGrid(slotType, searchTerm = '') {
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    
-        const filteredItems = EQUIPMENT_DATA.filter(item => {
+
+        const filteredItems = EQUIPMENT_DATA.filter((item) => {
             const slotMatch = item.slot === slotType;
             const nameMatch = !searchTerm || item.name.toLowerCase().includes(lowerCaseSearchTerm);
             return slotMatch && nameMatch;
         });
-    
-        const html = filteredItems.map(item => `
+
+        const html = filteredItems
+            .map(
+                (item) => `
             <div class="modal-item" data-item-id="${item.id}">
                 <img src="${getImagePath(item.image)}" alt="${item.name}" loading="lazy" width="48" height="48">
                 <span class="item-name ${item.quality}">${item.name}</span>
-            </div>`
-        ).join('');
-    
+            </div>`,
+            )
+            .join('');
+
         modalGrid.innerHTML = html;
         modalGrid.scrollTop = 0;
     }
 
-
     function openModalForSlot(slotElement) {
         activeSlotElement = slotElement;
         const slotType = slotElement.dataset.slot;
-        const itemSlotType = (slotType === 'accessory1' || slotType === 'accessory2') ? 'accessory' : slotType;
-    
+        const itemSlotType = slotType === 'accessory1' || slotType === 'accessory2' ? 'accessory' : slotType;
+
         modalTitle.textContent = `Select ${formatStatName(itemSlotType)}`;
         modalSearch.value = '';
-        
+
         populateModalGrid(itemSlotType);
-        
+
         const instructionP = document.querySelector('#equipment-modal .modal-body > p');
         const isMobile = window.innerWidth <= 768;
-    
+
         if (instructionP) {
             if (isMobile) {
-                instructionP.textContent = "Click once to preview stats, double-click to equip item.";
+                instructionP.textContent = 'Click once to preview stats, double-click to equip item.';
             } else {
-                instructionP.textContent = "Hover to preview stats, click an item to equip it.";
+                instructionP.textContent = 'Hover to preview stats, click an item to equip it.';
             }
         }
-        
+
         modal.style.display = 'flex';
-        
+
         if (!isMobile) {
             modalSearch.focus();
         }
@@ -528,20 +559,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function selectItemForCrafting(itemId) {
-        const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+        const itemData = EQUIPMENT_DATA.find((item) => item.id === itemId);
         if (!itemData || !activeSlotElement) return;
-    
+
         const slotElement = activeSlotElement;
         const slotKey = slotElement.dataset.slot;
 
         if (slotKey === 'accessory1' || slotKey === 'accessory2') {
             const otherSlot = slotKey === 'accessory1' ? 'accessory2' : 'accessory1';
             if (selectedLoadoutSlots[otherSlot] === itemId) {
-                showAlert("You cannot equip two of the same accessory.", "Unique Item");
+                showAlert('You cannot equip two of the same accessory.', 'Unique Item');
                 return;
             }
         }
-        
+
         const oldItemId = selectedLoadoutSlots[slotKey];
         if (oldItemId) {
             craftingList[oldItemId] = (craftingList[oldItemId] || 1) - 1;
@@ -549,12 +580,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 delete craftingList[oldItemId];
             }
         }
-    
+
         craftingList[itemId] = (craftingList[itemId] || 0) + 1;
         selectedLoadoutSlots[slotKey] = itemId;
-        
+
         slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
-        
+
         hideTooltip();
         closeModal();
         updateUIDisplays(itemId);
@@ -592,7 +623,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (slotElement) {
                     slotElement.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${slotKey} Slot">`;
                 }
-                break; 
+                break;
             }
         }
 
@@ -603,13 +634,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function clearAllSelections() {
         craftingList = {};
-        selectedLoadoutSlots = { helmet: null, chest: null, weapon: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
+        selectedLoadoutSlots = {
+            helmet: null,
+            chest: null,
+            weapon: null,
+            gloves: null,
+            legs: null,
+            boots: null,
+            accessory1: null,
+            accessory2: null,
+        };
 
         updateUIDisplays();
-        
+
         try {
             if (craftingLoadoutSlots && craftingLoadoutSlots.length > 0) {
-                craftingLoadoutSlots.forEach(slot => {
+                craftingLoadoutSlots.forEach((slot) => {
                     const slotKey = slot.dataset.slot;
                     if (slotKey && SLOT_PLACEHOLDERS[slotKey]) {
                         slot.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${formatStatName(slotKey)} Slot">`;
@@ -617,22 +657,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (e) {
-            console.error("Error resetting loadout slots:", e);
+            console.error('Error resetting loadout slots:', e);
         }
 
         saveCalculatorState();
-        
+
         if (calculateBtn && calculateBtn.style.display === 'none') {
             performCalculation();
         }
     }
-    
+
     function updateSelectedItemsDisplay(newItemId = null) {
         selectedItemsList.innerHTML = '';
-        const hasSelection = Object.values(craftingList).some(qty => qty > 0);
+        const hasSelection = Object.values(craftingList).some((qty) => qty > 0);
 
         if (!hasSelection) {
-            selectedItemsList.innerHTML = '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary); padding: var(--spacing-4) 0;">No items selected.</p>';
+            selectedItemsList.innerHTML =
+                '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary); padding: var(--spacing-4) 0;">No items selected.</p>';
             return;
         }
 
@@ -640,7 +681,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const quantity = craftingList[itemId];
             if (quantity <= 0) continue;
 
-            const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+            const itemData = EQUIPMENT_DATA.find((item) => item.id === itemId);
             if (itemData) {
                 let costHtml = '<div class="selected-item-cost">';
                 if (itemData.cost) {
@@ -654,7 +695,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             } else {
                                 qualityClass = 'text-normal';
                             }
-                             costHtml += `
+                            costHtml += `
                                 <div class="cost-pair">
                                     <img src="${getMaterialIconPath(mat, itemData.quality)}" alt="${mat}">
                                     <span class="${qualityClass}">${amount}</span>
@@ -667,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let statsHtml = '<div class="selected-item-stats">';
                 if (itemData.stats) {
                     Object.entries(itemData.stats)
-                        .sort(([,a], [,b]) => b - a) 
+                        .sort(([, a], [, b]) => b - a)
                         .forEach(([statKey, statValue]) => {
                             if (statValue > 0) {
                                 const troopType = getTroopTypeFromStat(statKey);
@@ -676,12 +717,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                 }
                 if (itemData.special_stats && itemData.special_stats.length > 0) {
-                     itemData.special_stats.forEach(stat => {
+                    itemData.special_stats.forEach((stat) => {
                         statsHtml += `<div class="special-stat">${stat}</div>`;
                     });
                 }
                 statsHtml += '</div>';
-
 
                 const itemEl = document.createElement('div');
                 itemEl.className = 'selected-item';
@@ -702,17 +742,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 selectedItemsList.appendChild(itemEl);
             }
         }
-        
-        selectedItemsList.querySelectorAll('.remove-item-btn').forEach(btn => {
+
+        selectedItemsList.querySelectorAll('.remove-item-btn').forEach((btn) => {
             btn.addEventListener('click', (e) => removeItem(e.currentTarget.dataset.itemId));
         });
     }
 
-    window.fitTextToContainer = function(container) {
+    window.fitTextToContainer = function (container) {
         if (!container) return;
-        
+
         container.style.fontSize = '';
-        
+
         if (container.scrollHeight <= container.clientHeight) return;
 
         let size = 14;
@@ -727,13 +767,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function calculateAndDisplayTotalStats() {
         const container = document.getElementById('total-stats-container');
         if (!container) return;
-    
+
         const totalStats = {};
         const specialStats = new Set();
-        const equippedPieceIds = Object.values(selectedLoadoutSlots).filter(id => id !== null);
-    
-        equippedPieceIds.forEach(itemId => {
-            const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+        const equippedPieceIds = Object.values(selectedLoadoutSlots).filter((id) => id !== null);
+
+        equippedPieceIds.forEach((itemId) => {
+            const itemData = EQUIPMENT_DATA.find((item) => item.id === itemId);
             if (itemData) {
                 if (itemData.stats) {
                     for (const stat in itemData.stats) {
@@ -741,27 +781,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 if (itemData.special_stats) {
-                    itemData.special_stats.forEach(stat => specialStats.add(stat));
+                    itemData.special_stats.forEach((stat) => specialStats.add(stat));
                 }
             }
         });
-        
-        EQUIPMENT_SET_DATA.forEach(set => {
-            const equippedCount = set.pieces.filter(pieceId => equippedPieceIds.includes(pieceId)).length;
-            
-            set.bonuses.forEach(bonus => {
+
+        EQUIPMENT_SET_DATA.forEach((set) => {
+            const equippedCount = set.pieces.filter((pieceId) => equippedPieceIds.includes(pieceId)).length;
+
+            set.bonuses.forEach((bonus) => {
                 if (equippedCount >= bonus.count) {
                     const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
-                    
-                    const statMatch = bonus.description.match(/(Troop|Infantry|Cavalry|Archer|Siege) (Attack|Defense|Health|Defence)[\s\+]+([\d\.]+)%/i);
-        
+
+                    const statMatch = bonus.description.match(
+                        /(Troop|Infantry|Cavalry|Archer|Siege) (Attack|Defense|Health|Defence)[\s\+]+([\d\.]+)%/i,
+                    );
+
                     if (statMatch) {
                         const scope = statMatch[1].toLowerCase();
                         const statType = statMatch[2].toLowerCase().replace('defence', 'defense');
                         const statValue = parseFloat(statMatch[3]);
-                        
+
                         if (scope === 'troop') {
-                            troopTypes.forEach(troopType => {
+                            troopTypes.forEach((troopType) => {
                                 const specificStatKey = `${troopType}_${statType}`;
                                 totalStats[specificStatKey] = (totalStats[specificStatKey] || 0) + statValue;
                             });
@@ -775,29 +817,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
-    
+
         const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
         const statTypes = ['attack', 'defense', 'health', 'march_speed'];
-    
-        statTypes.forEach(statType => {
+
+        statTypes.forEach((statType) => {
             const universalStatKey = `troop_${statType}`;
             const universalValue = totalStats[universalStatKey] || 0;
-    
+
             if (universalValue > 0) {
-                troopTypes.forEach(troopType => {
+                troopTypes.forEach((troopType) => {
                     const specificStatKey = `${troopType}_${statType}`;
                     totalStats[specificStatKey] = (totalStats[specificStatKey] || 0) + universalValue;
                 });
             }
         });
-    
+
         const groupedStats = {
             infantry: { total: 0, stats: {} },
             cavalry: { total: 0, stats: {} },
             archer: { total: 0, stats: {} },
-            siege: { total: 0, stats: {} }
+            siege: { total: 0, stats: {} },
         };
-    
+
         for (const stat in totalStats) {
             if (totalStats[stat] > 0 && !stat.startsWith('troop_')) {
                 const troopType = getTroopTypeFromStat(stat);
@@ -807,16 +849,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-    
-        const sortedTroopTypes = Object.keys(groupedStats).sort((a, b) => groupedStats[b].total - groupedStats[a].total);
-    
+
+        const sortedTroopTypes = Object.keys(groupedStats).sort(
+            (a, b) => groupedStats[b].total - groupedStats[a].total,
+        );
+
         let html = '';
-    
-        sortedTroopTypes.forEach(troopType => {
+
+        sortedTroopTypes.forEach((troopType) => {
             if (groupedStats[troopType].total > 0) {
                 html += `<div class="stats-group">`;
                 html += `<h5 class="stat-${troopType}">${formatStatName(troopType)}</h5>`;
-                
+
                 for (const stat in groupedStats[troopType].stats) {
                     const iconHtml = `<img src="${getImagePath(`${troopType}_icon_mini.webp`)}" alt="${troopType} icon">`;
                     html += `<div class="stat-pair ${troopType}">
@@ -827,31 +871,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 html += `</div>`;
             }
         });
-    
+
         if (specialStats.size > 0) {
             html += `<div class="stats-group"><h5 class="legendary-text">Extra Bonuses</h5>`;
-            specialStats.forEach(stat => {
+            specialStats.forEach((stat) => {
                 html += `<div class="special-stat">${stat}</div>`;
             });
             html += `</div>`;
         }
-    
+
         if (!html) {
-            html = '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary);">No loadout items selected.</p>';
+            html =
+                '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary);">No loadout items selected.</p>';
         }
-    
+
         container.innerHTML = html;
-        window.fitTextToContainer(container); 
+        window.fitTextToContainer(container);
     }
-    
+
     function updateUIDisplays(newItemId = null) {
         updateSelectedItemsDisplay(newItemId);
         calculateAndDisplayTotalStats();
     }
-    
+
     function getActiveFilters(panel) {
         const active = {};
-        panel.querySelectorAll('input[type="checkbox"]:checked').forEach(input => {
+        panel.querySelectorAll('input[type="checkbox"]:checked').forEach((input) => {
             const category = input.dataset.category;
             if (!active[category]) active[category] = [];
             active[category].push(input.value);
@@ -861,7 +906,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getDominantTroopType(itemData) {
         if (!itemData.stats) return null;
-        
+
         const troopTotals = { infantry: 0, cavalry: 0, archer: 0, siege: 0 };
         for (const stat in itemData.stats) {
             const troopType = getTroopTypeFromStat(stat);
@@ -869,7 +914,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 troopTotals[troopType] += itemData.stats[stat];
             }
         }
-        
+
         let dominantType = null;
         let maxStat = 0;
         for (const troopType in troopTotals) {
@@ -884,23 +929,30 @@ document.addEventListener('DOMContentLoaded', function() {
     function filterItems(grid, filterPanel, searchTerm) {
         const activeFilters = getActiveFilters(filterPanel);
         const lowerCaseSearchTerm = searchTerm.toLowerCase();
-        const transitionDuration = 300; 
+        const transitionDuration = 300;
 
-        grid.querySelectorAll('.selector-item').forEach(item => {
-            const itemData = EQUIPMENT_DATA.find(d => d.id === item.dataset.itemId);
+        grid.querySelectorAll('.selector-item').forEach((item) => {
+            const itemData = EQUIPMENT_DATA.find((d) => d.id === item.dataset.itemId);
             if (!itemData) return;
 
             const nameMatch = itemData.name.toLowerCase().includes(lowerCaseSearchTerm);
-            const slotMatch = !activeFilters.slot || activeFilters.slot.length === 0 || activeFilters.slot.includes(itemData.slot);
-            const qualityMatch = !activeFilters.quality || activeFilters.quality.length === 0 || activeFilters.quality.includes(itemData.quality);
+            const slotMatch =
+                !activeFilters.slot || activeFilters.slot.length === 0 || activeFilters.slot.includes(itemData.slot);
+            const qualityMatch =
+                !activeFilters.quality ||
+                activeFilters.quality.length === 0 ||
+                activeFilters.quality.includes(itemData.quality);
             const dominantTroopType = getDominantTroopType(itemData);
-            const troopTypeMatch = !activeFilters.troop_type || activeFilters.troop_type.length === 0 || activeFilters.troop_type.includes(dominantTroopType);
-            
-            const statsMatch = !activeFilters.stats || activeFilters.stats.length === 0 || 
-                activeFilters.stats.some(statFilter =>
-                    itemData.stats && itemData.stats[statFilter] > 0
-                );
-            
+            const troopTypeMatch =
+                !activeFilters.troop_type ||
+                activeFilters.troop_type.length === 0 ||
+                activeFilters.troop_type.includes(dominantTroopType);
+
+            const statsMatch =
+                !activeFilters.stats ||
+                activeFilters.stats.length === 0 ||
+                activeFilters.stats.some((statFilter) => itemData.stats && itemData.stats[statFilter] > 0);
+
             const shouldBeVisible = nameMatch && slotMatch && qualityMatch && statsMatch && troopTypeMatch;
 
             if (shouldBeVisible) {
@@ -923,27 +975,33 @@ document.addEventListener('DOMContentLoaded', function() {
         const categories = {
             'Equipment Slot': {
                 type: 'slot',
-                options: ['weapon', 'helmet', 'chest', 'gloves', 'legs', 'boots', 'accessory']
+                options: ['weapon', 'helmet', 'chest', 'gloves', 'legs', 'boots', 'accessory'],
             },
-            'Rarity': {
+            Rarity: {
                 type: 'quality',
-                options: ['Legendary', 'Epic', 'Elite', 'Advanced', 'Normal']
+                options: ['Legendary', 'Epic', 'Elite', 'Advanced', 'Normal'],
             },
             'Troop Type': {
                 type: 'troop_type',
-                options: ['infantry', 'cavalry', 'archer', 'siege']
+                options: ['infantry', 'cavalry', 'archer', 'siege'],
             },
             'Specific Stats': {
                 type: 'stats',
                 options: [
-                    'infantry_attack', 'cavalry_attack',
-                    'infantry_defense', 'cavalry_defense',
-                    'infantry_health', 'cavalry_health',
-                    'archer_attack', 'siege_attack',
-                    'archer_defense', 'siege_defense',
-                    'archer_health', 'siege_health'
-                ]
-            }
+                    'infantry_attack',
+                    'cavalry_attack',
+                    'infantry_defense',
+                    'cavalry_defense',
+                    'infantry_health',
+                    'cavalry_health',
+                    'archer_attack',
+                    'siege_attack',
+                    'archer_defense',
+                    'siege_defense',
+                    'archer_health',
+                    'siege_health',
+                ],
+            },
         };
 
         let html = `
@@ -952,12 +1010,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button class="btn-secondary filter-reset-btn">Reset</button>
             </div>
             <div class="filter-options">`;
-        
-        for(const title in categories) {
+
+        for (const title in categories) {
             const category = categories[title];
             html += `<div class="filter-category"><h5>${title}</h5>`;
             html += '<div class="filter-category-grid">';
-            category.options.forEach(opt => {
+            category.options.forEach((opt) => {
                 let className = '';
                 if (category.type === 'stats' || category.type === 'troop_type') {
                     const troopType = getTroopTypeFromStat(opt);
@@ -977,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function setupFilterFunctionality(grid, toggleBtn, panel, searchInput) {
         populateFilters(panel);
-        
+
         toggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             panel.classList.toggle('visible');
@@ -987,16 +1045,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         panel.addEventListener('change', () => filterItems(grid, panel, searchInput.value));
         panel.querySelector('.filter-reset-btn').addEventListener('click', () => {
-            panel.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+            panel.querySelectorAll('input[type="checkbox"]').forEach((c) => (c.checked = false));
             filterItems(grid, panel, searchInput.value);
         });
         searchInput.addEventListener('input', debouncedFilter);
     }
 
-
     function initializeEquipmentSelector() {
-        if (!equipmentSelectorGrid || EQUIPMENT_DATA.length === 0) { return; }
-        
+        if (!equipmentSelectorGrid || EQUIPMENT_DATA.length === 0) {
+            return;
+        }
+
         let html = '';
         EQUIPMENT_DATA.forEach((item, index) => {
             const loadingAttr = 'lazy';
@@ -1017,14 +1076,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         setupFilterFunctionality(equipmentSelectorGrid, selectorFilterToggleBtn, selectorFilterPanel, selectorSearch);
     }
-    
+
     modalGrid.addEventListener('click', (e) => {
         const itemElement = e.target.closest('.modal-item');
         if (!itemElement || !activeSlotElement) return;
-    
+
         const itemId = itemElement.dataset.itemId;
         const isMobile = window.innerWidth <= 768;
-    
+
         const selectLogic = () => {
             if (activeSlotElement.dataset.loadout) {
                 selectItemForComparison(itemId);
@@ -1032,12 +1091,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 selectItemForCrafting(itemId);
             }
         };
-    
+
         if (isMobile) {
             const clickTimestamp = new Date().getTime();
             const lastClick = parseInt(itemElement.dataset.lastClick || 0);
-            
-            if ((clickTimestamp - lastClick) < 300) {
+
+            if (clickTimestamp - lastClick < 300) {
                 delete itemElement.dataset.lastClick;
                 selectLogic();
             } else {
@@ -1048,9 +1107,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    allInputs.forEach(input => {
+    allInputs.forEach((input) => {
         input.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/,/g, '');
+            const value = e.target.value.replace(/,/g, '');
             if (!isNaN(value) && value.length > 0) {
                 e.target.value = parseInt(value, 10).toLocaleString('en-US');
             }
@@ -1060,10 +1119,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calculateBtn.addEventListener('click', () => {
         performCalculation();
-        allInputs.forEach(input => input.addEventListener('input', performCalculation));
+        allInputs.forEach((input) => input.addEventListener('input', performCalculation));
         calculateBtn.style.display = 'none';
     });
-    
+
     function removeItemFromSlot(slotKey) {
         const itemId = selectedLoadoutSlots[slotKey];
         if (!itemId) return;
@@ -1115,40 +1174,50 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    [...craftingLoadoutSlots, ...compareLoadoutASlots, ...compareLoadoutBSlots].forEach(slot => {
+    [...craftingLoadoutSlots, ...compareLoadoutASlots, ...compareLoadoutBSlots].forEach((slot) => {
         slot.addEventListener('click', () => handleSlotClick(slot));
     });
 
     modalCloseBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
     if (clearShoppingListBtn) {
         clearShoppingListBtn.addEventListener('click', clearAllSelections);
     }
-    
+
     function triggerSuccessAnimation(element) {
         if (!element) return;
         element.classList.remove('result-success');
         void element.offsetWidth;
         element.classList.add('result-success');
     }
-    
+
     document.addEventListener('click', (e) => {
-        if (selectorFilterPanel && !selectorFilterPanel.contains(e.target) && !selectorFilterToggleBtn.contains(e.target)) {
+        if (
+            selectorFilterPanel &&
+            !selectorFilterPanel.contains(e.target) &&
+            !selectorFilterToggleBtn.contains(e.target)
+        ) {
             selectorFilterPanel.classList.remove('visible');
         }
 
-        if (comparisonFilterPanel && !comparisonFilterPanel.contains(e.target) && !comparisonFilterToggleBtn.contains(e.target)) {
+        if (
+            comparisonFilterPanel &&
+            !comparisonFilterPanel.contains(e.target) &&
+            !comparisonFilterToggleBtn.contains(e.target)
+        ) {
             comparisonFilterPanel.classList.remove('visible');
         }
     });
 
     function populateScreenshotLoadout() {
         let html = '';
-        Object.keys(SLOT_PLACEHOLDERS).forEach(slotKey => {
+        Object.keys(SLOT_PLACEHOLDERS).forEach((slotKey) => {
             const slotId = `slot-${slotKey}`;
             const itemId = selectedLoadoutSlots[slotKey];
-            const itemData = itemId ? EQUIPMENT_DATA.find(i => i.id === itemId) : null;
-            
+            const itemData = itemId ? EQUIPMENT_DATA.find((i) => i.id === itemId) : null;
+
             html += `<div class="loadout-slot" id="screenshot-${slotId}" data-slot="${slotKey}">
                         ${itemData ? `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">` : ''}
                     </div>`;
@@ -1158,21 +1227,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function populateScreenshotShoppingList() {
         let html = '';
-        const uniqueItems = new Set(Object.values(selectedLoadoutSlots).filter(id => id !== null));
-    
+        const uniqueItems = new Set(Object.values(selectedLoadoutSlots).filter((id) => id !== null));
+
         if (uniqueItems.size === 0) {
-            screenshotShoppingList.innerHTML = '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary);">No items in loadout.</p>';
+            screenshotShoppingList.innerHTML =
+                '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary);">No items in loadout.</p>';
             return;
         }
 
-        uniqueItems.forEach(itemId => {
-            const itemData = EQUIPMENT_DATA.find(i => i.id === itemId);
+        uniqueItems.forEach((itemId) => {
+            const itemData = EQUIPMENT_DATA.find((i) => i.id === itemId);
             if (!itemData) return;
-    
+
             let statsHtml = '';
             if (itemData.stats) {
                 Object.entries(itemData.stats)
-                    .sort(([,a], [,b]) => b - a)
+                    .sort(([, a], [, b]) => b - a)
                     .forEach(([statKey, statValue]) => {
                         if (statValue > 0) {
                             const troopType = getTroopTypeFromStat(statKey);
@@ -1181,7 +1251,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
             }
             if (itemData.special_stats && itemData.special_stats.length > 0) {
-                 itemData.special_stats.forEach(stat => {
+                itemData.special_stats.forEach((stat) => {
                     statsHtml += `<div class="special-stat">${stat}</div>`;
                 });
             }
@@ -1191,7 +1261,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const costs = Object.entries(itemData.cost).filter(([, amount]) => amount > 0);
                 if (costs.length > 0) {
                     costs.forEach(([mat, amount]) => {
-                        let qualityClass = `text-${(itemData.quality || 'Normal').toLowerCase()}`;
+                        const qualityClass = `text-${(itemData.quality || 'Normal').toLowerCase()}`;
                         costHtml += `
                             <div class="cost-pair">
                                 <img src="${getMaterialIconPath(mat, itemData.quality)}" alt="${mat}">
@@ -1200,7 +1270,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
             }
-    
+
             html += `<div class="screenshot-list-item">
                         <img src="${getImagePath(itemData.image)}" alt="${itemData.name}">
                         <div class="screenshot-item-details">
@@ -1221,16 +1291,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalCost = { iron: 0, leather: 0, ebony: 0, bone: 0 };
         let totalGoldCost = 0;
         const materialNames = {
-            iron: "Iron Ore",
-            leather: "Leather",
-            ebony: "Ebony",
-            bone: "Animal Bone"
+            iron: 'Iron Ore',
+            leather: 'Leather',
+            ebony: 'Ebony',
+            bone: 'Animal Bone',
         };
-    
-        const uniqueItems = new Set(Object.values(selectedLoadoutSlots).filter(id => id !== null));
-    
-        uniqueItems.forEach(itemId => {
-            const itemData = EQUIPMENT_DATA.find(i => i.id === itemId);
+
+        const uniqueItems = new Set(Object.values(selectedLoadoutSlots).filter((id) => id !== null));
+
+        uniqueItems.forEach((itemId) => {
+            const itemData = EQUIPMENT_DATA.find((i) => i.id === itemId);
             if (itemData && itemData.cost) {
                 for (const mat in itemData.cost) {
                     totalCost[mat] += itemData.cost[mat];
@@ -1238,7 +1308,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 totalGoldCost += itemData.gold_cost || 0;
             }
         });
-    
+
         let html = '';
         Object.entries(totalCost).forEach(([mat, amount]) => {
             if (amount > 0) {
@@ -1249,7 +1319,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>`;
             }
         });
-    
+
         if (totalGoldCost > 0) {
             html += `
                 <div class="screenshot-cost-item">
@@ -1257,29 +1327,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="value">Gold: ${totalGoldCost.toLocaleString()}</span>
                 </div>`;
         }
-    
+
         if (!html) {
-            html = '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary);">No materials required.</p>';
+            html =
+                '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary);">No materials required.</p>';
         }
-    
+
         screenshotTotalCost.innerHTML = html;
     }
-    
+
     function openScreenshotModal() {
-        const hasLoadoutItems = Object.values(selectedLoadoutSlots).some(id => id !== null);
+        const hasLoadoutItems = Object.values(selectedLoadoutSlots).some((id) => id !== null);
         if (!hasLoadoutItems) {
-            showAlert("Please add at least one item to your equipment loadout first.");
+            showAlert('Please add at least one item to your equipment loadout first.');
             return;
         }
 
         screenshotViewToggle.checked = false;
         screenshotCaptureArea.classList.remove('view-materials');
-        screenshotToggleLabel.textContent = "Stats Overview";
+        screenshotToggleLabel.textContent = 'Stats Overview';
         screenshotTotalStatsWrapper.style.display = 'flex';
         screenshotTotalCostWrapper.style.display = 'none';
         screenshotTotalStatsWrapper.classList.remove('fade-out-down', 'fade-in-up');
         screenshotTotalCostWrapper.classList.remove('fade-out-down', 'fade-in-up');
-
 
         populateScreenshotLoadout();
         populateScreenshotShoppingList();
@@ -1294,7 +1364,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function waitForImagesToLoad(containerElement) {
         const images = Array.from(containerElement.getElementsByTagName('img'));
-        const promises = images.map(img => {
+        const promises = images.map((img) => {
             return new Promise((resolve, reject) => {
                 if (img.complete && img.naturalHeight !== 0) {
                     resolve();
@@ -1311,22 +1381,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const node = screenshotCaptureArea;
         const watermark = document.querySelector('.screenshot-watermark');
         if (watermark) watermark.classList.add('visible');
-    
+
         try {
-            await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 50)));
+            await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 50)));
             await waitForImagesToLoad(node);
-    
+
             const scale = 2;
             const dataUrl = await domtoimage.toPng(node, {
                 width: node.clientWidth * scale,
                 height: node.clientHeight * scale,
                 style: {
                     transform: `scale(${scale})`,
-                    transformOrigin: 'top left'
+                    transformOrigin: 'top left',
                 },
                 bgcolor: window.getComputedStyle(node).backgroundColor || 'transparent',
                 cacheBust: true,
-                quality: 0.95
+                quality: 0.95,
             });
             const blob = await (await fetch(dataUrl)).blob();
             if (!blob) {
@@ -1342,10 +1412,10 @@ document.addEventListener('DOMContentLoaded', function() {
         e.stopPropagation();
         const originalButtonText = downloadImageBtn.innerHTML;
         downloadImageBtn.disabled = true;
-    
+
         try {
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Image generation timed out')), 10000)
+                setTimeout(() => reject(new Error('Image generation timed out')), 10000),
             );
             const blob = await Promise.race([generateImageBlob(), timeoutPromise]);
 
@@ -1373,22 +1443,19 @@ document.addEventListener('DOMContentLoaded', function() {
         e.stopPropagation();
         const originalButtonText = copyImageBtn.innerHTML;
         copyImageBtn.disabled = true;
-    
+
         try {
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Image generation timed out')), 10000)
+                setTimeout(() => reject(new Error('Image generation timed out')), 10000),
             );
             const blob = await Promise.race([generateImageBlob(), timeoutPromise]);
-    
+
             try {
                 if (!navigator.clipboard || !navigator.clipboard.write) {
                     throw new Error('Clipboard API not available.');
                 }
-                await navigator.clipboard.write([
-                    new ClipboardItem({ 'image/png': blob })
-                ]);
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
                 copyImageBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-    
             } catch (clipboardError) {
                 console.warn('Clipboard API failed, falling back to download:', clipboardError);
                 const link = document.createElement('a');
@@ -1400,7 +1467,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 URL.revokeObjectURL(link.href);
                 copyImageBtn.innerHTML = '<i class="fas fa-download"></i> Downloaded!';
             }
-    
         } catch (err) {
             console.error('Failed to generate or copy image: ', err);
             copyImageBtn.innerHTML = '<i class="fas fa-times"></i> Failed!';
@@ -1412,60 +1478,61 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 3000);
         }
     }
-    
+
     if (screenshotBtn) screenshotBtn.addEventListener('click', openScreenshotModal);
     if (screenshotModalCloseBtn) screenshotModalCloseBtn.addEventListener('click', closeScreenshotModal);
-    if (screenshotModal) screenshotModal.addEventListener('click', (e) => {
-        if (e.target === screenshotModal) closeScreenshotModal();
-    });
+    if (screenshotModal)
+        screenshotModal.addEventListener('click', (e) => {
+            if (e.target === screenshotModal) closeScreenshotModal();
+        });
     if (copyImageBtn) copyImageBtn.addEventListener('click', handleCopyImage);
     if (downloadImageBtn) {
         downloadImageBtn.addEventListener('click', handleDownloadImage);
     }
-    
-   if (screenshotViewToggle) screenshotViewToggle.addEventListener('change', () => {
-        const isCostView = screenshotViewToggle.checked;
-        screenshotTotalStatsWrapper.classList.remove('fade-in-up', 'fade-out-down');
-        screenshotTotalCostWrapper.classList.remove('fade-in-up', 'fade-out-down');
 
-        if (isCostView) {
-            screenshotCaptureArea.classList.add('view-materials');
-            screenshotToggleLabel.textContent = "Material Cost";
-            
-            screenshotTotalStatsWrapper.classList.add('fade-out-down');
-            screenshotTotalCostWrapper.style.display = 'flex';
-            screenshotTotalCostWrapper.classList.add('fade-in-up');
-            
-            setTimeout(() => {
-                if(screenshotViewToggle.checked) {
-                    screenshotTotalStatsWrapper.style.display = 'none';
-                }
-            }, 400);
+    if (screenshotViewToggle)
+        screenshotViewToggle.addEventListener('change', () => {
+            const isCostView = screenshotViewToggle.checked;
+            screenshotTotalStatsWrapper.classList.remove('fade-in-up', 'fade-out-down');
+            screenshotTotalCostWrapper.classList.remove('fade-in-up', 'fade-out-down');
 
-        } else {
-            screenshotCaptureArea.classList.remove('view-materials');
-            screenshotToggleLabel.textContent = "Stats Overview";
-            
-            screenshotTotalCostWrapper.classList.add('fade-out-down');
-            screenshotTotalStatsWrapper.style.display = 'flex';
-            screenshotTotalStatsWrapper.classList.add('fade-in-up');
+            if (isCostView) {
+                screenshotCaptureArea.classList.add('view-materials');
+                screenshotToggleLabel.textContent = 'Material Cost';
 
-            setTimeout(() => {
-                if(!screenshotViewToggle.checked) {
-                    screenshotTotalCostWrapper.style.display = 'none';
-                }
-            }, 400);
-        }
-    });
+                screenshotTotalStatsWrapper.classList.add('fade-out-down');
+                screenshotTotalCostWrapper.style.display = 'flex';
+                screenshotTotalCostWrapper.classList.add('fade-in-up');
+
+                setTimeout(() => {
+                    if (screenshotViewToggle.checked) {
+                        screenshotTotalStatsWrapper.style.display = 'none';
+                    }
+                }, 400);
+            } else {
+                screenshotCaptureArea.classList.remove('view-materials');
+                screenshotToggleLabel.textContent = 'Stats Overview';
+
+                screenshotTotalCostWrapper.classList.add('fade-out-down');
+                screenshotTotalStatsWrapper.style.display = 'flex';
+                screenshotTotalStatsWrapper.classList.add('fade-in-up');
+
+                setTimeout(() => {
+                    if (!screenshotViewToggle.checked) {
+                        screenshotTotalCostWrapper.style.display = 'none';
+                    }
+                }, 400);
+            }
+        });
 
     function showTooltip(itemId, event) {
-        const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+        const itemData = EQUIPMENT_DATA.find((item) => item.id === itemId);
         if (!itemData) return;
 
         let statsHtml = '';
         if (itemData.stats) {
             Object.entries(itemData.stats)
-                .sort(([,a], [,b]) => b - a)
+                .sort(([, a], [, b]) => b - a)
                 .forEach(([key, value]) => {
                     if (value > 0) {
                         const troopType = getTroopTypeFromStat(key);
@@ -1473,7 +1540,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
         }
-        if(itemData.special_stats) itemData.special_stats.forEach(stat => statsHtml += `<div class="special-stat">${stat}</div>`);
+        if (itemData.special_stats)
+            itemData.special_stats.forEach((stat) => (statsHtml += `<div class="special-stat">${stat}</div>`));
 
         let costHtml = '';
         if (itemData.cost) {
@@ -1487,11 +1555,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         let setHtml = '';
-        const itemSet = EQUIPMENT_SET_DATA.find(set => set.pieces.includes(itemId));
+        const itemSet = EQUIPMENT_SET_DATA.find((set) => set.pieces.includes(itemId));
         if (itemSet) {
             setHtml += `<div class="tooltip-set-info">
                 <h5 class="set-name">${itemSet.name}</h5>`;
-            itemSet.bonuses.forEach(bonus => {
+            itemSet.bonuses.forEach((bonus) => {
                 setHtml += `<div class="set-bonus">(${bonus.count}-piece): ${bonus.description}</div>`;
             });
             setHtml += `</div>`;
@@ -1503,7 +1571,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ${costHtml ? `<div class="tooltip-section">${costHtml}</div>` : ''}
             ${setHtml ? `<div class="tooltip-section">${setHtml}</div>` : ''}
         `;
-        
+
         positionTooltip(event);
         equipmentTooltip.classList.add('visible');
     }
@@ -1516,7 +1584,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const tooltipRect = equipmentTooltip.getBoundingClientRect();
         let x = event.clientX + 15;
         let y = event.clientY + 15;
-    
+
         if (x + tooltipRect.width > window.innerWidth) {
             x = event.clientX - tooltipRect.width - 15;
         }
@@ -1529,14 +1597,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (y < 0) {
             y = 5;
         }
-        
+
         equipmentTooltip.style.left = `${x}px`;
         equipmentTooltip.style.top = `${y}px`;
     }
 
     async function initializeCalculator() {
         try {
-            const rarityOrder = { 'Legendary': 5, 'Epic': 4, 'Elite': 3, 'Advanced': 2, 'Normal': 1 };
+            const rarityOrder = { Legendary: 5, Epic: 4, Elite: 3, Advanced: 2, Normal: 1 };
             EQUIPMENT_DATA.sort((a, b) => {
                 const orderA = rarityOrder[a.quality] || 0;
                 const orderB = rarityOrder[b.quality] || 0;
@@ -1545,7 +1613,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             initializeEquipmentSelector();
             initializeComparisonFeatures();
-            
+
             const preLoginPath = sessionStorage.getItem('preLoginToolPath');
             if (preLoginPath === window.location.pathname) {
                 const preLoginState = JSON.parse(sessionStorage.getItem('preLoginState'));
@@ -1560,8 +1628,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             updateUIDisplays();
 
-            ['mouseover', 'mousemove', 'mouseout'].forEach(eventType => {
-                document.body.addEventListener(eventType, e => {
+            ['mouseover', 'mousemove', 'mouseout'].forEach((eventType) => {
+                document.body.addEventListener(eventType, (e) => {
                     const itemElement = e.target.closest('.modal-item, .selector-item');
                     if (eventType === 'mouseover' && itemElement) {
                         showTooltip(itemElement.dataset.itemId, e);
@@ -1578,19 +1646,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (loadoutViewSelector) {
                 loadoutViewSelector.addEventListener('change', updateLoadoutViews);
             }
-
         } catch (error) {
-            console.error("Could not initialize calculator:", error);
-            if(equipmentSelectorGrid) {
+            console.error('Could not initialize calculator:', error);
+            if (equipmentSelectorGrid) {
                 equipmentSelectorGrid.innerHTML = `<p style="color: var(--text-secondary); grid-column: 1 / -1; text-align: center;">Error: Could not load equipment data.</p>`;
             }
         }
     }
 
     function selectItemForComparison(itemId) {
-        const itemData = EQUIPMENT_DATA.find(item => item.id === itemId);
+        const itemData = EQUIPMENT_DATA.find((item) => item.id === itemId);
         if (!itemData || !activeSlotElement) return;
-        
+
         const slotElement = activeSlotElement;
         const slotKey = slotElement.dataset.slot;
         const loadoutIdentifier = slotElement.dataset.loadout;
@@ -1599,26 +1666,26 @@ document.addEventListener('DOMContentLoaded', function() {
         if (slotKey === 'accessory1' || slotKey === 'accessory2') {
             const otherSlot = slotKey === 'accessory1' ? 'accessory2' : 'accessory1';
             const otherItem = targetLoadout[otherSlot];
-            
+
             if (otherItem && otherItem.id === itemId) {
-                showAlert("You cannot equip two of the same accessory.", "Unique Item");
+                showAlert('You cannot equip two of the same accessory.', 'Unique Item');
                 return;
             }
         }
-    
+
         targetLoadout[slotKey] = {
             id: itemId,
             refined: false,
-            awakenLevel: 0
+            awakenLevel: 0,
         };
         slotElement.innerHTML = `<img src="${getImagePath(itemData.image)}" alt="${itemData.name}">`;
-        
+
         hideTooltip();
         closeModal();
         updateComparisonDisplays();
         saveCalculatorState();
     }
-    
+
     function removeItemFromComparisonSlot(slotElement) {
         const slotKey = slotElement.dataset.slot;
         const loadoutIdentifier = slotElement.dataset.loadout;
@@ -1626,7 +1693,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         slotElement.classList.remove('refined');
         slotElement.querySelector('.awaken-level')?.remove();
-    
+
         delete targetLoadout[slotKey];
         slotElement.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${slotKey} Slot">`;
         updateComparisonDisplays();
@@ -1642,14 +1709,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const specialStats = {};
         const tempAggregates = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {} };
         const iconicBonusesByTier = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {} };
-        
-        let accumulatedUnitCapacity = 0;
-        
-        const equippedPieces = Object.values(loadout).filter(item => item && item.id);
-        const equippedPieceIds = equippedPieces.map(item => item.id);
 
-        equippedPieces.forEach(item => {
-            const itemData = EQUIPMENT_DATA.find(d => d.id === item.id);
+        let accumulatedUnitCapacity = 0;
+
+        const equippedPieces = Object.values(loadout).filter((item) => item && item.id);
+        const equippedPieceIds = equippedPieces.map((item) => item.id);
+
+        equippedPieces.forEach((item) => {
+            const itemData = EQUIPMENT_DATA.find((d) => d.id === item.id);
             if (!itemData) return;
 
             if (itemData.stats) {
@@ -1663,7 +1730,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     totalStats[stat] += getRefinedBonus(itemData.stats[stat]);
                 }
             }
-            
+
             let iconicInfo = ICONIC_DATA[itemData.name];
             if (!iconicInfo && itemData.quality === 'Legendary' && itemData.slot === 'accessory') {
                 iconicInfo = ICONIC_DATA['Accessory'];
@@ -1673,10 +1740,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 for (let i = 1; i <= item.awakenLevel; i++) {
                     const tier = iconicInfo.tiers[i];
                     if (!tier) continue;
-                    
+
                     let tierValue = 0;
                     let critBuff = 0;
-                    
+
                     let statName = null;
                     if (tier.stat) {
                         statName = formatStatName(tier.stat);
@@ -1690,36 +1757,36 @@ document.addEventListener('DOMContentLoaded', function() {
                             tierValue = tier.values[currentKvkSeason] || 0;
                             if (item.refined) critBuff = tier.crit_bonus || 0;
                             const baseVal = tierValue + critBuff;
-                            
+
                             const baseStatKey = `base_${tier.stat}`;
                             totalStats[baseStatKey] = (totalStats[baseStatKey] || 0) + baseVal;
 
                             if (statName) tempAggregates[i][statName].value += baseVal;
                             break;
 
-                            case 'percent_stat':
-                                tierValue = tier.value || 0;
-                                if (item.refined) critBuff = tier.crit_buff || 0;
-                                const percentVal = tierValue + critBuff;
-                                
-                                let stat_key = tier.stat.toLowerCase().replace(/ /g, '_');
-                                let flatAmountToAdd = 0;
-    
+                        case 'percent_stat':
+                            tierValue = tier.value || 0;
+                            if (item.refined) critBuff = tier.crit_buff || 0;
+                            const percentVal = tierValue + critBuff;
+
+                            const stat_key = tier.stat.toLowerCase().replace(/ /g, '_');
+                            let flatAmountToAdd = 0;
+
+                            if (stat_key === 'unit_cap' || stat_key === 'unit_capacity') {
+                                flatAmountToAdd = percentVal * 2000;
+                                accumulatedUnitCapacity += flatAmountToAdd;
+                            }
+
+                            if (statName) {
                                 if (stat_key === 'unit_cap' || stat_key === 'unit_capacity') {
-                                    flatAmountToAdd = percentVal * 2000;
-                                    accumulatedUnitCapacity += flatAmountToAdd;
+                                    tempAggregates[i][statName].value += flatAmountToAdd;
+                                    tempAggregates[i][statName].isPercent = false;
+                                } else {
+                                    tempAggregates[i][statName].value += percentVal;
+                                    tempAggregates[i][statName].isPercent = true;
                                 }
-    
-                                if (statName) {
-                                    if (stat_key === 'unit_cap' || stat_key === 'unit_capacity') {
-                                        tempAggregates[i][statName].value += flatAmountToAdd;
-                                        tempAggregates[i][statName].isPercent = false; 
-                                    } else {
-                                        tempAggregates[i][statName].value += percentVal;
-                                        tempAggregates[i][statName].isPercent = true;
-                                    }
-                                }
-                                break;
+                            }
+                            break;
 
                         case 'flat_stat':
                             tierValue = tier.value || 0;
@@ -1731,7 +1798,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 tempAggregates[i][statName].isPercent = false;
                             }
 
-                            if (tier.stat.toLowerCase().includes('capacity') || tier.stat.toLowerCase().includes('cap')) {
+                            if (
+                                tier.stat.toLowerCase().includes('capacity') ||
+                                tier.stat.toLowerCase().includes('cap')
+                            ) {
                                 accumulatedUnitCapacity += flatVal;
                             } else {
                                 totalStats['unit_capacity_flat'] = (totalStats['unit_capacity_flat'] || 0) + flatVal;
@@ -1754,20 +1824,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             }
-            
+
             if (itemData.special_stats) {
-                itemData.special_stats.forEach(stat => {
+                itemData.special_stats.forEach((stat) => {
                     let finalStat = stat;
                     if (item.refined) {
-                        if (stat.includes("Horn of Fury") || stat.includes("Karuak's War Drums")) {
-                            finalStat = stat.replace("50", "65 <span class='refined-bonus'>(50 + 15)</span>");
-                        } else if (stat.includes("Ring of Doom")) {
-                            finalStat = stat.replace("50%", "65% <span class='refined-bonus'>(50% + 15%)</span>");
-                        } else if (stat.includes("Greatest Glory")) {
-                            finalStat = stat.replace("5%", "6.5% <span class='refined-bonus'>(5% + 1.5%)</span>");
+                        if (stat.includes('Horn of Fury') || stat.includes("Karuak's War Drums")) {
+                            finalStat = stat.replace('50', "65 <span class='refined-bonus'>(50 + 15)</span>");
+                        } else if (stat.includes('Ring of Doom')) {
+                            finalStat = stat.replace('50%', "65% <span class='refined-bonus'>(50% + 15%)</span>");
+                        } else if (stat.includes('Greatest Glory')) {
+                            finalStat = stat.replace('5%', "6.5% <span class='refined-bonus'>(5% + 1.5%)</span>");
                         }
                     }
-                     specialStats[finalStat] = true;
+                    specialStats[finalStat] = true;
                 });
             }
         });
@@ -1776,9 +1846,9 @@ document.addEventListener('DOMContentLoaded', function() {
             for (const [name, data] of Object.entries(tempAggregates[i])) {
                 if (data.value > 0) {
                     let formattedValue = '';
-                    
+
                     const isUnitCap = name.toLowerCase().includes('cap');
-                    
+
                     if (data.isPercent && !isUnitCap) {
                         formattedValue = `+${parseFloat(data.value.toFixed(1))}%`;
                     } else {
@@ -1789,50 +1859,53 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        EQUIPMENT_SET_DATA.forEach(set => {
-            const equippedCount = set.pieces.filter(pieceId => equippedPieceIds.includes(pieceId)).length;
-            set.bonuses.forEach(bonus => {
+        EQUIPMENT_SET_DATA.forEach((set) => {
+            const equippedCount = set.pieces.filter((pieceId) => equippedPieceIds.includes(pieceId)).length;
+            set.bonuses.forEach((bonus) => {
                 if (equippedCount >= bonus.count) {
-                     const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
-                     const statMatch = bonus.description.match(/(Troop|Infantry|Cavalry|Archer|Siege) (Attack|Defense|Health|Defence)[\s\+]+([\d\.]+)%/i);
-                     if(statMatch){
-                         const scope = statMatch[1].toLowerCase();
-                         const type = statMatch[2].toLowerCase().replace('defence', 'defense');
-                         const value = parseFloat(statMatch[3]);
+                    const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
+                    const statMatch = bonus.description.match(
+                        /(Troop|Infantry|Cavalry|Archer|Siege) (Attack|Defense|Health|Defence)[\s\+]+([\d\.]+)%/i,
+                    );
+                    if (statMatch) {
+                        const scope = statMatch[1].toLowerCase();
+                        const type = statMatch[2].toLowerCase().replace('defence', 'defense');
+                        const value = parseFloat(statMatch[3]);
 
-                         if(scope === 'troop'){
-                            troopTypes.forEach(troop => {
+                        if (scope === 'troop') {
+                            troopTypes.forEach((troop) => {
                                 totalStats[`${troop}_${type}`] = (totalStats[`${troop}_${type}`] || 0) + value;
                             });
-                         } else {
+                        } else {
                             totalStats[`${scope}_${type}`] = (totalStats[`${scope}_${type}`] || 0) + value;
-                         }
-                     } else {
-                         specialStats[bonus.description] = true;
-                     }
+                        }
+                    } else {
+                        specialStats[bonus.description] = true;
+                    }
                 }
             });
         });
-        
+
         const troopTypes = ['infantry', 'cavalry', 'archer', 'siege'];
-        ['attack', 'defense', 'health'].forEach(statType => {
+        ['attack', 'defense', 'health'].forEach((statType) => {
             const universalStat = `troop_${statType}`;
             if (totalStats[universalStat]) {
-                troopTypes.forEach(troop => {
-                    totalStats[`${troop}_${statType}`] = (totalStats[`${troop}_${statType}`] || 0) + totalStats[universalStat];
+                troopTypes.forEach((troop) => {
+                    totalStats[`${troop}_${statType}`] =
+                        (totalStats[`${troop}_${statType}`] || 0) + totalStats[universalStat];
                 });
             }
         });
-        
-        const baseStats = Object.keys(totalStats).filter(k => k.startsWith('base_'));
-        baseStats.forEach(key => {
+
+        const baseStats = Object.keys(totalStats).filter((k) => k.startsWith('base_'));
+        baseStats.forEach((key) => {
             const value = totalStats[key];
             delete totalStats[key];
-            let statName = key.substring(5);
-            
+            const statName = key.substring(5);
+
             if (statName.startsWith('Troop')) {
                 const statSuffix = statName.substring(5).toLowerCase().replace(/ /g, '_');
-                ['infantry', 'cavalry', 'archer', 'siege'].forEach(troop => {
+                ['infantry', 'cavalry', 'archer', 'siege'].forEach((troop) => {
                     const newKey = `${troop}${statSuffix}`;
                     totalStats[newKey] = (totalStats[newKey] || 0) + value;
                 });
@@ -1841,47 +1914,54 @@ document.addEventListener('DOMContentLoaded', function() {
                 totalStats[newKey] = (totalStats[newKey] || 0) + value;
             }
         });
-        
+
         if (totalStats['unit_capacity_flat']) delete totalStats['unit_capacity_flat'];
 
         return { stats: totalStats, special: specialStats, iconicBonusesByTier };
     }
-    
+
     function updateComparisonStats() {
         if (!comparisonStatsContainer) return;
         const statsA = calculateLoadoutStats(compareLoadoutA);
         const statsB = calculateLoadoutStats(compareLoadoutB);
-    
-        const allStatKeys = [...new Set([...Object.keys(statsA.stats), ...Object.keys(statsB.stats)])].filter(key => !key.startsWith('troop_'));
 
-        const allSpecialStatKeys = [...new Set([...Object.keys(statsA.special),...Object.keys(statsB.special)])];
+        const allStatKeys = [...new Set([...Object.keys(statsA.stats), ...Object.keys(statsB.stats)])].filter(
+            (key) => !key.startsWith('troop_'),
+        );
+
+        const allSpecialStatKeys = [...new Set([...Object.keys(statsA.special), ...Object.keys(statsB.special)])];
         let hasIconicBonuses = false;
-        for(let i = 1; i <= 5; i++){
-            if(Object.keys(statsA.iconicBonusesByTier[i]).length > 0 || Object.keys(statsB.iconicBonusesByTier[i]).length > 0) {
-                hasIconicBonuses = true; break;
+        for (let i = 1; i <= 5; i++) {
+            if (
+                Object.keys(statsA.iconicBonusesByTier[i]).length > 0 ||
+                Object.keys(statsB.iconicBonusesByTier[i]).length > 0
+            ) {
+                hasIconicBonuses = true;
+                break;
             }
         }
         if (allStatKeys.length === 0 && allSpecialStatKeys.length === 0 && !hasIconicBonuses) {
-            comparisonStatsContainer.innerHTML = '<p class="no-items-placeholder">Select equipment in a loadout to see its stats.</p>';
+            comparisonStatsContainer.innerHTML =
+                '<p class="no-items-placeholder">Select equipment in a loadout to see its stats.</p>';
             return;
         }
-    
+
         const groupedStats = {};
         const groupTotals = {};
 
-        allStatKeys.forEach(key => {
+        allStatKeys.forEach((key) => {
             const troopType = getTroopTypeFromStat(key);
             if (!groupedStats[troopType]) {
                 groupedStats[troopType] = [];
                 groupTotals[troopType] = 0;
             }
             groupedStats[troopType].push(key);
-            
+
             const valA = statsA.stats[key] || 0;
             const valB = statsB.stats[key] || 0;
-            groupTotals[troopType] += (valA + valB);
+            groupTotals[troopType] += valA + valB;
         });
-        
+
         for (const troop in groupedStats) {
             groupedStats[troop].sort((a, b) => {
                 const isBaseA = a.includes('_base_');
@@ -1907,30 +1987,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const totalA = (statsA.stats[a] || 0) + (statsB.stats[a] || 0);
                 const totalB = (statsA.stats[b] || 0) + (statsB.stats[b] || 0);
-                
+
                 return totalB - totalA;
             });
         }
-        
+
         const sortedTroopTypes = Object.keys(groupedStats).sort((a, b) => {
             return groupTotals[b] - groupTotals[a];
         });
 
         let mainStatsHtml = '';
-        sortedTroopTypes.forEach(troopType => {
-            groupedStats[troopType].forEach(key => {
+        sortedTroopTypes.forEach((troopType) => {
+            groupedStats[troopType].forEach((key) => {
                 const valA = statsA.stats[key] || 0;
                 const valB = statsB.stats[key] || 0;
                 if (valA === 0 && valB === 0) return;
-    
+
                 const delta = valB - valA;
                 const isPercentage = !key.includes('_base_');
                 const suffix = isPercentage ? '%' : '';
-                
-                let deltaHtml = (delta !== 0)
-                    ? `<span class="${delta > 0 ? 'stat-increase' : 'stat-decrease'}"><i class="fas ${delta > 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i> <span class="delta-number">${delta.toFixed(isPercentage ? 1 : 0).replace('.0', '')}${suffix}</span></span>`
-                    : `<span class="stat-no-change">-</span>`;
-                
+
+                const deltaHtml =
+                    delta !== 0
+                        ? `<span class="${delta > 0 ? 'stat-increase' : 'stat-decrease'}"><i class="fas ${delta > 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i> <span class="delta-number">${delta.toFixed(isPercentage ? 1 : 0).replace('.0', '')}${suffix}</span></span>`
+                        : `<span class="stat-no-change">-</span>`;
+
                 let iconHtml = '';
                 if (troopType !== 'general') {
                     iconHtml = `<img src="${getImagePath(`${troopType}_icon_mini.webp`)}" alt="${troopType} icon" class="stat-icon-mini">`;
@@ -1955,15 +2036,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const uniqueSpecialKeys = [...new Set(allSpecialKeys)];
 
         if (uniqueSpecialKeys.length > 0) {
-            specialStatsHtml += '<div class="comparison-special-row"><div class="comparison-special-title" style="border-bottom: 1px solid var(--border-color);">Extra Bonuses</div></div>';
-            uniqueSpecialKeys.forEach(key => {
+            specialStatsHtml +=
+                '<div class="comparison-special-row"><div class="comparison-special-title" style="border-bottom: 1px solid var(--border-color);">Extra Bonuses</div></div>';
+            uniqueSpecialKeys.forEach((key) => {
                 const valA = statsA.special[key];
                 const valB = statsB.special[key];
-                
-                const valueA_html = valA === true ? '<i class="fas fa-check"></i>' : (valA ? valA.toLocaleString() : '');
-                const valueB_html = valB === true ? '<i class="fas fa-check"></i>' : (valB ? valB.toLocaleString() : '');
 
-                 specialStatsHtml += `
+                const valueA_html = valA === true ? '<i class="fas fa-check"></i>' : valA ? valA.toLocaleString() : '';
+                const valueB_html = valB === true ? '<i class="fas fa-check"></i>' : valB ? valB.toLocaleString() : '';
+
+                specialStatsHtml += `
                     <div class="comparison-special-row">
                         <div class="special-stat-name" style="grid-column: 1 / 2;">${key.replace(/<[^>]*>/g, '')}</div>
                         <div class="stat-value" style="grid-column: 2 / 3;">${valueA_html}</div>
@@ -1973,19 +2055,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             });
         }
-        
+
         for (let tier = 1; tier <= 5; tier++) {
-            const allTierBonuses = [...new Set([...Object.keys(statsA.iconicBonusesByTier[tier]), ...Object.keys(statsB.iconicBonusesByTier[tier])])];
-            
+            const allTierBonuses = [
+                ...new Set([
+                    ...Object.keys(statsA.iconicBonusesByTier[tier]),
+                    ...Object.keys(statsB.iconicBonusesByTier[tier]),
+                ]),
+            ];
+
             if (allTierBonuses.length > 0) {
-                 specialStatsHtml += `<div class="comparison-special-row"><div class="comparison-special-title" style="border-bottom: 1px solid var(--border-color);">Tier ${tier} Iconic Bonuses</div></div>`;
-                 
-                 allTierBonuses.forEach(bonusName => {
+                specialStatsHtml += `<div class="comparison-special-row"><div class="comparison-special-title" style="border-bottom: 1px solid var(--border-color);">Tier ${tier} Iconic Bonuses</div></div>`;
+
+                allTierBonuses.forEach((bonusName) => {
                     const valA = statsA.iconicBonusesByTier[tier][bonusName];
                     const valB = statsB.iconicBonusesByTier[tier][bonusName];
-                    
-                    const displayA = valA === true ? '<i class="fas fa-check"></i>' : (valA || '');
-                    const displayB = valB === true ? '<i class="fas fa-check"></i>' : (valB || '');
+
+                    const displayA = valA === true ? '<i class="fas fa-check"></i>' : valA || '';
+                    const displayB = valB === true ? '<i class="fas fa-check"></i>' : valB || '';
 
                     specialStatsHtml += `<div class="comparison-special-row">
                         <div class="special-stat-name" style="grid-column: 1 / 2;">${bonusName}</div>
@@ -1993,12 +2080,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="special-stat-value" style="grid-column: 3 / 4;">${displayB}</div>
                         <div class="delta-value" style="grid-column: 4 / 5;"></div>
                     </div>`;
-                 });
+                });
             }
         }
 
         const showExtraBonuses = extraBonusesToggle.checked;
-        
+
         comparisonStatsContainer.innerHTML = `
         <div class="comparison-grid" id="comparison-main-stats-grid" style="opacity: ${showExtraBonuses ? 0 : 1}; pointer-events: ${showExtraBonuses ? 'none' : 'auto'};">
             <div class="comparison-header">Stats</div>
@@ -2024,24 +2111,28 @@ document.addEventListener('DOMContentLoaded', function() {
             <button class="filter-option-btn stat-cavalry" data-filter-type="cavalry">Cavalry</button>
             <button class="filter-option-btn stat-archer" data-filter-type="archer">Archer</button>
             <button class="filter-option-btn stat-siege" data-filter-type="siege">Siege</button>`;
-        if(comparisonFilterPanel) comparisonFilterPanel.querySelector('.filter-options').innerHTML = filterOptions;
+        if (comparisonFilterPanel) comparisonFilterPanel.querySelector('.filter-options').innerHTML = filterOptions;
 
-        if(comparisonFilterToggleBtn) comparisonFilterToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            comparisonFilterPanel.classList.toggle('visible');
-        });
+        if (comparisonFilterToggleBtn)
+            comparisonFilterToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                comparisonFilterPanel.classList.toggle('visible');
+            });
 
-        if(comparisonFilterPanel) comparisonFilterPanel.addEventListener('click', (e) => {
-            if(e.target.matches('.filter-option-btn')) {
-                const filterType = e.target.dataset.filterType;
-                document.querySelectorAll('#comparison-main-stats-grid .comparison-stat-row').forEach(row => {
-                    const isVisible = filterType === 'all' || Array.from(row.classList).includes(filterType);
-                    row.style.display = isVisible ? 'contents' : 'none';
-                });
-                comparisonFilterPanel.querySelectorAll('.filter-option-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-            }
-        });
+        if (comparisonFilterPanel)
+            comparisonFilterPanel.addEventListener('click', (e) => {
+                if (e.target.matches('.filter-option-btn')) {
+                    const filterType = e.target.dataset.filterType;
+                    document.querySelectorAll('#comparison-main-stats-grid .comparison-stat-row').forEach((row) => {
+                        const isVisible = filterType === 'all' || Array.from(row.classList).includes(filterType);
+                        row.style.display = isVisible ? 'contents' : 'none';
+                    });
+                    comparisonFilterPanel
+                        .querySelectorAll('.filter-option-btn')
+                        .forEach((btn) => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                }
+            });
 
         if (!awakenModeBtn || !refineModeBtn || !kvkSeasonSelector) return;
 
@@ -2059,11 +2150,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const level = parseInt(e.target.dataset.level, 10);
                 setAwakenLevel(level);
             }
-             if (e.target === awakenLevelModal) {
+            if (e.target === awakenLevelModal) {
                 awakenLevelModal.style.display = 'none';
             }
         });
-        
+
         extraBonusesToggle.addEventListener('change', () => {
             const mainGrid = document.getElementById('comparison-main-stats-grid');
             const extraGrid = document.getElementById('comparison-extra-bonuses-grid');
@@ -2095,7 +2186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         awakenModeBtn.classList.toggle('active', currentComparisonMode === 'awaken');
         refineModeBtn.classList.toggle('active', currentComparisonMode === 'refine');
     }
-    
+
     function toggleRefine(slotElement) {
         const loadoutIdentifier = slotElement.dataset.loadout;
         const slotKey = slotElement.dataset.slot;
@@ -2116,15 +2207,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const item = targetLoadout[slotKey];
         if (!item) return;
 
-        const itemData = EQUIPMENT_DATA.find(d => d.id === item.id);
+        const itemData = EQUIPMENT_DATA.find((d) => d.id === item.id);
         let iconicInfo = ICONIC_DATA[itemData.name];
-        
+
         if (!iconicInfo && itemData.quality === 'Legendary' && itemData.slot === 'accessory') {
             iconicInfo = ICONIC_DATA['Accessory'];
         }
-        
+
         if (!iconicInfo) {
-            showAlert("This item cannot be awakened.", "Notice");
+            showAlert('This item cannot be awakened.', 'Notice');
             return;
         }
 
@@ -2156,15 +2247,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateComparisonVisuals(loadoutIdentifier) {
         const loadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
-        
-        Object.keys(SLOT_PLACEHOLDERS).forEach(slotKey => {
+
+        Object.keys(SLOT_PLACEHOLDERS).forEach((slotKey) => {
             const slotElement = document.getElementById(`slot-${loadoutIdentifier.toLowerCase()}-${slotKey}`);
             if (!slotElement) return;
-    
+
             const item = loadout[slotKey];
-            
+
             slotElement.classList.toggle('refined', !!(item && item.refined));
-    
+
             let awakenEl = slotElement.querySelector('.awaken-level');
             if (item && item.awakenLevel > 0) {
                 if (!awakenEl) {
@@ -2194,7 +2285,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleDetailsToggle(loadoutIdentifier, viewMode) {
         const detailsList = loadoutIdentifier === 'A' ? compareLoadoutADetailsList : compareLoadoutBDetailsList;
-        const grid = loadoutIdentifier === 'A' ? document.getElementById('compare-a-loadout-grid') : document.getElementById('compare-b-loadout-grid');
+        const grid =
+            loadoutIdentifier === 'A'
+                ? document.getElementById('compare-a-loadout-grid')
+                : document.getElementById('compare-b-loadout-grid');
 
         if (viewMode !== 'default') {
             populateDetailsList(loadoutIdentifier, viewMode);
@@ -2213,70 +2307,68 @@ document.addEventListener('DOMContentLoaded', function() {
     function populateDetailsList(loadoutIdentifier, viewMode) {
         const loadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
         const detailsListElement = loadoutIdentifier === 'A' ? compareLoadoutADetailsList : compareLoadoutBDetailsList;
-        
+
         detailsListElement.innerHTML = '';
-        
+
         const slotOrder = ['helmet', 'weapon', 'chest', 'gloves', 'legs', 'boots', 'accessory1', 'accessory2'];
-        const equippedItems = slotOrder
-            .map(slot => loadout[slot])
-            .filter(item => item && item.id);
+        const equippedItems = slotOrder.map((slot) => loadout[slot]).filter((item) => item && item.id);
 
         if (equippedItems.length === 0) {
-            detailsListElement.innerHTML = '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary); padding: var(--spacing-8) 0;">No items in this loadout.</p>';;
+            detailsListElement.innerHTML =
+                '<p class="no-items-placeholder" style="text-align: center; color: var(--text-secondary); padding: var(--spacing-8) 0;">No items in this loadout.</p>';
             return;
         }
 
-        equippedItems.forEach(item => {
-            const itemData = EQUIPMENT_DATA.find(i => i.id === item.id);
+        equippedItems.forEach((item) => {
+            const itemData = EQUIPMENT_DATA.find((i) => i.id === item.id);
             if (!itemData) return;
-            
+
             const individualStats = calculateLoadoutStats({ [itemData.slot]: item });
 
             let statsHtml = '<div class="details-item-stats">';
             if (viewMode === 'stats') {
-                if(itemData.stats) {
+                if (itemData.stats) {
                     Object.entries(itemData.stats)
-                        .sort(([,a], [,b]) => b - a)
+                        .sort(([, a], [, b]) => b - a)
                         .forEach(([statKey, statValue]) => {
-                            if(statValue > 0) {
+                            if (statValue > 0) {
                                 const troopType = getTroopTypeFromStat(statKey);
-                                statsHtml += `<div class="stat-pair ${troopType}"><span>${formatStatName(statKey)}</span> <span>+${statValue.toFixed(1).replace('.0','')}%</span></div>`;
+                                statsHtml += `<div class="stat-pair ${troopType}"><span>${formatStatName(statKey)}</span> <span>+${statValue.toFixed(1).replace('.0', '')}%</span></div>`;
                             }
                         });
                 }
-                if(itemData.special_stats) {
-                     itemData.special_stats.forEach(stat => {
+                if (itemData.special_stats) {
+                    itemData.special_stats.forEach((stat) => {
                         statsHtml += `<div class="special-stat">${stat}</div>`;
                     });
                 }
             } else if (viewMode === 'iconic') {
                 for (let tier = 1; tier <= 5; tier++) {
-                   const tierEntries = Object.entries(individualStats.iconicBonusesByTier[tier]);
-                   
-                   if (tierEntries.length > 0) {
-                       tierEntries.forEach(([statName, statValue]) => {
-                          let fullText = '';
+                    const tierEntries = Object.entries(individualStats.iconicBonusesByTier[tier]);
 
-                          if (statValue === true) {
-                              fullText = statName;
-                          } 
-                          else {
-                              fullText = `${statName} ${statValue}`;
-                          }
-                          
-                          const highlightedText = fullText.replace(
-                              /([±+]?[\d,]+(?:\.\d+)?%?)/g, 
-                              '<span style="color: #57f287;">$1</span>'
-                          );
+                    if (tierEntries.length > 0) {
+                        tierEntries.forEach(([statName, statValue]) => {
+                            let fullText = '';
 
-                          statsHtml += `
+                            if (statValue === true) {
+                                fullText = statName;
+                            } else {
+                                fullText = `${statName} ${statValue}`;
+                            }
+
+                            const highlightedText = fullText.replace(
+                                /([±+]?[\d,]+(?:\.\d+)?%?)/g,
+                                '<span style="color: #57f287;">$1</span>',
+                            );
+
+                            statsHtml += `
                               <div class="special-stat" style="color: #ffffff;">
                                    <strong style="color: var(--accent-yellow); margin-right: 4px;">Tier ${toRoman(tier)}:</strong> ${highlightedText}
                               </div>`;
-                      });
-                   }
+                        });
+                    }
                 }
-           }
+            }
             statsHtml += '</div>';
 
             if (statsHtml === '<div class="details-item-stats"></div>') {
@@ -2300,10 +2392,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function clearCompareLoadout(loadoutIdentifier) {
         const targetLoadout = loadoutIdentifier === 'A' ? compareLoadoutA : compareLoadoutB;
-        
+
         for (const key in targetLoadout) delete targetLoadout[key];
 
-        Object.keys(SLOT_PLACEHOLDERS).forEach(slotKey => {
+        Object.keys(SLOT_PLACEHOLDERS).forEach((slotKey) => {
             const slotElement = document.getElementById(`slot-${loadoutIdentifier.toLowerCase()}-${slotKey}`);
             if (slotElement) {
                 slotElement.innerHTML = `<img src="${SLOT_PLACEHOLDERS[slotKey]}" alt="${formatStatName(slotKey)} Slot">`;
@@ -2319,19 +2411,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (clearLoadoutABtn) {
         clearLoadoutABtn.addEventListener('click', () => {
-             clearCompareLoadout('A');
+            clearCompareLoadout('A');
         });
     }
 
     if (clearLoadoutBBtn) {
         clearLoadoutBBtn.addEventListener('click', () => {
-             clearCompareLoadout('B');
+            clearCompareLoadout('B');
         });
     }
 
     initializeCalculator();
-    
-    window.restoreToolState = function(state) {
+
+    window.restoreToolState = function (state) {
         if (state) {
             loadCalculatorState(state);
         }

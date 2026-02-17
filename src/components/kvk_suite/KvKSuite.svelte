@@ -13,7 +13,8 @@
             <h2 class="coming-soon-title">Coming Soon</h2>
 
             <p class="coming-soon-description">
-                The KvK Suite is currently under development. This comprehensive toolkit will help you manage and optimize your Kingdom vs Kingdom experience.
+                The KvK Suite is currently under development. This comprehensive toolkit will help you manage and
+                optimize your Kingdom vs Kingdom experience.
             </p>
 
             <div class="features-preview">
@@ -88,8 +89,13 @@
     }
 
     @keyframes gradient-slide {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
+        0%,
+        100% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
     }
 
     .icon-container {

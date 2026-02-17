@@ -14,9 +14,9 @@ import { ViewTransitions } from 'astro:transitions';
 
 const {
     title,
-    description = "ROK information done right. Enhance your Rise of Kingdoms experience on Discord today.",
-    bodyClass = "",
-    keywords = "Rise of Kingdoms, ROK, calculator, tools, speedup calculator, troop calculator, RoK helper, Rise of Kingdoms guide"
+    description = 'ROK information done right. Enhance your Rise of Kingdoms experience on Discord today.',
+    bodyClass = '',
+    keywords = 'Rise of Kingdoms, ROK, calculator, tools, speedup calculator, troop calculator, RoK helper, Rise of Kingdoms guide',
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
@@ -24,157 +24,165 @@ const isToolPage = currentPath.startsWith('/tools');
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const fullTitle = `${title} - Codex Helper | Rise of Kingdoms Tools`;
 ---
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <title>{fullTitle}</title>
-    <meta name="title" content={fullTitle}>
-    <meta name="description" content={description}>
-    <meta name="keywords" content={keywords}>
-    <meta name="author" content="Codex Helper">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href={canonicalURL}>
+        <title>{fullTitle}</title>
+        <meta name="title" content={fullTitle} />
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <meta name="author" content="Codex Helper" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={canonicalURL} />
 
-    <meta property="og:type" content="website">
-    <meta property="og:url" content={canonicalURL}>
-    <meta property="og:title" content={fullTitle}>
-    <meta property="og:description" content={description}>
-    <meta property="og:image" content={new URL(metaImage.src, Astro.site)}>
-    <meta property="og:site_name" content="Codex Helper">
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalURL} />
+        <meta property="og:title" content={fullTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={new URL(metaImage.src, Astro.site)} />
+        <meta property="og:site_name" content="Codex Helper" />
 
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:url" content={canonicalURL}>
-    <meta name="twitter:title" content={fullTitle}>
-    <meta name="twitter:description" content={description}>
-    <meta name="twitter:image" content={new URL(metaImage.src, Astro.site)}>
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:url" content={canonicalURL} />
+        <meta name="twitter:title" content={fullTitle} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={new URL(metaImage.src, Astro.site)} />
 
-    <meta name="theme-color" content="#3b82f6">
-    <meta name="application-name" content="Codex Helper">
-    <meta name="apple-mobile-web-app-title" content="Codex Helper">
+        <meta name="theme-color" content="#3b82f6" />
+        <meta name="application-name" content="Codex Helper" />
+        <meta name="apple-mobile-web-app-title" content="Codex Helper" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src}>
-    <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src}>
-    <link rel="icon" type="image/png" sizes="16x16" href={favicon16.src}>
-    <link rel="manifest" href="/site.webmanifest">
+        <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src} />
+        <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src} />
+        <link rel="icon" type="image/png" sizes="16x16" href={favicon16.src} />
+        <link rel="manifest" href="/site.webmanifest" />
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-156DRH9ZB0"></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-156DRH9ZB0');
-    </script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-156DRH9ZB0"></script>
+        <script is:inline>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', 'G-156DRH9ZB0');
+        </script>
 
-    <slot name="head-scripts" />
-</head>
-<body class={bodyClass}>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+        <slot name="head-scripts" />
+    </head>
+    <body class={bodyClass}>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    {isToolPage && (
-        <div class="global-tool-bg" style={`background-image: url(${toolBgImage.src})`}></div>
-    )}
+        {isToolPage && <div class="global-tool-bg" style={`background-image: url(${toolBgImage.src})`} />}
 
-    <Navbar client:load {currentPath} />
+        <Navbar client:load {currentPath} />
 
-    <div id="main-content">
-        <slot />
-    </div>
+        <div id="main-content">
+            <slot />
+        </div>
 
-    <Footer />
+        <Footer />
 
-    <button id="back-to-top" class="back-to-top" aria-label="Back to top">
-        <i class="fas fa-chevron-up"></i>
-    </button>
+        <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+            <i class="fas fa-chevron-up"></i>
+        </button>
 
-    <script>
-        import "../scripts/utils.js";
-        import "../scripts/auth.js";
-        import "../scripts/script.js";
-    </script>
+        <script>
+            import '../scripts/utils.js';
+            import '../scripts/auth.js';
+            import '../scripts/script.js';
+        </script>
 
-    <script>
-        const btn = document.getElementById('back-to-top');
-        if (btn) {
-            window.addEventListener('scroll', () => {
-                btn.classList.toggle('visible', window.scrollY > 400);
-            }, { passive: true });
-            btn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-    </script>
+        <script>
+            const btn = document.getElementById('back-to-top');
+            if (btn) {
+                window.addEventListener(
+                    'scroll',
+                    () => {
+                        btn.classList.toggle('visible', window.scrollY > 400);
+                    },
+                    { passive: true },
+                );
+                btn.addEventListener('click', () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+        </script>
 
-    <slot name="body-scripts" />
+        <slot name="body-scripts" />
 
-    <style>
-        .skip-link {
-            position: absolute;
-            top: -100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent-blue);
-            color: #fff;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0 0 8px 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            z-index: 10000;
-            text-decoration: none;
-            transition: top 0.2s ease;
-        }
-        .skip-link:focus {
-            top: 0;
-        }
-        .back-to-top {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            font-size: 1rem;
-            cursor: pointer;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .back-to-top.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        .back-to-top:hover {
-            background: var(--accent-blue);
-            color: #fff;
-            border-color: var(--accent-blue);
-        }
-        .global-tool-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
-            background-color: #000;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-    </style>
-</body>
+        <style>
+            .skip-link {
+                position: absolute;
+                top: -100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--accent-blue);
+                color: #fff;
+                padding: 0.75rem 1.5rem;
+                border-radius: 0 0 8px 8px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                z-index: 10000;
+                text-decoration: none;
+                transition: top 0.2s ease;
+            }
+            .skip-link:focus {
+                top: 0;
+            }
+            .back-to-top {
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                border: 1px solid var(--border-color);
+                background: var(--bg-secondary);
+                color: var(--text-secondary);
+                font-size: 1rem;
+                cursor: pointer;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(10px);
+                transition: all 0.3s ease;
+                z-index: 999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .back-to-top.visible {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+            .back-to-top:hover {
+                background: var(--accent-blue);
+                color: #fff;
+                border-color: var(--accent-blue);
+            }
+            .global-tool-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: -1;
+                pointer-events: none;
+                background-color: #000;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+        </style>
+    </body>
 </html>

@@ -1,4 +1,4 @@
-(function() {
+(function () {
     const API_BASE_URL = '';
     const WEBSITE_APP_ID = import.meta.env.PUBLIC_DISCORD_APP_ID || '1434105087722258573';
     const REDIRECT_URI = `${window.location.origin}/api/auth/callback`;
@@ -59,11 +59,13 @@
                 </div>
             `;
         } else {
-            const dashboardLink = user.is_master_admin ? `
+            const dashboardLink = user.is_master_admin
+                ? `
                 <a href="/dashboard" class="dropdown-item">
                     <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
                 </a>
-            ` : '';
+            `
+                : '';
 
             dropdownContent = `
                 <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="dropdown-item">
@@ -95,7 +97,7 @@
 
         profileContainer.addEventListener('click', (e) => {
             if (e.target.closest('.dropdown-item') && !e.target.closest('.logout-trigger')) return;
-            
+
             e.stopPropagation();
             const isHidden = dropdown.style.display === 'none';
             dropdown.style.display = isHidden ? 'block' : 'none';
@@ -110,9 +112,9 @@
                 arrow.style.transform = 'rotate(0deg)';
             }
         });
-        
+
         document.dispatchEvent(new CustomEvent('auth:loggedIn', { detail: { user } }));
-        
+
         if (!document.getElementById('auth-dropdown-styles')) {
             const style = document.createElement('style');
             style.id = 'auth-dropdown-styles';
@@ -145,11 +147,11 @@
     function cacheUser(user) {
         const cacheData = {
             timestamp: Date.now(),
-            user: user
+            user: user,
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
     }
-    
+
     function clearUserCache() {
         localStorage.removeItem(CACHE_KEY);
     }
@@ -165,7 +167,7 @@
             cacheUser(user);
             renderLoggedInState(container, user);
         } catch (error) {
-            console.log("No active session found or session is invalid during refresh.");
+            console.log('No active session found or session is invalid during refresh.');
             currentUser = null;
             clearUserCache();
             renderLoggedOutState(container);
@@ -180,7 +182,7 @@
         if (typeof window.getPreLoginState === 'function') {
             const state = window.getPreLoginState();
             if (state) {
-                console.log("Saving pre-login state...", state);
+                console.log('Saving pre-login state...', state);
                 sessionStorage.setItem('preLoginState', JSON.stringify(state));
                 sessionStorage.setItem('preLoginToolPath', window.location.pathname);
             }
@@ -194,17 +196,17 @@
         try {
             await fetch(`${API_BASE_URL}/api/auth/logout`, {
                 method: 'POST',
-                credentials: 'include'
+                credentials: 'include',
             });
         } catch (error) {
-            console.error("Logout request failed:", error);
+            console.error('Logout request failed:', error);
         } finally {
             currentUser = null;
             clearUserCache();
             window.location.reload();
         }
     }
-    
+
     async function fetchWithAuth(endpoint, options = {}) {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
             ...options,
@@ -214,15 +216,15 @@
                 'Content-Type': 'application/json',
             },
         });
-    
+
         if (!response.ok) {
             if (response.status === 401) {
                 if (currentUser) {
-                    console.log("Session expired or invalid token. Logging out...");
+                    console.log('Session expired or invalid token. Logging out...');
                     currentUser = null;
                     clearUserCache();
-                    
-                    await logout(); 
+
+                    await logout();
                     return;
                 }
             }
@@ -243,7 +245,7 @@
             if (Date.now() - timestamp < CACHE_DURATION_MS) {
                 currentUser = user;
                 renderLoggedInState(container, user);
-                refreshAuthState(); 
+                refreshAuthState();
                 return;
             } else {
                 clearUserCache();
@@ -258,7 +260,7 @@
             } else {
                 const stateJSON = sessionStorage.getItem('preLoginState');
                 if (stateJSON && typeof window.restoreToolState === 'function') {
-                    console.log("Restoring tool state...");
+                    console.log('Restoring tool state...');
                     const state = JSON.parse(stateJSON);
                     window.restoreToolState(state);
                 }
@@ -273,7 +275,7 @@
             cacheUser(user);
             renderLoggedInState(container, user);
         } catch (error) {
-            console.log("No active session found or session is invalid.");
+            console.log('No active session found or session is invalid.');
             currentUser = null;
             clearUserCache();
             renderLoggedOutState(container);
@@ -285,5 +287,4 @@
         fetchWithAuth: fetchWithAuth,
         getLoggedInUser: getLoggedInUser,
     };
-
 })();

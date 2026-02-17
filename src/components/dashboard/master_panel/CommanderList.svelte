@@ -11,58 +11,58 @@
     let items = [];
 
     $: {
-    const query = search.toLowerCase();
-    items = Object.entries(data).map(([key, rawTemplates]) => {
-        const templates = Array.isArray(rawTemplates) 
-            ? rawTemplates 
-            : (rawTemplates ? [rawTemplates] : []);
+        const query = search.toLowerCase();
+        items = Object.entries(data)
+            .map(([key, rawTemplates]) => {
+                const templates = Array.isArray(rawTemplates) ? rawTemplates : rawTemplates ? [rawTemplates] : [];
 
-        const aliasInfo = aliases[key] || {};
-        const displayName = aliasInfo.display_name || key;
-        const knownAliases = aliasInfo.aliases || [];
-        
-        const mainTemplate = templates.find(t => t.name === key) || templates[0];
-        
-        const tags = templates.map(t => {
-            if (t.name === key) return "Main";
-            if (t && t.name && t.name.startsWith(key + '_')) {
-                const type = t.name.slice(key.length + 1);
-                return type.charAt(0).toUpperCase() + type.slice(1);
-            }
-            return t ? t.name : "Unknown";
-        }).sort((a, b) => (a === "Main" ? -1 : b === "Main" ? 1 : 0));
-        
-        let avatarUrl = null;
+                const aliasInfo = aliases[key] || {};
+                const displayName = aliasInfo.display_name || key;
+                const knownAliases = aliasInfo.aliases || [];
 
-        const safeEmojiMap = Array.isArray(emojiMap) ? emojiMap : [];
-        let emojiEntry = safeEmojiMap.find(e => e.key === key);
-        
-        if (!emojiEntry) {
-            emojiEntry = safeEmojiMap.find(e => knownAliases.includes(e.key));
-        }
+                const mainTemplate = templates.find((t) => t.name === key) || templates[0];
 
-        if (emojiEntry) {
-            avatarUrl = `https://cdn.discordapp.com/emojis/${emojiEntry.emoji}.png`;
-        } else {
-            if (mainTemplate?.json?.embeds?.[0]?.author?.icon_url) {
-                avatarUrl = mainTemplate.json.embeds[0].author.icon_url;
-            } else if (mainTemplate?.json?.embeds?.[0]?.image?.url) {
-                avatarUrl = mainTemplate.json.embeds[0].image.url;
-            }
-        }
+                const tags = templates
+                    .map((t) => {
+                        if (t.name === key) return 'Main';
+                        if (t && t.name && t.name.startsWith(key + '_')) {
+                            const type = t.name.slice(key.length + 1);
+                            return type.charAt(0).toUpperCase() + type.slice(1);
+                        }
+                        return t ? t.name : 'Unknown';
+                    })
+                    .sort((a, b) => (a === 'Main' ? -1 : b === 'Main' ? 1 : 0));
 
-        return {
-            id: key,
-            displayName,
-            tags,
-            mainTemplate,
-            avatarUrl
-        };
-    }).filter(item => 
-        item.displayName.toLowerCase().includes(query) || 
-        item.id.toLowerCase().includes(query)
-    ).sort((a, b) => a.displayName.localeCompare(b.displayName));
-}
+                let avatarUrl = null;
+
+                const safeEmojiMap = Array.isArray(emojiMap) ? emojiMap : [];
+                let emojiEntry = safeEmojiMap.find((e) => e.key === key);
+
+                if (!emojiEntry) {
+                    emojiEntry = safeEmojiMap.find((e) => knownAliases.includes(e.key));
+                }
+
+                if (emojiEntry) {
+                    avatarUrl = `https://cdn.discordapp.com/emojis/${emojiEntry.emoji}.png`;
+                } else {
+                    if (mainTemplate?.json?.embeds?.[0]?.author?.icon_url) {
+                        avatarUrl = mainTemplate.json.embeds[0].author.icon_url;
+                    } else if (mainTemplate?.json?.embeds?.[0]?.image?.url) {
+                        avatarUrl = mainTemplate.json.embeds[0].image.url;
+                    }
+                }
+
+                return {
+                    id: key,
+                    displayName,
+                    tags,
+                    mainTemplate,
+                    avatarUrl,
+                };
+            })
+            .filter((item) => item.displayName.toLowerCase().includes(query) || item.id.toLowerCase().includes(query))
+            .sort((a, b) => a.displayName.localeCompare(b.displayName));
+    }
 </script>
 
 <div class="vertical-list">
@@ -89,25 +89,28 @@
             </div>
 
             <div class="item-actions">
-                <button 
-                    class="action-btn edit" 
+                <button
+                    class="action-btn edit"
                     aria-label="Edit {item.displayName}"
-                    on:click={() => dispatch('edit', { id: item.id })} 
+                    on:click={() => dispatch('edit', { id: item.id })}
                 >
                     <i class="fas fa-pen"></i> <span>Edit</span>
                 </button>
 
-                <button 
-                    class="action-btn delete" 
+                <button
+                    class="action-btn delete"
                     aria-label="Delete {item.displayName}"
-                    on:click={(e) => { e.stopPropagation(); dispatch('delete', { id: item.id, name: item.displayName }); }}
+                    on:click={(e) => {
+                        e.stopPropagation();
+                        dispatch('delete', { id: item.id, name: item.displayName });
+                    }}
                 >
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
         </div>
     {/each}
-    
+
     {#if items.length === 0}
         <div class="no-results">No commanders found matching "{search}"</div>
     {/if}
@@ -119,7 +122,7 @@
         border-color: #ef4444;
         color: white;
     }
-    
+
     .item-actions {
         display: flex;
         gap: 8px;
@@ -166,7 +169,7 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: rgba(255,255,255,0.05);
+        background: rgba(255, 255, 255, 0.05);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -207,7 +210,7 @@
     .stat-tag {
         font-size: 0.85rem;
         color: var(--text-secondary);
-        background: rgba(255,255,255,0.05);
+        background: rgba(255, 255, 255, 0.05);
         padding: 4px 10px;
         border-radius: 12px;
         display: flex;
@@ -244,9 +247,17 @@
     }
 
     @media (max-width: 600px) {
-        .item-stats { display: none; }
-        .list-item { padding: 10px; }
-        .action-btn span { display: none; }
-        .action-btn { padding: 8px; }
+        .item-stats {
+            display: none;
+        }
+        .list-item {
+            padding: 10px;
+        }
+        .action-btn span {
+            display: none;
+        }
+        .action-btn {
+            padding: 8px;
+        }
     }
 </style>

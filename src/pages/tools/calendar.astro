@@ -10,24 +10,24 @@ import CalendarComponent from '../../components/calendar/Calendar.svelte';
     bodyClass="has-sub-nav"
 >
     <script type="application/ld+json" slot="head-scripts">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "ROK Event Calendar",
-        "description": "Track upcoming Rise of Kingdoms events and plan your gameplay",
-        "url": "https://codexhelper.com/tools/calendar/",
-        "applicationCategory": "GameApplication",
-        "operatingSystem": "Any",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "author": {
-            "@type": "Organization",
-            "name": "Codex Helper"
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "ROK Event Calendar",
+            "description": "Track upcoming Rise of Kingdoms events and plan your gameplay",
+            "url": "https://codexhelper.com/tools/calendar/",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "author": {
+                "@type": "Organization",
+                "name": "Codex Helper"
+            }
         }
-    }
     </script>
     <main class="tool-page-wrapper">
         <CalendarComponent client:only="svelte" />

@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     function getStorageKey(key) {
         const user = window.auth ? window.auth.getLoggedInUser() : null;
         if (user && user.id) {
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             localStorage.setItem(getStorageKey(key), JSON.stringify(data));
         } catch (e) {
-            console.error("Failed to save user data to localStorage", e);
+            console.error('Failed to save user data to localStorage', e);
         }
     };
 
@@ -20,24 +20,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = localStorage.getItem(getStorageKey(key));
             return data ? JSON.parse(data) : null;
         } catch (e) {
-            console.error("Failed to load user data from localStorage", e);
+            console.error('Failed to load user data from localStorage', e);
             return null;
         }
     };
 
-    window.onAuthSuccess = function() {
+    window.onAuthSuccess = function () {
         renderSavedTemplatesView();
     };
 
-    window.getPreLoginState = function() {
+    window.getPreLoginState = function () {
         const mailInput = document.getElementById('mail-input');
         if (mailInput && mailInput.value) {
             return { mailContent: mailInput.value };
         }
         return null;
     };
-    
-    window.restoreToolState = function(state) {
+
+    window.restoreToolState = function (state) {
         const mailInput = document.getElementById('mail-input');
         if (mailInput && state && state.mailContent) {
             mailInput.value = state.mailContent;
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loggedOutOverlay = document.getElementById('logged-out-overlay');
     const savedTemplatesAuthContainer = document.getElementById('saved-templates-auth-container');
 
-    let templates = window.templatesData;
+    const templates = window.templatesData;
     let selectedTemplate = null;
     let hoveredTemplate = null;
     let isGalleryPopulated = false;
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let historyStack = [];
     let historyIndex = -1;
     let inputTimeout = null;
-    
+
     function escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!filterOptionsContainer) return;
 
         const filters = templates.reduce((acc, t) => {
-            (t.tags || []).forEach(tag => {
+            (t.tags || []).forEach((tag) => {
                 const [category, value] = tag.split(':');
                 if (!category || !value) return;
                 const catKey = category.toLowerCase();
@@ -138,25 +138,27 @@ document.addEventListener('DOMContentLoaded', function() {
             return acc;
         }, {});
         filterOptionsContainer.innerHTML = '';
-        
+
         const categoryOrder = ['format', 'type'];
 
-        categoryOrder.forEach(category => {
+        categoryOrder.forEach((category) => {
             if (filters[category] && filters[category].size > 0) {
                 const categoryDiv = document.createElement('div');
                 categoryDiv.className = 'filter-category';
-                
+
                 if (category === 'format') {
                     categoryDiv.classList.add('has-divider');
                 }
 
                 categoryDiv.innerHTML = `<h5>${escapeHtml(category.replace(/_/g, ' '))}</h5>`;
-                Array.from(filters[category]).sort().forEach(value => {
-                     const label = document.createElement('label');
-                     label.className = 'filter-option';
-                     label.innerHTML = `<input type="checkbox" data-category="${escapeHtml(category)}" value="${escapeHtml(value)}"> ${escapeHtml(value)}`;
-                     categoryDiv.appendChild(label);
-                });
+                Array.from(filters[category])
+                    .sort()
+                    .forEach((value) => {
+                        const label = document.createElement('label');
+                        label.className = 'filter-option';
+                        label.innerHTML = `<input type="checkbox" data-category="${escapeHtml(category)}" value="${escapeHtml(value)}"> ${escapeHtml(value)}`;
+                        categoryDiv.appendChild(label);
+                    });
                 filterOptionsContainer.appendChild(categoryDiv);
             }
         });
@@ -167,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!templateGallery) return;
         const activeFilters = getActiveFilters();
         const searchTerm = templateSearchInput ? templateSearchInput.value.toLowerCase() : '';
-    
+
         if (!isGalleryPopulated) {
             templateGallery.innerHTML = '';
             templates.forEach((template, index) => {
@@ -176,29 +178,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 item.dataset.index = index;
 
                 item.innerHTML = `<img src="${escapeHtml(template.image)}" alt="${escapeHtml(template.title)} preview" loading="lazy" width="200" height="125"><h4>${escapeHtml(template.title)}</h4>`;
-    
+
                 item.addEventListener('click', () => {
                     const isAlreadySelected = item.classList.contains('selected');
-                    
-                    document.querySelectorAll('.template-item.selected').forEach(el => el.classList.remove('selected'));
-    
+
+                    document
+                        .querySelectorAll('.template-item.selected')
+                        .forEach((el) => el.classList.remove('selected'));
+
                     if (isAlreadySelected) {
                         selectedTemplate = null;
                         hoveredTemplate = null;
-                        if(loadTemplateBtn) loadTemplateBtn.disabled = true;
+                        if (loadTemplateBtn) loadTemplateBtn.disabled = true;
                     } else {
                         item.classList.add('selected');
                         selectedTemplate = templates[index];
-                        if(loadTemplateBtn) loadTemplateBtn.disabled = false;
+                        if (loadTemplateBtn) loadTemplateBtn.disabled = false;
                     }
                     updateMagnifiedPreview();
                 });
-    
+
                 templateGallery.appendChild(item);
             });
             isGalleryPopulated = true;
         }
-    
+
         const items = templateGallery.children;
         for (const item of items) {
             const index = parseInt(item.dataset.index, 10);
@@ -207,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const filterMatch = checkVisibility(template.tags, activeFilters);
             const shouldBeVisible = titleMatch && filterMatch;
             const isFadingOut = item.dataset.isFadingOut === 'true';
-    
+
             if (shouldBeVisible) {
                 item.style.display = 'block';
                 delete item.dataset.isFadingOut;
@@ -223,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (item.dataset.isFadingOut === 'true') {
                         item.style.display = 'none';
                     }
-                }, 300); 
+                }, 300);
             }
         }
     }
@@ -231,15 +235,15 @@ document.addEventListener('DOMContentLoaded', function() {
     function escapeHtml(text) {
         if (typeof text !== 'string') return '';
         return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
-    
+
     if (gradientToggleBtn) {
-        gradientToggleBtn.addEventListener('mousedown', function(e) {
+        gradientToggleBtn.addEventListener('mousedown', function (e) {
             e.preventDefault();
         });
     }
@@ -263,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUndoRedoButtons();
     }
 
-    window.getPreLoginState = function() {
+    window.getPreLoginState = function () {
         const mailInput = document.getElementById('mail-input');
         if (mailInput && mailInput.value) {
             return { mailContent: mailInput.value };
@@ -279,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mailInput.setSelectionRange(state.start, state.end);
             updatePreview();
             updateUndoRedoButtons();
-            
+
             if (document.activeElement !== mailInput) {
                 mailInput.focus();
             }
@@ -299,83 +303,93 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateUndoRedoButtons() {
-        if(undoBtn) undoBtn.disabled = historyIndex <= 0;
+        if (undoBtn) undoBtn.disabled = historyIndex <= 0;
     }
-    
+
     function applyTag(tag, value = null) {
         const start = mailInput.selectionStart;
         const end = mailInput.selectionEnd;
-        let selectedText = mailInput.value.substring(start, end);
+        const selectedText = mailInput.value.substring(start, end);
         if (!selectedText && value === null) return;
-    
+
         saveState();
-    
+
         let replacement;
-    
+
         if (value !== null) {
             const openingTag = `<${tag}=${value}>`;
             const closingTag = `</${tag}>`;
-            const exactTagRegex = new RegExp(`^\\s*${openingTag.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}([\\s\\S]*?)${closingTag}\\s*$`, 'i');
-    
+            const exactTagRegex = new RegExp(
+                `^\\s*${openingTag.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}([\\s\\S]*?)${closingTag}\\s*$`,
+                'i',
+            );
+
             if (selectedText.trim().match(exactTagRegex)) {
                 replacement = selectedText.replace(exactTagRegex, '$1');
             } else {
                 const anyOpeningTagRegex = new RegExp(`<${tag}=[^>]+>`, 'gi');
                 const anyClosingTagRegex = new RegExp(`</${tag}>`, 'gi');
-                
+
                 const textToWrap = selectedText.replace(anyOpeningTagRegex, '').replace(anyClosingTagRegex, '');
                 replacement = `${openingTag}${textToWrap}${closingTag}`;
             }
         } else {
             const openTag = `<${tag}>`;
             const closeTag = `</${tag}>`;
-            const fullTagRegex = new RegExp(`^\\s*${openTag.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}([\\s\\S]*?)${closeTag}\\s*$`, 'i');
+            const fullTagRegex = new RegExp(
+                `^\\s*${openTag.replace(/\[/g, '\\[').replace(/\]/g, '\\]')}([\\s\\S]*?)${closeTag}\\s*$`,
+                'i',
+            );
             const openTagRegex = new RegExp(openTag, 'gi');
             const closeTagRegex = new RegExp(closeTag, 'gi');
-    
+
             if (selectedText.trim().startsWith(`<${tag}`) && selectedText.trim().endsWith(closeTag)) {
-                 replacement = selectedText.replace(fullTagRegex, '$1');
+                replacement = selectedText.replace(fullTagRegex, '$1');
             } else if (selectedText.includes(`<${tag}`)) {
                 replacement = selectedText.replace(openTagRegex, '').replace(closeTagRegex, '');
             } else {
                 replacement = `${openTag}${selectedText}${closeTag}`;
             }
         }
-    
+
         mailInput.setRangeText(replacement, start, end, 'select');
         updatePreview();
         saveState(true);
     }
-    
+
     function applyDoubleTag(tag1, tag2) {
         const start = mailInput.selectionStart;
         const end = mailInput.selectionEnd;
-        let selectedText = mailInput.value.substring(start, end);
+        const selectedText = mailInput.value.substring(start, end);
         if (!selectedText) return;
-    
+
         saveState();
-    
+
         const tag1Open = `<${tag1}>`;
         const tag1Close = `</${tag1}>`;
         const tag2Open = `<${tag2}>`;
         const tag2Close = `</${tag2}>`;
-    
+
         const hasTag1 = selectedText.includes(tag1Open) && selectedText.includes(tag1Close);
         const hasTag2 = selectedText.includes(tag2Open) && selectedText.includes(tag2Close);
-    
+
         let processedText = selectedText;
-    
+
         if (hasTag1) {
-            processedText = processedText.replace(new RegExp(tag1Open, 'g'), '').replace(new RegExp(tag1Close, 'g'), '');
+            processedText = processedText
+                .replace(new RegExp(tag1Open, 'g'), '')
+                .replace(new RegExp(tag1Close, 'g'), '');
         }
         if (hasTag2) {
-            processedText = processedText.replace(new RegExp(tag2Open, 'g'), '').replace(new RegExp(tag2Close, 'g'), '');
+            processedText = processedText
+                .replace(new RegExp(tag2Open, 'g'), '')
+                .replace(new RegExp(tag2Close, 'g'), '');
         }
-    
+
         if (!hasTag1 || !hasTag2) {
             processedText = `${tag1Open}${tag2Open}${processedText}${tag2Close}${tag1Close}`;
         }
-        
+
         mailInput.setRangeText(processedText, start, end, 'select');
         updatePreview();
         saveState(true);
@@ -388,24 +402,24 @@ document.addEventListener('DOMContentLoaded', function() {
         if (overrideText === null) {
             window.saveUserData(CACHE_KEY, { mailContent: text });
         }
-    
+
         const newlines = (text.match(/\n/g) || []).length;
         const charCount = text.length + newlines;
-    
+
         charCounter.textContent = `${charCount}/${currentCharLimit}`;
         charCounter.style.color = charCount > currentCharLimit ? '#ff4d4d' : 'var(--text-secondary)';
-        
+
         const parsedHtml = parseGameTagsToHtml(text);
         mailPreview.innerHTML = parsedHtml.replace(/\n/g, '<br>');
     }
-    
+
     function parseGameTagsToHtml(text) {
         const stack = [];
         const tagRegex = /<(\/)?([a-zA-Z]+)(?:=([^>]*))?>/g;
         const knownTags = new Set(['b', 'i', 'size', 'color']);
-        let tags = [];
+        const tags = [];
         let match;
-    
+
         tagRegex.lastIndex = 0;
         while ((match = tagRegex.exec(text)) !== null) {
             const tagName = match[2].toLowerCase();
@@ -414,11 +428,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     fullTag: match[0],
                     tagName: tagName,
                     isClosing: !!match[1],
-                    index: match.index
+                    index: match.index,
                 });
             }
         }
-    
+
         for (const tag of tags) {
             if (tag.isClosing) {
                 if (stack.length === 0 || stack[stack.length - 1].tagName !== tag.tagName) {
@@ -432,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 stack.push(tag);
             }
         }
-    
+
         if (stack.length > 0) {
             const unclosedTag = stack[0];
             const preError = escapeHtml(text.substring(0, unclosedTag.index));
@@ -444,25 +458,25 @@ document.addEventListener('DOMContentLoaded', function() {
         let html = '';
         let lastIndex = 0;
         const renderStack = [];
-        
+
         tagRegex.lastIndex = 0;
         while ((match = tagRegex.exec(text)) !== null) {
             html += escapeHtml(text.substring(lastIndex, match.index));
             lastIndex = tagRegex.lastIndex;
-    
+
             const fullTag = match[0];
             const isClosing = !!match[1];
             const tagName = match[2].toLowerCase();
             const tagValue = match[3];
-    
+
             if (!knownTags.has(tagName)) {
                 html += escapeHtml(fullTag);
                 continue;
             }
-    
+
             if (isClosing) {
                 const state = renderStack.pop();
-                
+
                 if (state && state.status === 'invalid') {
                     html += `<span class="error-underline">${escapeHtml(fullTag)}</span>`;
                 } else if (state && state.status === 'ignored') {
@@ -475,18 +489,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (tagName === 'b') {
                     html += '<strong>';
                     renderStack.push({ status: 'valid' });
-                }
-                else if (tagName === 'i') {
+                } else if (tagName === 'i') {
                     html += '<em>';
                     renderStack.push({ status: 'valid' });
-                }
-                else if (tagName === 'size' && tagValue) {
+                } else if (tagName === 'size' && tagValue) {
                     const scaledSize = Math.max(parseFloat(tagValue) * 0.55, 1);
                     html += `<span style="font-size: ${scaledSize}px;">`;
                     renderStack.push({ status: 'valid' });
                 } else if (tagName === 'color' && tagValue) {
                     let finalColor = tagValue.replace(/"/g, '').replace(/=/g, '');
-                    
+
                     if (!finalColor.startsWith('#') && /^[a-fA-F0-9]{6}$/.test(finalColor)) {
                         html += `<span class="error-underline">${escapeHtml(fullTag)}</span>`;
                         renderStack.push({ status: 'invalid' });
@@ -502,31 +514,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-    
+
         if (lastIndex < text.length) {
             html += escapeHtml(text.substring(lastIndex));
         }
-    
+
         return html;
     }
-    
+
     function closeAllDropdowns() {
         if (isLivePreviewingGradient || isLivePreviewingColor) {
             isLivePreviewingGradient = false;
             isLivePreviewingColor = false;
             updatePreview();
         }
-        document.querySelectorAll('.custom-dropdown-options.visible').forEach(d => d.classList.remove('visible'));
-        if(customColorPickerContainer) customColorPickerContainer.style.display = 'none';
+        document.querySelectorAll('.custom-dropdown-options.visible').forEach((d) => d.classList.remove('visible'));
+        if (customColorPickerContainer) customColorPickerContainer.style.display = 'none';
     }
 
     function applyCustomSize() {
-        if(!customSizeInput) return;
+        if (!customSizeInput) return;
         const customSize = customSizeInput.value;
         if (customSize && !isNaN(customSize) && customSize > 0) {
             applyTag('size', customSize);
         }
-        if(customSizeModal) customSizeModal.style.display = 'none';
+        if (customSizeModal) customSizeModal.style.display = 'none';
     }
 
     function applyGradient() {
@@ -535,11 +547,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const startColor = gradientColor1.value;
         const endColor = gradientColor2.value;
         const bias = parseFloat(gradientBiasSlider.value);
-        
+
         const strengthValue = parseInt(gradientStrengthSlider.value, 10);
         const strengthMin = parseInt(gradientStrengthSlider.min, 10);
         const strengthMax = parseInt(gradientStrengthSlider.max, 10);
-        const grouping = (strengthMax + strengthMin) - strengthValue;
+        const grouping = strengthMax + strengthMin - strengthValue;
 
         const startPos = mailInput.selectionStart;
         const endPos = mailInput.selectionEnd;
@@ -558,42 +570,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generateGradientTags(text, color1, color2, bias = 1, grouping = 10) {
-        const cleanText = text.replace(/<[^>]*>/g, "");
+        const cleanText = text.replace(/<[^>]*>/g, '');
         const totalLen = cleanText.length;
-        
+
         if (totalLen === 0) return text;
-        
+
         const start = hexToRgb(color1);
         const end = hexToRgb(color2);
         let output = '';
 
         const parts = text.split(/(<[^>]+>)/g);
-        
+
         let currentTextIndex = 0;
 
-        parts.forEach(part => {
+        parts.forEach((part) => {
             if (part.startsWith('<') && part.endsWith('>')) {
                 output += part;
             } else if (part.length > 0) {
                 const chunkSize = grouping;
-                
+
                 for (let i = 0; i < part.length; i += chunkSize) {
                     const chunk = part.substring(i, Math.min(i + chunkSize, part.length));
-                    
-                    const midpointGlobal = currentTextIndex + (chunk.length / 2);
+
+                    const midpointGlobal = currentTextIndex + chunk.length / 2;
                     const linearRatio = totalLen > 1 ? midpointGlobal / (totalLen - 1) : 0;
                     const biasedRatio = Math.pow(linearRatio, bias);
-            
+
                     let r = Math.round(start.r + biasedRatio * (end.r - start.r));
                     let g = Math.round(start.g + biasedRatio * (end.g - start.g));
                     let b = Math.round(start.b + biasedRatio * (end.b - start.b));
-                    
+
                     r = Math.max(0, Math.min(255, r));
                     g = Math.max(0, Math.min(255, g));
                     b = Math.max(0, Math.min(255, b));
-                    
+
                     output += `<color=${rgbToHex(r, g, b)}>${chunk}</color>`;
-                    
+
                     currentTextIndex += chunk.length;
                 }
             }
@@ -608,27 +620,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const startColor = gradientColor1.value;
         const endColor = gradientColor2.value;
         const bias = parseFloat(gradientBiasSlider.value);
-        
+
         const strengthValue = parseInt(gradientStrengthSlider.value, 10);
         const strengthMin = parseInt(gradientStrengthSlider.min, 10);
         const strengthMax = parseInt(gradientStrengthSlider.max, 10);
-        const grouping = (strengthMax + strengthMin) - strengthValue;
+        const grouping = strengthMax + strengthMin - strengthValue;
 
         gradientPreviewBar.style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
-    
+
         const selectedText = mailInput.value.substring(gradientSelection.start, gradientSelection.end);
-    
+
         if (selectedText) {
             const generatedTags = generateGradientTags(selectedText, startColor, endColor, bias, grouping);
-            
+
             const charCost = generatedTags.length - selectedText.length;
             gradientCharCounter.textContent = `+${charCost} chars`;
-    
+
             if (isLivePreviewingGradient) {
                 const fullText = mailInput.value;
                 const preSelection = fullText.substring(0, gradientSelection.start);
                 const postSelection = fullText.substring(gradientSelection.end);
-                
+
                 updatePreview(preSelection + generatedTags + postSelection);
             }
         } else {
@@ -638,28 +650,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function hexToRgb(hex) {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : { r: 255, g: 255, b: 255 };
+        return result
+            ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) }
+            : { r: 255, g: 255, b: 255 };
     }
 
     function componentToHex(c) {
         const hex = c.toString(16);
-        return hex.length == 1 ? "0" + hex : hex;
+        return hex.length == 1 ? '0' + hex : hex;
     }
 
     function rgbToHex(r, g, b) {
-        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+        return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
     }
 
     function switchView(tabName) {
         const views = {
             generator: generatorView,
             templates: templatesView,
-            saved: savedTemplatesView
+            saved: savedTemplatesView,
         };
         const tabs = {
             generator: generatorTabBtn,
             templates: templatesTabBtn,
-            saved: savedTemplatesTabBtn
+            saved: savedTemplatesTabBtn,
         };
 
         for (const key in views) {
@@ -682,15 +696,16 @@ document.addEventListener('DOMContentLoaded', function() {
             populateFilters();
             renderTemplates();
         } catch (error) {
-            templateGallery.innerHTML = '<p class="error-message" style="color: var(--text-muted);">Could not load templates.</p>';
-            console.error("Error setting up templates:", error);
+            templateGallery.innerHTML =
+                '<p class="error-message" style="color: var(--text-muted);">Could not load templates.</p>';
+            console.error('Error setting up templates:', error);
         }
     }
 
     function getActiveFilters() {
         if (!filterOptionsContainer) return {};
         const active = {};
-        filterOptionsContainer.querySelectorAll('input:checked').forEach(input => {
+        filterOptionsContainer.querySelectorAll('input:checked').forEach((input) => {
             const category = input.dataset.category;
             if (!active[category]) active[category] = [];
             active[category].push(input.value);
@@ -700,16 +715,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function checkVisibility(templateTags, activeFilters) {
         if (Object.keys(activeFilters).length === 0) return true;
-        return Object.keys(activeFilters).every(category => {
+        return Object.keys(activeFilters).every((category) => {
             const requiredTags = activeFilters[category];
             if (requiredTags.length === 0) return true;
-            const templateTagsInCategory = (templateTags || []).filter(t => t.startsWith(category + ':')).map(t => t.split(':')[1]);
-            return requiredTags.some(reqTag => templateTagsInCategory.includes(reqTag));
+            const templateTagsInCategory = (templateTags || [])
+                .filter((t) => t.startsWith(category + ':'))
+                .map((t) => t.split(':')[1]);
+            return requiredTags.some((reqTag) => templateTagsInCategory.includes(reqTag));
         });
     }
-    
+
     function updateMagnifiedPreview() {
-        if(!magnifiedImage || !magnifiedTitle || !magnifiedPreviewContainer) return;
+        if (!magnifiedImage || !magnifiedTitle || !magnifiedPreviewContainer) return;
         const templateToShow = hoveredTemplate || selectedTemplate;
         if (templateToShow) {
             magnifiedImage.src = templateToShow.image;
@@ -721,21 +738,21 @@ document.addEventListener('DOMContentLoaded', function() {
             magnifiedTitle.classList.remove('visible');
         }
     }
-    
+
     let savedTemplatesCache = null;
     let hasFetchedTemplates = false;
 
     async function renderSavedTemplatesView() {
         const user = window.auth.getLoggedInUser();
-    
+
         if (user) {
             loggedOutOverlay.style.display = 'none';
-            
+
             if (hasFetchedTemplates && savedTemplatesCache) {
                 populateSavedTemplatesTable(savedTemplatesCache);
                 return;
             }
-    
+
             savedTemplatesContent.innerHTML = `<p>Loading your templates...</p>`;
             try {
                 const templates = await window.auth.fetchWithAuth('/api/templates');
@@ -772,7 +789,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="grid-header">Actions</div>
         `;
 
-        templates.forEach(t => {
+        templates.forEach((t) => {
             tableHtml += `
                 <div class="grid-row" data-template-id="${t.template_id}">
                     <div class="template-name">${escapeHtml(t.template_name)}</div>
@@ -790,29 +807,29 @@ document.addEventListener('DOMContentLoaded', function() {
         tableHtml += '</div>';
         savedTemplatesContent.innerHTML = tableHtml;
     }
-    
+
     async function handleCopySavedTemplate(button, templateId) {
         const originalIcon = button.innerHTML;
 
         try {
             const templates = await window.auth.fetchWithAuth('/api/templates');
-            const template = templates.find(t => t.template_id == templateId);
+            const template = templates.find((t) => t.template_id == templateId);
             if (template) {
                 await navigator.clipboard.writeText(template.content);
                 button.innerHTML = '<i class="fas fa-check"></i>';
-                setTimeout(() => button.innerHTML = originalIcon, 2000);
+                setTimeout(() => (button.innerHTML = originalIcon), 2000);
             }
         } catch (error) {
             console.error('Failed to copy template:', error);
             button.innerHTML = '<i class="fas fa-times"></i>';
-            setTimeout(() => button.innerHTML = originalIcon, 2000);
+            setTimeout(() => (button.innerHTML = originalIcon), 2000);
         }
     }
 
     async function handleLoadSavedTemplate(templateId) {
         try {
             const templates = await window.auth.fetchWithAuth('/api/templates');
-            const template = templates.find(t => t.template_id == templateId);
+            const template = templates.find((t) => t.template_id == templateId);
             if (template) {
                 mailInput.value = template.content;
                 updatePreview();
@@ -840,12 +857,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     renderSavedTemplatesView();
                 } catch (error) {
                     console.error('Failed to delete template:', error);
-                    window.showAlert('Could not delete the template.', "Delete Error");
+                    window.showAlert('Could not delete the template.', 'Delete Error');
                 }
-            }
+            },
         );
     }
-    
+
     async function handleSaveTemplate() {
         const name = saveTemplateNameInput.value.trim();
         const content = mailInput.value;
@@ -866,8 +883,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     template_name: name,
                     content: content,
-                    char_count: charCount
-                })
+                    char_count: charCount,
+                }),
             });
             saveTemplateModal.style.display = 'none';
             hasFetchedTemplates = false;
@@ -875,7 +892,7 @@ document.addEventListener('DOMContentLoaded', function() {
             switchView('saved');
         } catch (error) {
             console.error('Failed to save template:', error);
-            window.showAlert(`Could not save template: ${error.message}`, "Save Error");
+            window.showAlert(`Could not save template: ${error.message}`, 'Save Error');
         } finally {
             button.disabled = false;
             button.textContent = 'Save';
@@ -897,27 +914,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if(undoBtn) undoBtn.addEventListener('click', undo);
+    if (undoBtn) undoBtn.addEventListener('click', undo);
 
-    if(clearBtn) {
+    if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-            window.showConfirm(
-                'Are you sure you want to clear the editor?',
-                'Confirm Clear',
-                () => {
-                    saveState();
-                    mailInput.value = '';
-                    updatePreview();
-                    saveState();
-                }
-            );
+            window.showConfirm('Are you sure you want to clear the editor?', 'Confirm Clear', () => {
+                saveState();
+                mailInput.value = '';
+                updatePreview();
+                saveState();
+            });
         });
     }
 
-    if(mailInput) {
+    if (mailInput) {
         mailInput.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); } 
-            else if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
+            if (e.ctrlKey && e.key === 'z') {
+                e.preventDefault();
+                undo();
+            } else if (e.ctrlKey && e.key === 'y') {
+                e.preventDefault();
+                redo();
+            }
         });
         mailInput.addEventListener('input', () => {
             clearTimeout(inputTimeout);
@@ -925,28 +943,28 @@ document.addEventListener('DOMContentLoaded', function() {
             updatePreview();
         });
     }
-    
-    if(generatorTabBtn) generatorTabBtn.addEventListener('click', () => switchView('generator'));
-    if(templatesTabBtn) templatesTabBtn.addEventListener('click', () => switchView('templates'));
-    if(savedTemplatesTabBtn) savedTemplatesTabBtn.addEventListener('click', () => switchView('saved'));
 
-    if(previewTabBtns) {
-        previewTabBtns.forEach(btn => {
+    if (generatorTabBtn) generatorTabBtn.addEventListener('click', () => switchView('generator'));
+    if (templatesTabBtn) templatesTabBtn.addEventListener('click', () => switchView('templates'));
+    if (savedTemplatesTabBtn) savedTemplatesTabBtn.addEventListener('click', () => switchView('saved'));
+
+    if (previewTabBtns) {
+        previewTabBtns.forEach((btn) => {
             btn.addEventListener('click', () => {
-                previewTabBtns.forEach(p => p.classList.remove('active'));
+                previewTabBtns.forEach((p) => p.classList.remove('active'));
                 btn.classList.add('active');
-                if(previewContainer) {
+                if (previewContainer) {
                     previewContainer.className = 'mail-preview-container';
                     previewContainer.classList.add(btn.dataset.bg === 'mail' ? 'mail-bg' : 'board-bg');
                 }
-                currentCharLimit = (btn.dataset.bg === 'mail') ? 2000 : 1000;
+                currentCharLimit = btn.dataset.bg === 'mail' ? 2000 : 1000;
                 updatePreview();
             });
         });
     }
-    
+
     function addFormattingListener(button, callback) {
-        if(button) {
+        if (button) {
             button.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 callback();
@@ -959,7 +977,7 @@ document.addEventListener('DOMContentLoaded', function() {
     addFormattingListener(boldItalicBtn, () => applyDoubleTag('b', 'i'));
     addFormattingListener(applyGradientBtn, applyGradient);
 
-    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+    document.querySelectorAll('.custom-dropdown').forEach((dropdown) => {
         const toggle = dropdown.querySelector('.toolbar-btn');
         const options = dropdown.querySelector('.custom-dropdown-options');
         if (toggle && options) {
@@ -994,32 +1012,46 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!target) return;
             const value = target.dataset.value;
             if (value === 'custom') {
-                if(customSizeModal) customSizeModal.style.display = 'flex';
-                if(customSizeInput) { customSizeInput.focus(); customSizeInput.value = ''; }
+                if (customSizeModal) customSizeModal.style.display = 'flex';
+                if (customSizeInput) {
+                    customSizeInput.focus();
+                    customSizeInput.value = '';
+                }
             } else {
                 applyTag('size', value);
             }
             closeAllDropdowns();
         });
     }
-    if(customSizeApplyBtn) customSizeApplyBtn.addEventListener('click', applyCustomSize);
-    if(customSizeCancelBtn) customSizeCancelBtn.addEventListener('click', () => { if(customSizeModal) customSizeModal.style.display = 'none'; });
-    if(customSizeModal) customSizeModal.addEventListener('click', (e) => { if (e.target === customSizeModal) customSizeModal.style.display = 'none'; });
-    if(customSizeInput) {
+    if (customSizeApplyBtn) customSizeApplyBtn.addEventListener('click', applyCustomSize);
+    if (customSizeCancelBtn)
+        customSizeCancelBtn.addEventListener('click', () => {
+            if (customSizeModal) customSizeModal.style.display = 'none';
+        });
+    if (customSizeModal)
+        customSizeModal.addEventListener('click', (e) => {
+            if (e.target === customSizeModal) customSizeModal.style.display = 'none';
+        });
+    if (customSizeInput) {
         customSizeInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') { e.preventDefault(); applyCustomSize(); } 
-            else if (e.key === 'Escape') { if(customSizeModal) customSizeModal.style.display = 'none'; }
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyCustomSize();
+            } else if (e.key === 'Escape') {
+                if (customSizeModal) customSizeModal.style.display = 'none';
+            }
         });
     }
 
-    if(customColorOptions) {
+    if (customColorOptions) {
         customColorOptions.addEventListener('mousedown', (e) => {
             e.preventDefault();
             const target = e.target.closest('.custom-option');
             if (!target) return;
             const value = target.dataset.value;
             if (value === 'custom-toggle') {
-                customColorPickerContainer.style.display = customColorPickerContainer.style.display === 'flex' ? 'none' : 'flex';
+                customColorPickerContainer.style.display =
+                    customColorPickerContainer.style.display === 'flex' ? 'none' : 'flex';
             } else {
                 applyTag('color', value);
                 closeAllDropdowns();
@@ -1031,30 +1063,39 @@ document.addEventListener('DOMContentLoaded', function() {
         const fullText = mailInput.value;
         const preSelection = fullText.substring(0, colorSelection.start);
         const postSelection = fullText.substring(colorSelection.end);
-        let selectedText = fullText.substring(colorSelection.start, colorSelection.end).replace(/<color=[^>]+>/gi, '').replace(/<\/color>/gi, '');
+        const selectedText = fullText
+            .substring(colorSelection.start, colorSelection.end)
+            .replace(/<color=[^>]+>/gi, '')
+            .replace(/<\/color>/gi, '');
         const coloredText = `<color=${color}>${selectedText}</color>`;
         updatePreview(preSelection + coloredText + postSelection);
     }
-    if(customColorInput) customColorInput.addEventListener('input', () => livePreviewColor(customColorInput.value));
-    if(applyCustomColorBtn) applyCustomColorBtn.addEventListener('click', () => { applyTag('color', customColorInput.value); closeAllDropdowns(); });
+    if (customColorInput) customColorInput.addEventListener('input', () => livePreviewColor(customColorInput.value));
+    if (applyCustomColorBtn)
+        applyCustomColorBtn.addEventListener('click', () => {
+            applyTag('color', customColorInput.value);
+            closeAllDropdowns();
+        });
 
-    if(gradientColor1) gradientColor1.addEventListener('input', updateGradientUI);
-    if(gradientColor2) gradientColor2.addEventListener('input', updateGradientUI);
-    if(gradientBiasSlider) gradientBiasSlider.addEventListener('input', updateGradientUI);
-    if(gradientStrengthSlider) gradientStrengthSlider.addEventListener('input', updateGradientUI);
+    if (gradientColor1) gradientColor1.addEventListener('input', updateGradientUI);
+    if (gradientColor2) gradientColor2.addEventListener('input', updateGradientUI);
+    if (gradientBiasSlider) gradientBiasSlider.addEventListener('input', updateGradientUI);
+    if (gradientStrengthSlider) gradientStrengthSlider.addEventListener('input', updateGradientUI);
 
-    if(copyBtn) {
+    if (copyBtn) {
         copyBtn.addEventListener('click', () => {
             const copyBtnText = copyBtn.querySelector('span');
             if (!copyBtnText || !mailInput) return;
             navigator.clipboard.writeText(mailInput.value).then(() => {
                 const originalText = copyBtnText.textContent;
                 copyBtnText.textContent = 'Copied!';
-                setTimeout(() => { copyBtnText.textContent = originalText; }, 2000);
+                setTimeout(() => {
+                    copyBtnText.textContent = originalText;
+                }, 2000);
             });
         });
     }
-    if(loadTemplateBtn) {
+    if (loadTemplateBtn) {
         loadTemplateBtn.addEventListener('click', () => {
             if (selectedTemplate) {
                 mailInput.value = selectedTemplate.content;
@@ -1078,7 +1119,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     if (saveTemplateConfirmBtn) saveTemplateConfirmBtn.addEventListener('click', handleSaveTemplate);
-    if (saveTemplateCancelBtn) saveTemplateCancelBtn.addEventListener('click', () => saveTemplateModal.style.display = 'none');
+    if (saveTemplateCancelBtn)
+        saveTemplateCancelBtn.addEventListener('click', () => (saveTemplateModal.style.display = 'none'));
 
     if (savedTemplatesContent) {
         savedTemplatesContent.addEventListener('click', (e) => {
@@ -1100,15 +1142,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if(filterToggleBtn) {
+    if (filterToggleBtn) {
         filterToggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if(filterPanel) filterPanel.classList.toggle('visible');
+            if (filterPanel) filterPanel.classList.toggle('visible');
         });
     }
-    if(filterResetBtn) {
+    if (filterResetBtn) {
         filterResetBtn.addEventListener('click', () => {
-            if(filterOptionsContainer) filterOptionsContainer.querySelectorAll('input:checked').forEach(i => i.checked = false);
+            if (filterOptionsContainer)
+                filterOptionsContainer.querySelectorAll('input:checked').forEach((i) => (i.checked = false));
             renderTemplates();
         });
     }
@@ -1127,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if(templateSearchInput) {
+    if (templateSearchInput) {
         templateSearchInput.addEventListener('input', debounce(renderTemplates, 250));
     }
 
@@ -1144,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updatePreview();
     setupTemplatesAndFilters();
-    if(mailInput) saveState();
+    if (mailInput) saveState();
     updateUndoRedoButtons();
     updateGradientUI();
 });

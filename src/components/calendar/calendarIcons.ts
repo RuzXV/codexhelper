@@ -3,7 +3,9 @@
  * Prevents duplicate import.meta.glob bundles across Calendar, EventModal, ShiftModal,
  * RemoveModal, and CycleConfigModal.
  */
-const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', { eager: true }) as Record<string, any>;
+const iconModules = import.meta.glob('../../assets/images/calendar/event_icons/*.{png,jpg,jpeg,webp,svg}', {
+    eager: true,
+}) as Record<string, any>;
 
 export function getIconSrc(filename: string | null | undefined): string | null {
     if (!filename) return null;

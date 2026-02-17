@@ -191,13 +191,13 @@
     // - Fixed gap between tiles, with connection lines
     // ============================================================
 
-    const NODE_WIDTH = 230;      // Tiles width
-    const NODE_HEIGHT = 80;       // Slightly less tall
-    const H_GAP = 70;             // Horizontal gap between tiles
-    const LINE_SPACING = 140;     // Vertical spacing between the 4 main lines
+    const NODE_WIDTH = 230; // Tiles width
+    const NODE_HEIGHT = 80; // Slightly less tall
+    const H_GAP = 70; // Horizontal gap between tiles
+    const LINE_SPACING = 140; // Vertical spacing between the 4 main lines
     const PADDING_LEFT = 40;
-    const PADDING_TOP = 110;      // Extra padding for top pattern (centered with bottom)
-    const PADDING_BOTTOM = 110;   // Extra padding for bottom pattern + tooltip room
+    const PADDING_TOP = 110; // Extra padding for top pattern (centered with bottom)
+    const PADDING_BOTTOM = 110; // Extra padding for bottom pattern + tooltip room
 
     // The 4 horizontal lines (Y positions will be calculated from these)
     // Line 0 = Infantry, Line 1 = Archer, Line 2 = Cavalry, Line 3 = Siege
@@ -220,10 +220,10 @@
     //   - 3 tiles: rows 0.5, 1.5, 2.5 (between lines)
 
     function getRowsForCount(count: number): number[] {
-        if (count === 4) return [0, 1, 2, 3];           // On all 4 lines
-        if (count === 2) return [0.5, 2.5];             // Top and bottom of 3-tile layout (middle is empty for line pass-through)
-        if (count === 3) return [0.5, 1.5, 2.5];        // Between all lines
-        if (count === 1) return [1.5];                  // Center (between Archer/Cavalry)
+        if (count === 4) return [0, 1, 2, 3]; // On all 4 lines
+        if (count === 2) return [0.5, 2.5]; // Top and bottom of 3-tile layout (middle is empty for line pass-through)
+        if (count === 3) return [0.5, 1.5, 2.5]; // Between all lines
+        if (count === 1) return [1.5]; // Center (between Archer/Cavalry)
         return [];
     }
 
@@ -235,7 +235,7 @@
             generatedPositions.push({
                 col: colIndex,
                 row: row,
-                slot: `col${colIndex}_slot${slotIndex}`
+                slot: `col${colIndex}_slot${slotIndex}`,
             });
         });
     });
@@ -246,96 +246,96 @@
     // Pattern: 4-4-1-3-3-2-4-4-4-1-3-2-4-4-1-2-4-1
     const techAssignments: Record<string, string> = {
         // Column 0 (4 tiles) - Tier 1 Attack Stats
-        'col0_slot0': 'quenchedBladesI',           // Infantry Attack I
-        'col0_slot1': 'improvedBowsI',             // Archer Attack I
-        'col0_slot2': 'mountedCombatTechniquesI',  // Cavalry Attack I
-        'col0_slot3': 'improvedProjectilesI',      // Siege Attack I
+        col0_slot0: 'quenchedBladesI', // Infantry Attack I
+        col0_slot1: 'improvedBowsI', // Archer Attack I
+        col0_slot2: 'mountedCombatTechniquesI', // Cavalry Attack I
+        col0_slot3: 'improvedProjectilesI', // Siege Attack I
 
         // Column 1 (4 tiles) - Tier 1 March Speed
-        'col1_slot0': 'swiftMarchingI',            // Infantry March I
-        'col1_slot1': 'fleetOfFootI',              // Archer March I
-        'col1_slot2': 'swiftSteedsI',              // Cavalry March I
-        'col1_slot3': 'reinforcedAxlesI',          // Siege March I
+        col1_slot0: 'swiftMarchingI', // Infantry March I
+        col1_slot1: 'fleetOfFootI', // Archer March I
+        col1_slot2: 'swiftSteedsI', // Cavalry March I
+        col1_slot3: 'reinforcedAxlesI', // Siege March I
 
         // Column 2 (1 tile) - Central utility
-        'col2_slot0': 'callToArmsI',               // Call To Arms I
+        col2_slot0: 'callToArmsI', // Call To Arms I
 
         // Column 3 (3 tiles) - Utility branches
-        'col3_slot0': 'cuttingCornersI',           // Cutting Corners I
-        'col3_slot1': 'culturalExchange',          // Cultural Exchange (swapped with Leadership I)
-        'col3_slot2': 'leadershipI',               // Leadership I (swapped with Cultural Exchange)
+        col3_slot0: 'cuttingCornersI', // Cutting Corners I
+        col3_slot1: 'culturalExchange', // Cultural Exchange (swapped with Leadership I)
+        col3_slot2: 'leadershipI', // Leadership I (swapped with Cultural Exchange)
 
         // Column 4 (3 tiles) - Utility branches continued
-        'col4_slot0': 'barbarianBounties',         // Barbarian Bounties
-        'col4_slot1': 'callToArmsII',              // Call To Arms II (swapped with Karaku Reports)
-        'col4_slot2': 'karakuReports',             // Karaku Reports (swapped with Call To Arms II)
+        col4_slot0: 'barbarianBounties', // Barbarian Bounties
+        col4_slot1: 'callToArmsII', // Call To Arms II (swapped with Karaku Reports)
+        col4_slot2: 'karakuReports', // Karaku Reports (swapped with Call To Arms II)
 
         // Column 5 (2 tiles) - positioned at rows 0.5, 2.5
-        'col5_slot0': 'cuttingCornersII',          // Cutting Corners II
-        'col5_slot1': 'leadershipII',              // Leadership II
+        col5_slot0: 'cuttingCornersII', // Cutting Corners II
+        col5_slot1: 'leadershipII', // Leadership II
 
         // Column 6 (4 tiles) - Tier 2 Attack Stats
-        'col6_slot0': 'quenchedBladesII',          // Infantry Attack II
-        'col6_slot1': 'improvedBowsII',            // Archer Attack II
-        'col6_slot2': 'mountedCombatTechniquesII', // Cavalry Attack II
-        'col6_slot3': 'improvedProjectilesII',     // Siege Attack II
+        col6_slot0: 'quenchedBladesII', // Infantry Attack II
+        col6_slot1: 'improvedBowsII', // Archer Attack II
+        col6_slot2: 'mountedCombatTechniquesII', // Cavalry Attack II
+        col6_slot3: 'improvedProjectilesII', // Siege Attack II
 
         // Column 7 (4 tiles) - Defense Stats
-        'col7_slot0': 'starmetalShields',          // Infantry Defense
-        'col7_slot1': 'starmetalBracers',          // Archer Defense
-        'col7_slot2': 'starmetalBarding',          // Cavalry Defense
-        'col7_slot3': 'starmetalAxles',            // Siege Defense
+        col7_slot0: 'starmetalShields', // Infantry Defense
+        col7_slot1: 'starmetalBracers', // Archer Defense
+        col7_slot2: 'starmetalBarding', // Cavalry Defense
+        col7_slot3: 'starmetalAxles', // Siege Defense
 
         // Column 8 (4 tiles) - Tier 2 March Speed
-        'col8_slot0': 'swiftMarchingII',           // Infantry March II
-        'col8_slot1': 'fleetOfFootII',             // Archer March II
-        'col8_slot2': 'swiftSteedsII',             // Cavalry March II
-        'col8_slot3': 'reinforcedAxlesII',         // Siege March II
+        col8_slot0: 'swiftMarchingII', // Infantry March II
+        col8_slot1: 'fleetOfFootII', // Archer March II
+        col8_slot2: 'swiftSteedsII', // Cavalry March II
+        col8_slot3: 'reinforcedAxlesII', // Siege March II
 
         // Column 9 (1 tile) - Central utility
-        'col9_slot0': 'largerCamps',               // Larger Camps
+        col9_slot0: 'largerCamps', // Larger Camps
 
         // Column 10 (3 tiles) - Utility branches
-        'col10_slot0': 'runecraft',                // Runecraft (swapped with Special Concoctions I)
-        'col10_slot1': 'specialConcoctionsI',      // Special Concoctions I (swapped with Runecraft)
-        'col10_slot2': 'expandedFormationsI',      // Expanded Formations I (swapped with Emergency Support)
+        col10_slot0: 'runecraft', // Runecraft (swapped with Special Concoctions I)
+        col10_slot1: 'specialConcoctionsI', // Special Concoctions I (swapped with Runecraft)
+        col10_slot2: 'expandedFormationsI', // Expanded Formations I (swapped with Emergency Support)
 
         // Column 11 (2 tiles) - positioned at rows 0.5, 2.5
-        'col11_slot0': 'emergencySupport',         // Emergency Support (swapped with Expanded Formation I)
-        'col11_slot1': 'rapidRetreat',             // Rapid Retreat
+        col11_slot0: 'emergencySupport', // Emergency Support (swapped with Expanded Formation I)
+        col11_slot1: 'rapidRetreat', // Rapid Retreat
 
         // Column 12 (4 tiles) - Tier 3 Health/Specialty Stats
-        'col12_slot0': 'ironInfantry',             // Iron Infantry
-        'col12_slot1': 'archersFocus',             // Archer's Focus
-        'col12_slot2': 'ridersResilience',         // Rider's Resilience
-        'col12_slot3': 'siegeProvisions',          // Siege Provisions
+        col12_slot0: 'ironInfantry', // Iron Infantry
+        col12_slot1: 'archersFocus', // Archer's Focus
+        col12_slot2: 'ridersResilience', // Rider's Resilience
+        col12_slot3: 'siegeProvisions', // Siege Provisions
 
         // Column 13 (4 tiles) - Tier 3 March Speed
-        'col13_slot0': 'swiftMarchingIII',         // Infantry March III
-        'col13_slot1': 'fleetOfFootIII',           // Archer March III
-        'col13_slot2': 'swiftSteedsIII',           // Cavalry March III
-        'col13_slot3': 'reinforcedAxlesIII',       // Siege March III
+        col13_slot0: 'swiftMarchingIII', // Infantry March III
+        col13_slot1: 'fleetOfFootIII', // Archer March III
+        col13_slot2: 'swiftSteedsIII', // Cavalry March III
+        col13_slot3: 'reinforcedAxlesIII', // Siege March III
 
         // Column 14 (1 tile) - Central utility
-        'col14_slot0': 'specialConcoctionsII',     // Special Concoctions II
+        col14_slot0: 'specialConcoctionsII', // Special Concoctions II
 
         // Column 15 (2 tiles) - positioned at rows 0.5, 2.5
-        'col15_slot0': 'celestialGuidance',        // Celestial Guidance
-        'col15_slot1': 'expandedFormationsII',     // Expanded Formations II
+        col15_slot0: 'celestialGuidance', // Celestial Guidance
+        col15_slot1: 'expandedFormationsII', // Expanded Formations II
 
         // Column 16 (4 tiles) - Expert Stats
-        'col16_slot0': 'infantryExpert',           // Infantry Expert
-        'col16_slot1': 'archerExpert',             // Archer Expert
-        'col16_slot2': 'cavalryExpert',            // Cavalry Expert
-        'col16_slot3': 'siegeExpert',              // Siege Expert
+        col16_slot0: 'infantryExpert', // Infantry Expert
+        col16_slot1: 'archerExpert', // Archer Expert
+        col16_slot2: 'cavalryExpert', // Cavalry Expert
+        col16_slot3: 'siegeExpert', // Siege Expert
 
         // Column 17 (1 tile) - Final utility
-        'col17_slot0': 'surpriseStrike',           // Surprise Strike
+        col17_slot0: 'surpriseStrike', // Surprise Strike
     };
 
     // Build final positions from assignments
     const techPositions: Record<string, { col: number; row: number }> = {};
-    generatedPositions.forEach(pos => {
+    generatedPositions.forEach((pos) => {
         const techKey = techAssignments[pos.slot];
         if (techKey) {
             techPositions[techKey] = { col: pos.col, row: pos.row };
@@ -437,17 +437,17 @@
     // passes through the empty middle of the 2-tile column, then fans out to 4
     // Format: { fromCol: number, fromSlot: number, throughCol: number, toCol: number }
     const passThroughConnections = [
-        { fromCol: 4, fromSlot: 1, throughCol: 5, toCol: 6 },   // Col 4 mid → through Col 5 gap → Col 6 (4)
+        { fromCol: 4, fromSlot: 1, throughCol: 5, toCol: 6 }, // Col 4 mid → through Col 5 gap → Col 6 (4)
         { fromCol: 10, fromSlot: 1, throughCol: 11, toCol: 12 }, // Col 10 mid → through Col 11 gap → Col 12 (4)
         { fromCol: 14, fromSlot: 0, throughCol: 15, toCol: 16 }, // Col 14 (single) → through Col 15 gap → Col 16 (4)
     ];
 
     // Build a map of slot positions for connection drawing
     const slotPositionMap: Record<string, { x: number; y: number }> = {};
-    generatedPositions.forEach(pos => {
+    generatedPositions.forEach((pos) => {
         slotPositionMap[pos.slot] = {
             x: PADDING_LEFT + pos.col * (NODE_WIDTH + H_GAP),
-            y: PADDING_TOP + pos.row * LINE_SPACING
+            y: PADDING_TOP + pos.row * LINE_SPACING,
         };
     });
 
@@ -524,7 +524,7 @@
 
     // Remove research history for a tech at a specific level (for downgrades)
     function removeResearchRecord(techKey: string, level: number) {
-        researchOrder = researchOrder.filter(e => !(e.techKey === techKey && e.level === level));
+        researchOrder = researchOrder.filter((e) => !(e.techKey === techKey && e.level === level));
     }
 
     // Check if line-based prerequisites are met (any connecting tech must be at least level 1)
@@ -533,7 +533,7 @@
         if (!prereqs || prereqs.length === 0) return { met: true };
 
         // Need at least one of the connecting techs to be at level 1+
-        const anyMet = prereqs.some(prereqKey => (userTechLevels[prereqKey] || 0) >= 1);
+        const anyMet = prereqs.some((prereqKey) => (userTechLevels[prereqKey] || 0) >= 1);
         if (!anyMet) {
             return { met: false, missingTechs: prereqs };
         }
@@ -556,7 +556,7 @@
                     researchOrder,
                     includeRCCrystalCost,
                     helpsPerResearch,
-                    researchSpeedBonus
+                    researchSpeedBonus,
                 };
                 win.saveUserData(TECH_SIMULATOR_CACHE_KEY, state);
             }
@@ -660,7 +660,7 @@
     let showClearModal = false;
 
     function openClearModal() {
-        const techCount = Object.keys(userTechLevels).filter(k => userTechLevels[k] > 0).length;
+        const techCount = Object.keys(userTechLevels).filter((k) => userTechLevels[k] > 0).length;
         if (techCount === 0) {
             showMessage({ type: 'warning', text: 'All technologies are already at Level 0.' });
             currentMode = 'single'; // Switch back to single mode
@@ -670,7 +670,7 @@
     }
 
     function confirmClear() {
-        const techCount = Object.keys(userTechLevels).filter(k => userTechLevels[k] > 0).length;
+        const techCount = Object.keys(userTechLevels).filter((k) => userTechLevels[k] > 0).length;
         // Reset all tech levels to 0
         for (const key in userTechLevels) {
             userTechLevels[key] = 0;
@@ -725,7 +725,7 @@
         22: 150000,
         23: 200000,
         24: 250000,
-        25: 300000
+        25: 300000,
     };
 
     // Calculate total RC crystal cost up to a given level
@@ -738,9 +738,7 @@
     }
 
     // Available versions (future-proofed for more versions)
-    const availableVersions = [
-        { id: 'v5', name: 'Version 5 (Current)' }
-    ];
+    const availableVersions = [{ id: 'v5', name: 'Version 5 (Current)' }];
 
     // Research Center crystal cost reduction percentages by level
     // Level 1-10: 0.1% per level (1% at 10)
@@ -811,7 +809,7 @@
     // RC level requirements for specific techs
     const rcRequirements: Record<string, Record<number, number>> = {
         callToArmsI: { 9: 17 },
-        callToArmsII: { 6: 18, 8: 21, 9: 24, 10: 25 }
+        callToArmsII: { 6: 18, 8: 21, 9: 24, 10: 25 },
     };
 
     // Get RC requirement for a specific tech and level
@@ -940,7 +938,7 @@
 
         if ('anyOf' in prereqRule) {
             // ANY ONE of these techs needs at least 1 point
-            const anyMet = prereqRule.anyOf.some(prereqKey => (userTechLevels[prereqKey] || 0) >= 1);
+            const anyMet = prereqRule.anyOf.some((prereqKey) => (userTechLevels[prereqKey] || 0) >= 1);
             if (!anyMet) {
                 return { met: false, missingTechs: prereqRule.anyOf, isAnyOf: true };
             }
@@ -1023,7 +1021,7 @@
     // Calculate reduced crystal cost for a specific tech level based on CC levels at time of research
     function calculateActualCrystalCostFromHistory(techKey: string, level: number, baseCost: number): number {
         // Find the research order entry for this tech/level
-        const entry = researchOrder.find(e => e.techKey === techKey && e.level === level);
+        const entry = researchOrder.find((e) => e.techKey === techKey && e.level === level);
         if (entry) {
             // Use the CC levels that were active when this was researched
             const ccReduction = entry.cc1AtTime + entry.cc2AtTime;
@@ -1052,15 +1050,17 @@
     }, 0);
 
     // Total crystals including optional RC cost
-    $: totalCrystalsUsed = techTreeCrystalCost + (includeRCCrystalCost ? getTotalRCCrystalCost(researchCenterLevel) : 0);
+    $: totalCrystalsUsed =
+        techTreeCrystalCost + (includeRCCrystalCost ? getTotalRCCrystalCost(researchCenterLevel) : 0);
 
     // Raw crystal cost (no CC/RC reduction) for achievement tracking
-    $: rawCrystalCost = Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
-        const tech = allTechs[techKey];
-        if (!tech || level <= 0) return total;
-        const rawSum = tech.levels.slice(0, level).reduce((sum: number, lvl: TechLevel) => sum + lvl.crystals, 0);
-        return total + rawSum;
-    }, 0) + (includeRCCrystalCost ? getTotalRCCrystalCost(researchCenterLevel) : 0);
+    $: rawCrystalCost =
+        Object.entries(userTechLevels).reduce((total, [techKey, level]) => {
+            const tech = allTechs[techKey];
+            if (!tech || level <= 0) return total;
+            const rawSum = tech.levels.slice(0, level).reduce((sum: number, lvl: TechLevel) => sum + lvl.crystals, 0);
+            return total + rawSum;
+        }, 0) + (includeRCCrystalCost ? getTotalRCCrystalCost(researchCenterLevel) : 0);
 
     // Savings from cost reduction (RC + CC)
     $: crystalSavings = rawCrystalCost - totalCrystalsUsed;
@@ -1090,9 +1090,8 @@
     }, 0);
 
     // After research speed bonus (applied first, same as healing calc: base / (1 + bonus/100))
-    $: timeAfterSpeedBonus = researchSpeedBonus > 0
-        ? baseTimeSeconds / (1 + researchSpeedBonus / 100)
-        : baseTimeSeconds;
+    $: timeAfterSpeedBonus =
+        researchSpeedBonus > 0 ? baseTimeSeconds / (1 + researchSpeedBonus / 100) : baseTimeSeconds;
 
     // After helps (applied second, iterative: each help removes max(180s, 1% of remaining))
     $: timeAfterHelps = (() => {
@@ -1123,7 +1122,10 @@
     }, 0);
 
     // Check if a tech requirement is met
-    function checkTechRequirement(req: TechRequirement, targetLevel: number): { met: boolean; failedTech?: string; failedTechs?: string[]; requiredLevel?: number; isAnyOf?: boolean } {
+    function checkTechRequirement(
+        req: TechRequirement,
+        targetLevel: number,
+    ): { met: boolean; failedTech?: string; failedTechs?: string[]; requiredLevel?: number; isAnyOf?: boolean } {
         if (req.level > targetLevel) return { met: true }; // Requirement doesn't apply yet
 
         const requiredLevel = req.techLevel || 0;
@@ -1136,9 +1138,15 @@
             }
         } else if (req.anyOf) {
             // Any of these techs at required level
-            const anyMet = req.anyOf.some(techKey => (userTechLevels[techKey] || 0) >= requiredLevel);
+            const anyMet = req.anyOf.some((techKey) => (userTechLevels[techKey] || 0) >= requiredLevel);
             if (!anyMet) {
-                return { met: false, failedTech: req.anyOf[0], failedTechs: req.anyOf, requiredLevel: requiredLevel, isAnyOf: true };
+                return {
+                    met: false,
+                    failedTech: req.anyOf[0],
+                    failedTechs: req.anyOf,
+                    requiredLevel: requiredLevel,
+                    isAnyOf: true,
+                };
             }
         } else if (req.allOf) {
             // All of these techs at required level
@@ -1150,7 +1158,12 @@
                 }
             }
             if (failedTechs.length > 0) {
-                return { met: false, failedTech: failedTechs[0], failedTechs: failedTechs, requiredLevel: requiredLevel };
+                return {
+                    met: false,
+                    failedTech: failedTechs[0],
+                    failedTechs: failedTechs,
+                    requiredLevel: requiredLevel,
+                };
             }
         }
 
@@ -1158,7 +1171,21 @@
     }
 
     // Check all requirements for upgrading a tech to a specific level
-    function canUpgradeToLevel(techKey: string, targetLevel: number): { canUpgrade: boolean; blockingReq?: TechRequirement; failedTech?: string; failedTechs?: string[]; requiredLevel?: number; rcRequired?: number; missingPrereqs?: string[]; isAnyOf?: boolean; isPrereqAnyOf?: boolean; isLinePrereq?: boolean } {
+    function canUpgradeToLevel(
+        techKey: string,
+        targetLevel: number,
+    ): {
+        canUpgrade: boolean;
+        blockingReq?: TechRequirement;
+        failedTech?: string;
+        failedTechs?: string[];
+        requiredLevel?: number;
+        rcRequired?: number;
+        missingPrereqs?: string[];
+        isAnyOf?: boolean;
+        isPrereqAnyOf?: boolean;
+        isLinePrereq?: boolean;
+    } {
         const tech = allTechs[techKey];
         if (!tech) return { canUpgrade: false };
 
@@ -1167,13 +1194,22 @@
             // First check line-based prerequisites (from connections)
             const lineCheck = checkLinePrerequisites(techKey);
             if (!lineCheck.met && lineCheck.missingTechs) {
-                return { canUpgrade: false, missingPrereqs: lineCheck.missingTechs, isPrereqAnyOf: true, isLinePrereq: true };
+                return {
+                    canUpgrade: false,
+                    missingPrereqs: lineCheck.missingTechs,
+                    isPrereqAnyOf: true,
+                    isLinePrereq: true,
+                };
             }
 
             // Then check explicit prerequisite rules
             const prereqCheck = checkPrerequisites(techKey);
             if (!prereqCheck.met && prereqCheck.missingTechs) {
-                return { canUpgrade: false, missingPrereqs: prereqCheck.missingTechs, isPrereqAnyOf: prereqCheck.isAnyOf };
+                return {
+                    canUpgrade: false,
+                    missingPrereqs: prereqCheck.missingTechs,
+                    isPrereqAnyOf: prereqCheck.isAnyOf,
+                };
             }
         }
 
@@ -1194,7 +1230,7 @@
                         failedTech: result.failedTech,
                         failedTechs: result.failedTechs,
                         requiredLevel: result.requiredLevel,
-                        isAnyOf: result.isAnyOf
+                        isAnyOf: result.isAnyOf,
                     };
                 }
             }
@@ -1225,7 +1261,18 @@
 
     // Check if removing a level from a tech would break any dependencies
     // Returns info about what tech depends on this level being maintained
-    function checkRemovalDependencies(techKey: string, newLevel: number): { canRemove: boolean; blockingTech?: string; blockingTechName?: string; blockingTechLevel?: number; requiredLevel?: number; isAnyOf?: boolean; otherOptions?: string[] } {
+    function checkRemovalDependencies(
+        techKey: string,
+        newLevel: number,
+    ): {
+        canRemove: boolean;
+        blockingTech?: string;
+        blockingTechName?: string;
+        blockingTechLevel?: number;
+        requiredLevel?: number;
+        isAnyOf?: boolean;
+        otherOptions?: string[];
+    } {
         // Check all other techs to see if any of them depend on this tech at a higher level
         for (const [otherTechKey, otherTech] of Object.entries(allTechs)) {
             const otherTechLevel = userTechLevels[otherTechKey] || 0;
@@ -1245,7 +1292,7 @@
                             blockingTech: otherTechKey,
                             blockingTechName: otherTech.name,
                             blockingTechLevel: otherTechLevel,
-                            requiredLevel: requiredLevel
+                            requiredLevel: requiredLevel,
                         };
                     }
                 }
@@ -1255,8 +1302,8 @@
                     const currentLevel = userTechLevels[techKey] || 0;
                     if (currentLevel >= requiredLevel && newLevel < requiredLevel) {
                         // Check if any OTHER tech in the anyOf list meets the requirement
-                        const othersMeetReq = req.anyOf.some(altKey =>
-                            altKey !== techKey && (userTechLevels[altKey] || 0) >= requiredLevel
+                        const othersMeetReq = req.anyOf.some(
+                            (altKey) => altKey !== techKey && (userTechLevels[altKey] || 0) >= requiredLevel,
                         );
                         if (!othersMeetReq) {
                             // This tech is the only one meeting the anyOf requirement
@@ -1267,7 +1314,7 @@
                                 blockingTechLevel: otherTechLevel,
                                 requiredLevel: requiredLevel,
                                 isAnyOf: true,
-                                otherOptions: req.anyOf.filter(k => k !== techKey)
+                                otherOptions: req.anyOf.filter((k) => k !== techKey),
                             };
                         }
                     }
@@ -1281,7 +1328,7 @@
                             blockingTech: otherTechKey,
                             blockingTechName: otherTech.name,
                             blockingTechLevel: otherTechLevel,
-                            requiredLevel: requiredLevel
+                            requiredLevel: requiredLevel,
                         };
                     }
                 }
@@ -1297,7 +1344,7 @@
                             blockingTech: otherTechKey,
                             blockingTechName: otherTech.name,
                             blockingTechLevel: otherTechLevel,
-                            requiredLevel: 1
+                            requiredLevel: 1,
                         };
                     }
                 }
@@ -1305,8 +1352,8 @@
                     const currentLevel = userTechLevels[techKey] || 0;
                     if (currentLevel >= 1 && newLevel < 1) {
                         // Check if any OTHER tech in the anyOf list is unlocked
-                        const othersMeetReq = prereqRule.anyOf.some(altKey =>
-                            altKey !== techKey && (userTechLevels[altKey] || 0) >= 1
+                        const othersMeetReq = prereqRule.anyOf.some(
+                            (altKey) => altKey !== techKey && (userTechLevels[altKey] || 0) >= 1,
                         );
                         if (!othersMeetReq) {
                             return {
@@ -1316,7 +1363,7 @@
                                 blockingTechLevel: otherTechLevel,
                                 requiredLevel: 1,
                                 isAnyOf: true,
-                                otherOptions: prereqRule.anyOf.filter(k => k !== techKey)
+                                otherOptions: prereqRule.anyOf.filter((k) => k !== techKey),
                             };
                         }
                     }
@@ -1327,8 +1374,8 @@
             const linePrereqs = linePrerequisites[otherTechKey];
             if (linePrereqs && linePrereqs.includes(techKey) && otherTechLevel >= 1 && newLevel < 1) {
                 // Check if any OTHER tech in the line prereqs is unlocked
-                const othersMeetReq = linePrereqs.some(altKey =>
-                    altKey !== techKey && (userTechLevels[altKey] || 0) >= 1
+                const othersMeetReq = linePrereqs.some(
+                    (altKey) => altKey !== techKey && (userTechLevels[altKey] || 0) >= 1,
                 );
                 if (!othersMeetReq) {
                     return {
@@ -1338,7 +1385,7 @@
                         blockingTechLevel: otherTechLevel,
                         requiredLevel: 1,
                         isAnyOf: true,
-                        otherOptions: linePrereqs.filter(k => k !== techKey)
+                        otherOptions: linePrereqs.filter((k) => k !== techKey),
                     };
                 }
             }
@@ -1367,46 +1414,61 @@
 
             if (!check.canUpgrade) {
                 if (check.missingPrereqs && check.missingPrereqs.length > 0) {
-                    const prereqNames = check.missingPrereqs.map(key => allTechs[key]?.name || key);
+                    const prereqNames = check.missingPrereqs.map((key) => allTechs[key]?.name || key);
                     const prereqList = prereqNames.join(', ');
                     const prefix = check.isPrereqAnyOf ? 'Requires any of' : 'Requires at least 1 point in each of';
                     showMessage({
                         type: 'error',
                         text: `${prefix}: ${prereqList} to unlock.`,
-                        techLink: { techKey: check.missingPrereqs[0], techName: prereqNames[0], requiredLevel: 1 }
+                        techLink: { techKey: check.missingPrereqs[0], techName: prereqNames[0], requiredLevel: 1 },
                     });
                 } else if (check.rcRequired) {
                     showMessage({
                         type: 'error',
                         text: `Requires Research Center Level ${check.rcRequired} to unlock Level ${targetLevel}.`,
-                        rcRequirement: check.rcRequired
+                        rcRequirement: check.rcRequired,
                     });
                 } else if (check.failedTech && check.requiredLevel) {
                     // Check if this is a multi-tech requirement (anyOf or allOf)
-                    if (check.isAnyOf && check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 0) {
-                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
+                    if (
+                        check.isAnyOf &&
+                        check.failedTechs &&
+                        Array.isArray(check.failedTechs) &&
+                        check.failedTechs.length > 0
+                    ) {
+                        const techLinks = check.failedTechs.map((key) => ({
+                            techKey: key,
+                            techName: allTechs[key]?.name || key,
+                        }));
                         showMessage({
                             type: 'error',
                             text: '',
                             prefix: 'Requires any of:',
                             multiTechLinks: techLinks,
-                            requiredLevel: check.requiredLevel
+                            requiredLevel: check.requiredLevel,
                         });
                     } else if (check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 1) {
-                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
+                        const techLinks = check.failedTechs.map((key) => ({
+                            techKey: key,
+                            techName: allTechs[key]?.name || key,
+                        }));
                         showMessage({
                             type: 'error',
                             text: '',
                             prefix: 'Requires all of:',
                             multiTechLinks: techLinks,
-                            requiredLevel: check.requiredLevel
+                            requiredLevel: check.requiredLevel,
                         });
                     } else {
                         const failedTechName = allTechs[check.failedTech]?.name || check.failedTech;
                         showMessage({
                             type: 'error',
                             text: `Requires ${failedTechName} → Lvl ${check.requiredLevel}`,
-                            techLink: { techKey: check.failedTech, techName: failedTechName, requiredLevel: check.requiredLevel }
+                            techLink: {
+                                techKey: check.failedTech,
+                                techName: failedTechName,
+                                requiredLevel: check.requiredLevel,
+                            },
                         });
                     }
                 }
@@ -1417,7 +1479,6 @@
             recordResearch(techKey, targetLevel);
             userTechLevels[techKey] = targetLevel;
             userTechLevels = { ...userTechLevels }; // Trigger reactivity
-
         } else if (currentMode === 'max') {
             // Upgrade to max possible level
             if (currentLevel >= tech.maxLevel) {
@@ -1431,46 +1492,61 @@
                 // Can't upgrade at all - show what's blocking
                 const check = canUpgradeToLevel(techKey, currentLevel + 1);
                 if (check.missingPrereqs && check.missingPrereqs.length > 0) {
-                    const prereqNames = check.missingPrereqs.map(key => allTechs[key]?.name || key);
+                    const prereqNames = check.missingPrereqs.map((key) => allTechs[key]?.name || key);
                     const prereqList = prereqNames.join(', ');
                     const prefix = check.isPrereqAnyOf ? 'Requires any of' : 'Requires at least 1 point in each of';
                     showMessage({
                         type: 'error',
                         text: `${prefix}: ${prereqList} to unlock.`,
-                        techLink: { techKey: check.missingPrereqs[0], techName: prereqNames[0], requiredLevel: 1 }
+                        techLink: { techKey: check.missingPrereqs[0], techName: prereqNames[0], requiredLevel: 1 },
                     });
                 } else if (check.rcRequired) {
                     showMessage({
                         type: 'error',
                         text: `Requires Research Center Level ${check.rcRequired} to continue.`,
-                        rcRequirement: check.rcRequired
+                        rcRequirement: check.rcRequired,
                     });
                 } else if (check.failedTech && check.requiredLevel) {
                     // Check if this is a multi-tech requirement (anyOf or allOf)
-                    if (check.isAnyOf && check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 0) {
-                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
+                    if (
+                        check.isAnyOf &&
+                        check.failedTechs &&
+                        Array.isArray(check.failedTechs) &&
+                        check.failedTechs.length > 0
+                    ) {
+                        const techLinks = check.failedTechs.map((key) => ({
+                            techKey: key,
+                            techName: allTechs[key]?.name || key,
+                        }));
                         showMessage({
                             type: 'error',
                             text: '',
                             prefix: 'Requires any of:',
                             multiTechLinks: techLinks,
-                            requiredLevel: check.requiredLevel
+                            requiredLevel: check.requiredLevel,
                         });
                     } else if (check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 1) {
-                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
+                        const techLinks = check.failedTechs.map((key) => ({
+                            techKey: key,
+                            techName: allTechs[key]?.name || key,
+                        }));
                         showMessage({
                             type: 'error',
                             text: '',
                             prefix: 'Requires all of:',
                             multiTechLinks: techLinks,
-                            requiredLevel: check.requiredLevel
+                            requiredLevel: check.requiredLevel,
                         });
                     } else {
                         const failedTechName = allTechs[check.failedTech]?.name || check.failedTech;
                         showMessage({
                             type: 'error',
                             text: `Requires ${failedTechName} → Lvl ${check.requiredLevel}`,
-                            techLink: { techKey: check.failedTech, techName: failedTechName, requiredLevel: check.requiredLevel }
+                            techLink: {
+                                techKey: check.failedTech,
+                                techName: failedTechName,
+                                requiredLevel: check.requiredLevel,
+                            },
                         });
                     }
                 }
@@ -1491,39 +1567,53 @@
                     showMessage({
                         type: 'warning',
                         text: `Upgraded to Level ${maxPossible}. Requires Research Center Level ${check.rcRequired} to continue.`,
-                        rcRequirement: check.rcRequired
+                        rcRequirement: check.rcRequired,
                     });
                 } else if (check.failedTech && check.requiredLevel) {
                     // Check if this is a multi-tech requirement (anyOf or allOf)
-                    if (check.isAnyOf && check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 0) {
-                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
+                    if (
+                        check.isAnyOf &&
+                        check.failedTechs &&
+                        Array.isArray(check.failedTechs) &&
+                        check.failedTechs.length > 0
+                    ) {
+                        const techLinks = check.failedTechs.map((key) => ({
+                            techKey: key,
+                            techName: allTechs[key]?.name || key,
+                        }));
                         showMessage({
                             type: 'warning',
                             text: `Upgraded to Level ${maxPossible}.`,
                             prefix: 'Requires any of:',
                             multiTechLinks: techLinks,
-                            requiredLevel: check.requiredLevel
+                            requiredLevel: check.requiredLevel,
                         });
                     } else if (check.failedTechs && Array.isArray(check.failedTechs) && check.failedTechs.length > 1) {
-                        const techLinks = check.failedTechs.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
+                        const techLinks = check.failedTechs.map((key) => ({
+                            techKey: key,
+                            techName: allTechs[key]?.name || key,
+                        }));
                         showMessage({
                             type: 'warning',
                             text: `Upgraded to Level ${maxPossible}.`,
                             prefix: 'Requires all of:',
                             multiTechLinks: techLinks,
-                            requiredLevel: check.requiredLevel
+                            requiredLevel: check.requiredLevel,
                         });
                     } else {
                         const failedTechName = allTechs[check.failedTech]?.name || check.failedTech;
                         showMessage({
                             type: 'warning',
                             text: `Upgraded to Level ${maxPossible}. Requires ${failedTechName} Level ${check.requiredLevel} to finish.`,
-                            techLink: { techKey: check.failedTech, techName: failedTechName, requiredLevel: check.requiredLevel }
+                            techLink: {
+                                techKey: check.failedTech,
+                                techName: failedTechName,
+                                requiredLevel: check.requiredLevel,
+                            },
                         });
                     }
                 }
             }
-
         } else if (currentMode === 'remove') {
             // Remove 1 level
             if (currentLevel <= 0) {
@@ -1536,19 +1626,26 @@
             if (!depCheck.canRemove) {
                 if (depCheck.isAnyOf && depCheck.otherOptions && depCheck.otherOptions.length > 0) {
                     // Show message that they need to level up an alternative first
-                    const altTechLinks = depCheck.otherOptions.map(key => ({ techKey: key, techName: allTechs[key]?.name || key }));
+                    const altTechLinks = depCheck.otherOptions.map((key) => ({
+                        techKey: key,
+                        techName: allTechs[key]?.name || key,
+                    }));
                     showMessage({
                         type: 'error',
                         text: `${depCheck.blockingTechName} Lvl ${depCheck.blockingTechLevel} requires this. Upgrade any of:`,
                         prefix: '',
                         multiTechLinks: altTechLinks,
-                        requiredLevel: depCheck.requiredLevel
+                        requiredLevel: depCheck.requiredLevel,
                     });
                 } else {
                     showMessage({
                         type: 'error',
                         text: `Cannot remove. ${depCheck.blockingTechName} Lvl ${depCheck.blockingTechLevel} requires ${tech.name} → Lvl ${depCheck.requiredLevel}.`,
-                        techLink: { techKey: depCheck.blockingTech!, techName: depCheck.blockingTechName!, requiredLevel: depCheck.blockingTechLevel! }
+                        techLink: {
+                            techKey: depCheck.blockingTech!,
+                            techName: depCheck.blockingTechName!,
+                            requiredLevel: depCheck.blockingTechLevel!,
+                        },
                     });
                 }
                 return;
@@ -1598,7 +1695,7 @@
     }
 
     // Build placeholder nodes for visualization
-    let placeholderNodes: PlaceholderNode[] = generatedPositions.map(pos => {
+    let placeholderNodes: PlaceholderNode[] = generatedPositions.map((pos) => {
         const techKey = techAssignments[pos.slot] || null;
         const tech = techKey ? allTechs[techKey] : null;
         return {
@@ -1607,10 +1704,10 @@
             row: pos.row,
             position: {
                 x: PADDING_LEFT + pos.col * (NODE_WIDTH + H_GAP),
-                y: PADDING_TOP + pos.row * LINE_SPACING
+                y: PADDING_TOP + pos.row * LINE_SPACING,
             },
             techKey,
-            technology: tech
+            technology: tech,
         };
     });
 
@@ -1637,7 +1734,7 @@
                 totalCrystals: tech.totals.crystals,
                 position: { x, y },
                 unlocked: currentLevel > 0,
-                technology: tech
+                technology: tech,
             });
         });
 
@@ -1650,7 +1747,7 @@
     const totalColumns = columnPattern.length;
     const canvasWidth = PADDING_LEFT + totalColumns * (NODE_WIDTH + H_GAP) + 50;
     // Height: 4 lines (0,1,2,3) = 3 gaps between them, plus node height, plus padding top/bottom
-    const canvasHeight = PADDING_TOP + (3 * LINE_SPACING) + NODE_HEIGHT + PADDING_BOTTOM;
+    const canvasHeight = PADDING_TOP + 3 * LINE_SPACING + NODE_HEIGHT + PADDING_BOTTOM;
 
     // Category colors
     const categoryColors: Record<string, string> = {
@@ -1658,7 +1755,7 @@
         archer: '#2A9D8F',
         cavalry: '#E9C46A',
         siege: '#9B59B6',
-        utility: '#3498DB'
+        utility: '#3498DB',
     };
 
     // Viewport and dragging state
@@ -1740,7 +1837,7 @@
     }
 
     // Helper function to create a path with rounded corners
-    function createRoundedPath(points: {x: number, y: number}[], radius: number = 12): string {
+    function createRoundedPath(points: { x: number; y: number }[], radius: number = 12): string {
         if (points.length < 2) return '';
         if (points.length === 2) {
             return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
@@ -1811,7 +1908,7 @@
                     { x: x1, y: y1 },
                     { x: midX, y: y1 },
                     { x: midX, y: y2 },
-                    { x: x2, y: y2 }
+                    { x: x2, y: y2 },
                 ];
                 path.setAttribute('d', createRoundedPath(points, cornerRadius));
             }
@@ -1836,7 +1933,7 @@
             const pointsToConverge = [
                 { x: x1, y: y1 },
                 { x: convergenceX, y: y1 },
-                { x: convergenceX, y: convergenceY }
+                { x: convergenceX, y: convergenceY },
             ];
             pathToConverge.setAttribute('d', createRoundedPath(pointsToConverge, cornerRadius));
             pathToConverge.classList.add('connection-line');
@@ -1854,7 +1951,7 @@
                 const points = [
                     { x: convergenceX, y: convergenceY },
                     { x: convergenceX, y: y2 },
-                    { x: x2, y: y2 }
+                    { x: x2, y: y2 },
                 ];
                 path.setAttribute('d', createRoundedPath(points, cornerRadius));
                 path.classList.add('connection-line');
@@ -1911,7 +2008,7 @@
         closeTooltip();
 
         // Find the node for this tech
-        const targetNode = placeholderNodes.find(n => n.techKey === techKey);
+        const targetNode = placeholderNodes.find((n) => n.techKey === techKey);
         if (!targetNode) return;
 
         // Calculate the scroll position to center the tech in the viewport
@@ -1942,13 +2039,13 @@
     // Rows 0, 0.5, 1 open downward (tooltip top at anchor)
     // Rows 1.5, 2, 2.5, 3 open upward (tooltip bottom at anchor)
     const TOOLTIP_ROW_ANCHORS: Record<number, { y: number; openDown: boolean }> = {
-        0:   { y: 0,   openDown: true },   // Row 0: tooltip starts near top
-        0.5: { y: 30,  openDown: true },   // Row 0.5: slightly lower
-        1:   { y: 70,  openDown: true },   // Row 1: lower still
-        1.5: { y: 430, openDown: false },  // Row 1.5: opens upward
-        2:   { y: 400, openDown: false },  // Row 2: opens upward
-        2.5: { y: 440, openDown: false },  // Row 2.5: opens upward
-        3:   { y: 480, openDown: false },  // Row 3: opens upward, near bottom
+        0: { y: 0, openDown: true }, // Row 0: tooltip starts near top
+        0.5: { y: 30, openDown: true }, // Row 0.5: slightly lower
+        1: { y: 70, openDown: true }, // Row 1: lower still
+        1.5: { y: 430, openDown: false }, // Row 1.5: opens upward
+        2: { y: 400, openDown: false }, // Row 2: opens upward
+        2.5: { y: 440, openDown: false }, // Row 2.5: opens upward
+        3: { y: 480, openDown: false }, // Row 3: opens upward, near bottom
     };
 
     function calculateTooltipPosition(event: MouseEvent, node: PlaceholderNode): void {
@@ -1976,13 +2073,13 @@
         let y: number;
 
         // Horizontal: position to the right of the tech node (relative to main container)
-        x = (nodeRect.right - mainContainer.left) + 10;
+        x = nodeRect.right - mainContainer.left + 10;
 
         // Check if tooltip goes off right edge of screen
         const screenWidth = window.innerWidth;
         if (mainContainer.left + x + tooltipWidth > screenWidth - 20) {
             // Position to the left of the tech node instead
-            x = (nodeRect.left - mainContainer.left) - tooltipWidth - 10;
+            x = nodeRect.left - mainContainer.left - tooltipWidth - 10;
         }
 
         // Clamp X within main container bounds
@@ -2080,7 +2177,8 @@
                 The Crystal Tech Simulator is not optimized for mobile devices due to its complex interactive interface.
             </p>
             <p class="mobile-warning-text">
-                For the best experience, please visit this page on a <strong>desktop computer</strong>, <strong>laptop</strong>, or <strong>tablet in landscape mode</strong>.
+                For the best experience, please visit this page on a <strong>desktop computer</strong>,
+                <strong>laptop</strong>, or <strong>tablet in landscape mode</strong>.
             </p>
         </div>
     </div>
@@ -2088,431 +2186,560 @@
     <!-- Settings Island -->
     <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
     <div class="settings-island" on:click={handleSettingsOutsideClick}>
-    <div class="settings-info">
-        <p class="settings-info-text">
-            Currently <strong>ALL</strong> KvK modes feature the "New" Crystal Tech changes (v5) including kingdoms entering KvK 4. When new, major crystal tech adjustments occur in-game, they are not always immediately accessible in every KvK mode, therefore please choose the version that matches your situation.
-        </p>
-    </div>
-    <div class="settings-controls">
-        <div class="settings-dropdown">
-            <span class="settings-label">
-                <img src={versionIcon.src} alt="Version" class="settings-icon" />
-                <span>Crystal Tech Version</span>
-            </span>
-            <div class="custom-select-container">
-                <button
-                    class="select-trigger"
-                    class:active={isVersionDropdownOpen}
-                    on:click={toggleVersionDropdown}
-                >
-                    <span>{availableVersions.find(v => v.id === selectedVersion)?.name || selectedVersion}</span>
-                    <span class="select-arrow"></span>
-                </button>
-                {#if isVersionDropdownOpen}
-                    <div class="select-dropdown">
-                        {#each availableVersions as version}
-                            <button
-                                class="select-option"
-                                class:selected={selectedVersion === version.id}
-                                on:click={() => selectVersion(version.id)}
-                            >
-                                {version.name}
-                            </button>
-                        {/each}
-                    </div>
-                {/if}
-            </div>
+        <div class="settings-info">
+            <p class="settings-info-text">
+                Currently <strong>ALL</strong> KvK modes feature the "New" Crystal Tech changes (v5) including kingdoms entering
+                KvK 4. When new, major crystal tech adjustments occur in-game, they are not always immediately accessible
+                in every KvK mode, therefore please choose the version that matches your situation.
+            </p>
         </div>
-
-        <div class="settings-dropdown">
-            <span class="settings-label">
-                <img src={researchCenterIcon.src} alt="Research Center" class="settings-icon" />
-                <span>Research Center Level</span>
-            </span>
-            <div class="custom-select-container">
-                <button
-                    class="select-trigger"
-                    class:active={isRCDropdownOpen}
-                    on:click={toggleRCDropdown}
-                >
-                    <span>Level {researchCenterLevel}</span>
-                    <span class="select-arrow"></span>
-                </button>
-                {#if isRCDropdownOpen}
-                    <div class="select-dropdown rc-dropdown">
-                        {#each Array.from({ length: 25 }, (_, i) => i + 1) as level}
-                            <button
-                                class="select-option"
-                                class:selected={researchCenterLevel === level}
-                                on:click={() => selectRCLevel(level)}
-                            >
-                                Level {level}
-                            </button>
-                        {/each}
-                    </div>
-                {/if}
-            </div>
-        </div>
-
-        <div class="settings-toggle vertical centered">
-            <span class="settings-label rc-toggle-label">
-                <span>Include Research Center Crystal Cost <span class="here-link" on:click={scrollToTotalCrystals} on:keydown={(e) => e.key === 'Enter' && scrollToTotalCrystals()} role="button" tabindex="0">Here</span></span>
-            </span>
-            <label class="toggle-switch modern small">
-                <input type="checkbox" bind:checked={includeRCCrystalCost} />
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
-    </div>
-</div>
-
-<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-<div class="crystal-tech-container" bind:this={containerEl} on:click={handleOutsideClick}>
-    <!-- Header Bar -->
-    <div class="crystal-tech-header">
-        <div class="greek-key-border left"></div>
-        <h2 class="crystal-tech-title">CRYSTAL TECHNOLOGIES</h2>
-        <div class="greek-key-border right"></div>
-    </div>
-
-    <!-- Tech Tree Viewport -->
-    <!-- svelte-ignore a11y_no_noninteractive_element_interactions a11y_no_noninteractive_tabindex -->
-    <div
-        class="tech-tree-viewport"
-        bind:this={viewport}
-        on:mousedown={handleMouseDown}
-        on:touchstart={handleTouchStart}
-        on:touchmove={handleTouchMove}
-        on:touchend={handleTouchEnd}
-        on:wheel={handleWheel}
-        role="application"
-        tabindex="0"
-        aria-label="Crystal Technology Tree - drag to scroll"
-        style="height: {canvasHeight}px;"
-    >
-        <!-- Mode Selector (top right of viewport) -->
-        <div class="mode-selector">
-            <span class="mode-label">Mode:</span>
-            <div class="mode-buttons">
-                <button
-                    class="mode-btn single"
-                    class:active={currentMode === 'single'}
-                    on:click={() => currentMode = 'single'}
-                    title="Add 1 level"
-                >
-                    <i class="fas fa-plus"></i>
-                    <span>Single</span>
-                </button>
-                <button
-                    class="mode-btn max"
-                    class:active={currentMode === 'max'}
-                    on:click={() => currentMode = 'max'}
-                    title="Max out tech"
-                >
-                    <i class="fas fa-angles-up"></i>
-                    <span>Max</span>
-                </button>
-                <button
-                    class="mode-btn remove"
-                    class:active={currentMode === 'remove'}
-                    on:click={() => currentMode = 'remove'}
-                    title="Remove 1 level"
-                >
-                    <i class="fas fa-minus"></i>
-                    <span>Remove</span>
-                </button>
-                <button
-                    class="mode-btn clear"
-                    on:click={openClearModal}
-                    title="Clear all progress"
-                >
-                    <i class="fas fa-trash"></i>
-                    <span>Clear</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="tech-tree-canvas" bind:this={canvas} style="width: {canvasWidth}px; height: {canvasHeight}px;">
-            <!-- SVG for connection lines -->
-            <svg class="tech-connections" bind:this={svg}></svg>
-
-            <!-- Tech nodes / Placeholder tiles -->
-            <div class="tech-nodes">
-                {#each placeholderNodes as node (node.slot)}
-                    {@const currentLevel = node.techKey ? (userTechLevels[node.techKey] || 0) : 0}
-                    {@const maxLevel = node.technology?.maxLevel || 10}
-                    {@const progress = (currentLevel / maxLevel) * 100}
-                    {@const isMaxed = currentLevel >= maxLevel}
-                    {@const techIcon = getTechIcon(node.techKey)}
-                    <div
-                        class="tech-node"
-                        class:placeholder-tile={!node.techKey}
-                        class:unlocked={node.technology && currentLevel > 0}
-                        class:locked={!node.technology || currentLevel === 0}
-                        class:maxed={isMaxed}
-                        class:highlighted={highlightedTechKey === node.techKey}
-                        style="left: {node.position.x}px; top: {node.position.y}px;"
-                        data-slot={node.slot}
-                        data-col={node.col}
-                        data-row={node.row}
-                        on:click={(e) => { if (node.techKey && !(e.target as HTMLElement).closest('.info-btn')) handleTechClick(node.techKey); }}
-                        role="button"
-                        tabindex={node.techKey ? 0 : -1}
+        <div class="settings-controls">
+            <div class="settings-dropdown">
+                <span class="settings-label">
+                    <img src={versionIcon.src} alt="Version" class="settings-icon" />
+                    <span>Crystal Tech Version</span>
+                </span>
+                <div class="custom-select-container">
+                    <button
+                        class="select-trigger"
+                        class:active={isVersionDropdownOpen}
+                        on:click={toggleVersionDropdown}
                     >
-                        <div class="tech-icon-frame">
-                            {#if techIcon}
-                                <img src={techIcon.src} alt={node.technology?.name || ''} class="tech-icon-img" width="64" height="64" loading="lazy" />
-                            {:else}
-                                <div class="tech-icon placeholder">
-                                    <span class="icon-placeholder">{node.technology ? node.technology.name.charAt(0) : node.col}</span>
+                        <span>{availableVersions.find((v) => v.id === selectedVersion)?.name || selectedVersion}</span>
+                        <span class="select-arrow"></span>
+                    </button>
+                    {#if isVersionDropdownOpen}
+                        <div class="select-dropdown">
+                            {#each availableVersions as version}
+                                <button
+                                    class="select-option"
+                                    class:selected={selectedVersion === version.id}
+                                    on:click={() => selectVersion(version.id)}
+                                >
+                                    {version.name}
+                                </button>
+                            {/each}
+                        </div>
+                    {/if}
+                </div>
+            </div>
+
+            <div class="settings-dropdown">
+                <span class="settings-label">
+                    <img src={researchCenterIcon.src} alt="Research Center" class="settings-icon" />
+                    <span>Research Center Level</span>
+                </span>
+                <div class="custom-select-container">
+                    <button class="select-trigger" class:active={isRCDropdownOpen} on:click={toggleRCDropdown}>
+                        <span>Level {researchCenterLevel}</span>
+                        <span class="select-arrow"></span>
+                    </button>
+                    {#if isRCDropdownOpen}
+                        <div class="select-dropdown rc-dropdown">
+                            {#each Array.from({ length: 25 }, (_, i) => i + 1) as level}
+                                <button
+                                    class="select-option"
+                                    class:selected={researchCenterLevel === level}
+                                    on:click={() => selectRCLevel(level)}
+                                >
+                                    Level {level}
+                                </button>
+                            {/each}
+                        </div>
+                    {/if}
+                </div>
+            </div>
+
+            <div class="settings-toggle vertical centered">
+                <span class="settings-label rc-toggle-label">
+                    <span
+                        >Include Research Center Crystal Cost <span
+                            class="here-link"
+                            on:click={scrollToTotalCrystals}
+                            on:keydown={(e) => e.key === 'Enter' && scrollToTotalCrystals()}
+                            role="button"
+                            tabindex="0">Here</span
+                        ></span
+                    >
+                </span>
+                <label class="toggle-switch modern small">
+                    <input type="checkbox" bind:checked={includeRCCrystalCost} />
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+    <div class="crystal-tech-container" bind:this={containerEl} on:click={handleOutsideClick}>
+        <!-- Header Bar -->
+        <div class="crystal-tech-header">
+            <div class="greek-key-border left"></div>
+            <h2 class="crystal-tech-title">CRYSTAL TECHNOLOGIES</h2>
+            <div class="greek-key-border right"></div>
+        </div>
+
+        <!-- Tech Tree Viewport -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions a11y_no_noninteractive_tabindex -->
+        <div
+            class="tech-tree-viewport"
+            bind:this={viewport}
+            on:mousedown={handleMouseDown}
+            on:touchstart={handleTouchStart}
+            on:touchmove={handleTouchMove}
+            on:touchend={handleTouchEnd}
+            on:wheel={handleWheel}
+            role="application"
+            tabindex="0"
+            aria-label="Crystal Technology Tree - drag to scroll"
+            style="height: {canvasHeight}px;"
+        >
+            <!-- Mode Selector (top right of viewport) -->
+            <div class="mode-selector">
+                <span class="mode-label">Mode:</span>
+                <div class="mode-buttons">
+                    <button
+                        class="mode-btn single"
+                        class:active={currentMode === 'single'}
+                        on:click={() => (currentMode = 'single')}
+                        title="Add 1 level"
+                    >
+                        <i class="fas fa-plus"></i>
+                        <span>Single</span>
+                    </button>
+                    <button
+                        class="mode-btn max"
+                        class:active={currentMode === 'max'}
+                        on:click={() => (currentMode = 'max')}
+                        title="Max out tech"
+                    >
+                        <i class="fas fa-angles-up"></i>
+                        <span>Max</span>
+                    </button>
+                    <button
+                        class="mode-btn remove"
+                        class:active={currentMode === 'remove'}
+                        on:click={() => (currentMode = 'remove')}
+                        title="Remove 1 level"
+                    >
+                        <i class="fas fa-minus"></i>
+                        <span>Remove</span>
+                    </button>
+                    <button class="mode-btn clear" on:click={openClearModal} title="Clear all progress">
+                        <i class="fas fa-trash"></i>
+                        <span>Clear</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tech-tree-canvas" bind:this={canvas} style="width: {canvasWidth}px; height: {canvasHeight}px;">
+                <!-- SVG for connection lines -->
+                <svg class="tech-connections" bind:this={svg}></svg>
+
+                <!-- Tech nodes / Placeholder tiles -->
+                <div class="tech-nodes">
+                    {#each placeholderNodes as node (node.slot)}
+                        {@const currentLevel = node.techKey ? userTechLevels[node.techKey] || 0 : 0}
+                        {@const maxLevel = node.technology?.maxLevel || 10}
+                        {@const progress = (currentLevel / maxLevel) * 100}
+                        {@const isMaxed = currentLevel >= maxLevel}
+                        {@const techIcon = getTechIcon(node.techKey)}
+                        <div
+                            class="tech-node"
+                            class:placeholder-tile={!node.techKey}
+                            class:unlocked={node.technology && currentLevel > 0}
+                            class:locked={!node.technology || currentLevel === 0}
+                            class:maxed={isMaxed}
+                            class:highlighted={highlightedTechKey === node.techKey}
+                            style="left: {node.position.x}px; top: {node.position.y}px;"
+                            data-slot={node.slot}
+                            data-col={node.col}
+                            data-row={node.row}
+                            on:click={(e) => {
+                                if (node.techKey && !(e.target as HTMLElement).closest('.info-btn'))
+                                    handleTechClick(node.techKey);
+                            }}
+                            role="button"
+                            tabindex={node.techKey ? 0 : -1}
+                        >
+                            <div class="tech-icon-frame">
+                                {#if techIcon}
+                                    <img
+                                        src={techIcon.src}
+                                        alt={node.technology?.name || ''}
+                                        class="tech-icon-img"
+                                        width="64"
+                                        height="64"
+                                        loading="lazy"
+                                    />
+                                {:else}
+                                    <div class="tech-icon placeholder">
+                                        <span class="icon-placeholder"
+                                            >{node.technology ? node.technology.name.charAt(0) : node.col}</span
+                                        >
+                                    </div>
+                                {/if}
+                            </div>
+                            <div class="tech-info">
+                                <span class="tech-name {getTextSizeClass(node.technology?.name)}"
+                                    >{node.technology?.name || node.slot}</span
+                                >
+                                <div class="tech-level" style="--progress: {progress}%">
+                                    <span>{currentLevel}/{maxLevel}</span>
                                 </div>
+                            </div>
+                            {#if node.technology}
+                                <button
+                                    class="info-btn"
+                                    class:active={hoveredNode === node && showTooltip}
+                                    on:click={(e) => handleInfoClick(node, e)}
+                                    aria-label="Show tech details"
+                                >
+                                    <i class="fas fa-info"></i>
+                                </button>
                             {/if}
                         </div>
-                        <div class="tech-info">
-                            <span class="tech-name {getTextSizeClass(node.technology?.name)}">{node.technology?.name || node.slot}</span>
-                            <div class="tech-level" style="--progress: {progress}%">
-                                <span>{currentLevel}/{maxLevel}</span>
-                            </div>
-                        </div>
-                        {#if node.technology}
-                            <button
-                                class="info-btn"
-                                class:active={hoveredNode === node && showTooltip}
-                                on:click={(e) => handleInfoClick(node, e)}
-                                aria-label="Show tech details"
-                            >
-                                <i class="fas fa-info"></i>
-                            </button>
-                        {/if}
-                    </div>
-                {/each}
-            </div>
-        </div>
-        <div class="viewport-scroll-hint">
-            <i class="fas fa-arrows-alt-h"></i>
-            <span>Drag to scroll</span>
-        </div>
-    </div>
-
-    <!-- Click Tooltip -->
-    {#if hoveredNode && hoveredNode.technology && showTooltip}
-        {@const tech = hoveredNode.technology}
-        {@const techIcon = getTechIcon(hoveredNode.techKey)}
-        {@const currentLevel = hoveredNode.techKey ? (userTechLevels[hoveredNode.techKey] || 0) : 0}
-        <div
-            class="tech-tooltip"
-            class:show={showTooltip}
-            style="left: {tooltipX}px; top: {tooltipY}px; --origin-x: {tooltipOriginX - tooltipX}px; --origin-y: {tooltipOriginY - tooltipY}px;"
-        >
-            <div class="tooltip-header">
-                <div class="tooltip-icon">
-                    {#if techIcon}
-                        <img src={techIcon.src} alt={tech.name} width="48" height="48" />
-                    {:else}
-                        <span class="icon-placeholder">{tech.name.charAt(0)}</span>
-                    {/if}
-                </div>
-                <div class="tooltip-title">
-                    <h3>{tech.name}</h3>
-                    <p class="tooltip-description">{tech.description}</p>
-                </div>
-            </div>
-            <div class="tooltip-summary">
-                <div class="summary-item">
-                    <span class="summary-label">Current Level</span>
-                    <span class="summary-value">{currentLevel} / {tech.maxLevel}</span>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-label">Max Buff</span>
-                    <span class="summary-value buff">{tech.totals.buff}</span>
-                </div>
-            </div>
-            <div class="tooltip-table-container">
-                <table class="tooltip-table">
-                    <thead>
-                        <tr>
-                            <th>Lvl</th>
-                            <th>Buff</th>
-                            <th>Time</th>
-                            <th><img src={crystalIcon.src} alt="Crystals" width="16" height="16" /></th>
-                            <th><img src={seasonCoinIcon.src} alt="Season Coins" width="16" height="16" /></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each tech.levels as level}
-                            {@const meetsRC = hoveredNode?.techKey ? meetsRCRequirement(hoveredNode.techKey, level.level) : true}
-                            {@const displayCost = hoveredNode?.techKey ? getReducedCost(level.crystals, getCostReductionAtLevel(hoveredNode.techKey, level.level)) : level.crystals}
-                            <tr class:completed={level.level <= currentLevel} class:next={level.level === currentLevel + 1} class:rc-locked={!meetsRC}>
-                                <td class="level-col">{level.level}</td>
-                                <td class="buff-col">{level.buff}</td>
-                                <td class="time-col">{level.time}</td>
-                                <td class="crystal-col">{formatNumber(displayCost)}</td>
-                                <td class="coin-col">{formatNumber(level.seasonCoins)}</td>
-                            </tr>
-                        {/each}
-                    </tbody>
-                    <tfoot>
-                        <tr class="totals-row">
-                            <td>Total</td>
-                            <td class="buff-col">{tech.totals.buff}</td>
-                            <td class="time-col">{tech.totals.time}</td>
-                            <td class="crystal-col">{formatNumber(hoveredNode?.techKey ? tech.levels.reduce((sum, lvl, i) => sum + getReducedCost(lvl.crystals, getCostReductionAtLevel(hoveredNode!.techKey!, i + 1)), 0) : tech.totals.crystals)}</td>
-                            <td class="coin-col">{formatNumber(tech.totals.seasonCoins)}</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-            {#if hoveredNode?.techKey && getCombinedRequirements(hoveredNode.techKey).length > 0}
-                <div class="tooltip-requirements">
-                    <span class="req-label">Requirements:</span>
-                    {#each getCombinedRequirements(hoveredNode.techKey) as combinedReq}
-                        {#if combinedReq.type === 'tech'}
-                            {@const parts = getRequirementParts(combinedReq.req)}
-                            <span class="req-item"><span class="req-unlock-level">Lvl {combinedReq.level}:</span> {#if parts.keyword}<span class="req-keyword">{parts.keyword}</span>&nbsp;{/if}{#each parts.techIds as techId, i}<span class="req-tech-link" on:click={() => navigateToTech(techId)} on:keydown={(e) => e.key === 'Enter' && navigateToTech(techId)} role="button" tabindex="0">{getTechName(techId)}</span>{#if i < parts.techIds.length - 1},&nbsp;{/if}{/each} <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {combinedReq.req.techLevel || 0}</span></span>
-                        {:else}
-                            {@const meetsRC = researchCenterLevel >= combinedReq.rcLevel}
-                            <span class="req-item"><span class="req-unlock-level">Lvl {combinedReq.level}:</span> <span class="rc-req-name" class:rc-met={meetsRC} class:rc-not-met={!meetsRC}>Research Center</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {combinedReq.rcLevel}</span></span>
-                        {/if}
                     {/each}
                 </div>
-            {/if}
-        </div>
-    {/if}
-
-    <!-- Message Display -->
-    {#if simulatorMessage}
-        <div class="simulator-message" class:error={simulatorMessage.type === 'error'} class:warning={simulatorMessage.type === 'warning'}>
-            <div class="message-content">
-                <i class="fas {simulatorMessage.type === 'error' ? 'fa-exclamation-circle' : 'fa-exclamation-triangle'}"></i>
-                <span class="message-text">
-                    {#if simulatorMessage.multiTechLinks && simulatorMessage.multiTechLinks.length > 0}
-                        {#if simulatorMessage.text}{simulatorMessage.text} {/if}{simulatorMessage.prefix} {#each simulatorMessage.multiTechLinks as link, i}<span class="message-tech-link" on:click={() => { navigateToTech(link.techKey); clearMessage(); }} on:keydown={(e) => { if (e.key === 'Enter') { navigateToTech(link.techKey); clearMessage(); } }} role="button" tabindex="0">{link.techName}</span>{#if i < (simulatorMessage.multiTechLinks?.length || 0) - 1},&nbsp;{/if}{/each} <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.requiredLevel}</span>
-                    {:else if simulatorMessage.techLink}
-                        Requires <span class="message-tech-link" on:click={() => { if (simulatorMessage?.techLink) navigateToTech(simulatorMessage.techLink.techKey); clearMessage(); }} on:keydown={(e) => { if (e.key === 'Enter' && simulatorMessage?.techLink) { navigateToTech(simulatorMessage.techLink.techKey); clearMessage(); } }} role="button" tabindex="0">{simulatorMessage.techLink.techName}</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.techLink.requiredLevel}</span> to {simulatorMessage.type === 'warning' ? 'finish' : 'continue'}.
-                    {:else if simulatorMessage.rcRequirement}
-                        Requires <span class="rc-req-name">Research Center</span> <span class="req-arrow">→</span> <span class="req-tech-level">Lvl {simulatorMessage.rcRequirement}</span> to {simulatorMessage.type === 'warning' ? 'finish' : 'continue'}.
-                    {:else}
-                        {simulatorMessage.text}
-                    {/if}
-                </span>
-                <button class="message-close" on:click={clearMessage} aria-label="Close message">
-                    <i class="fas fa-times"></i>
-                </button>
+            </div>
+            <div class="viewport-scroll-hint">
+                <i class="fas fa-arrows-alt-h"></i>
+                <span>Drag to scroll</span>
             </div>
         </div>
-    {/if}
 
-    <!-- Footer Bar with Counters -->
-    <div class="crystal-tech-footer">
-        <button class="footer-counter speedups clickable" class:active={expandedFooterPanel === 'speedups'} on:click={() => toggleFooterPanel('speedups')} aria-label="Toggle speedup details">
-            <span class="icon-chevron" class:open={expandedFooterPanel === 'speedups'}><i class="fas fa-chevron-down"></i></span>
-            <img src={researchSpeedupIcon.src} alt="Speedup" class="counter-icon" width="28" height="28" />
-            <span class="counter-label">Total Speedups Spent:</span>
-            <span class="counter-value">{formatSpeedups(totalSpeedupsUsed)}</span>
-        </button>
-        <div class="footer-counter season-coins">
-            <img src={seasonCoinIcon.src} alt="Season Coins" class="counter-icon" width="28" height="28" />
-            <span class="counter-label">Total Season Coins:</span>
-            <span class="counter-value">{totalSeasonCoinsUsed.toLocaleString()}</span>
+        <!-- Click Tooltip -->
+        {#if hoveredNode && hoveredNode.technology && showTooltip}
+            {@const tech = hoveredNode.technology}
+            {@const techIcon = getTechIcon(hoveredNode.techKey)}
+            {@const currentLevel = hoveredNode.techKey ? userTechLevels[hoveredNode.techKey] || 0 : 0}
+            <div
+                class="tech-tooltip"
+                class:show={showTooltip}
+                style="left: {tooltipX}px; top: {tooltipY}px; --origin-x: {tooltipOriginX -
+                    tooltipX}px; --origin-y: {tooltipOriginY - tooltipY}px;"
+            >
+                <div class="tooltip-header">
+                    <div class="tooltip-icon">
+                        {#if techIcon}
+                            <img src={techIcon.src} alt={tech.name} width="48" height="48" />
+                        {:else}
+                            <span class="icon-placeholder">{tech.name.charAt(0)}</span>
+                        {/if}
+                    </div>
+                    <div class="tooltip-title">
+                        <h3>{tech.name}</h3>
+                        <p class="tooltip-description">{tech.description}</p>
+                    </div>
+                </div>
+                <div class="tooltip-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Current Level</span>
+                        <span class="summary-value">{currentLevel} / {tech.maxLevel}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Max Buff</span>
+                        <span class="summary-value buff">{tech.totals.buff}</span>
+                    </div>
+                </div>
+                <div class="tooltip-table-container">
+                    <table class="tooltip-table">
+                        <thead>
+                            <tr>
+                                <th>Lvl</th>
+                                <th>Buff</th>
+                                <th>Time</th>
+                                <th><img src={crystalIcon.src} alt="Crystals" width="16" height="16" /></th>
+                                <th><img src={seasonCoinIcon.src} alt="Season Coins" width="16" height="16" /></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {#each tech.levels as level}
+                                {@const meetsRC = hoveredNode?.techKey
+                                    ? meetsRCRequirement(hoveredNode.techKey, level.level)
+                                    : true}
+                                {@const displayCost = hoveredNode?.techKey
+                                    ? getReducedCost(
+                                          level.crystals,
+                                          getCostReductionAtLevel(hoveredNode.techKey, level.level),
+                                      )
+                                    : level.crystals}
+                                <tr
+                                    class:completed={level.level <= currentLevel}
+                                    class:next={level.level === currentLevel + 1}
+                                    class:rc-locked={!meetsRC}
+                                >
+                                    <td class="level-col">{level.level}</td>
+                                    <td class="buff-col">{level.buff}</td>
+                                    <td class="time-col">{level.time}</td>
+                                    <td class="crystal-col">{formatNumber(displayCost)}</td>
+                                    <td class="coin-col">{formatNumber(level.seasonCoins)}</td>
+                                </tr>
+                            {/each}
+                        </tbody>
+                        <tfoot>
+                            <tr class="totals-row">
+                                <td>Total</td>
+                                <td class="buff-col">{tech.totals.buff}</td>
+                                <td class="time-col">{tech.totals.time}</td>
+                                <td class="crystal-col"
+                                    >{formatNumber(
+                                        hoveredNode?.techKey
+                                            ? tech.levels.reduce(
+                                                  (sum, lvl, i) =>
+                                                      sum +
+                                                      getReducedCost(
+                                                          lvl.crystals,
+                                                          getCostReductionAtLevel(hoveredNode!.techKey!, i + 1),
+                                                      ),
+                                                  0,
+                                              )
+                                            : tech.totals.crystals,
+                                    )}</td
+                                >
+                                <td class="coin-col">{formatNumber(tech.totals.seasonCoins)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                {#if hoveredNode?.techKey && getCombinedRequirements(hoveredNode.techKey).length > 0}
+                    <div class="tooltip-requirements">
+                        <span class="req-label">Requirements:</span>
+                        {#each getCombinedRequirements(hoveredNode.techKey) as combinedReq}
+                            {#if combinedReq.type === 'tech'}
+                                {@const parts = getRequirementParts(combinedReq.req)}
+                                <span class="req-item"
+                                    ><span class="req-unlock-level">Lvl {combinedReq.level}:</span>
+                                    {#if parts.keyword}<span class="req-keyword">{parts.keyword}</span
+                                        >&nbsp;{/if}{#each parts.techIds as techId, i}<span
+                                            class="req-tech-link"
+                                            on:click={() => navigateToTech(techId)}
+                                            on:keydown={(e) => e.key === 'Enter' && navigateToTech(techId)}
+                                            role="button"
+                                            tabindex="0">{getTechName(techId)}</span
+                                        >{#if i < parts.techIds.length - 1},&nbsp;{/if}{/each}
+                                    <span class="req-arrow">→</span>
+                                    <span class="req-tech-level">Lvl {combinedReq.req.techLevel || 0}</span></span
+                                >
+                            {:else}
+                                {@const meetsRC = researchCenterLevel >= combinedReq.rcLevel}
+                                <span class="req-item"
+                                    ><span class="req-unlock-level">Lvl {combinedReq.level}:</span>
+                                    <span class="rc-req-name" class:rc-met={meetsRC} class:rc-not-met={!meetsRC}
+                                        >Research Center</span
+                                    > <span class="req-arrow">→</span>
+                                    <span class="req-tech-level">Lvl {combinedReq.rcLevel}</span></span
+                                >
+                            {/if}
+                        {/each}
+                    </div>
+                {/if}
+            </div>
+        {/if}
+
+        <!-- Message Display -->
+        {#if simulatorMessage}
+            <div
+                class="simulator-message"
+                class:error={simulatorMessage.type === 'error'}
+                class:warning={simulatorMessage.type === 'warning'}
+            >
+                <div class="message-content">
+                    <i
+                        class="fas {simulatorMessage.type === 'error'
+                            ? 'fa-exclamation-circle'
+                            : 'fa-exclamation-triangle'}"
+                    ></i>
+                    <span class="message-text">
+                        {#if simulatorMessage.multiTechLinks && simulatorMessage.multiTechLinks.length > 0}
+                            {#if simulatorMessage.text}{simulatorMessage.text}
+                            {/if}{simulatorMessage.prefix}
+                            {#each simulatorMessage.multiTechLinks as link, i}<span
+                                    class="message-tech-link"
+                                    on:click={() => {
+                                        navigateToTech(link.techKey);
+                                        clearMessage();
+                                    }}
+                                    on:keydown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            navigateToTech(link.techKey);
+                                            clearMessage();
+                                        }
+                                    }}
+                                    role="button"
+                                    tabindex="0">{link.techName}</span
+                                >{#if i < (simulatorMessage.multiTechLinks?.length || 0) - 1},&nbsp;{/if}{/each}
+                            <span class="req-arrow">→</span>
+                            <span class="req-tech-level">Lvl {simulatorMessage.requiredLevel}</span>
+                        {:else if simulatorMessage.techLink}
+                            Requires <span
+                                class="message-tech-link"
+                                on:click={() => {
+                                    if (simulatorMessage?.techLink) navigateToTech(simulatorMessage.techLink.techKey);
+                                    clearMessage();
+                                }}
+                                on:keydown={(e) => {
+                                    if (e.key === 'Enter' && simulatorMessage?.techLink) {
+                                        navigateToTech(simulatorMessage.techLink.techKey);
+                                        clearMessage();
+                                    }
+                                }}
+                                role="button"
+                                tabindex="0">{simulatorMessage.techLink.techName}</span
+                            > <span class="req-arrow">→</span>
+                            <span class="req-tech-level">Lvl {simulatorMessage.techLink.requiredLevel}</span>
+                            to {simulatorMessage.type === 'warning' ? 'finish' : 'continue'}.
+                        {:else if simulatorMessage.rcRequirement}
+                            Requires <span class="rc-req-name">Research Center</span> <span class="req-arrow">→</span>
+                            <span class="req-tech-level">Lvl {simulatorMessage.rcRequirement}</span>
+                            to {simulatorMessage.type === 'warning' ? 'finish' : 'continue'}.
+                        {:else}
+                            {simulatorMessage.text}
+                        {/if}
+                    </span>
+                    <button class="message-close" on:click={clearMessage} aria-label="Close message">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        {/if}
+
+        <!-- Footer Bar with Counters -->
+        <div class="crystal-tech-footer">
+            <button
+                class="footer-counter speedups clickable"
+                class:active={expandedFooterPanel === 'speedups'}
+                on:click={() => toggleFooterPanel('speedups')}
+                aria-label="Toggle speedup details"
+            >
+                <span class="icon-chevron" class:open={expandedFooterPanel === 'speedups'}
+                    ><i class="fas fa-chevron-down"></i></span
+                >
+                <img src={researchSpeedupIcon.src} alt="Speedup" class="counter-icon" width="28" height="28" />
+                <span class="counter-label">Total Speedups Spent:</span>
+                <span class="counter-value">{formatSpeedups(totalSpeedupsUsed)}</span>
+            </button>
+            <div class="footer-counter season-coins">
+                <img src={seasonCoinIcon.src} alt="Season Coins" class="counter-icon" width="28" height="28" />
+                <span class="counter-label">Total Season Coins:</span>
+                <span class="counter-value">{totalSeasonCoinsUsed.toLocaleString()}</span>
+            </div>
+            <button
+                class="footer-counter crystals clickable"
+                class:active={expandedFooterPanel === 'crystals'}
+                on:click={() => toggleFooterPanel('crystals')}
+                aria-label="Toggle crystal details"
+            >
+                <span class="icon-chevron" class:open={expandedFooterPanel === 'crystals'}
+                    ><i class="fas fa-chevron-down"></i></span
+                >
+                <img src={crystalIcon.src} alt="Crystal" class="counter-icon" width="28" height="28" />
+                <span class="counter-label">Total Crystals Used:</span>
+                <span class="counter-value" id="total-crystals-value">{totalCrystalsUsed.toLocaleString()}</span>
+            </button>
         </div>
-        <button class="footer-counter crystals clickable" class:active={expandedFooterPanel === 'crystals'} on:click={() => toggleFooterPanel('crystals')} aria-label="Toggle crystal details">
-            <span class="icon-chevron" class:open={expandedFooterPanel === 'crystals'}><i class="fas fa-chevron-down"></i></span>
-            <img src={crystalIcon.src} alt="Crystal" class="counter-icon" width="28" height="28" />
-            <span class="counter-label">Total Crystals Used:</span>
-            <span class="counter-value" id="total-crystals-value">{totalCrystalsUsed.toLocaleString()}</span>
-        </button>
+
+        <!-- Footer Expansion Panel (opens downward below footer) -->
+        {#if expandedFooterPanel === 'speedups'}
+            <div class="footer-expansion-panel" transition:slide={{ duration: 200 }}>
+                <div class="expansion-content">
+                    <div class="expansion-inputs">
+                        <div class="expansion-input-group">
+                            <label for="research-speed-bonus">Research Speed Bonus</label>
+                            <div class="input-with-suffix">
+                                <input
+                                    type="number"
+                                    id="research-speed-bonus"
+                                    min="0"
+                                    max="999"
+                                    bind:value={researchSpeedBonus}
+                                    on:change={clampSpeedBonus}
+                                />
+                                <span class="input-suffix">%</span>
+                            </div>
+                        </div>
+                        <div class="expansion-input-group">
+                            <label for="helps-per-research">Helps per Research</label>
+                            <div class="input-with-suffix">
+                                <input
+                                    type="number"
+                                    id="helps-per-research"
+                                    min="0"
+                                    max="30"
+                                    bind:value={helpsPerResearch}
+                                    on:change={clampHelps}
+                                />
+                                <span class="input-suffix">/ 30</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expansion-stats">
+                        <div class="expansion-stat-row">
+                            <span class="stat-label">Base Time</span>
+                            <span class="stat-value">{formatSpeedups(baseTimeDays)}</span>
+                        </div>
+                        <div class="expansion-stat-row">
+                            <span class="stat-label">After Speed Bonus</span>
+                            <span class="stat-value">{formatSpeedups(timeAfterSpeedBonusDays)}</span>
+                        </div>
+                        <div class="expansion-stat-row">
+                            <span class="stat-label">After {helpsPerResearch} Helps</span>
+                            <span class="stat-value">{formatSpeedups(totalSpeedupsUsed)}</span>
+                        </div>
+                        <div class="expansion-stat-row final">
+                            <span class="stat-label">Speedups Needed</span>
+                            <span class="stat-value highlight">{formatSpeedups(totalSpeedupsUsed)}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {/if}
+        {#if expandedFooterPanel === 'crystals'}
+            <div class="footer-expansion-panel" transition:slide={{ duration: 200 }}>
+                <div class="expansion-content crystals-layout">
+                    <div class="expansion-crystal-card">
+                        <span class="crystal-card-label">Without Reduction</span>
+                        <span class="crystal-card-value">{rawCrystalCost.toLocaleString()}</span>
+                        <span class="crystal-card-note">Raw cost (no RC / CC)</span>
+                    </div>
+                    <div class="expansion-crystal-card savings">
+                        <span class="crystal-card-label">Reduction Savings</span>
+                        <span class="crystal-card-value">{crystalSavings.toLocaleString()}</span>
+                        <span class="crystal-card-note">Saved by RC + CC levels</span>
+                    </div>
+                </div>
+            </div>
+        {/if}
     </div>
-
-    <!-- Footer Expansion Panel (opens downward below footer) -->
-    {#if expandedFooterPanel === 'speedups'}
-        <div class="footer-expansion-panel" transition:slide={{ duration: 200 }}>
-            <div class="expansion-content">
-                <div class="expansion-inputs">
-                    <div class="expansion-input-group">
-                        <label for="research-speed-bonus">Research Speed Bonus</label>
-                        <div class="input-with-suffix">
-                            <input
-                                type="number"
-                                id="research-speed-bonus"
-                                min="0"
-                                max="999"
-                                bind:value={researchSpeedBonus}
-                                on:change={clampSpeedBonus}
-                            />
-                            <span class="input-suffix">%</span>
-                        </div>
-                    </div>
-                    <div class="expansion-input-group">
-                        <label for="helps-per-research">Helps per Research</label>
-                        <div class="input-with-suffix">
-                            <input
-                                type="number"
-                                id="helps-per-research"
-                                min="0"
-                                max="30"
-                                bind:value={helpsPerResearch}
-                                on:change={clampHelps}
-                            />
-                            <span class="input-suffix">/ 30</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="expansion-stats">
-                    <div class="expansion-stat-row">
-                        <span class="stat-label">Base Time</span>
-                        <span class="stat-value">{formatSpeedups(baseTimeDays)}</span>
-                    </div>
-                    <div class="expansion-stat-row">
-                        <span class="stat-label">After Speed Bonus</span>
-                        <span class="stat-value">{formatSpeedups(timeAfterSpeedBonusDays)}</span>
-                    </div>
-                    <div class="expansion-stat-row">
-                        <span class="stat-label">After {helpsPerResearch} Helps</span>
-                        <span class="stat-value">{formatSpeedups(totalSpeedupsUsed)}</span>
-                    </div>
-                    <div class="expansion-stat-row final">
-                        <span class="stat-label">Speedups Needed</span>
-                        <span class="stat-value highlight">{formatSpeedups(totalSpeedupsUsed)}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {/if}
-    {#if expandedFooterPanel === 'crystals'}
-        <div class="footer-expansion-panel" transition:slide={{ duration: 200 }}>
-            <div class="expansion-content crystals-layout">
-                <div class="expansion-crystal-card">
-                    <span class="crystal-card-label">Without Reduction</span>
-                    <span class="crystal-card-value">{rawCrystalCost.toLocaleString()}</span>
-                    <span class="crystal-card-note">Raw cost (no RC / CC)</span>
-                </div>
-                <div class="expansion-crystal-card savings">
-                    <span class="crystal-card-label">Reduction Savings</span>
-                    <span class="crystal-card-value">{crystalSavings.toLocaleString()}</span>
-                    <span class="crystal-card-note">Saved by RC + CC levels</span>
-                </div>
-            </div>
-        </div>
-    {/if}
-</div>
 {/if}
 
 <!-- Clear Confirmation Modal -->
 {#if showClearModal}
-    <div class="modal-overlay" on:click={cancelClear} on:keydown={(e) => e.key === 'Escape' && cancelClear()} role="button" tabindex="-1" aria-label="Close modal">
-        <div class="modal-content" on:click|stopPropagation on:keydown|stopPropagation role="dialog" aria-modal="true" aria-labelledby="clear-modal-title" tabindex="-1">
+    <div
+        class="modal-overlay"
+        on:click={cancelClear}
+        on:keydown={(e) => e.key === 'Escape' && cancelClear()}
+        role="button"
+        tabindex="-1"
+        aria-label="Close modal"
+    >
+        <div
+            class="modal-content"
+            on:click|stopPropagation
+            on:keydown|stopPropagation
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="clear-modal-title"
+            tabindex="-1"
+        >
             <div class="modal-icon">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
             <h3 id="clear-modal-title">Clear All Progress?</h3>
             <p>This will reset all technologies to Level 0. This action cannot be undone.</p>
             <div class="modal-buttons">
-                <button class="modal-btn cancel" on:click={cancelClear}>
-                    Cancel
-                </button>
-                <button class="modal-btn confirm" on:click={confirmClear}>
-                    Clear All
-                </button>
+                <button class="modal-btn cancel" on:click={cancelClear}> Cancel </button>
+                <button class="modal-btn confirm" on:click={confirmClear}> Clear All </button>
             </div>
         </div>
     </div>
@@ -2545,7 +2772,9 @@
         max-width: 380px;
         width: 90%;
         text-align: center;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(100, 180, 220, 0.1);
+        box-shadow:
+            0 20px 60px rgba(0, 0, 0, 0.5),
+            0 0 40px rgba(100, 180, 220, 0.1);
     }
 
     .modal-icon {
@@ -2938,7 +3167,7 @@
 
     .toggle-slider:before {
         position: absolute;
-        content: "";
+        content: '';
         height: 18px;
         width: 18px;
         left: 2px;
@@ -3013,11 +3242,15 @@
 
     /* Glow highlight animation for total crystals value */
     @keyframes crystalGlow {
-        0%, 100% {
+        0%,
+        100% {
             text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
         }
         50% {
-            text-shadow: 0 0 15px rgba(74, 222, 128, 1), 0 0 25px rgba(74, 222, 128, 0.7), 0 0 35px rgba(74, 222, 128, 0.4);
+            text-shadow:
+                0 0 15px rgba(74, 222, 128, 1),
+                0 0 25px rgba(74, 222, 128, 0.7),
+                0 0 35px rgba(74, 222, 128, 0.4);
         }
     }
 
@@ -3033,7 +3266,9 @@
     /* Font face for NotoSansHans */
     @font-face {
         font-family: 'NotoSansHans';
-        src: url('/fonts/NotoSansHans-Black.woff2') format('woff2'), url('/fonts/NotoSansHans-Black.otf') format('opentype');
+        src:
+            url('/fonts/NotoSansHans-Black.woff2') format('woff2'),
+            url('/fonts/NotoSansHans-Black.otf') format('opentype');
         font-weight: 900;
         font-style: normal;
         font-display: swap;
@@ -3041,7 +3276,9 @@
 
     @font-face {
         font-family: 'NotoSansHans';
-        src: url('/fonts/NotoSansHans-Bold.woff2') format('woff2'), url('/fonts/NotoSansHans-Bold.otf') format('opentype');
+        src:
+            url('/fonts/NotoSansHans-Bold.woff2') format('woff2'),
+            url('/fonts/NotoSansHans-Bold.otf') format('opentype');
         font-weight: 700;
         font-style: normal;
         font-display: swap;
@@ -3049,7 +3286,9 @@
 
     @font-face {
         font-family: 'NotoSansHans';
-        src: url('/fonts/NotoSansHans-DemiLight.woff2') format('woff2'), url('/fonts/NotoSansHans-DemiLight.otf') format('opentype');
+        src:
+            url('/fonts/NotoSansHans-DemiLight.woff2') format('woff2'),
+            url('/fonts/NotoSansHans-DemiLight.otf') format('opentype');
         font-weight: 300;
         font-style: normal;
         font-display: swap;
@@ -3309,7 +3548,9 @@
     .icon-chevron {
         font-size: 0.75rem;
         color: #5a7a8a;
-        transition: transform 0.2s ease, color 0.2s ease;
+        transition:
+            transform 0.2s ease,
+            color 0.2s ease;
     }
 
     .icon-chevron.open {
@@ -3381,13 +3622,13 @@
     }
 
     /* Hide number input spinners */
-    .input-with-suffix input[type="number"]::-webkit-outer-spin-button,
-    .input-with-suffix input[type="number"]::-webkit-inner-spin-button {
+    .input-with-suffix input[type='number']::-webkit-outer-spin-button,
+    .input-with-suffix input[type='number']::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
 
-    .input-with-suffix input[type="number"] {
+    .input-with-suffix input[type='number'] {
         -moz-appearance: textfield;
         appearance: textfield;
     }
@@ -3499,7 +3740,6 @@
         cursor: grab;
         background: radial-gradient(ellipse at center, #0872a0 0%, #044560 100%);
     }
-
 
     .tech-tree-viewport:active {
         cursor: grabbing;
@@ -3673,9 +3913,11 @@
         border-radius: 4px;
         padding: 8px;
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
         background: radial-gradient(circle at 38% 50%, #d2f7fd 0%, #6bc9f0 70%);
-        border: 2px solid #9FC2DA;
+        border: 2px solid #9fc2da;
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.4),
             0 3px 6px rgba(0, 0, 0, 0.25);
@@ -3695,7 +3937,7 @@
     }
 
     .tech-node.selected {
-        border-color: #FFD700;
+        border-color: #ffd700;
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.4),
             0 0 0 3px rgba(255, 215, 0, 0.5),
@@ -3734,7 +3976,7 @@
 
     .tech-node.placeholder-tile {
         background: radial-gradient(circle at 30% 50%, #5a7a8a 0%, #3a5a6a 70%);
-        border-color: #5A7B8C;
+        border-color: #5a7b8c;
         opacity: 0.6;
     }
 
@@ -3749,12 +3991,12 @@
     }
 
     .tech-node.placeholder-tile .tech-icon-frame {
-        background: linear-gradient(to bottom, #5A7B8C, #4A6B7C);
-        border-color: #6A8B9C;
+        background: linear-gradient(to bottom, #5a7b8c, #4a6b7c);
+        border-color: #6a8b9c;
     }
 
     .tech-node.maxed {
-        border-color: #7AB8D6;
+        border-color: #7ab8d6;
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.4),
             0 0 6px rgba(100, 180, 220, 0.3),
@@ -3804,7 +4046,7 @@
 
     .tech-node.unlocked .icon-placeholder,
     .tech-node.maxed .icon-placeholder {
-        color: #8B6914;
+        color: #8b6914;
     }
 
     /* ================================================
@@ -3857,7 +4099,7 @@
         max-width: 85px;
         border-radius: 8px;
         overflow: hidden;
-        background: #AFC3D2;
+        background: #afc3d2;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
     }
 
@@ -3880,7 +4122,7 @@
         font-size: 0.7rem;
         font-weight: 900;
         font-family: 'NotoSansHans', sans-serif;
-        color: #FFFFFF;
+        color: #ffffff;
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
     }
 
@@ -4268,8 +4510,15 @@
     }
 
     @keyframes scroll-hint-pulse {
-        0%, 100% { transform: translateX(0); opacity: 0.6; }
-        50% { transform: translateX(5px); opacity: 1; }
+        0%,
+        100% {
+            transform: translateX(0);
+            opacity: 0.6;
+        }
+        50% {
+            transform: translateX(5px);
+            opacity: 1;
+        }
     }
 
     /* ================================================

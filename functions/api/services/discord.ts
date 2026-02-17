@@ -6,7 +6,9 @@ import { parseAdminIds } from '../_constants';
  * Fetch the user's guild list from Discord, with a 60-second KV cache
  * to reduce redundant API calls during dashboard navigation.
  */
-async function fetchUserGuilds(c: Context<{ Bindings: Bindings, Variables: Variables }>): Promise<DiscordGuild[] | null> {
+async function fetchUserGuilds(
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+): Promise<DiscordGuild[] | null> {
     const user = c.get('user');
     const cacheKey = `discord:guilds:${user.id}`;
 
@@ -14,14 +16,16 @@ async function fetchUserGuilds(c: Context<{ Bindings: Bindings, Variables: Varia
     try {
         const cached = await c.env.API_CACHE.get(cacheKey);
         if (cached) return JSON.parse(cached) as DiscordGuild[];
-    } catch (_) { /* cache miss, proceed to API */ }
+    } catch (_) {
+        /* cache miss, proceed to API */
+    }
 
     const response = await fetch(`https://discord.com/api/users/@me/guilds`, {
-        headers: { 'Authorization': `Bearer ${user.accessToken}` }
+        headers: { Authorization: `Bearer ${user.accessToken}` },
     });
 
     if (!response.ok) return null;
-    const guilds = await response.json() as DiscordGuild[];
+    const guilds = (await response.json()) as DiscordGuild[];
 
     // Cache for 60 seconds (non-blocking write)
     const putPromise = c.env.API_CACHE.put(cacheKey, JSON.stringify(guilds), { expirationTtl: 60 });
@@ -34,7 +38,10 @@ async function fetchUserGuilds(c: Context<{ Bindings: Bindings, Variables: Varia
     return guilds;
 }
 
-export async function verifyGuildAdmin(c: Context<{ Bindings: Bindings, Variables: Variables }>, guildId: string): Promise<boolean> {
+export async function verifyGuildAdmin(
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    guildId: string,
+): Promise<boolean> {
     const guilds = await fetchUserGuilds(c);
     if (!guilds) return false;
 
@@ -47,7 +54,10 @@ export async function verifyGuildAdmin(c: Context<{ Bindings: Bindings, Variable
     return (perms & ADMIN) === ADMIN || (perms & MANAGE_GUILD) === MANAGE_GUILD;
 }
 
-export async function verifyGuildPatreonAccess(c: Context<{ Bindings: Bindings, Variables: Variables }>, guildId: string): Promise<boolean> {
+export async function verifyGuildPatreonAccess(
+    c: Context<{ Bindings: Bindings; Variables: Variables }>,
+    guildId: string,
+): Promise<boolean> {
     const user = c.get('user');
     const masterAdminIds = parseAdminIds(c.env.MASTER_ADMIN_IDS);
 
@@ -57,16 +67,18 @@ export async function verifyGuildPatreonAccess(c: Context<{ Bindings: Bindings, 
     if (!isDiscordAdmin) return false;
 
     const authRecord = await c.env.BOT_DB.prepare(
-        'SELECT authorized_by_discord_user_id FROM guild_authorizations WHERE guild_id = ?'
-    ).bind(guildId).first();
+        'SELECT authorized_by_discord_user_id FROM guild_authorizations WHERE guild_id = ?',
+    )
+        .bind(guildId)
+        .first();
 
     if (authRecord) {
-        return true; 
+        return true;
     }
 
-    const bypassRecord = await c.env.BOT_DB.prepare(
-        'SELECT 1 FROM guild_bypass WHERE guild_id = ?'
-    ).bind(guildId).first();
+    const bypassRecord = await c.env.BOT_DB.prepare('SELECT 1 FROM guild_bypass WHERE guild_id = ?')
+        .bind(guildId)
+        .first();
 
     if (bypassRecord) return true;
 

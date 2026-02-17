@@ -1,12 +1,21 @@
 import { Hono, Context } from 'hono';
 import { getCookie } from 'hono/cookie';
-import { Bindings, Variables, OnlineUser, BackupEntry, ChangelogEntry, DiscordUser, KVListKey, CalendarEventInput } from '../_types';
+import {
+    Bindings,
+    Variables,
+    OnlineUser,
+    BackupEntry,
+    ChangelogEntry,
+    DiscordUser,
+    KVListKey,
+    CalendarEventInput,
+} from '../_types';
 import { errors } from '../_errors';
 import { authMiddleware, masterAdminMiddleware } from '../_middleware';
 import { EVENT_INTERVALS, TROOP_CYCLE, EVENT_COLOR_MAP, parseAdminIds } from '../_constants';
-import { GoogleCalendarService, addDays } from '../services/googleCalendar';
+import { GoogleCalendarService } from '../services/googleCalendar';
 
-const admin = new Hono<{ Bindings: Bindings, Variables: Variables }>();
+const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 type AdminContext = Context<{ Bindings: Bindings; Variables: Variables }>;
 
@@ -17,22 +26,21 @@ async function manageBackups(c: AdminContext, key: string, oldData: string | nul
     const RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
     const now = Date.now();
 
-    let history: BackupEntry[] = await c.env.BOT_DATA.get(BACKUP_KEY, 'json') || [];
+    let history: BackupEntry[] = (await c.env.BOT_DATA.get(BACKUP_KEY, 'json')) || [];
     if (!Array.isArray(history)) history = [];
 
     let parsedData: unknown = oldData;
     try {
         parsedData = JSON.parse(oldData);
-    } catch (e) {
-    }
+    } catch (_e) {}
 
     history.push({
         timestamp: now,
         date: new Date(now).toISOString(),
-        data: parsedData
+        data: parsedData,
     });
 
-    const cleanHistory = history.filter((entry) => (now - entry.timestamp) < RETENTION_MS);
+    const cleanHistory = history.filter((entry) => now - entry.timestamp < RETENTION_MS);
 
     await c.env.BOT_DATA.put(BACKUP_KEY, JSON.stringify(cleanHistory));
 }
@@ -42,7 +50,7 @@ admin.post('/internal/update-cache', async (c) => {
     if (secret !== c.env.BOT_SECRET_KEY) return errors.unauthorized(c);
 
     const { top_servers, bot_stats, active_patrons } = await c.req.json();
-    
+
     const promises = [];
     if (top_servers) promises.push(c.env.API_CACHE.put('top_servers', JSON.stringify(top_servers)));
     if (bot_stats) promises.push(c.env.API_CACHE.put('bot_stats', JSON.stringify(bot_stats)));
@@ -58,16 +66,18 @@ admin.post('/internal/extend-events', async (c) => {
 
     try {
         const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
-        
+
         const today = new Date();
         const targetYear = today.getUTCFullYear() + 1;
         const targetDate = new Date(Date.UTC(targetYear, 11, 31));
 
-        const { results } = await c.env.DB.prepare(`
+        const { results } = await c.env.DB.prepare(
+            `
             SELECT series_id, title, type, troop_type, duration, created_by, MAX(start_date) as last_start_date 
             FROM events 
             GROUP BY series_id
-        `).all();
+        `,
+        ).all();
 
         if (!results || results.length === 0) return c.json({ message: 'No active event series found.' });
 
@@ -79,14 +89,14 @@ admin.post('/internal/extend-events', async (c) => {
             const interval = EVENT_INTERVALS[series.type as string];
             if (!interval || interval <= 0 || !series.last_start_date) continue;
 
-            let currentDate = new Date(series.last_start_date as string);
+            const currentDate = new Date(series.last_start_date as string);
             let currentTroopIndex = -1;
             if (series.troop_type && TROOP_CYCLE.includes(series.troop_type as string)) {
                 currentTroopIndex = TROOP_CYCLE.indexOf(series.troop_type as string);
             }
 
             let loopSafety = 0;
-            while (currentDate < targetDate && loopSafety < 50) { 
+            while (currentDate < targetDate && loopSafety < 50) {
                 loopSafety++;
                 currentDate.setUTCDate(currentDate.getUTCDate() + interval);
                 if (currentDate > targetDate) break;
@@ -99,38 +109,56 @@ admin.post('/internal/extend-events', async (c) => {
                 }
 
                 const newEventId = crypto.randomUUID();
-                const colorId = EVENT_COLOR_MAP[series.type as string] || "8";
-                
-                dbBatch.push(c.env.DB.prepare(
-                    `INSERT INTO events (id, series_id, title, type, troop_type, start_date, duration, created_by) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-                ).bind(newEventId, series.series_id, series.title, series.type, nextTroop || null, newStartDate, series.duration, series.created_by));
+                const colorId = EVENT_COLOR_MAP[series.type as string] || '8';
 
-                gcalPromises.push(gcal.createEvent({
-                    title: series.title as string,
-                    type: series.type as string | null,
-                    troop_type: nextTroop || null,
-                    start_date: newStartDate,
-                    duration: series.duration as number,
-                    colorId: colorId
-                } as CalendarEventInput, newEventId));
+                dbBatch.push(
+                    c.env.DB.prepare(
+                        `INSERT INTO events (id, series_id, title, type, troop_type, start_date, duration, created_by) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                    ).bind(
+                        newEventId,
+                        series.series_id,
+                        series.title,
+                        series.type,
+                        nextTroop || null,
+                        newStartDate,
+                        series.duration,
+                        series.created_by,
+                    ),
+                );
+
+                gcalPromises.push(
+                    gcal.createEvent(
+                        {
+                            title: series.title as string,
+                            type: series.type as string | null,
+                            troop_type: nextTroop || null,
+                            start_date: newStartDate,
+                            duration: series.duration as number,
+                            colorId: colorId,
+                        } as CalendarEventInput,
+                        newEventId,
+                    ),
+                );
 
                 totalCreated++;
             }
         }
 
         if (dbBatch.length > 0) {
-            const chunkSize = 50; 
+            const chunkSize = 50;
             for (let i = 0; i < dbBatch.length; i += chunkSize) {
                 await c.env.DB.batch(dbBatch.slice(i, i + chunkSize));
             }
         }
 
         c.executionCtx.waitUntil(Promise.allSettled(gcalPromises));
-        return c.json({ status: 'success', message: `Checked ${results.length} series. Generated ${totalCreated} new future events.` });
-
+        return c.json({
+            status: 'success',
+            message: `Checked ${results.length} series. Generated ${totalCreated} new future events.`,
+        });
     } catch (e) {
-        console.error("Auto-extend error:", e);
+        console.error('Auto-extend error:', e);
         return errors.internal(c, e);
     }
 });
@@ -148,29 +176,30 @@ admin.get('/top-servers', async (c) => {
 admin.get('/data/version', async (c) => {
     const version = await c.env.BOT_DATA.get('data_version');
     c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-    return c.json({ version: version || "0" });
+    return c.json({ version: version || '0' });
 });
 
 admin.get('/data/:key', async (c) => {
     const key = c.req.param('key');
     const secret = c.req.header('X-Internal-Secret');
-    
+
     const isBot = secret === c.env.BOT_SECRET_KEY;
     if (!isBot) {
         const sessionToken = getCookie(c, 'session_token');
         if (!sessionToken) return errors.unauthorized(c);
 
-        const session = await c.env.DB.prepare('SELECT user_id FROM user_sessions WHERE session_token = ?').bind(sessionToken).first();
+        const session = await c.env.DB.prepare('SELECT user_id FROM user_sessions WHERE session_token = ?')
+            .bind(sessionToken)
+            .first();
         const masterAdminIds = parseAdminIds(c.env.MASTER_ADMIN_IDS);
         if (!session || !masterAdminIds.includes(session.user_id as string)) {
-             return errors.unauthorized(c);
+            return errors.unauthorized(c);
         }
     }
 
     const data = await c.env.BOT_DATA.get(key, 'json');
-    return c.json(data || {}); 
+    return c.json(data || {});
 });
-
 
 admin.use('/admin/*', authMiddleware, masterAdminMiddleware);
 
@@ -180,13 +209,13 @@ admin.post('/admin/heartbeat', async (c) => {
     const NOW = Date.now();
     const TIMEOUT_MS = 60 * 1000;
 
-    let onlineMap: Record<string, OnlineUser> = await c.env.API_CACHE.get('panel_online_users', 'json') || {};
+    const onlineMap: Record<string, OnlineUser> = (await c.env.API_CACHE.get('panel_online_users', 'json')) || {};
 
     onlineMap[user.id] = {
         id: user.id,
         username: username || user.username || 'Admin',
         avatar: avatar || null,
-        last_seen: NOW
+        last_seen: NOW,
     };
 
     const activeUsers: OnlineUser[] = [];
@@ -201,16 +230,16 @@ admin.post('/admin/heartbeat', async (c) => {
 
     c.executionCtx.waitUntil(c.env.API_CACHE.put('panel_online_users', JSON.stringify(cleanMap)));
 
-    return c.json({ 
+    return c.json({
         online_count: activeUsers.length,
-        users: activeUsers.sort((a, b) => b.last_seen - a.last_seen) 
+        users: activeUsers.sort((a, b) => b.last_seen - a.last_seen),
     });
 });
 
 admin.post('/admin/data/:key', async (c) => {
     const key = c.req.param('key');
     const rawBody = await c.req.json();
-    
+
     let bodyData = rawBody;
     let details = `Modified data for key: ${key}`;
 
@@ -219,27 +248,27 @@ admin.post('/admin/data/:key', async (c) => {
         details = rawBody.logDetails;
     }
 
-    let username = "Unknown Admin";
+    let username = 'Unknown Admin';
     let adminId = c.get('user').id;
     let adminAvatar = null;
 
     try {
         const userRes = await fetch('https://discord.com/api/users/@me', {
-            headers: { 'Authorization': `Bearer ${c.get('user').accessToken}` }
+            headers: { Authorization: `Bearer ${c.get('user').accessToken}` },
         });
-        const uData = await userRes.json() as DiscordUser;
+        const uData = (await userRes.json()) as DiscordUser;
         username = uData.username || uData.global_name || c.get('user').id;
         adminId = uData.id;
         adminAvatar = uData.avatar;
-    } catch(e) {}
+    } catch (_e) {}
 
     const currentData = await c.env.BOT_DATA.get(key);
-    
+
     c.executionCtx.waitUntil(manageBackups(c, key, currentData));
 
     await Promise.all([
         c.env.BOT_DATA.put(key, JSON.stringify(bodyData)),
-        c.env.BOT_DATA.put('data_version', Date.now().toString())
+        c.env.BOT_DATA.put('data_version', Date.now().toString()),
     ]);
 
     const logEntry = {
@@ -248,12 +277,12 @@ admin.post('/admin/data/:key', async (c) => {
         userId: adminId,
         userAvatar: adminAvatar,
         action: `Updated ${key}`,
-        details: details
+        details: details,
     };
 
-    let logs: ChangelogEntry[] = await c.env.BOT_DATA.get('system_changelog', 'json') || [];
+    let logs: ChangelogEntry[] = (await c.env.BOT_DATA.get('system_changelog', 'json')) || [];
     logs.unshift(logEntry);
-    if (logs.length > 200) logs = logs.slice(0, 200); 
+    if (logs.length > 200) logs = logs.slice(0, 200);
     await c.env.BOT_DATA.put('system_changelog', JSON.stringify(logs));
 
     return c.json({ status: 'success', message: `Updated ${key}` });
@@ -273,41 +302,61 @@ admin.post('/admin/gcal/reset', async (c) => {
         if (phase === 'cleanup') {
             const gcalEvents = await gcal.listEvents(BATCH_SIZE);
             if (gcalEvents.length > 0) {
-                await Promise.all(gcalEvents.map(e => gcal.deleteEvent(e.id)));
-                return c.json({ status: 'partial', phase: 'cleanup', offset: 0, message: `Deleted batch of ${gcalEvents.length} events.` });
+                await Promise.all(gcalEvents.map((e) => gcal.deleteEvent(e.id)));
+                return c.json({
+                    status: 'partial',
+                    phase: 'cleanup',
+                    offset: 0,
+                    message: `Deleted batch of ${gcalEvents.length} events.`,
+                });
             } else {
-                return c.json({ status: 'partial', phase: 'create', offset: 0, message: 'Cleanup complete. Switching to creation.' });
+                return c.json({
+                    status: 'partial',
+                    phase: 'create',
+                    offset: 0,
+                    message: 'Cleanup complete. Switching to creation.',
+                });
             }
-        } 
-        
+        }
+
         if (phase === 'create') {
             const { results } = await c.env.DB.prepare(
-                `SELECT * FROM events WHERE start_date >= '2024-01-01' LIMIT ? OFFSET ?`
-            ).bind(BATCH_SIZE, offset).all();
+                `SELECT * FROM events WHERE start_date >= '2024-01-01' LIMIT ? OFFSET ?`,
+            )
+                .bind(BATCH_SIZE, offset)
+                .all();
 
             const eventsToCreate = results || [];
 
             if (eventsToCreate.length > 0) {
-                const createPromises = eventsToCreate.map(ev => {
-                    const colorId = EVENT_COLOR_MAP[ev.type as string] || "8";
-                    return gcal.createEvent({
-                        title: ev.title as string,
-                        type: ev.type as string | null,
-                        troop_type: ev.troop_type as string | null,
-                        start_date: ev.start_date as string,
-                        duration: ev.duration as number,
-                        colorId: colorId
-                    } as CalendarEventInput, ev.id as string);
+                const createPromises = eventsToCreate.map((ev) => {
+                    const colorId = EVENT_COLOR_MAP[ev.type as string] || '8';
+                    return gcal.createEvent(
+                        {
+                            title: ev.title as string,
+                            type: ev.type as string | null,
+                            troop_type: ev.troop_type as string | null,
+                            start_date: ev.start_date as string,
+                            duration: ev.duration as number,
+                            colorId: colorId,
+                        } as CalendarEventInput,
+                        ev.id as string,
+                    );
                 });
                 await Promise.all(createPromises);
-                return c.json({ status: 'partial', phase: 'create', offset: offset + eventsToCreate.length, message: `Created batch of ${eventsToCreate.length} events.` });
+                return c.json({
+                    status: 'partial',
+                    phase: 'create',
+                    offset: offset + eventsToCreate.length,
+                    message: `Created batch of ${eventsToCreate.length} events.`,
+                });
             } else {
                 return c.json({ status: 'complete', message: 'Full reset and sync completed successfully.' });
             }
         }
         return errors.badRequest(c, 'Invalid phase');
-    } catch(e) {
-        console.error("GCal Sync Error", e);
+    } catch (e) {
+        console.error('GCal Sync Error', e);
         return errors.internal(c, e);
     }
 });
@@ -315,16 +364,18 @@ admin.post('/admin/gcal/reset', async (c) => {
 admin.get('/admin/backups/:key', async (c) => {
     const key = c.req.param('key');
     const list = await c.env.BOT_DATA.list({ prefix: `backup:${key}:` });
-    
-    const backups = list.keys.map((k: KVListKey) => {
-        const parts = k.name.split(':');
-        const ts = parseInt(parts[parts.length - 1]);
-        return {
-            key: k.name,
-            timestamp: ts,
-            date: new Date(ts).toLocaleString()
-        };
-    }).sort((a, b) => b.timestamp - a.timestamp);
+
+    const backups = list.keys
+        .map((k: KVListKey) => {
+            const parts = k.name.split(':');
+            const ts = parseInt(parts[parts.length - 1]);
+            return {
+                key: k.name,
+                timestamp: ts,
+                date: new Date(ts).toLocaleString(),
+            };
+        })
+        .sort((a, b) => b.timestamp - a.timestamp);
 
     return c.json(backups);
 });
@@ -347,7 +398,6 @@ admin.post('/admin/restore', async (c) => {
     }
 
     await c.env.BOT_DATA.put(targetKey, backupData);
-
 
     return c.json({ success: true, message: 'Restored successfully' });
 });

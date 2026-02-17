@@ -4,7 +4,7 @@ import { decryptFernetToken } from '../crypto';
 import { Bindings, Variables } from './_types';
 import { parseAdminIds } from './_constants';
 
-export const authMiddleware = async (c: Context<{ Bindings: Bindings, Variables: Variables }>, next: Next) => {
+export const authMiddleware = async (c: Context<{ Bindings: Bindings; Variables: Variables }>, next: Next) => {
     const sessionToken = getCookie(c, 'session_token');
     if (!sessionToken) {
         return c.json({ error: 'Authentication required. No session token provided.' }, 401);
@@ -16,9 +16,11 @@ export const authMiddleware = async (c: Context<{ Bindings: Bindings, Variables:
         expiry_date: number;
     };
 
-    const session = await c.env.DB.prepare(
-        'SELECT user_id, discord_access_token, expiry_date FROM user_sessions WHERE session_token = ?'
-    ).bind(sessionToken).first() as Session | null;
+    const session = (await c.env.DB.prepare(
+        'SELECT user_id, discord_access_token, expiry_date FROM user_sessions WHERE session_token = ?',
+    )
+        .bind(sessionToken)
+        .first()) as Session | null;
 
     if (session && Date.now() / 1000 < session.expiry_date) {
         try {
@@ -26,7 +28,7 @@ export const authMiddleware = async (c: Context<{ Bindings: Bindings, Variables:
             c.set('user', { id: session.user_id, accessToken: decryptedToken, username: '' });
             await next();
         } catch (e) {
-            console.error("Token decryption failed:", e);
+            console.error('Token decryption failed:', e);
             return c.json({ error: 'Invalid session token (decryption failed)' }, 401);
         }
     } else {
@@ -42,7 +44,7 @@ export const botAuthMiddleware = async (c: Context<{ Bindings: Bindings }>, next
     await next();
 };
 
-export const masterAdminMiddleware = async (c: Context<{ Bindings: Bindings, Variables: Variables }>, next: Next) => {
+export const masterAdminMiddleware = async (c: Context<{ Bindings: Bindings; Variables: Variables }>, next: Next) => {
     const user = c.get('user');
     const masterAdminIds = parseAdminIds(c.env.MASTER_ADMIN_IDS);
     if (!user || !masterAdminIds.includes(user.id)) {

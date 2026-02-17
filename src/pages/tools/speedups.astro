@@ -3,11 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import SpeedupsHub from '../../components/speedups/SpeedupsHub.svelte';
 import '../../styles/calculators.css';
 
-const allImages = import.meta.glob([
-    '../../assets/images/calculators/**/*.{webp,png,jpg}',
-    '../../assets/images/training/**/*.{webp,png,jpg}',
-    '../../assets/images/calendar/event_icons/mge_icon.webp',
-], { eager: true });
+const allImages = import.meta.glob(
+    [
+        '../../assets/images/calculators/**/*.{webp,png,jpg}',
+        '../../assets/images/training/**/*.{webp,png,jpg}',
+        '../../assets/images/calendar/event_icons/mge_icon.webp',
+    ],
+    { eager: true },
+);
 
 const imageMap: { [key: string]: string } = {};
 
@@ -27,35 +30,34 @@ for (const path in allImages) {
     bodyClass="has-sub-nav"
 >
     <script type="application/ld+json" slot="head-scripts">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "ROK Speedup Calculator",
-        "description": "Calculate exact speedup costs for training and healing troops in Rise of Kingdoms",
-        "url": "https://codexhelper.com/tools/speedups/",
-        "applicationCategory": "GameApplication",
-        "operatingSystem": "Any",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "author": {
-            "@type": "Organization",
-            "name": "Codex Helper"
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "ROK Speedup Calculator",
+            "description": "Calculate exact speedup costs for training and healing troops in Rise of Kingdoms",
+            "url": "https://codexhelper.com/tools/speedups/",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "author": {
+                "@type": "Organization",
+                "name": "Codex Helper"
+            }
         }
-    }
     </script>
     <main class="tool-page-wrapper">
         <section class="tool-hero">
             <div class="tool-hero-container">
                 <h1 class="calculator-main-title">
-                   <img src={imageMap['universal_speedup.webp']} alt="" style="height: 40px; margin-right: 10px;" />
+                    <img src={imageMap['universal_speedup.webp']} alt="" style="height: 40px; margin-right: 10px;" />
                     Speedup Costs
                 </h1>
-                
+
                 <p>Calculate the exact amount of speedups needed to hit your training and healing goals.</p>
-            
             </div>
         </section>
 

@@ -8,11 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainTitle = document.getElementById('calculator-main-title');
     const mainDescription = document.getElementById('calculator-main-description');
 
-    const SLIDE_SLUGS = [
-        'crystal-tech',
-        'timers',
-        'flag-calculator'
-    ];
+    const SLIDE_SLUGS = ['crystal-tech', 'timers', 'flag-calculator'];
 
     let currentIndex = 0;
 

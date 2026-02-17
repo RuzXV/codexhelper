@@ -7,17 +7,25 @@
     import stoneIcon from '../../assets/images/calculators/shared/stone_icon.webp';
     import goldIcon from '../../assets/images/calculators/shared/gold_icon.webp';
 
-    const FLAG_RANGE_COSTS: { start: number; end: number; food: number; wood: number; stone: number; gold: number; crystal: number }[] = [
-        { start: 1,   end: 10,  food: 75000,  wood: 75000,  stone: 56250, gold: 37500, crystal: 0 },
-        { start: 11,  end: 20,  food: 75000,  wood: 75000,  stone: 56250, gold: 37500, crystal: 0 },
-        { start: 21,  end: 30,  food: 93750,  wood: 93750,  stone: 70350, gold: 46875, crystal: 7500 },
-        { start: 31,  end: 40,  food: 93750,  wood: 93750,  stone: 70350, gold: 46875, crystal: 11250 },
-        { start: 41,  end: 50,  food: 112500, wood: 112500, stone: 84375, gold: 56250, crystal: 15000 },
-        { start: 51,  end: 60,  food: 112500, wood: 112500, stone: 84375, gold: 56250, crystal: 18750 },
-        { start: 61,  end: 70,  food: 131250, wood: 131250, stone: 98475, gold: 65625, crystal: 22500 },
-        { start: 71,  end: 80,  food: 131250, wood: 131250, stone: 98475, gold: 65625, crystal: 26250 },
-        { start: 81,  end: 90,  food: 150000, wood: 150000, stone: 112500, gold: 75000, crystal: 30000 },
-        { start: 91,  end: 100, food: 150000, wood: 150000, stone: 112500, gold: 75000, crystal: 33750 },
+    const FLAG_RANGE_COSTS: {
+        start: number;
+        end: number;
+        food: number;
+        wood: number;
+        stone: number;
+        gold: number;
+        crystal: number;
+    }[] = [
+        { start: 1, end: 10, food: 75000, wood: 75000, stone: 56250, gold: 37500, crystal: 0 },
+        { start: 11, end: 20, food: 75000, wood: 75000, stone: 56250, gold: 37500, crystal: 0 },
+        { start: 21, end: 30, food: 93750, wood: 93750, stone: 70350, gold: 46875, crystal: 7500 },
+        { start: 31, end: 40, food: 93750, wood: 93750, stone: 70350, gold: 46875, crystal: 11250 },
+        { start: 41, end: 50, food: 112500, wood: 112500, stone: 84375, gold: 56250, crystal: 15000 },
+        { start: 51, end: 60, food: 112500, wood: 112500, stone: 84375, gold: 56250, crystal: 18750 },
+        { start: 61, end: 70, food: 131250, wood: 131250, stone: 98475, gold: 65625, crystal: 22500 },
+        { start: 71, end: 80, food: 131250, wood: 131250, stone: 98475, gold: 65625, crystal: 26250 },
+        { start: 81, end: 90, food: 150000, wood: 150000, stone: 112500, gold: 75000, crystal: 30000 },
+        { start: 91, end: 100, food: 150000, wood: 150000, stone: 112500, gold: 75000, crystal: 33750 },
         { start: 101, end: 110, food: 163750, wood: 168750, stone: 126600, gold: 84375, crystal: 37500 },
         { start: 111, end: 120, food: 168750, wood: 168750, stone: 126600, gold: 84375, crystal: 41250 },
         { start: 121, end: 130, food: 187500, wood: 137500, stone: 140625, gold: 93750, crystal: 45000 },
@@ -55,46 +63,58 @@
 
     // Crystal costs per individual flag (from cog_flag_cost.py)
     const CRYSTAL_COSTS: number[] = [
-        ...Array(20).fill(0),       // Flags 1-20
-        ...Array(10).fill(7500),    // Flags 21-30
-        ...Array(10).fill(11250),   // Flags 31-40
-        ...Array(10).fill(15000),   // Flags 41-50
-        ...Array(10).fill(18750),   // Flags 51-60
-        ...Array(10).fill(22500),   // Flags 61-70
-        ...Array(10).fill(26250),   // Flags 71-80
-        ...Array(10).fill(30000),   // Flags 81-90
-        ...Array(10).fill(33750),   // Flags 91-100
-        ...Array(10).fill(37500),   // Flags 101-110
-        ...Array(10).fill(41250),   // Flags 111-120
-        ...Array(10).fill(45000),   // Flags 121-130
-        ...Array(10).fill(48750),   // Flags 131-140
-        ...Array(10).fill(52500),   // Flags 141-150
-        ...Array(10).fill(56250),   // Flags 151-160
-        ...Array(10).fill(60000),   // Flags 161-170
-        ...Array(10).fill(63750),   // Flags 171-180
-        ...Array(10).fill(67500),   // Flags 181-190
-        ...Array(10).fill(71250),   // Flags 191-200
-        ...Array(10).fill(75000),   // Flags 201-210
-        ...Array(10).fill(78750),   // Flags 211-220
-        ...Array(10).fill(82500),   // Flags 221-230
-        ...Array(10).fill(86250),   // Flags 231-240
-        ...Array(10).fill(90000),   // Flags 241-250
-        ...Array(10).fill(93750),   // Flags 251-260
-        ...Array(10).fill(97500),   // Flags 261-270
-        ...Array(10).fill(101250),  // Flags 271-280
-        ...Array(10).fill(105000),  // Flags 281-290
-        ...Array(10).fill(112500),  // Flags 291-300
+        ...Array(20).fill(0), // Flags 1-20
+        ...Array(10).fill(7500), // Flags 21-30
+        ...Array(10).fill(11250), // Flags 31-40
+        ...Array(10).fill(15000), // Flags 41-50
+        ...Array(10).fill(18750), // Flags 51-60
+        ...Array(10).fill(22500), // Flags 61-70
+        ...Array(10).fill(26250), // Flags 71-80
+        ...Array(10).fill(30000), // Flags 81-90
+        ...Array(10).fill(33750), // Flags 91-100
+        ...Array(10).fill(37500), // Flags 101-110
+        ...Array(10).fill(41250), // Flags 111-120
+        ...Array(10).fill(45000), // Flags 121-130
+        ...Array(10).fill(48750), // Flags 131-140
+        ...Array(10).fill(52500), // Flags 141-150
+        ...Array(10).fill(56250), // Flags 151-160
+        ...Array(10).fill(60000), // Flags 161-170
+        ...Array(10).fill(63750), // Flags 171-180
+        ...Array(10).fill(67500), // Flags 181-190
+        ...Array(10).fill(71250), // Flags 191-200
+        ...Array(10).fill(75000), // Flags 201-210
+        ...Array(10).fill(78750), // Flags 211-220
+        ...Array(10).fill(82500), // Flags 221-230
+        ...Array(10).fill(86250), // Flags 231-240
+        ...Array(10).fill(90000), // Flags 241-250
+        ...Array(10).fill(93750), // Flags 251-260
+        ...Array(10).fill(97500), // Flags 261-270
+        ...Array(10).fill(101250), // Flags 271-280
+        ...Array(10).fill(105000), // Flags 281-290
+        ...Array(10).fill(112500), // Flags 291-300
         ...Array(100).fill(187500), // Flags 301-400
-        ...Array(30).fill(225000),  // Flags 401-430
+        ...Array(30).fill(225000), // Flags 401-430
     ];
 
     const MAX_FLAGS = CRYSTAL_COSTS.length; // 430
 
     /** Get the resource costs for a specific flag number (1-based) */
-    function getCostsForFlag(flagNum: number): { food: number; wood: number; stone: number; gold: number; crystal: number } {
-        const range = FLAG_RANGE_COSTS.find(r => flagNum >= r.start && flagNum <= r.end);
+    function getCostsForFlag(flagNum: number): {
+        food: number;
+        wood: number;
+        stone: number;
+        gold: number;
+        crystal: number;
+    } {
+        const range = FLAG_RANGE_COSTS.find((r) => flagNum >= r.start && flagNum <= r.end);
         if (range) {
-            return { food: range.food, wood: range.wood, stone: range.stone, gold: range.gold, crystal: CRYSTAL_COSTS[flagNum - 1] };
+            return {
+                food: range.food,
+                wood: range.wood,
+                stone: range.stone,
+                gold: range.gold,
+                crystal: CRYSTAL_COSTS[flagNum - 1],
+            };
         }
         return { food: 0, wood: 0, stone: 0, gold: 0, crystal: CRYSTAL_COSTS[flagNum - 1] || 0 };
     }
@@ -124,8 +144,11 @@
         const match = dateStr.trim().match(/^(\d{1,2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
         if (!match) return null;
         const [, hh, mm, dd, mo, yyyy] = match;
-        const h = parseInt(hh); const m = parseInt(mm);
-        const d = parseInt(dd); const month = parseInt(mo); const y = parseInt(yyyy);
+        const h = parseInt(hh);
+        const m = parseInt(mm);
+        const d = parseInt(dd);
+        const month = parseInt(mo);
+        const y = parseInt(yyyy);
         if (h < 0 || h > 23 || m < 0 || m > 59 || d < 1 || d > 31 || month < 1 || month > 12) return null;
         const date = new Date(Date.UTC(y, month - 1, d, h, m, 0, 0));
         if (isNaN(date.getTime())) return null;
@@ -135,10 +158,10 @@
     // ── Resource definitions (crystal first) ──
     const RESOURCES = [
         { key: 'crystal', label: 'Crystal', colorClass: 'crystal-res', imageSrc: crystalIcon.src },
-        { key: 'food',    label: 'Food',    colorClass: 'food',        imageSrc: foodIcon.src },
-        { key: 'wood',    label: 'Wood',    colorClass: 'wood',        imageSrc: woodIcon.src },
-        { key: 'stone',   label: 'Stone',   colorClass: 'stone',       imageSrc: stoneIcon.src },
-        { key: 'gold',    label: 'Gold',    colorClass: 'gold',        imageSrc: goldIcon.src },
+        { key: 'food', label: 'Food', colorClass: 'food', imageSrc: foodIcon.src },
+        { key: 'wood', label: 'Wood', colorClass: 'wood', imageSrc: woodIcon.src },
+        { key: 'stone', label: 'Stone', colorClass: 'stone', imageSrc: stoneIcon.src },
+        { key: 'gold', label: 'Gold', colorClass: 'gold', imageSrc: goldIcon.src },
     ] as const;
 
     // ── State ──
@@ -253,8 +276,13 @@
         // Simulate flag building
         let currentCrystal = totalCrystal;
         let flagsBuilt = 0;
-        let totalFood = 0, totalWood = 0, totalStone = 0, totalGold = 0, totalCrystalSpent = 0;
-        let breakdown: { flagNum: number; food: number; wood: number; stone: number; gold: number; crystal: number }[] = [];
+        let totalFood = 0,
+            totalWood = 0,
+            totalStone = 0,
+            totalGold = 0,
+            totalCrystalSpent = 0;
+        let breakdown: { flagNum: number; food: number; wood: number; stone: number; gold: number; crystal: number }[] =
+            [];
 
         for (let i = flags; i < MAX_FLAGS; i++) {
             const crystalCost = CRYSTAL_COSTS[i];
@@ -360,7 +388,9 @@
     let tickInterval: ReturnType<typeof setInterval>;
 
     onMount(() => {
-        tickInterval = setInterval(() => { tick++; }, 15000);
+        tickInterval = setInterval(() => {
+            tick++;
+        }, 15000);
         return () => clearInterval(tickInterval);
     });
 </script>
@@ -385,17 +415,14 @@
                     inputmode="numeric"
                     bind:value={currentFlags}
                     placeholder="Example: 50"
-                    on:input={() => { currentFlags = formatNumberInput(currentFlags); }}
+                    on:input={() => {
+                        currentFlags = formatNumberInput(currentFlags);
+                    }}
                 />
             </div>
             <div class="input-group">
                 <label for="flag-end-date">Target Date (UTC)</label>
-                <input
-                    id="flag-end-date"
-                    type="text"
-                    bind:value={endDate}
-                    placeholder="HH:MM DD/MM/YYYY"
-                />
+                <input id="flag-end-date" type="text" bind:value={endDate} placeholder="HH:MM DD/MM/YYYY" />
                 <span class="input-hint">Optional — projects resource gains over time</span>
             </div>
         </div>
@@ -419,7 +446,9 @@
                                     inputmode="numeric"
                                     bind:value={resourceAmounts[res.key]}
                                     placeholder="Amount"
-                                    on:input={() => { resourceAmounts[res.key] = formatNumberInput(resourceAmounts[res.key]); }}
+                                    on:input={() => {
+                                        resourceAmounts[res.key] = formatNumberInput(resourceAmounts[res.key]);
+                                    }}
                                 />
                             </div>
                             <div class="input-group compact">
@@ -430,7 +459,9 @@
                                     inputmode="numeric"
                                     bind:value={resourceProduction[res.key]}
                                     placeholder="/hr"
-                                    on:input={() => { resourceProduction[res.key] = formatNumberInput(resourceProduction[res.key]); }}
+                                    on:input={() => {
+                                        resourceProduction[res.key] = formatNumberInput(resourceProduction[res.key]);
+                                    }}
                                 />
                             </div>
                         </div>
@@ -539,7 +570,11 @@
                             </div>
                             {#each RESOURCES as res}
                                 {@const summary = result.resourceSummaries[res.key]}
-                                <div class="resource-table-row" class:deficit={summary.deficit > 0} class:surplus={summary.deficit === 0}>
+                                <div
+                                    class="resource-table-row"
+                                    class:deficit={summary.deficit > 0}
+                                    class:surplus={summary.deficit === 0}
+                                >
                                     <span class="rt-col-resource">
                                         <span class="rt-icon {res.colorClass}">
                                             <img src={res.imageSrc} alt={res.label} />
@@ -558,7 +593,12 @@
                                 </div>
                             {/each}
                         </div>
-                        <p class="resource-table-note">Status shows how much of each resource you still need to build all {result.flagsBuilt} flag{result.flagsBuilt !== 1 ? 's' : ''} your crystal allows.</p>
+                        <p class="resource-table-note">
+                            Status shows how much of each resource you still need to build all {result.flagsBuilt} flag{result.flagsBuilt !==
+                            1
+                                ? 's'
+                                : ''} your crystal allows.
+                        </p>
                     </div>
                 {/if}
 
@@ -569,8 +609,14 @@
                         <div class="next-flag-info">
                             <i class="fas fa-arrow-right"></i>
                             <span>
-                                Next flag (#{result.totalFlags + 1}) costs <strong>{formatNumber(CRYSTAL_COSTS[result.totalFlags])}</strong> crystal
-                                — you need <strong>{formatNumber(Math.max(0, CRYSTAL_COSTS[result.totalFlags] - result.remainingCrystal))}</strong> more
+                                Next flag (#{result.totalFlags + 1}) costs
+                                <strong>{formatNumber(CRYSTAL_COSTS[result.totalFlags])}</strong>
+                                crystal — you need
+                                <strong
+                                    >{formatNumber(
+                                        Math.max(0, CRYSTAL_COSTS[result.totalFlags] - result.remainingCrystal),
+                                    )}</strong
+                                > more
                             </span>
                         </div>
                     </div>
@@ -656,7 +702,6 @@
         margin-bottom: var(--spacing-4);
     }
 
-
     .input-group {
         display: flex;
         flex-direction: column;
@@ -687,7 +732,9 @@
         border-radius: var(--radius-md);
         color: var(--text-primary);
         font-size: var(--font-size-sm);
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
         outline: none;
         font-family: inherit;
     }
@@ -763,11 +810,26 @@
         object-fit: contain;
     }
 
-    .resource-input-icon.food { color: #a3e635; background: rgba(163, 230, 53, 0.12); }
-    .resource-input-icon.wood { color: #f97316; background: rgba(249, 115, 22, 0.12); }
-    .resource-input-icon.stone { color: #94a3b8; background: rgba(148, 163, 184, 0.12); }
-    .resource-input-icon.gold { color: #fbbf24; background: rgba(251, 191, 36, 0.12); }
-    .resource-input-icon.crystal-res { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
+    .resource-input-icon.food {
+        color: #a3e635;
+        background: rgba(163, 230, 53, 0.12);
+    }
+    .resource-input-icon.wood {
+        color: #f97316;
+        background: rgba(249, 115, 22, 0.12);
+    }
+    .resource-input-icon.stone {
+        color: #94a3b8;
+        background: rgba(148, 163, 184, 0.12);
+    }
+    .resource-input-icon.gold {
+        color: #fbbf24;
+        background: rgba(251, 191, 36, 0.12);
+    }
+    .resource-input-icon.crystal-res {
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.12);
+    }
 
     .resource-input-label {
         font-size: var(--font-size-xs);
@@ -832,7 +894,9 @@
         box-shadow: 0 0 25px rgba(54, 164, 247, 0.4);
     }
 
-    .btn-calculate:hover::before { left: 100%; }
+    .btn-calculate:hover::before {
+        left: 100%;
+    }
 
     .btn-clear {
         display: flex;
@@ -877,7 +941,9 @@
         margin-bottom: var(--spacing-4);
     }
 
-    .result-card.error i { flex-shrink: 0; }
+    .result-card.error i {
+        flex-shrink: 0;
+    }
 
     .result-title {
         display: flex;
@@ -891,9 +957,13 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .flag-result-icon { color: #004cff; }
+    .flag-result-icon {
+        color: #004cff;
+    }
 
-    .result-section { margin-bottom: var(--spacing-2); }
+    .result-section {
+        margin-bottom: var(--spacing-2);
+    }
 
     .result-section-header {
         font-size: var(--font-size-xs);
@@ -1025,11 +1095,26 @@
         object-fit: contain;
     }
 
-    .rt-icon.food { color: #a3e635; background: rgba(163, 230, 53, 0.12); }
-    .rt-icon.wood { color: #f97316; background: rgba(249, 115, 22, 0.12); }
-    .rt-icon.stone { color: #94a3b8; background: rgba(148, 163, 184, 0.12); }
-    .rt-icon.gold { color: #fbbf24; background: rgba(251, 191, 36, 0.12); }
-    .rt-icon.crystal-res { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
+    .rt-icon.food {
+        color: #a3e635;
+        background: rgba(163, 230, 53, 0.12);
+    }
+    .rt-icon.wood {
+        color: #f97316;
+        background: rgba(249, 115, 22, 0.12);
+    }
+    .rt-icon.stone {
+        color: #94a3b8;
+        background: rgba(148, 163, 184, 0.12);
+    }
+    .rt-icon.gold {
+        color: #fbbf24;
+        background: rgba(251, 191, 36, 0.12);
+    }
+    .rt-icon.crystal-res {
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.12);
+    }
 
     .rt-col {
         font-size: var(--font-size-xs);
@@ -1118,7 +1203,8 @@
             gap: var(--spacing-3);
         }
 
-        .stat-grid, .stat-grid.wide {
+        .stat-grid,
+        .stat-grid.wide {
             grid-template-columns: 1fr 1fr;
         }
 
@@ -1155,7 +1241,8 @@
             justify-content: center;
         }
 
-        .stat-grid, .stat-grid.wide {
+        .stat-grid,
+        .stat-grid.wide {
             grid-template-columns: 1fr;
         }
 

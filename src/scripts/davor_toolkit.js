@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     if (!window.weightingData || !window.scorePairings) {
-        console.error("Critical data (weightingData or scorePairings) not found on window object. Aborting script initialization.");
-        document.querySelector('.tool-content').innerHTML = '<h2 style="text-align: center; color: var(--text-secondary);">Error: Tool data could not be loaded. Please refresh the page.</h2>';
+        console.error(
+            'Critical data (weightingData or scorePairings) not found on window object. Aborting script initialization.',
+        );
+        document.querySelector('.tool-content').innerHTML =
+            '<h2 style="text-align: center; color: var(--text-secondary);">Error: Tool data could not be loaded. Please refresh the page.</h2>';
         return;
     }
 
@@ -26,12 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickNav = document.getElementById('quick-access-nav');
     const mainTitle = document.getElementById('calculator-main-title');
     const mainDescription = document.getElementById('calculator-main-description');
-    
-    const SLIDE_SLUGS = [
-        'stats-weighting',
-        'score-my-armaments',
-        'inscription-tier-list'
-    ];
+
+    const SLIDE_SLUGS = ['stats-weighting', 'score-my-armaments', 'inscription-tier-list'];
 
     let currentIndex = 0;
 
@@ -45,13 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const tooltip = document.getElementById('inscription-tooltip');
-    
+
     function getInscriptionName(target) {
         const text = target.textContent.trim();
         if (window.inscriptionDescriptions && window.inscriptionDescriptions[text]) {
             return text;
         }
-        const parent = target.closest('.inscription-btn, .tier-item, button'); 
+        const parent = target.closest('.inscription-btn, .tier-item, button');
         if (parent) {
             const parentText = parent.textContent.trim();
             if (window.inscriptionDescriptions && window.inscriptionDescriptions[parentText]) {
@@ -69,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (description) {
                 description = description.replace(
                     /(Cooldown:.*)/i,
-                    '<div style="margin-top: 8px; color: #ff8787;">$1</div>'
+                    '<div style="margin-top: 8px; color: #ff8787;">$1</div>',
                 );
             }
 
@@ -79,9 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const tag = e.target.closest('.inscription-tag');
             const tierRow = e.target.closest('.tier-row');
-            
-            let activeColor = '#D1D5DB'; 
-            let titleColor = '#F3F4F6'; 
+
+            let activeColor = '#D1D5DB';
+            let titleColor = '#F3F4F6';
 
             if (tag) {
                 if (tag.classList.contains('special')) {
@@ -98,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             tooltip.style.borderColor = activeColor;
             tooltip.style.boxShadow = `0 4px 20px ${activeColor === '#D1D5DB' ? 'rgba(0,0,0,0.5)' : activeColor + '40'}`;
-            
+
             const strongTag = tooltip.querySelector('strong');
             if (strongTag) {
                 strongTag.style.color = titleColor;
@@ -149,112 +148,119 @@ document.addEventListener('DOMContentLoaded', () => {
     // Touch support for mobile tooltip
     let activeTooltipTarget = null;
 
-    document.addEventListener('touchstart', (e) => {
-        const name = getInscriptionName(e.target);
-        if (name) {
-            // If tapping the same inscription, hide tooltip
-            if (activeTooltipTarget === e.target && tooltip.classList.contains('visible')) {
+    document.addEventListener(
+        'touchstart',
+        (e) => {
+            const name = getInscriptionName(e.target);
+            if (name) {
+                // If tapping the same inscription, hide tooltip
+                if (activeTooltipTarget === e.target && tooltip.classList.contains('visible')) {
+                    tooltip.classList.remove('visible');
+                    setTimeout(() => {
+                        tooltip.style.display = 'none';
+                    }, 200);
+                    activeTooltipTarget = null;
+                    return;
+                }
+
+                activeTooltipTarget = e.target;
+                let description = window.inscriptionDescriptions[name];
+
+                if (description) {
+                    description = description.replace(
+                        /(Cooldown:.*)/i,
+                        '<div style="margin-top: 8px; color: #ff8787;">$1</div>',
+                    );
+                }
+
+                tooltip.innerHTML = `<strong>${name}</strong>${description}`;
+                tooltip.style.display = 'block';
+
+                const tag = e.target.closest('.inscription-tag');
+                const tierRow = e.target.closest('.tier-row');
+
+                let activeColor = '#D1D5DB';
+                let titleColor = '#F3F4F6';
+
+                if (tag) {
+                    if (tag.classList.contains('special')) {
+                        activeColor = '#fdd451';
+                        titleColor = '#fdd451';
+                    } else if (tag.classList.contains('rare')) {
+                        activeColor = '#60a5fa';
+                        titleColor = '#60a5fa';
+                    }
+                } else if (tierRow) {
+                    activeColor = tierRow.style.borderColor || activeColor;
+                    titleColor = activeColor;
+                }
+
+                tooltip.style.borderColor = activeColor;
+                tooltip.style.boxShadow = `0 4px 20px ${activeColor === '#D1D5DB' ? 'rgba(0,0,0,0.5)' : activeColor + '40'}`;
+
+                const strongTag = tooltip.querySelector('strong');
+                if (strongTag) {
+                    strongTag.style.color = titleColor;
+                    strongTag.style.borderBottomColor = activeColor;
+                }
+
+                // Position tooltip centered horizontally, above the touch point
+                const touch = e.touches[0];
+                const padding = 16;
+
+                // Force layout to get correct dimensions
+                tooltip.style.left = '0px';
+                tooltip.style.top = '0px';
+
+                requestAnimationFrame(() => {
+                    const left = Math.max(
+                        padding,
+                        Math.min(
+                            touch.clientX - tooltip.offsetWidth / 2,
+                            window.innerWidth - tooltip.offsetWidth - padding,
+                        ),
+                    );
+                    let top = touch.clientY - tooltip.offsetHeight - 20;
+
+                    if (top < padding) {
+                        top = touch.clientY + 30;
+                    }
+
+                    tooltip.style.left = `${left}px`;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.classList.add('visible');
+                });
+            } else {
+                // Tapped outside inscription, hide tooltip
                 tooltip.classList.remove('visible');
                 setTimeout(() => {
                     tooltip.style.display = 'none';
                 }, 200);
                 activeTooltipTarget = null;
-                return;
             }
-
-            activeTooltipTarget = e.target;
-            let description = window.inscriptionDescriptions[name];
-
-            if (description) {
-                description = description.replace(
-                    /(Cooldown:.*)/i,
-                    '<div style="margin-top: 8px; color: #ff8787;">$1</div>'
-                );
-            }
-
-            tooltip.innerHTML = `<strong>${name}</strong>${description}`;
-            tooltip.style.display = 'block';
-
-            const tag = e.target.closest('.inscription-tag');
-            const tierRow = e.target.closest('.tier-row');
-
-            let activeColor = '#D1D5DB';
-            let titleColor = '#F3F4F6';
-
-            if (tag) {
-                if (tag.classList.contains('special')) {
-                    activeColor = '#fdd451';
-                    titleColor = '#fdd451';
-                } else if (tag.classList.contains('rare')) {
-                    activeColor = '#60a5fa';
-                    titleColor = '#60a5fa';
-                }
-            } else if (tierRow) {
-                activeColor = tierRow.style.borderColor || activeColor;
-                titleColor = activeColor;
-            }
-
-            tooltip.style.borderColor = activeColor;
-            tooltip.style.boxShadow = `0 4px 20px ${activeColor === '#D1D5DB' ? 'rgba(0,0,0,0.5)' : activeColor + '40'}`;
-
-            const strongTag = tooltip.querySelector('strong');
-            if (strongTag) {
-                strongTag.style.color = titleColor;
-                strongTag.style.borderBottomColor = activeColor;
-            }
-
-            // Position tooltip centered horizontally, above the touch point
-            const touch = e.touches[0];
-            const padding = 16;
-
-            // Force layout to get correct dimensions
-            tooltip.style.left = '0px';
-            tooltip.style.top = '0px';
-
-            requestAnimationFrame(() => {
-                let left = Math.max(padding, Math.min(
-                    touch.clientX - tooltip.offsetWidth / 2,
-                    window.innerWidth - tooltip.offsetWidth - padding
-                ));
-                let top = touch.clientY - tooltip.offsetHeight - 20;
-
-                if (top < padding) {
-                    top = touch.clientY + 30;
-                }
-
-                tooltip.style.left = `${left}px`;
-                tooltip.style.top = `${top}px`;
-                tooltip.classList.add('visible');
-            });
-        } else {
-            // Tapped outside inscription, hide tooltip
-            tooltip.classList.remove('visible');
-            setTimeout(() => {
-                tooltip.style.display = 'none';
-            }, 200);
-            activeTooltipTarget = null;
-        }
-    }, { passive: true });
+        },
+        { passive: true },
+    );
 
     const moveToSlide = (targetIndex, updateUrl = true) => {
         if (!slides.length || !slides[targetIndex]) return;
-        
+
         slides.forEach((slide, index) => {
             slide.classList.toggle('is-active', index === targetIndex);
         });
         currentIndex = targetIndex;
         updateCarouselUI();
-        
+
         if (updateUrl && SLIDE_SLUGS[targetIndex]) {
             const newUrl = new URL(window.location);
             newUrl.searchParams.set('tool', SLIDE_SLUGS[targetIndex]);
             window.history.pushState({ index: targetIndex }, '', newUrl);
         }
-        
+
         const currentTitle = slides[currentIndex].dataset.title;
-        if(currentTitle === "Score my Armaments") {
+        if (currentTitle === 'Score my Armaments') {
             initArmamentCalculator();
-        } else if (currentTitle === "Inscription Tier List") {
+        } else if (currentTitle === 'Inscription Tier List') {
             if (typeof initTierListTool === 'function') initTierListTool();
         }
     };
@@ -262,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateCarouselUI = () => {
         const currentSlide = slides[currentIndex];
         if (!currentSlide) return;
-        
+
         const davorIconHtml = `<img src="${window.davorIconPath}" width="${window.davorIconWidth}" height="${window.davorIconHeight}" alt="Davor Icon" class="davor-title-icon" loading="eager">`;
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
@@ -270,21 +276,27 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             mainTitle.innerHTML = `${currentSlide.dataset.title} by Davor ${davorIconHtml}`;
         }
-        
+
         mainDescription.textContent = currentSlide.dataset.description;
 
-        if(quickNav){
-            Array.from(quickNav.children).forEach((btn, index) => btn.classList.toggle('active', index === currentIndex));
+        if (quickNav) {
+            Array.from(quickNav.children).forEach((btn, index) =>
+                btn.classList.toggle('active', index === currentIndex),
+            );
         }
-        if(prevButton && nextButton){
+        if (prevButton && nextButton) {
             prevButton.classList.toggle('disabled', currentIndex === 0);
             nextButton.classList.toggle('disabled', currentIndex === slides.length - 1);
         }
     };
-    
+
     if (nextButton && prevButton) {
-        nextButton.addEventListener('click', () => { if (currentIndex < slides.length - 1) moveToSlide(currentIndex + 1); });
-        prevButton.addEventListener('click', () => { if (currentIndex > 0) moveToSlide(currentIndex - 1); });
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < slides.length - 1) moveToSlide(currentIndex + 1);
+        });
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) moveToSlide(currentIndex - 1);
+        });
     }
 
     // Swipe support for mobile carousel
@@ -294,24 +306,32 @@ document.addEventListener('DOMContentLoaded', () => {
         let touchEndX = 0;
         const minSwipeDistance = 50;
 
-        carouselContainer.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
+        carouselContainer.addEventListener(
+            'touchstart',
+            (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            },
+            { passive: true },
+        );
 
-        carouselContainer.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            const swipeDistance = touchEndX - touchStartX;
+        carouselContainer.addEventListener(
+            'touchend',
+            (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                const swipeDistance = touchEndX - touchStartX;
 
-            if (Math.abs(swipeDistance) > minSwipeDistance) {
-                if (swipeDistance < 0 && currentIndex < slides.length - 1) {
-                    // Swipe left - next slide
-                    moveToSlide(currentIndex + 1);
-                } else if (swipeDistance > 0 && currentIndex > 0) {
-                    // Swipe right - previous slide
-                    moveToSlide(currentIndex - 1);
+                if (Math.abs(swipeDistance) > minSwipeDistance) {
+                    if (swipeDistance < 0 && currentIndex < slides.length - 1) {
+                        // Swipe left - next slide
+                        moveToSlide(currentIndex + 1);
+                    } else if (swipeDistance > 0 && currentIndex > 0) {
+                        // Swipe right - previous slide
+                        moveToSlide(currentIndex - 1);
+                    }
                 }
-            }
-        }, { passive: true });
+            },
+            { passive: true },
+        );
     }
 
     if (quickNav) {
@@ -319,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.classList.add('quick-access-btn');
             const loadingAttr = index === 0 ? 'loading="eager"' : 'loading="lazy"';
-            
+
             let iconHtml = '';
             if (slide.dataset.icon) {
                 iconHtml = `<img src="${slide.dataset.icon}" alt="" ${loadingAttr}>`;
@@ -345,23 +365,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const conversionLabel = document.getElementById('conversion-label');
     const conversionResultEl = document.getElementById('conversion-result');
     const conversionOutputEl = document.getElementById('conversion-output');
-    let state = { troopType: 'cavalry', pairing: null, equipmentSet: null, equipmentSetIndex: 0, totalScore: 0 };
-    
+    const state = { troopType: 'cavalry', pairing: null, equipmentSet: null, equipmentSetIndex: 0, totalScore: 0 };
+
     function updatePairingSelector() {
         if (!pairingSelector) return;
         pairingSelector.classList.add('fade-out');
-    
+
         setTimeout(() => {
             pairingSelector.innerHTML = '';
             const pairings = commanderPairings[state.troopType] || [];
             pairings.forEach((pairing, index) => {
                 const [primary, secondary] = pairing.split(' / ');
-                const primaryFilename = `${primary.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
-                const secondaryFilename = `${secondary.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
-    
+                const primaryFilename = `${primary
+                    .toLowerCase()
+                    .replace(/ \(.+\)/, '')
+                    .replace(/ /g, '_')}.webp`;
+                const secondaryFilename = `${secondary
+                    .toLowerCase()
+                    .replace(/ \(.+\)/, '')
+                    .replace(/ /g, '_')}.webp`;
+
                 const primaryImg = getImagePath(primaryFilename);
                 const secondaryImg = getImagePath(secondaryFilename);
-                
+
                 const div = document.createElement('div');
                 div.className = 'pairing-item';
                 div.dataset.pairing = pairing;
@@ -376,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 pairingSelector.appendChild(div);
             });
-            
+
             pairingSelector.classList.remove('fade-out');
         }, 150);
     }
@@ -384,23 +410,32 @@ document.addEventListener('DOMContentLoaded', () => {
     function showEquipmentSet(index) {
         if (!equipmentDisplay) return;
         equipmentDisplay.classList.add('fade-out');
-    
+
         setTimeout(() => {
             const sets = equipmentSets[state.troopType];
             const setNames = Object.keys(sets);
             if (index < 0 || index >= setNames.length) return;
-    
+
             state.equipmentSetIndex = index;
             const setName = setNames[index];
             state.equipmentSet = setName;
-    
+
             const pieceNames = sets[setName];
-            const setPieces = pieceNames.map(name => equipmentData.find(p => p.name === name)).filter(Boolean);
-    
+            const setPieces = pieceNames.map((name) => equipmentData.find((p) => p.name === name)).filter(Boolean);
+
             let equipmentHtml = `<div class="equipment-loadout-shape">`;
-            const slotMap = { helmet: null, weapon: null, chest: null, gloves: null, legs: null, boots: null, accessory1: null, accessory2: null };
-            
-            setPieces.forEach(piece => {
+            const slotMap = {
+                helmet: null,
+                weapon: null,
+                chest: null,
+                gloves: null,
+                legs: null,
+                boots: null,
+                accessory1: null,
+                accessory2: null,
+            };
+
+            setPieces.forEach((piece) => {
                 if (piece.slot === 'accessory') {
                     if (!slotMap.accessory1) slotMap.accessory1 = piece;
                     else if (!slotMap.accessory2) slotMap.accessory2 = piece;
@@ -410,27 +445,27 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const isFirstCavSet = state.troopType === 'cavalry' && setName === 'Budget';
-        
+
             for (const slot in slotMap) {
                 const piece = slotMap[slot];
                 if (piece) {
                     const imageSrc = getImagePath(piece.image);
-                    const loadingAttr = (isFirstCavSet && slot === 'helmet') ? 'loading="eager"' : 'loading="lazy"';
+                    const loadingAttr = isFirstCavSet && slot === 'helmet' ? 'loading="eager"' : 'loading="lazy"';
                     equipmentHtml += `<div class="equipment-slot" data-slot="${slot}"><img src="${imageSrc}" alt="${piece.name}" ${loadingAttr}></div>`;
                 }
             }
-        
+
             equipmentHtml += `</div><span class="equipment-set-name">${setName}</span>`;
             equipmentDisplay.innerHTML = equipmentHtml;
             equipmentDisplay.dataset.setName = setName;
-            
+
             equipmentDisplay.classList.remove('fade-out');
-            
+
             updatePaginationDots();
             calculateAndDisplay();
         }, 150);
     }
-    
+
     function updatePaginationDots() {
         if (!paginationDots) return;
         const setNames = Object.keys(equipmentSets[state.troopType]);
@@ -446,24 +481,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateWeightingUI() {
-        if(!pairingSelector) return;
+        if (!pairingSelector) return;
         state.pairing = null;
         state.equipmentSetIndex = 0;
         updatePairingSelector();
         showEquipmentSet(0);
-    
+
         const firstPairingItem = pairingSelector.querySelector('.pairing-item');
         if (firstPairingItem) {
             firstPairingItem.classList.add('active');
             state.pairing = firstPairingItem.dataset.pairing;
         }
-    
+
         resultDisplay.style.display = 'none';
         conversionOutputEl.innerHTML = '';
         conversionLabel.textContent = '';
         allDamageInput.value = '';
         healthInput.value = '';
-    
+
         if (state.pairing && (allDamageInput.value || healthInput.value)) {
             calculateAndDisplay();
         }
@@ -471,47 +506,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function calculateAndDisplay() {
         if (!state.pairing || state.equipmentSet === null || !resultDisplay) {
-            if(resultDisplay) resultDisplay.classList.add('fade-out');
-            if(conversionResultEl) conversionResultEl.classList.add('fade-out');
+            if (resultDisplay) resultDisplay.classList.add('fade-out');
+            if (conversionResultEl) conversionResultEl.classList.add('fade-out');
             return;
         }
-    
+
         const troopType = state.troopType;
         const capitalizedTroopType = troopType.charAt(0).toUpperCase() + troopType.slice(1);
         const setIndex = state.equipmentSetIndex + 1;
         const scaleKey = `${capitalizedTroopType} Set ${setIndex}`;
         const scales = scalingData[state.pairing]?.[scaleKey];
-    
+
         if (!scales) {
             resultDisplay.classList.add('fade-out');
             conversionResultEl.classList.add('fade-out');
             return;
         }
-        
+
         statWeightsTitle.textContent = `Stat Weights for ${state.pairing}:`;
         statWeightsEl.innerHTML = `<strong>1%</strong> All Damage = <strong>${scales.health}%</strong> Health = <strong>${scales.defense}%</strong> Defense = <strong>${scales.attack}%</strong> Attack`;
-        
+
         resultDisplay.style.display = 'block';
         resultDisplay.classList.remove('fade-out');
-    
+
         const allDamage = parseFloat(allDamageInput.value);
         const health = parseFloat(healthInput.value);
         let outputHtml = '';
         let labelText = '';
-    
+
         if (!isNaN(allDamage) && allDamageInput.value) {
-            labelText = "What is the minimum Health needed for an upgrade?";
+            labelText = 'What is the minimum Health needed for an upgrade?';
             const equivalentHealth = (allDamage * scales.health + 0.1).toFixed(1);
             outputHtml = `To upgrade from <strong>${allDamage}%</strong> All Damage, you will need <strong id="result-value">${equivalentHealth}%</strong> Health or higher.`;
         } else if (!isNaN(health) && healthInput.value) {
-            labelText = "What is the minimum All Damage needed for an upgrade?";
+            labelText = 'What is the minimum All Damage needed for an upgrade?';
             const equivalentDamage = (health / scales.health + 0.1).toFixed(1);
             outputHtml = `To upgrade from <strong>${health}%</strong> Health, you will need <strong id="result-value">${equivalentDamage}%</strong> All Damage or higher.`;
         }
-    
+
         conversionLabel.textContent = labelText;
         conversionOutputEl.innerHTML = outputHtml ? `<span>${outputHtml}</span>` : '';
-    
+
         if (outputHtml) {
             conversionResultEl.classList.remove('fade-out');
             triggerSuccessAnimation(conversionResultEl);
@@ -521,7 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (troopTypeSelector) {
-        troopTypeSelector.addEventListener('click', e => {
+        troopTypeSelector.addEventListener('click', (e) => {
             const button = e.target.closest('.selector-btn');
             if (button) {
                 troopTypeSelector.querySelector('.active').classList.remove('active');
@@ -533,7 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (pairingSelector) {
-        pairingSelector.addEventListener('click', e => {
+        pairingSelector.addEventListener('click', (e) => {
             const item = e.target.closest('.pairing-item');
             if (item) {
                 const currentActive = pairingSelector.querySelector('.active');
@@ -544,28 +579,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
-    if(prevSetBtn) prevSetBtn.addEventListener('click', () => {
-        const numSets = Object.keys(equipmentSets[state.troopType]).length;
-        const newIndex = (state.equipmentSetIndex - 1 + numSets) % numSets;
-        showEquipmentSet(newIndex);
-    });
 
-    if(nextSetBtn) nextSetBtn.addEventListener('click', () => {
-        const numSets = Object.keys(equipmentSets[state.troopType]).length;
-        const newIndex = (state.equipmentSetIndex + 1) % numSets;
-        showEquipmentSet(newIndex);
-    });
+    if (prevSetBtn)
+        prevSetBtn.addEventListener('click', () => {
+            const numSets = Object.keys(equipmentSets[state.troopType]).length;
+            const newIndex = (state.equipmentSetIndex - 1 + numSets) % numSets;
+            showEquipmentSet(newIndex);
+        });
 
-    if (allDamageInput) allDamageInput.addEventListener('input', () => {
-        if (allDamageInput.value) healthInput.value = '';
-        calculateAndDisplay();
-    });
+    if (nextSetBtn)
+        nextSetBtn.addEventListener('click', () => {
+            const numSets = Object.keys(equipmentSets[state.troopType]).length;
+            const newIndex = (state.equipmentSetIndex + 1) % numSets;
+            showEquipmentSet(newIndex);
+        });
 
-    if (healthInput) healthInput.addEventListener('input', () => {
-        if (healthInput.value) allDamageInput.value = '';
-        calculateAndDisplay();
-    });
+    if (allDamageInput)
+        allDamageInput.addEventListener('input', () => {
+            if (allDamageInput.value) healthInput.value = '';
+            calculateAndDisplay();
+        });
+
+    if (healthInput)
+        healthInput.addEventListener('input', () => {
+            if (healthInput.value) allDamageInput.value = '';
+            calculateAndDisplay();
+        });
 
     const armamentToolTabBtn = document.querySelector('.generator-tab-btn[data-tab="armament-tool"]');
     const savedScoresTabBtn = document.querySelector('.generator-tab-btn[data-tab="saved-scores"]');
@@ -589,22 +628,70 @@ document.addEventListener('DOMContentLoaded', () => {
     const loggedOutOverlayScores = document.getElementById('logged-out-overlay-scores');
     const savedScoresAuthContainer = document.getElementById('saved-scores-auth-container');
     const inscriptionsData = window.inscriptionsData;
-    const INSCRIPTION_STATS_DATA = window.inscriptionStats || {}; 
+    const INSCRIPTION_STATS_DATA = window.inscriptionStats || {};
     let isArmamentCalculatorInitialized = false;
-    let selectedInscriptions = new Set();
-    let inscriptionCache = new Map();
+    const selectedInscriptions = new Set();
+    const inscriptionCache = new Map();
     let savedScoresCache = null;
 
-    const SPECIAL_INSCRIPTIONS = ["Destructive", "Straight to the Point", "Invincible", "Fearless", "Hunter", "Unstoppable", "Balanced", "Intrepid", "Cocoon", "Inviolable", "Crowned", "Rounded", "Thrasher", "Butterfly Effect", "Steelskin", "Flurry", "Toppler", "Demolisher", "Airtight", "Thundering"];
-    const RARE_INSCRIPTIONS = ["Battle Ready", "Even-Keeled", "Unswerving", "Forceful", "Crazed", "Boiling Blood", "Defiant", "Focus Fire", "Self Defense", "Aegis", "Reinforced", "Tenacious", "Pummeler", "Causative", "Determined", "Relentless", "Imploder", "Raider", "Hardheaded", "Rattling"];
+    const SPECIAL_INSCRIPTIONS = [
+        'Destructive',
+        'Straight to the Point',
+        'Invincible',
+        'Fearless',
+        'Hunter',
+        'Unstoppable',
+        'Balanced',
+        'Intrepid',
+        'Cocoon',
+        'Inviolable',
+        'Crowned',
+        'Rounded',
+        'Thrasher',
+        'Butterfly Effect',
+        'Steelskin',
+        'Flurry',
+        'Toppler',
+        'Demolisher',
+        'Airtight',
+        'Thundering',
+    ];
+    const RARE_INSCRIPTIONS = [
+        'Battle Ready',
+        'Even-Keeled',
+        'Unswerving',
+        'Forceful',
+        'Crazed',
+        'Boiling Blood',
+        'Defiant',
+        'Focus Fire',
+        'Self Defense',
+        'Aegis',
+        'Reinforced',
+        'Tenacious',
+        'Pummeler',
+        'Causative',
+        'Determined',
+        'Relentless',
+        'Imploder',
+        'Raider',
+        'Hardheaded',
+        'Rattling',
+    ];
 
     function initArmamentCalculator() {
         if (isArmamentCalculatorInitialized) return;
-        
-        const formations = [{ name: "Arch", id: "arch" }, { name: "Wedge", id: "wedge" }, { name: "Hollow Square", id: "hollow_square" }, { name: "Delta", id: "delta" }, { name: "Pincer", id: "pincer" }];
+
+        const formations = [
+            { name: 'Arch', id: 'arch' },
+            { name: 'Wedge', id: 'wedge' },
+            { name: 'Hollow Square', id: 'hollow_square' },
+            { name: 'Delta', id: 'delta' },
+            { name: 'Pincer', id: 'pincer' },
+        ];
         formations.sort((a, b) => a.name.localeCompare(b.name));
         formationSelector.innerHTML = '';
-        formations.forEach(f => {
+        formations.forEach((f) => {
             const btn = document.createElement('button');
             btn.className = 'formation-btn';
             btn.dataset.formation = f.name;
@@ -612,7 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formationSelector.appendChild(btn);
         });
 
-        armamentTroopSelector.addEventListener('click', e => {
+        armamentTroopSelector.addEventListener('click', (e) => {
             const button = e.target.closest('.selector-btn');
             if (button) {
                 armamentTroopSelector.querySelector('.active').classList.remove('active');
@@ -621,11 +708,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        armamentPairingSelector.addEventListener('click', e => {
+        armamentPairingSelector.addEventListener('click', (e) => {
             const item = e.target.closest('.pairing-item');
-            if(item) {
+            if (item) {
                 const currentActive = armamentPairingSelector.querySelector('.active');
-                if(currentActive) currentActive.classList.remove('active');
+                if (currentActive) currentActive.classList.remove('active');
                 item.classList.add('active');
                 calculateArmamentScore();
             }
@@ -638,35 +725,37 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedInscriptionsDisplay.addEventListener('click', (e) => {
             const tag = e.target.closest('.inscription-tag');
             if (!tag) return;
-        
+
             const inscriptionName = tag.dataset.name;
             if (selectedInscriptions.has(inscriptionName)) {
                 selectedInscriptions.delete(inscriptionName);
-        
-                const mainListTag = inscriptionSelector.querySelector(`.inscription-tag[data-name="${inscriptionName}"]`);
+
+                const mainListTag = inscriptionSelector.querySelector(
+                    `.inscription-tag[data-name="${inscriptionName}"]`,
+                );
                 if (mainListTag) {
                     mainListTag.classList.remove('active');
                 }
-        
+
                 updateSelectedInscriptionsDisplay();
                 calculateArmamentScore();
             }
         });
 
-        [armamentAttackInput, armamentDefenseInput, armamentHealthInput, armamentAllDamageInput].forEach(input => {
+        [armamentAttackInput, armamentDefenseInput, armamentHealthInput, armamentAllDamageInput].forEach((input) => {
             input.addEventListener('input', calculateArmamentScore);
         });
 
         armamentToolTabBtn.addEventListener('click', () => switchArmamentView('armament-tool'));
         savedScoresTabBtn.addEventListener('click', () => switchArmamentView('saved-scores'));
-        
+
         saveScoreSection.addEventListener('click', (e) => {
             if (e.target.matches('.saved-scores-link, .saved-scores-link *')) {
                 e.preventDefault();
                 switchArmamentView('saved-scores');
             }
         });
-        
+
         window.onAuthSuccess = () => {
             updateSaveScoreSection();
             renderSavedScoresView();
@@ -683,50 +772,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const tierListControls = document.getElementById('tierlist-controls');
     const tierListDisplay = document.getElementById('tierlist-display');
     const tierListPlaceholder = document.getElementById('tierlist-placeholder');
-    
+
     const TIER_CONFIG = {
-        "S+": { color: "#ff8a8a", bg: "rgba(255, 138, 138, 0.15)", border: "#ff8a8a" },
-        "S":  { color: "#ffc078", bg: "rgba(255, 192, 120, 0.15)", border: "#ffc078" },
-        "A":  { color: "#f7d794", bg: "rgba(247, 215, 148, 0.15)", border: "#f7d794" },
-        "B":  { color: "#88d8b0", bg: "rgba(136, 216, 176, 0.15)", border: "#88d8b0" },
-        "C":  { color: "#89c2d9", bg: "rgba(137, 194, 217, 0.15)", border: "#89c2d9" }
+        'S+': { color: '#ff8a8a', bg: 'rgba(255, 138, 138, 0.15)', border: '#ff8a8a' },
+        S: { color: '#ffc078', bg: 'rgba(255, 192, 120, 0.15)', border: '#ffc078' },
+        A: { color: '#f7d794', bg: 'rgba(247, 215, 148, 0.15)', border: '#f7d794' },
+        B: { color: '#88d8b0', bg: 'rgba(136, 216, 176, 0.15)', border: '#88d8b0' },
+        C: { color: '#89c2d9', bg: 'rgba(137, 194, 217, 0.15)', border: '#89c2d9' },
     };
 
     const TIER_LIST_PAIRINGS = {
         cavalry: [
-            "Arthur Pendragon / Achilles",
-            "Arthur Pendragon / Philip II",
-            "Gang Gamchan / Achilles",
-            "Huo Qubing / Arthur Pendragon",
-            "Huo Qubing / Joan of Arc Prime"
+            'Arthur Pendragon / Achilles',
+            'Arthur Pendragon / Philip II',
+            'Gang Gamchan / Achilles',
+            'Huo Qubing / Arthur Pendragon',
+            'Huo Qubing / Joan of Arc Prime',
         ],
         infantry: [
-            "Bai Qi / Liu Che",
-            "Bai Qi / William Wallace",
-            "Liu Che / Philip II",
-            "Ragnar Lodbrok Prime / Scipio Africanus Prime"
-
+            'Bai Qi / Liu Che',
+            'Bai Qi / William Wallace',
+            'Liu Che / Philip II',
+            'Ragnar Lodbrok Prime / Scipio Africanus Prime',
         ],
         archer: [
-            "Qin Shi Huang / Yi Seong-Gye",
-            "Qin Shi Huang / Zhuge Liang",
-            "Shajar al-Durr / Ashurbanipal",
-            "Zhuge Liang / Hermann Prime",
-            "Zhuge Liang / Philip II"
-
-        ]
+            'Qin Shi Huang / Yi Seong-Gye',
+            'Qin Shi Huang / Zhuge Liang',
+            'Shajar al-Durr / Ashurbanipal',
+            'Zhuge Liang / Hermann Prime',
+            'Zhuge Liang / Philip II',
+        ],
     };
 
-    let tierState = {
+    const tierState = {
         troop: 'cavalry',
         pairing: null,
-        slot: 'Scroll'
+        slot: 'Scroll',
     };
 
     function initTierListTool() {
         if (!tierListTroopSelector) return;
 
-        tierListTroopSelector.addEventListener('click', e => {
+        tierListTroopSelector.addEventListener('click', (e) => {
             const button = e.target.closest('.selector-btn');
             if (button) {
                 tierListTroopSelector.querySelector('.active').classList.remove('active');
@@ -736,7 +823,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        tierListPairingSelector.addEventListener('click', e => {
+        tierListPairingSelector.addEventListener('click', (e) => {
             const item = e.target.closest('.pairing-item');
             if (item) {
                 const currentActive = tierListPairingSelector.querySelector('.active');
@@ -748,12 +835,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 tierListDisplay.style.display = 'flex';
                 tierListDisplay.style.flexDirection = 'column';
                 tierListDisplay.style.gap = '10px';
-                
+
                 renderTierList();
             }
         });
 
-        tierListSlotSelector.addEventListener('click', e => {
+        tierListSlotSelector.addEventListener('click', (e) => {
             const button = e.target.closest('.selector-btn');
             if (button) {
                 tierListSlotSelector.querySelector('.active').classList.remove('active');
@@ -768,9 +855,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateTierListPairings(troopType) {
         if (!tierListPairingSelector) return;
-        
+
         tierListPairingSelector.classList.add('fade-out');
-        
+
         setTimeout(() => {
             tierListPairingSelector.innerHTML = '';
             tierState.pairing = null;
@@ -778,27 +865,34 @@ document.addEventListener('DOMContentLoaded', () => {
             tierListDisplay.style.display = 'none';
             tierListDisplay.innerHTML = '';
             tierListPlaceholder.style.display = 'flex';
-            
+
             const pairings = TIER_LIST_PAIRINGS[troopType] || [];
-            
+
             if (pairings.length === 0) {
-                 tierListPairingSelector.innerHTML = '<p class="inscription-placeholder">No pairings available for this troop type in the Tier List.</p>';
+                tierListPairingSelector.innerHTML =
+                    '<p class="inscription-placeholder">No pairings available for this troop type in the Tier List.</p>';
             }
 
             pairings.forEach((pairing, index) => {
                 const [primary, secondary] = pairing.split(' / ');
-                let primName = primary;
+                const primName = primary;
 
-                const primaryFilename = `${primName.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
-                const secondaryFilename = `${secondary.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
-                
-                let primaryImg = getImagePath(primaryFilename);
-                let secondaryImg = getImagePath(secondaryFilename);
+                const primaryFilename = `${primName
+                    .toLowerCase()
+                    .replace(/ \(.+\)/, '')
+                    .replace(/ /g, '_')}.webp`;
+                const secondaryFilename = `${secondary
+                    .toLowerCase()
+                    .replace(/ \(.+\)/, '')
+                    .replace(/ /g, '_')}.webp`;
+
+                const primaryImg = getImagePath(primaryFilename);
+                const secondaryImg = getImagePath(secondaryFilename);
 
                 const div = document.createElement('div');
                 div.className = 'pairing-item';
                 div.dataset.pairing = pairing;
-                
+
                 div.innerHTML = `
                     <div class="pairing-images">
                         <img src="${primaryImg}" alt="${primary}" class="commander-icon" loading="lazy">
@@ -810,7 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             tierListPairingSelector.classList.remove('fade-out');
-            
+
             tierState.pairing = null;
             tierListControls.style.display = 'none';
             tierListPlaceholder.style.display = 'flex';
@@ -821,7 +915,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!tierListDisplay || !tierState.pairing || !window.inscriptionTierList) return;
 
         const data = window.inscriptionTierList[tierState.pairing];
-        
+
         if (!data) {
             tierListDisplay.innerHTML = `<p class="inscription-placeholder">No tier data found for this pairing.</p>`;
             return;
@@ -837,21 +931,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             let html = '';
-            const tiers = ["S+", "S", "A", "B", "C"];
+            const tiers = ['S+', 'S', 'A', 'B', 'C'];
 
-            tiers.forEach(tier => {
+            tiers.forEach((tier) => {
                 const inscriptions = slotData[tier] || [];
                 if (inscriptions.length === 0) return;
 
                 const style = TIER_CONFIG[tier];
-                
-                const badges = inscriptions.map(name => {
-                    let className = "inscription-tag";
-                    if (SPECIAL_INSCRIPTIONS.includes(name)) className += " special";
-                    else if (RARE_INSCRIPTIONS.includes(name)) className += " rare";
 
-                    return `<div class="${className}" style="cursor: default; margin: 0;">${name.replace(/_/g, ' ')}</div>`;
-                }).join('');
+                const badges = inscriptions
+                    .map((name) => {
+                        let className = 'inscription-tag';
+                        if (SPECIAL_INSCRIPTIONS.includes(name)) className += ' special';
+                        else if (RARE_INSCRIPTIONS.includes(name)) className += ' rare';
+
+                        return `<div class="${className}" style="cursor: default; margin: 0;">${name.replace(/_/g, ' ')}</div>`;
+                    })
+                    .join('');
 
                 html += `
                     <div class="tier-row" style="background: ${style.bg}; border-color: ${style.border};">
@@ -881,11 +977,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchArmamentView(tabName) {
         const views = {
             'armament-tool': armamentToolView,
-            'saved-scores': savedScoresView
+            'saved-scores': savedScoresView,
         };
         const tabs = {
             'armament-tool': armamentToolTabBtn,
-            'saved-scores': savedScoresTabBtn
+            'saved-scores': savedScoresTabBtn,
         };
 
         for (const key in views) {
@@ -902,18 +998,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateArmamentPairingSelector(troopType) {
         if (!armamentPairingSelector) return;
         armamentPairingSelector.classList.add('fade-out');
-        
+
         setTimeout(() => {
             armamentPairingSelector.innerHTML = '';
             const pairings = armamentPairingsByTroop[troopType] || [];
             pairings.forEach((pairing, index) => {
                 const [primary, secondary] = pairing.split(' / ');
-                const primaryFilename = `${primary.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
-                const secondaryFilename = `${secondary.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
-    
+                const primaryFilename = `${primary
+                    .toLowerCase()
+                    .replace(/ \(.+\)/, '')
+                    .replace(/ /g, '_')}.webp`;
+                const secondaryFilename = `${secondary
+                    .toLowerCase()
+                    .replace(/ \(.+\)/, '')
+                    .replace(/ /g, '_')}.webp`;
+
                 const primaryImg = getImagePath(primaryFilename);
                 const secondaryImg = getImagePath(secondaryFilename);
-                
+
                 const div = document.createElement('div');
                 div.className = 'pairing-item';
                 div.dataset.pairing = pairing;
@@ -929,13 +1031,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 armamentPairingSelector.appendChild(div);
             });
             armamentPairingSelector.classList.remove('fade-out');
-            
+
             const firstPairing = armamentPairingSelector.querySelector('.pairing-item');
             if (firstPairing) {
                 firstPairing.classList.add('active');
             }
             calculateArmamentScore();
-
         }, 150);
     }
 
@@ -944,12 +1045,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!btn) return;
 
         const alreadyActive = btn.classList.contains('active');
-        formationSelector.querySelectorAll('.formation-btn').forEach(b => b.classList.remove('active'));
-        
+        formationSelector.querySelectorAll('.formation-btn').forEach((b) => b.classList.remove('active'));
+
         if (!alreadyActive) {
             btn.classList.add('active');
         }
-        
+
         inscriptionSelector.classList.add('fade-out');
         setTimeout(() => {
             updateInscriptionSelector();
@@ -961,20 +1062,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleInscriptionClick(e) {
         const tag = e.target.closest('.inscription-tag');
         if (!tag) return;
-    
+
         const inscriptionName = tag.dataset.name;
         tag.classList.toggle('active');
-    
+
         if (selectedInscriptions.has(inscriptionName)) {
             selectedInscriptions.delete(inscriptionName);
         } else {
             selectedInscriptions.add(inscriptionName);
         }
-    
+
         updateSelectedInscriptionsDisplay();
         calculateArmamentScore();
     }
-    
+
     function updateInscriptionSelector() {
         selectedInscriptions.clear();
         inscriptionCache.clear();
@@ -982,7 +1083,8 @@ document.addEventListener('DOMContentLoaded', () => {
         inscriptionSearch.value = '';
 
         if (!activeFormationBtn) {
-            inscriptionSelector.innerHTML = '<p class="inscription-placeholder">Select a formation to see available inscriptions.</p>';
+            inscriptionSelector.innerHTML =
+                '<p class="inscription-placeholder">Select a formation to see available inscriptions.</p>';
             updateSelectedInscriptionsDisplay();
             return;
         }
@@ -994,12 +1096,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const rarityOrder = { "Special": 3, "Rare": 2, "Common": 1 };
+        const rarityOrder = { Special: 3, Rare: 2, Common: 1 };
 
         const sortedInscriptions = [...availableInscriptions].sort((a, b) => {
-            const rarityA = SPECIAL_INSCRIPTIONS.includes(a) ? "Special" : RARE_INSCRIPTIONS.includes(a) ? "Rare" : "Common";
-            const rarityB = SPECIAL_INSCRIPTIONS.includes(b) ? "Special" : RARE_INSCRIPTIONS.includes(b) ? "Rare" : "Common";
-            
+            const rarityA = SPECIAL_INSCRIPTIONS.includes(a)
+                ? 'Special'
+                : RARE_INSCRIPTIONS.includes(a)
+                  ? 'Rare'
+                  : 'Common';
+            const rarityB = SPECIAL_INSCRIPTIONS.includes(b)
+                ? 'Special'
+                : RARE_INSCRIPTIONS.includes(b)
+                  ? 'Rare'
+                  : 'Common';
+
             if (rarityOrder[rarityA] !== rarityOrder[rarityB]) {
                 return rarityOrder[rarityB] - rarityOrder[rarityA];
             }
@@ -1008,7 +1118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const grid = document.createElement('div');
         grid.className = 'inscription-grid';
-        sortedInscriptions.forEach(name => {
+        sortedInscriptions.forEach((name) => {
             const tag = document.createElement('div');
             tag.className = 'inscription-tag';
             tag.dataset.name = name;
@@ -1016,7 +1126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (SPECIAL_INSCRIPTIONS.includes(name)) tag.classList.add('special');
             else if (RARE_INSCRIPTIONS.includes(name)) tag.classList.add('rare');
-            
+
             inscriptionCache.set(name, tag);
             grid.appendChild(tag);
         });
@@ -1030,13 +1140,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = inscriptionSelector.querySelector('.inscription-grid');
         if (!grid) return;
 
-        grid.querySelectorAll('.inscription-tag').forEach(tag => {
+        grid.querySelectorAll('.inscription-tag').forEach((tag) => {
             const name = tag.dataset.name.toLowerCase().replace(/_/g, ' ');
             const shouldShow = name.includes(lowerCaseSearch);
-            
+
             if (shouldShow) {
                 tag.style.display = 'block';
-                setTimeout(() => tag.style.opacity = '1', 10);
+                setTimeout(() => (tag.style.opacity = '1'), 10);
             } else {
                 tag.style.opacity = '0';
                 setTimeout(() => {
@@ -1050,14 +1160,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateSelectedInscriptionsDisplay() {
         if (!selectedInscriptionsDisplay) return;
-    
+
         if (selectedInscriptions.size === 0) {
             selectedInscriptionsDisplay.innerHTML = '<p class="inscription-placeholder">No inscriptions selected.</p>';
             return;
         }
-    
+
         let html = '<div class="inscription-grid">';
-        selectedInscriptions.forEach(inscriptionName => {
+        selectedInscriptions.forEach((inscriptionName) => {
             const cachedTag = inscriptionCache.get(inscriptionName);
             if (cachedTag) {
                 const newTag = cachedTag.cloneNode(true);
@@ -1083,13 +1193,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const formationName = activeFormationBtn.dataset.formation;
-        
+
         const totalBonuses = {
             attack: parseFloat(armamentAttackInput.value) || 0,
             defense: parseFloat(armamentDefenseInput.value) || 0,
             health: parseFloat(armamentHealthInput.value) || 0,
             allDamage: parseFloat(armamentAllDamageInput.value) || 0,
-            na: 0, ca: 0, skillDamage: 0, smiteDamage: 0, comboDamage: 0
+            na: 0,
+            ca: 0,
+            skillDamage: 0,
+            smiteDamage: 0,
+            comboDamage: 0,
         };
 
         const totalMultipliers = { allDamage: 0, na: 0, skillDamage: 0, smiteDamage: 0, comboDamage: 0 };
@@ -1099,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', () => {
             totalBonuses[stat] = (totalBonuses[stat] || 0) + formationData.bonuses[stat];
         }
 
-        selectedInscriptions.forEach(inscriptionName => {
+        selectedInscriptions.forEach((inscriptionName) => {
             const inscriptionData = INSCRIPTION_STATS_DATA[inscriptionName] || { bonuses: {}, multipliers: {} };
             for (const stat in inscriptionData.bonuses) {
                 totalBonuses[stat] = (totalBonuses[stat] || 0) + inscriptionData.bonuses[stat];
@@ -1108,7 +1222,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalMultipliers[stat] = (totalMultipliers[stat] || 0) + inscriptionData.multipliers[stat];
             }
         });
-        
+
         const scaling = armamentPairingScalings[pairing];
         if (!scaling) {
             armamentScoreResult.innerHTML = '<span>Error: Scaling data not found for this pairing.</span>';
@@ -1123,22 +1237,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 let statScore = totalBonuses[stat] * scaling[stat];
 
                 if (totalMultipliers.hasOwnProperty(stat) && totalMultipliers[stat] !== 0) {
-                     statScore *= (1 + totalMultipliers[stat]);
+                    statScore *= 1 + totalMultipliers[stat];
                 }
                 totalScore += statScore;
             }
         }
-        
+
         state.totalScore = totalScore.toFixed(2);
         armamentScoreResult.innerHTML = `<span>Total Armament Score: <strong>${state.totalScore}</strong></span>`;
         triggerSuccessAnimation(armamentScoreResult);
         updateSaveScoreSection();
     }
-    
+
     function triggerSuccessAnimation(element) {
         if (!element) return;
         element.classList.remove('result-success');
-        void element.offsetWidth; 
+        void element.offsetWidth;
         element.classList.add('result-success');
     }
 
@@ -1147,7 +1261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = window.auth.getLoggedInUser();
 
         if (user) {
-                saveScoreSection.innerHTML = `
+            saveScoreSection.innerHTML = `
                 <span>You can </span>
                 <button id="save-score-btn" class="btn-primary">Save Score</button>
                 <span> and access/compare your scores in the 
@@ -1177,7 +1291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formation = activeFormationBtn ? activeFormationBtn.dataset.formation : null;
 
         if (!pairing || !formation) {
-            window.showAlert("Please select a pairing and formation before saving.");
+            window.showAlert('Please select a pairing and formation before saving.');
             return;
         }
 
@@ -1191,16 +1305,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 health: parseFloat(armamentHealthInput.value) || 0,
                 allDamage: parseFloat(armamentAllDamageInput.value) || 0,
             },
-            total_score: parseFloat(state.totalScore)
+            total_score: parseFloat(state.totalScore),
         };
-        
+
         btn.disabled = true;
         btn.textContent = 'Saving...';
 
         try {
             await window.auth.fetchWithAuth('/api/scores', {
                 method: 'POST',
-                body: JSON.stringify(scoreData)
+                body: JSON.stringify(scoreData),
             });
             btn.textContent = 'Saved!';
             savedScoresCache = null;
@@ -1210,12 +1324,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 2000);
         } catch (error) {
             console.error('Failed to save score:', error);
-            window.showAlert(`Could not save score: ${error.message}`, "Save Error");
+            window.showAlert(`Could not save score: ${error.message}`, 'Save Error');
             btn.disabled = false;
             btn.textContent = 'Save Score';
         }
     }
-    
+
     async function renderSavedScoresView() {
         const user = window.auth.getLoggedInUser();
 
@@ -1253,9 +1367,9 @@ document.addEventListener('DOMContentLoaded', () => {
             savedScoresContent.innerHTML = `<p>You have no saved scores. Use the "Save Score" button in the tool to add one!</p>`;
             return;
         }
-        
+
         const isMobile = window.innerWidth <= 768;
-    
+
         let tableHtml = `<div class="saved-scores-grid">
             <div class="grid-header">Pairing</div>
             <div class="grid-header">Formation</div>
@@ -1264,20 +1378,26 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="grid-header">Score</div>
             <div class="grid-header">Actions</div>
         `;
-        
-        scores.forEach(score => {
+
+        scores.forEach((score) => {
             const [primary, secondary] = score.pairing.split(' / ');
-            const primaryFilename = `${primary.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
-            const secondaryFilename = `${secondary.toLowerCase().replace(/ \(.+\)/, '').replace(/ /g, '_')}.webp`;
+            const primaryFilename = `${primary
+                .toLowerCase()
+                .replace(/ \(.+\)/, '')
+                .replace(/ /g, '_')}.webp`;
+            const secondaryFilename = `${secondary
+                .toLowerCase()
+                .replace(/ \(.+\)/, '')
+                .replace(/ /g, '_')}.webp`;
             const primaryImg = getImagePath(primaryFilename);
             const secondaryImg = getImagePath(secondaryFilename);
-            
+
             const formationFilename = score.formation.toLowerCase().replace(/ /g, '_') + '.webp';
             const formationImg = getImagePath(formationFilename);
-    
+
             let inscriptionsHtml = '<div class="inscription-grid">';
             if (score.inscriptions && score.inscriptions.length > 0) {
-                score.inscriptions.forEach(name => {
+                score.inscriptions.forEach((name) => {
                     let tagClass = 'inscription-tag';
                     if (SPECIAL_INSCRIPTIONS.includes(name)) tagClass += ' special';
                     else if (RARE_INSCRIPTIONS.includes(name)) tagClass += ' rare';
@@ -1287,14 +1407,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 inscriptionsHtml += '<span>None</span>';
             }
             inscriptionsHtml += '</div>';
-    
+
             const statsHtml = `
                 <div class="stat-line">Attack: <strong>${score.stats.attack}%</strong></div>
                 <div class="stat-line">Defense: <strong>${score.stats.defense}%</strong></div>
                 <div class="stat-line">Health: <strong>${score.stats.health}%</strong></div>
                 <div class="stat-line">All Dmg: <strong>${score.stats.allDamage}%</strong></div>
             `;
-    
+
             if (isMobile) {
                 tableHtml += `<div class="grid-row-container" data-score-id="${score.score_id}">
                                 <div class="score-pairing pairing-images">
@@ -1333,11 +1453,11 @@ document.addEventListener('DOMContentLoaded', () => {
                               </div>`;
             }
         });
-    
+
         tableHtml += '</div>';
         savedScoresContent.innerHTML = tableHtml;
-    
-        savedScoresContent.querySelectorAll('.delete-score-btn').forEach(btn => {
+
+        savedScoresContent.querySelectorAll('.delete-score-btn').forEach((btn) => {
             btn.addEventListener('click', handleDeleteScore);
         });
     }
@@ -1347,32 +1467,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const row = btn.closest('[data-score-id]');
         const scoreId = row.dataset.scoreId;
 
-        window.showConfirm(
-            'Are you sure you want to delete this saved score?', 
-            'Confirm Deletion', 
-            async () => {
-                try {
-                    await window.auth.fetchWithAuth(`/api/scores/${scoreId}`, { method: 'DELETE' });
-                    savedScoresCache = null;
-                    renderSavedScoresView();
-                } catch (error) {
-                    console.error('Failed to delete score:', error);
-                    window.showAlert(`Could not delete score: ${error.message}`, "Delete Error");
-                }
+        window.showConfirm('Are you sure you want to delete this saved score?', 'Confirm Deletion', async () => {
+            try {
+                await window.auth.fetchWithAuth(`/api/scores/${scoreId}`, { method: 'DELETE' });
+                savedScoresCache = null;
+                renderSavedScoresView();
+            } catch (error) {
+                console.error('Failed to delete score:', error);
+                window.showAlert(`Could not delete score: ${error.message}`, 'Delete Error');
             }
-        );
+        });
     }
-    
+
     const initAndResize = () => {
-        const troopButtons = document.querySelectorAll('#troop-type-selector .selector-btn, #armament-troop-selector .selector-btn');
+        const troopButtons = document.querySelectorAll(
+            '#troop-type-selector .selector-btn, #armament-troop-selector .selector-btn',
+        );
         const textMap = {
-            'cavalry': { long: 'Cavalry', short: 'Cav' },
-            'infantry': { long: 'Infantry', short: 'Inf' },
-            'archer': { long: 'Archer', short: 'Arch' },
-            'engineering': { long: 'Engineering', short: 'Siege' }
+            cavalry: { long: 'Cavalry', short: 'Cav' },
+            infantry: { long: 'Infantry', short: 'Inf' },
+            archer: { long: 'Archer', short: 'Arch' },
+            engineering: { long: 'Engineering', short: 'Siege' },
         };
         const isMobile = window.innerWidth <= 768;
-        troopButtons.forEach(btn => {
+        troopButtons.forEach((btn) => {
             const type = btn.dataset.type;
             const span = btn.querySelector('span');
             if (span && textMap[type]) {
@@ -1391,16 +1509,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const toolSlug = urlParams.get('tool');
         const slugIndex = SLIDE_SLUGS.indexOf(toolSlug);
-        
-        const targetIndex = (slugIndex !== -1) ? slugIndex : 0;
-        
+
+        const targetIndex = slugIndex !== -1 ? slugIndex : 0;
+
         moveToSlide(targetIndex, false);
     });
 
     initAndResize();
-    moveToSlide(currentIndex, false); 
-    
-    if(document.querySelector('.carousel-slide[data-title="Stats Weighting"]')) {
+    moveToSlide(currentIndex, false);
+
+    if (document.querySelector('.carousel-slide[data-title="Stats Weighting"]')) {
         updateWeightingUI();
     }
 });

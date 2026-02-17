@@ -9,25 +9,34 @@ const bot = new Hono<{ Bindings: Bindings }>();
 bot.use('*', botAuthMiddleware);
 
 // SQL whitelist for the /query endpoint — only these prefixes are allowed.
-const ALLOWED_SQL_PREFIXES = [
-    'SELECT ', 'INSERT ', 'UPDATE ', 'DELETE ',
-    'INSERT OR REPLACE ', 'INSERT OR IGNORE ',
-];
+const ALLOWED_SQL_PREFIXES = ['SELECT ', 'INSERT ', 'UPDATE ', 'DELETE ', 'INSERT OR REPLACE ', 'INSERT OR IGNORE '];
 
 // Table-level whitelist — only these tables can be accessed via the bot SQL API
 const ALLOWED_TABLES = [
-    'system_events', 'guild_authorizations', 'guild_bypass',
-    'patron_users', 'ark_of_osiris_setups', 'ark_of_osiris_teams',
-    'ark_of_osiris_signups', 'mge_settings', 'mge_applications',
-    'mge_rankings', 'mge_questions', 'event_calendar_setups',
-    'tracked_events', 'reminder_setups', 'custom_reminders',
-    'allowed_channels', 'command_usage', 'egg_hammer_personalization',
+    'system_events',
+    'guild_authorizations',
+    'guild_bypass',
+    'patron_users',
+    'ark_of_osiris_setups',
+    'ark_of_osiris_teams',
+    'ark_of_osiris_signups',
+    'mge_settings',
+    'mge_applications',
+    'mge_rankings',
+    'mge_questions',
+    'event_calendar_setups',
+    'tracked_events',
+    'reminder_setups',
+    'custom_reminders',
+    'allowed_channels',
+    'command_usage',
+    'egg_hammer_personalization',
     'guild_event_sequence',
 ];
 
 function isSqlAllowed(sql: string): boolean {
     const trimmed = sql.trim().toUpperCase();
-    if (!ALLOWED_SQL_PREFIXES.some(prefix => trimmed.startsWith(prefix))) return false;
+    if (!ALLOWED_SQL_PREFIXES.some((prefix) => trimmed.startsWith(prefix))) return false;
 
     // Verify the SQL only references allowed tables
     // Extract table names from common SQL patterns (FROM, INTO, UPDATE, JOIN, etc.)
@@ -46,8 +55,8 @@ function isSqlAllowed(sql: string): boolean {
 
     // If we found table references, verify they're all allowed
     if (referencedTables.length > 0) {
-        const allowedLower = ALLOWED_TABLES.map(t => t.toLowerCase());
-        return referencedTables.every(t => allowedLower.includes(t));
+        const allowedLower = ALLOWED_TABLES.map((t) => t.toLowerCase());
+        return referencedTables.every((t) => allowedLower.includes(t));
     }
 
     return true;
@@ -56,8 +65,10 @@ function isSqlAllowed(sql: string): boolean {
 bot.get('/templates/list/:userId', async (c) => {
     const { userId } = c.req.param();
     const { results } = await c.env.DB.prepare(
-      'SELECT template_name, date_saved, last_loaded FROM user_templates WHERE user_id = ? ORDER BY date_saved DESC'
-    ).bind(userId).all();
+        'SELECT template_name, date_saved, last_loaded FROM user_templates WHERE user_id = ? ORDER BY date_saved DESC',
+    )
+        .bind(userId)
+        .all();
     return c.json(results || []);
 });
 
@@ -65,32 +76,34 @@ bot.get('/templates/autocomplete/:userId', async (c) => {
     const { userId } = c.req.param();
     const current = c.req.query('current') || '';
     const { results } = await c.env.DB.prepare(
-        "SELECT template_id, template_name, date_saved FROM user_templates WHERE user_id = ? AND template_name LIKE ? ORDER BY date_saved DESC LIMIT 25"
-    ).bind(userId, `%${current}%`).all();
+        'SELECT template_id, template_name, date_saved FROM user_templates WHERE user_id = ? AND template_name LIKE ? ORDER BY date_saved DESC LIMIT 25',
+    )
+        .bind(userId, `%${current}%`)
+        .all();
     return c.json(results || []);
 });
 
 bot.get('/templates/load/:templateId/:userId', async (c) => {
     const { templateId, userId } = c.req.param();
-    const result = await c.env.DB.prepare(
-      'SELECT * FROM user_templates WHERE template_id = ? AND user_id = ?'
-    ).bind(templateId, userId).first();
+    const result = await c.env.DB.prepare('SELECT * FROM user_templates WHERE template_id = ? AND user_id = ?')
+        .bind(templateId, userId)
+        .first();
     return result ? c.json(result) : c.json({ error: 'Template not found' }, 404);
 });
 
 bot.delete('/templates/delete/:templateId/:userId', async (c) => {
     const { templateId, userId } = c.req.param();
-    const { success } = await c.env.DB.prepare(
-      'DELETE FROM user_templates WHERE template_id = ? AND user_id = ?'
-    ).bind(templateId, userId).run();
+    const { success } = await c.env.DB.prepare('DELETE FROM user_templates WHERE template_id = ? AND user_id = ?')
+        .bind(templateId, userId)
+        .run();
     return success ? c.json({ status: 'success' }) : c.json({ error: 'Deletion failed or template not found' }, 404);
 });
 
 bot.post('/templates/update-loaded/:templateId', async (c) => {
     const { templateId } = c.req.param();
-    await c.env.DB.prepare(
-      'UPDATE user_templates SET last_loaded = ? WHERE template_id = ?'
-    ).bind(Date.now() / 1000, templateId).run();
+    await c.env.DB.prepare('UPDATE user_templates SET last_loaded = ? WHERE template_id = ?')
+        .bind(Date.now() / 1000, templateId)
+        .run();
     return c.json({ status: 'success' });
 });
 
@@ -99,12 +112,12 @@ bot.get('/events/upcoming', async (c) => {
         const { results } = await c.env.DB.prepare(
             `SELECT * FROM events 
              WHERE start_date >= date('now', '-2 days') 
-             ORDER BY start_date ASC`
+             ORDER BY start_date ASC`,
         ).all();
 
         return c.json(results || []);
     } catch (e) {
-        console.error("Failed to fetch upcoming events for bot:", e);
+        console.error('Failed to fetch upcoming events for bot:', e);
         return c.json({ error: 'Failed to fetch events' }, 500);
     }
 });
@@ -112,13 +125,13 @@ bot.get('/events/upcoming', async (c) => {
 bot.get('/settings/:userId', async (c) => {
     const { userId } = c.req.param();
     try {
-        const result = await c.env.DB.prepare(
-            'SELECT settings FROM user_settings WHERE user_id = ?'
-        ).bind(userId).first();
+        const result = await c.env.DB.prepare('SELECT settings FROM user_settings WHERE user_id = ?')
+            .bind(userId)
+            .first();
 
         return c.json(result ? JSON.parse(result.settings as string) : {});
     } catch (e) {
-        console.error("Failed to fetch user settings for bot:", e);
+        console.error('Failed to fetch user settings for bot:', e);
         return c.json({ error: 'Failed to fetch settings' }, 500);
     }
 });
@@ -155,8 +168,10 @@ bot.post('/query', async (c) => {
 bot.get('/sync/feed', async (c) => {
     const lastTimestamp = c.req.query('since') || 0;
     const { results } = await c.env.BOT_DB.prepare(
-        "SELECT * FROM system_events WHERE created_at > ? ORDER BY created_at ASC LIMIT 50"
-    ).bind(lastTimestamp).all();
+        'SELECT * FROM system_events WHERE created_at > ? ORDER BY created_at ASC LIMIT 50',
+    )
+        .bind(lastTimestamp)
+        .all();
     return c.json(results || []);
 });
 
@@ -176,14 +191,14 @@ bot.post('/batch', async (c) => {
         }
 
         const statements = (operations as BatchOperation[]).map((op) =>
-            c.env.BOT_DB.prepare(op.sql).bind(...(op.params || []))
+            c.env.BOT_DB.prepare(op.sql).bind(...(op.params || [])),
         );
 
         const results = await c.env.BOT_DB.batch(statements);
 
         return c.json(results);
     } catch (e) {
-        console.error("Batch Execution Error:", e);
+        console.error('Batch Execution Error:', e);
         return errors.internal(c, e);
     }
 });

@@ -16,10 +16,15 @@ import infantryIcon from '../../assets/images/materials/troop_icons/infantry_ico
 import archerIcon from '../../assets/images/materials/troop_icons/archer_icon_mini.webp';
 import siegeIcon from '../../assets/images/materials/troop_icons/siege_icon_mini.webp';
 
-const allDavorImageModules = import.meta.glob<any>('../../assets/images/davor_toolkit/**/*.{webp,png,jpg}', { eager: true });
-const allCommanderImageModules = import.meta.glob<any>('../../assets/images/davor_toolkit/commanders/*.webp', { eager: true });
-const allEquipmentImageModules = import.meta.glob<any>('../../assets/images/materials/equipment/*.webp', { eager: true });
-
+const allDavorImageModules = import.meta.glob<any>('../../assets/images/davor_toolkit/**/*.{webp,png,jpg}', {
+    eager: true,
+});
+const allCommanderImageModules = import.meta.glob<any>('../../assets/images/davor_toolkit/commanders/*.webp', {
+    eager: true,
+});
+const allEquipmentImageModules = import.meta.glob<any>('../../assets/images/materials/equipment/*.webp', {
+    eager: true,
+});
 
 const imagePathMap: { [key: string]: string } = {};
 
@@ -41,6 +46,7 @@ const davorIconPath = davorIcon.src;
 const davorIconWidth = davorIcon.width;
 const davorIconHeight = davorIcon.height;
 ---
+
 <link rel="preload" href="/fonts/NotoSansHans-Black.woff2" as="font" type="font/woff2" crossorigin />
 
 <Layout
@@ -50,24 +56,24 @@ const davorIconHeight = davorIcon.height;
     bodyClass="has-sub-nav"
 >
     <script type="application/ld+json" slot="head-scripts">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Davor's ROK Toolkit",
-        "description": "Advanced Rise of Kingdoms combat optimization tools with stat weighting and armament scoring",
-        "url": "https://codexhelper.com/tools/davor_toolkit/",
-        "applicationCategory": "GameApplication",
-        "operatingSystem": "Any",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "author": {
-            "@type": "Organization",
-            "name": "Codex Helper"
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "Davor's ROK Toolkit",
+            "description": "Advanced Rise of Kingdoms combat optimization tools with stat weighting and armament scoring",
+            "url": "https://codexhelper.com/tools/davor_toolkit/",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Any",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "author": {
+                "@type": "Organization",
+                "name": "Codex Helper"
+            }
         }
-    }
     </script>
     <main class="tool-page-wrapper">
         <section class="tool-hero">
@@ -84,17 +90,63 @@ const davorIconHeight = davorIcon.height;
             <div class="carousel-container">
                 <div class="carousel-track-container">
                     <div class="carousel-track">
-                        <div class="carousel-slide" data-title="Stats Weighting" data-description="Analyze the stat weights for different commander pairings and equipment sets to optimize your armaments." data-icon={statsWeightingIconPath}>
+                        <div
+                            class="carousel-slide"
+                            data-title="Stats Weighting"
+                            data-description="Analyze the stat weights for different commander pairings and equipment sets to optimize your armaments."
+                            data-icon={statsWeightingIconPath}
+                        >
                             <div class="calculator-island">
                                 <div class="island-content">
-                                    <p class="tool-explanation">This tool will help you weight the <span class="wizard-gradient">extra stats</span> that you receive, on top of the existing stats from your commanders and equipment based on the <span class="wizard-gradient">Damage Formula</span> and <span class="wizard-gradient">Combat Effectiveness,</span> which is the improvement of both your <span class="wizard-gradient">damage dealt</span> and <span class="wizard-gradient">damage taken</span>.</p>
+                                    <p class="tool-explanation">
+                                        This tool will help you weight the <span class="wizard-gradient"
+                                            >extra stats</span
+                                        > that you receive, on top of the existing stats from your commanders and equipment
+                                        based on the <span class="wizard-gradient">Damage Formula</span> and <span
+                                            class="wizard-gradient">Combat Effectiveness,</span
+                                        > which is the improvement of both your <span class="wizard-gradient"
+                                            >damage dealt</span
+                                        > and <span class="wizard-gradient">damage taken</span>.
+                                    </p>
                                     <div class="form-group">
                                         <div class="form-label-heading">Troop Type</div>
                                         <div id="troop-type-selector" class="button-selector">
-                                            <button class="selector-btn active" data-type="cavalry"><Image loading="eager" src={cavalryIcon} alt="Cavalry" width="24" height="24"/><span>Cavalry</span></button>
-                                            <button class="selector-btn" data-type="infantry"><Image loading="eager" src={infantryIcon} alt="Infantry" width="24" height="24"/><span>Infantry</span></button>
-                                            <button class="selector-btn" data-type="archer"><Image loading="eager" src={archerIcon} alt="Archers" width="24" height="24"/><span>Archers</span></button>
-                                            <button class="selector-btn" data-type="engineering"><Image loading="eager" src={siegeIcon} alt="Engineering" width="24" height="24"/><span>Engineering</span></button>
+                                            <button class="selector-btn active" data-type="cavalry"
+                                                ><Image
+                                                    loading="eager"
+                                                    src={cavalryIcon}
+                                                    alt="Cavalry"
+                                                    width="24"
+                                                    height="24"
+                                                /><span>Cavalry</span></button
+                                            >
+                                            <button class="selector-btn" data-type="infantry"
+                                                ><Image
+                                                    loading="eager"
+                                                    src={infantryIcon}
+                                                    alt="Infantry"
+                                                    width="24"
+                                                    height="24"
+                                                /><span>Infantry</span></button
+                                            >
+                                            <button class="selector-btn" data-type="archer"
+                                                ><Image
+                                                    loading="eager"
+                                                    src={archerIcon}
+                                                    alt="Archers"
+                                                    width="24"
+                                                    height="24"
+                                                /><span>Archers</span></button
+                                            >
+                                            <button class="selector-btn" data-type="engineering"
+                                                ><Image
+                                                    loading="eager"
+                                                    src={siegeIcon}
+                                                    alt="Engineering"
+                                                    width="24"
+                                                    height="24"
+                                                /><span>Engineering</span></button
+                                            >
                                         </div>
                                     </div>
 
@@ -121,12 +173,12 @@ const davorIconHeight = davorIcon.height;
                                     <div class="form-group-horizontal-power">
                                         <div class="form-group">
                                             <label for="all-damage-input">All Damage (%)</label>
-                                            <input type="number" id="all-damage-input" placeholder="Example: 1.5">
+                                            <input type="number" id="all-damage-input" placeholder="Example: 1.5" />
                                         </div>
                                         <span class="input-divider">or</span>
                                         <div class="form-group">
                                             <label for="health-input">Health (%)</label>
-                                            <input type="number" id="health-input" placeholder="Example: 2.5">
+                                            <input type="number" id="health-input" placeholder="Example: 2.5" />
                                         </div>
                                     </div>
                                     <div id="conversion-result" class="calc-result">
@@ -137,22 +189,66 @@ const davorIconHeight = davorIcon.height;
                             </div>
                         </div>
 
-                        <div class="carousel-slide" data-title="Score my Armaments" data-description="Score and optimize your armaments based on pairings, formations, and inscriptions.">
-                           <div class="calculator-island">
-                                 <div class="island-content">
+                        <div
+                            class="carousel-slide"
+                            data-title="Score my Armaments"
+                            data-description="Score and optimize your armaments based on pairings, formations, and inscriptions."
+                        >
+                            <div class="calculator-island">
+                                <div class="island-content">
                                     <div class="generator-tabs">
-                                        <button class="generator-tab-btn active" data-tab="armament-tool">Armament Tool</button>
+                                        <button class="generator-tab-btn active" data-tab="armament-tool"
+                                            >Armament Tool</button
+                                        >
                                         <button class="generator-tab-btn" data-tab="saved-scores">Saved Scores</button>
                                     </div>
                                     <div id="armament-tool-view" class="generator-view active">
-                                        <p class="tool-explanation">This tool utilizes a <span class="wizard-gradient">Score System</span> based on <span class="wizard-gradient">scale values</span> for the extra stats that you receive, on top of existing stats from your commanders and equipment. This Score system gives <span class="wizard-gradient">1 point per 1% attack,</span> and relative scoring for other stats, taking into account <span class="wizard-gradient">Bonus/Reduction</span> and <span class="wizard-gradient">Boost/Resistance</span>. The scale of values is based on the <span class="wizard-gradient">Damage Formula</span> and <span class="wizard-gradient">Combat Effectiveness</span>, and takes into consideration the updated <span class="wizard-gradient">Crystal Tech v5.</span> Total scores will allow you to compare two armaments, two inscriptions or even two full sets on a formation.</p>
+                                        <p class="tool-explanation">
+                                            This tool utilizes a <span class="wizard-gradient">Score System</span> based on
+                                            <span class="wizard-gradient">scale values</span> for the extra stats that you
+                                            receive, on top of existing stats from your commanders and equipment. This Score
+                                            system gives <span class="wizard-gradient">1 point per 1% attack,</span> and relative
+                                            scoring for other stats, taking into account <span class="wizard-gradient"
+                                                >Bonus/Reduction</span
+                                            > and <span class="wizard-gradient">Boost/Resistance</span>. The scale of
+                                            values is based on the <span class="wizard-gradient">Damage Formula</span> and
+                                            <span class="wizard-gradient">Combat Effectiveness</span>, and takes into
+                                            consideration the updated <span class="wizard-gradient"
+                                                >Crystal Tech v5.</span
+                                            > Total scores will allow you to compare two armaments, two inscriptions or even
+                                            two full sets on a formation.
+                                        </p>
 
                                         <div class="form-group">
                                             <div class="form-label-heading">Troop Type</div>
                                             <div id="armament-troop-selector" class="button-selector">
-                                                <button class="selector-btn active" data-type="cavalry"><Image loading="eager" src={cavalryIcon} alt="Cavalry" width="24" height="24"/><span>Cavalry</span></button>
-                                                <button class="selector-btn" data-type="infantry"><Image loading="eager" src={infantryIcon} alt="Infantry" width="24" height="24"/><span>Infantry</span></button>
-                                                <button class="selector-btn" data-type="archer"><Image loading="eager" src={archerIcon} alt="Archers" width="24" height="24"/><span>Archers</span></button>
+                                                <button class="selector-btn active" data-type="cavalry"
+                                                    ><Image
+                                                        loading="eager"
+                                                        src={cavalryIcon}
+                                                        alt="Cavalry"
+                                                        width="24"
+                                                        height="24"
+                                                    /><span>Cavalry</span></button
+                                                >
+                                                <button class="selector-btn" data-type="infantry"
+                                                    ><Image
+                                                        loading="eager"
+                                                        src={infantryIcon}
+                                                        alt="Infantry"
+                                                        width="24"
+                                                        height="24"
+                                                    /><span>Infantry</span></button
+                                                >
+                                                <button class="selector-btn" data-type="archer"
+                                                    ><Image
+                                                        loading="eager"
+                                                        src={archerIcon}
+                                                        alt="Archers"
+                                                        width="24"
+                                                        height="24"
+                                                    /><span>Archers</span></button
+                                                >
                                             </div>
                                         </div>
 
@@ -166,11 +262,21 @@ const davorIconHeight = davorIcon.height;
                                                     <label class="form-label-heading">Formation</label>
                                                     <div id="formation-selector" class="formation-selector"></div>
                                                 </div>
-                                                <div class="form-group" style="display: flex; flex-direction: column; flex-grow: 1;">
+                                                <div
+                                                    class="form-group"
+                                                    style="display: flex; flex-direction: column; flex-grow: 1;"
+                                                >
                                                     <label class="form-label-heading">Inscriptions</label>
-                                                    <input type="search" id="inscription-search" class="inscription-search" placeholder="Search inscriptions...">
+                                                    <input
+                                                        type="search"
+                                                        id="inscription-search"
+                                                        class="inscription-search"
+                                                        placeholder="Search inscriptions..."
+                                                    />
                                                     <div id="inscription-selector" class="inscription-selector">
-                                                        <p class="inscription-placeholder">Select a formation to see available inscriptions.</p>
+                                                        <p class="inscription-placeholder">
+                                                            Select a formation to see available inscriptions.
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -180,31 +286,35 @@ const davorIconHeight = davorIcon.height;
                                             <div class="stat-inputs-grid">
                                                 <div class="form-group">
                                                     <label for="armament-attack">Attack (%)</label>
-                                                    <input type="number" id="armament-attack" placeholder="10.0">
+                                                    <input type="number" id="armament-attack" placeholder="10.0" />
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="armament-defense">Defense (%)</label>
-                                                    <input type="number" id="armament-defense" placeholder="10.0">
+                                                    <input type="number" id="armament-defense" placeholder="10.0" />
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="armament-health">Health (%)</label>
-                                                    <input type="number" id="armament-health" placeholder="8.0">
+                                                    <input type="number" id="armament-health" placeholder="8.0" />
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="armament-all-damage">All Damage (%)</label>
-                                                    <input type="number" id="armament-all-damage" placeholder="2.0">
+                                                    <input type="number" id="armament-all-damage" placeholder="2.0" />
                                                 </div>
                                             </div>
                                             <div class="selected-inscriptions-wrapper">
                                                 <div class="form-label-heading">Selected Inscriptions</div>
                                                 <div id="selected-inscriptions-display">
-                                                <p class="inscription-placeholder">No inscriptions selected.</p>
+                                                    <p class="inscription-placeholder">No inscriptions selected.</p>
                                                 </div>
-                                                <p class="inscription-deselect-note">Tap an inscription to de-select it.</p>
-                                        </div>
+                                                <p class="inscription-deselect-note">
+                                                    Tap an inscription to de-select it.
+                                                </p>
+                                            </div>
                                         </div>
 
-                                        <div id="armament-score-result" class="calc-result"><span>Select a pairing and formation to calculate your score.</span></div>
+                                        <div id="armament-score-result" class="calc-result">
+                                            <span>Select a pairing and formation to calculate your score.</span>
+                                        </div>
                                         <div id="save-score-section" class="save-score-section"></div>
                                         <p class="last-updated-note">Last Updated: November 2025</p>
                                     </div>
@@ -212,9 +322,12 @@ const davorIconHeight = davorIcon.height;
                                         <div id="saved-scores-header" class="saved-templates-header">
                                             <h2>Your Saved Scores</h2>
                                         </div>
-                                        <div id="saved-scores-content">
-                                        </div>
-                                        <div id="logged-out-overlay-scores" class="logged-out-overlay" style="display: none;">
+                                        <div id="saved-scores-content"></div>
+                                        <div
+                                            id="logged-out-overlay-scores"
+                                            class="logged-out-overlay"
+                                            style="display: none;"
+                                        >
                                             <div class="logged-out-message">
                                                 <h3>Log in to view and manage your saved scores.</h3>
                                                 <div id="saved-scores-auth-container"></div>
@@ -225,21 +338,52 @@ const davorIconHeight = davorIcon.height;
                             </div>
                         </div>
 
-                        <div class="carousel-slide" data-title="Inscription Tier List" data-description="A mathematically driven tier list evaluating inscription efficiency relative to the strongest option for each pairing." data-icon={statsWeightingIconPath}>
+                        <div
+                            class="carousel-slide"
+                            data-title="Inscription Tier List"
+                            data-description="A mathematically driven tier list evaluating inscription efficiency relative to the strongest option for each pairing."
+                            data-icon={statsWeightingIconPath}
+                        >
                             <div class="calculator-island">
                                 <div class="island-content">
                                     <p class="tool-explanation">
-                                        This tool provides a <span class="wizard-gradient">mathematically driven</span> tier list, differing from subjective rankings.
-                                        Each inscription is evaluated using a baseline armament (Triple equal stats) and Formation buff.
-                                        The strongest inscription sets the <span class="wizard-gradient">100% reference point</span>, and all others are scored relative to it.
+                                        This tool provides a <span class="wizard-gradient">mathematically driven</span> tier
+                                        list, differing from subjective rankings. Each inscription is evaluated using a baseline
+                                        armament (Triple equal stats) and Formation buff. The strongest inscription sets the
+                                        <span class="wizard-gradient">100% reference point</span>, and all others are
+                                        scored relative to it.
                                     </p>
 
                                     <div class="form-group">
                                         <div class="form-label-heading">Troop Type</div>
                                         <div id="tierlist-troop-selector" class="button-selector">
-                                            <button class="selector-btn active" data-type="cavalry"><Image loading="lazy" src={cavalryIcon} alt="Cavalry" width="24" height="24"/><span>Cavalry</span></button>
-                                            <button class="selector-btn" data-type="infantry"><Image loading="lazy" src={infantryIcon} alt="Infantry" width="24" height="24"/><span>Infantry</span></button>
-                                            <button class="selector-btn" data-type="archer"><Image loading="lazy" src={archerIcon} alt="Archers" width="24" height="24"/><span>Archers</span></button>
+                                            <button class="selector-btn active" data-type="cavalry"
+                                                ><Image
+                                                    loading="lazy"
+                                                    src={cavalryIcon}
+                                                    alt="Cavalry"
+                                                    width="24"
+                                                    height="24"
+                                                /><span>Cavalry</span></button
+                                            >
+                                            <button class="selector-btn" data-type="infantry"
+                                                ><Image
+                                                    loading="lazy"
+                                                    src={infantryIcon}
+                                                    alt="Infantry"
+                                                    width="24"
+                                                    height="24"
+                                                /><span>Infantry</span></button
+                                            >
+                                            <button class="selector-btn" data-type="archer"
+                                                ><Image
+                                                    loading="lazy"
+                                                    src={archerIcon}
+                                                    alt="Archers"
+                                                    width="24"
+                                                    height="24"
+                                                /><span>Archers</span></button
+                                            >
                                         </div>
                                     </div>
 
@@ -252,25 +396,42 @@ const davorIconHeight = davorIcon.height;
                                         <div class="inscription-selector-wrapper">
                                             <div class="form-label-heading">Inscription Tier List</div>
                                             <div id="tierlist-container" class="inscription-selector">
-                                                
                                                 <div id="tierlist-controls" style="display: none; margin-bottom: 10px;">
                                                     <div id="tierlist-slot-selector" class="button-selector">
-                                                        <button class="selector-btn active" data-slot="Scroll" style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;">Scroll</button>
-                                                        <button class="selector-btn" data-slot="Instrument" style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;">Instrument</button>
-                                                        <button class="selector-btn" data-slot="Flag" style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;">Flag</button>
-                                                        <button class="selector-btn" data-slot="Emblem" style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;">Emblem</button>
+                                                        <button
+                                                            class="selector-btn active"
+                                                            data-slot="Scroll"
+                                                            style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;"
+                                                            >Scroll</button
+                                                        >
+                                                        <button
+                                                            class="selector-btn"
+                                                            data-slot="Instrument"
+                                                            style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;"
+                                                            >Instrument</button
+                                                        >
+                                                        <button
+                                                            class="selector-btn"
+                                                            data-slot="Flag"
+                                                            style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;"
+                                                            >Flag</button
+                                                        >
+                                                        <button
+                                                            class="selector-btn"
+                                                            data-slot="Emblem"
+                                                            style="padding: 6px 12px; font-size: 0.8rem; min-height: 32px;"
+                                                            >Emblem</button
+                                                        >
                                                     </div>
                                                 </div>
 
                                                 <div id="tierlist-display" style="display: none;"></div>
-                                                
-                                                <div id="tierlist-placeholder">
-                                                    Select a pairing to view tiers.
-                                                </div>
+
+                                                <div id="tierlist-placeholder">Select a pairing to view tiers.</div>
                                             </div>
                                         </div>
                                     </div>
-                                     
+
                                     <p class="last-updated-note">Last Updated: January 2026</p>
                                 </div>
                             </div>
@@ -287,10 +448,18 @@ const davorIconHeight = davorIcon.height;
                 <div class="contributor-box">
                     <div class="contributor-content">
                         <h3>About Davor</h3>
-                        <p>Davor is a long-time mathematical ROK player who excels at understanding the true nature of the numbers behind the game we all play. He is one of our <span class="wizard-gradient">Codex Wizards</span> consistently answering questions related to the game and continues to create tools for the community to help optimize their gameplay and get the most of our their accounts.</p>
+                        <p>
+                            Davor is a long-time mathematical ROK player who excels at understanding the true nature of
+                            the numbers behind the game we all play. He is one of our <span class="wizard-gradient"
+                                >Codex Wizards</span
+                            > consistently answering questions related to the game and continues to create tools for the community
+                            to help optimize their gameplay and get the most of our their accounts.
+                        </p>
                     </div>
                     <div class="contributor-actions">
-                        <p class="contributor-connect">Contact Davor or find more of his tools and support his work here:</p>
+                        <p class="contributor-connect">
+                            Contact Davor or find more of his tools and support his work here:
+                        </p>
                         <div class="action-item">
                             <span class="action-label">Discord:</span>
                             <div class="action-btn discord-btn">
@@ -300,8 +469,16 @@ const davorIconHeight = davorIcon.height;
                         </div>
                         <div class="action-item">
                             <span class="action-label">Support Him:</span>
-                            <a href="https://buymeacoffee.com/davorrok/davor-s-rok-tools-box" target="_blank" class="action-btn support-btn">
-                                <img loading="lazy" src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="Buy me a coffee">
+                            <a
+                                href="https://buymeacoffee.com/davorrok/davor-s-rok-tools-box"
+                                target="_blank"
+                                class="action-btn support-btn"
+                            >
+                                <img
+                                    loading="lazy"
+                                    src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg"
+                                    alt="Buy me a coffee"
+                                />
                                 <span>Support Davor</span>
                             </a>
                         </div>
@@ -313,7 +490,21 @@ const davorIconHeight = davorIcon.height;
 
     <div id="inscription-tooltip"></div>
 
-    <script define:vars={{ imagePaths: imagePathMap, equipmentData, inscriptionsData, inscriptionStats, davorIconPath, davorIconWidth, davorIconHeight, weightingData, scorePairings, inscriptionTierList, inscriptionDescriptions }}>
+    <script
+        define:vars={{
+            imagePaths: imagePathMap,
+            equipmentData,
+            inscriptionsData,
+            inscriptionStats,
+            davorIconPath,
+            davorIconWidth,
+            davorIconHeight,
+            weightingData,
+            scorePairings,
+            inscriptionTierList,
+            inscriptionDescriptions,
+        }}
+    >
         window.DAVOR_IMAGE_PATHS = imagePaths;
         window.equipmentData = equipmentData;
         window.inscriptionsData = inscriptionsData;
@@ -327,8 +518,8 @@ const davorIconHeight = davorIcon.height;
         window.inscriptionDescriptions = inscriptionDescriptions;
     </script>
     <script>
-        import "../../scripts/utils.js";
-        import "../../scripts/auth.js";
-        import "../../scripts/davor_toolkit.js";
+        import '../../scripts/utils.js';
+        import '../../scripts/auth.js';
+        import '../../scripts/davor_toolkit.js';
     </script>
 </Layout>

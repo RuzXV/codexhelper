@@ -16,7 +16,11 @@ export const CreateEventSchema = z.object({
 
 export const ShiftEventsSchema = z.object({
     series_id: z.string().uuid('Invalid series ID format'),
-    shift_days: z.number().int().min(-365, 'Cannot shift more than 365 days back').max(365, 'Cannot shift more than 365 days forward'),
+    shift_days: z
+        .number()
+        .int()
+        .min(-365, 'Cannot shift more than 365 days back')
+        .max(365, 'Cannot shift more than 365 days forward'),
 });
 
 export const UpdateEventSchema = z.object({
@@ -31,13 +35,21 @@ export const UpdateEventSchema = z.object({
 // ============================================
 
 export const ChannelSettingsSchema = z.object({
-    channel_id: z.string().regex(/^\d{17,20}$/, 'Invalid Discord channel ID').nullable().optional(),
+    channel_id: z
+        .string()
+        .regex(/^\d{17,20}$/, 'Invalid Discord channel ID')
+        .nullable()
+        .optional(),
     is_active: z.boolean().optional(),
 });
 
 export const ReminderSettingsSchema = z.object({
     reminder_type: z.enum(['ruins', 'altar', 'custom']),
-    channel_id: z.string().regex(/^\d{17,20}$/, 'Invalid Discord channel ID').nullable().optional(),
+    channel_id: z
+        .string()
+        .regex(/^\d{17,20}$/, 'Invalid Discord channel ID')
+        .nullable()
+        .optional(),
     is_active: z.boolean().optional(),
     message: z.string().max(2000, 'Message cannot exceed 2000 characters').optional(),
 });
@@ -47,7 +59,10 @@ export const ReminderSettingsSchema = z.object({
 // ============================================
 
 export const TemplateSchema = z.object({
-    template_name: z.string().min(1, 'Template name is required').max(100, 'Template name must be 100 characters or less'),
+    template_name: z
+        .string()
+        .min(1, 'Template name is required')
+        .max(100, 'Template name must be 100 characters or less'),
     template_data: z.string().max(100000, 'Template data is too large'),
 });
 
@@ -102,9 +117,16 @@ export const CalendarSettingsSchema = z.object({
     channel_id: z.string().max(20).optional(),
     create_discord_events: z.boolean().optional(),
     is_personalized: z.boolean().optional(),
-    reference_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Reference date must be YYYY-MM-DD').optional().nullable(),
+    reference_date: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, 'Reference date must be YYYY-MM-DD')
+        .optional()
+        .nullable(),
     reference_type: z.enum(['egg', 'hammer']).optional().nullable(),
-    reference_cycle_id: z.union([z.number().int().nonnegative(), z.string().regex(/^\d+$/)]).optional().nullable(),
+    reference_cycle_id: z
+        .union([z.number().int().nonnegative(), z.string().regex(/^\d+$/)])
+        .optional()
+        .nullable(),
 });
 
 export const ChannelActionSchema = z.object({
@@ -114,25 +136,32 @@ export const ChannelActionSchema = z.object({
 });
 
 export const ReminderBulkSchema = z.object({
-    reminders: z.array(z.object({
-        reminder_type: z.string().min(1),
-        channel_id: z.string().nullable().optional(),
-        is_active: z.boolean().optional(),
-        first_instance_ts: z.number().nullable().optional(),
-        last_instance_ts: z.number().nullable().optional(),
-        create_discord_event: z.boolean().optional(),
-        reminder_intervals_seconds: z.string().optional(),
-        is_new_setup: z.boolean().optional(),
-    })),
-    customReminders: z.array(z.object({
-        reminder_id: z.number().int().optional(),
-        channel_id: z.string().nullable().optional(),
-        title: z.string().max(200).optional(),
-        message: z.string().max(2000).optional(),
-        role_id: z.string().nullable().optional(),
-        repeat_interval_seconds: z.number().optional(),
-        first_instance_ts: z.number().optional(),
-    })).optional().default([]),
+    reminders: z.array(
+        z.object({
+            reminder_type: z.string().min(1),
+            channel_id: z.string().nullable().optional(),
+            is_active: z.boolean().optional(),
+            first_instance_ts: z.number().nullable().optional(),
+            last_instance_ts: z.number().nullable().optional(),
+            create_discord_event: z.boolean().optional(),
+            reminder_intervals_seconds: z.string().optional(),
+            is_new_setup: z.boolean().optional(),
+        }),
+    ),
+    customReminders: z
+        .array(
+            z.object({
+                reminder_id: z.number().int().optional(),
+                channel_id: z.string().nullable().optional(),
+                title: z.string().max(200).optional(),
+                message: z.string().max(2000).optional(),
+                role_id: z.string().nullable().optional(),
+                repeat_interval_seconds: z.number().optional(),
+                first_instance_ts: z.number().optional(),
+            }),
+        )
+        .optional()
+        .default([]),
     deletedCustomIds: z.array(z.number().int()).optional().default([]),
 });
 
@@ -145,10 +174,12 @@ export const ArkTagSchema = z.object({
 // ============================================
 
 export const BotBatchSchema = z.object({
-    batch: z.array(z.object({
-        sql: z.string().min(1),
-        params: z.array(z.unknown()).optional(),
-    })),
+    batch: z.array(
+        z.object({
+            sql: z.string().min(1),
+            params: z.array(z.unknown()).optional(),
+        }),
+    ),
 });
 
 export const BotQuerySchema = z.object({
@@ -167,14 +198,12 @@ export const UserSettingsSchema = z.record(z.string(), z.unknown());
 // Validation Helper
 // ============================================
 
-export type ValidationResult<T> =
-    | { success: true; data: T }
-    | { success: false; error: string };
+export type ValidationResult<T> = { success: true; data: T } | { success: false; error: string };
 
 export function validateBody<T>(schema: z.ZodSchema<T>, body: unknown): ValidationResult<T> {
     const result = schema.safeParse(body);
     if (!result.success) {
-        const errors = result.error.errors.map(e => {
+        const errors = result.error.errors.map((e) => {
             const path = e.path.length > 0 ? `${e.path.join('.')}: ` : '';
             return `${path}${e.message}`;
         });

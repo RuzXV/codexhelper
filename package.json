@@ -9,7 +9,13 @@
     "preview": "astro preview",
     "astro": "astro",
     "prelocal": "npx kill-port 4321 8788",
-    "local": "concurrently \"npm run dev\" \"npx wrangler pages dev --proxy 4321\" --kill-others --names \"ASTRO,WRANGLER\""
+    "local": "concurrently \"npm run dev\" \"npx wrangler pages dev --proxy 4321\" --kill-others --names \"ASTRO,WRANGLER\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.0",
@@ -23,7 +29,18 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240419.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
     "concurrently": "^9.1.2",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-astro": "^1.6.0",
+    "eslint-plugin-svelte": "^3.15.0",
+    "globals": "^17.3.0",
+    "prettier": "^3.8.1",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-svelte": "^3.4.1",
+    "vitest": "^4.0.18",
     "wrangler": "^4.55.0"
   }
 }

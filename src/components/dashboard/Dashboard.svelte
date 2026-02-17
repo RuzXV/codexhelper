@@ -92,7 +92,7 @@
                 availableServers = servers;
                 if (availableServers.length > 0) {
                     const storedId = localStorage.getItem('codex_last_server_id');
-                    const previousSelection = availableServers.find(s => s.id === storedId);
+                    const previousSelection = availableServers.find((s) => s.id === storedId);
 
                     if (previousSelection) {
                         selectServer(previousSelection);
@@ -104,7 +104,7 @@
                 }
             }
         } catch (e) {
-            console.error("Failed to fetch user servers:", e);
+            console.error('Failed to fetch user servers:', e);
             availableServers = [];
         } finally {
         }
@@ -131,7 +131,8 @@
                 The Dashboard is not optimized for mobile devices due to its complex interactive interface.
             </p>
             <p class="mobile-warning-text">
-                For the best experience, please visit this page on a <strong>desktop computer</strong>, <strong>laptop</strong>, or <strong>tablet in landscape mode</strong>.
+                For the best experience, please visit this page on a <strong>desktop computer</strong>,
+                <strong>laptop</strong>, or <strong>tablet in landscape mode</strong>.
             </p>
         </div>
     </div>
@@ -153,7 +154,12 @@
                 <h2>Access Restricted</h2>
                 <p>You do not have the required permissions to view this dashboard.</p>
                 <p style="font-size: 0.9rem;">This area is restricted to active Patrons and Administrators.</p>
-                <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="btn-primary" style="margin-top: 20px;">
+                <a
+                    href="https://www.patreon.com/c/kingscodex"
+                    target="_blank"
+                    class="btn-primary"
+                    style="margin-top: 20px;"
+                >
                     Subscribe on Patreon
                 </a>
             </div>
@@ -188,9 +194,9 @@
                                 on:selectServer={handleSelectServer}
                             />
                         {:else if currentView === 'changelog'}
-                             <ChangelogPanel {user} />
+                            <ChangelogPanel {user} />
                         {:else if currentView === 'recovery'}
-                             <HistoryPanel {user} />
+                            <HistoryPanel {user} />
                         {/if}
                     </div>
                 {/key}
@@ -322,7 +328,8 @@
     }
 
     /* Loading & Auth States */
-    .loading-container, .unauthorized-container {
+    .loading-container,
+    .unauthorized-container {
         display: flex;
         flex-direction: column;
         align-items: center;

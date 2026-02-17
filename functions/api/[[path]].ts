@@ -13,17 +13,16 @@ import guildRoutes from './routes/guilds';
 import scoreRoutes from './routes/scores';
 import adminRoutes from './routes/admin';
 
-const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
-app.use('/api/*', cors({
-    origin: [
-        'https://codexhelper.com',
-        'https://www.codexhelper.com',
-        'http://127.0.0.1:8788'
-    ],
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    credentials: true,
-}));
+app.use(
+    '/api/*',
+    cors({
+        origin: ['https://codexhelper.com', 'https://www.codexhelper.com', 'http://127.0.0.1:8788'],
+        allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        credentials: true,
+    }),
+);
 
 /**
  * Rate limiting middleware using KV.
@@ -36,7 +35,7 @@ app.use('/api/*', async (c: Context<{ Bindings: Bindings }>, next: Next) => {
     const path = new URL(c.req.url).pathname;
 
     let limit = 60;
-    let window = 60;
+    const window = 60;
     let prefix = 'rl:api';
 
     if (path.startsWith('/api/auth')) {

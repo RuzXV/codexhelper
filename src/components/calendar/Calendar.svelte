@@ -15,7 +15,7 @@
     let clockInterval;
     let isLoading = false;
     let selectedEventId = null;
-    let hoveredSeriesId = null; 
+    let hoveredSeriesId = null;
     let isFilterOpen = false;
     let activeFilters = [];
     const ALL_EVENT_TYPES = Object.keys(eventConfigs.events);
@@ -24,62 +24,56 @@
         add: false,
         shift: false,
         remove: false,
-        cycle: false
+        cycle: false,
     };
     const ROTATION_TYPES = ['holy_knights_treasure', 'hunt_for_history', 'egg_hammer'];
-    const CYCLES = [
-        "Helmet / Pants",
-        "Weapon / Accessory",
-        "Chest / Gloves / Boots"
-    ];
+    const CYCLES = ['Helmet / Pants', 'Weapon / Accessory', 'Chest / Gloves / Boots'];
     $: activeSeries = getUniqueSeries(events);
     $: year = viewDate.getUTCFullYear();
     $: month = viewDate.getUTCMonth();
     $: monthName = new Intl.DateTimeFormat('en-US', { month: 'long', timeZone: 'UTC' }).format(viewDate);
     $: processedEvents = (() => {
         const allRotationEvents = events
-            .filter(e => ROTATION_TYPES.includes(e.type))
+            .filter((e) => ROTATION_TYPES.includes(e.type))
             .sort((a, b) => a.start_date.localeCompare(b.start_date));
 
-        return events.map(e => {
+        return events.map((e) => {
             let displayTitle = e.title;
             let dynamicIcon = null;
 
             if (eggRotationSettings && ROTATION_TYPES.includes(e.type)) {
-                
-                const currentIndex = allRotationEvents.findIndex(x => x.id === e.id);
-                const anchorIndex = allRotationEvents.findIndex(x => x.start_date === eggRotationSettings.anchorDate);
+                const currentIndex = allRotationEvents.findIndex((x) => x.id === e.id);
+                const anchorIndex = allRotationEvents.findIndex((x) => x.start_date === eggRotationSettings.anchorDate);
 
                 if (currentIndex !== -1 && anchorIndex !== -1) {
                     const diff = currentIndex - anchorIndex;
-                    
+
                     const isHammer = Math.abs(diff) % 2 === 1;
 
                     if (isHammer) {
-                        displayTitle = "Hunt for History";
+                        displayTitle = 'Hunt for History';
                         dynamicIcon = getIconSrc('hammer.webp');
                     } else {
                         const cycleSteps = Math.floor(diff / 2);
                         let typeIndex = (eggRotationSettings.anchorCycleId + cycleSteps) % 3;
-                        
-                        if (typeIndex < 0) typeIndex = (typeIndex % 3 + 3) % 3;
+
+                        if (typeIndex < 0) typeIndex = ((typeIndex % 3) + 3) % 3;
                         displayTitle = `Holy Knight's Treasure - ${CYCLES[typeIndex]}`;
                         dynamicIcon = getIconSrc('egg.webp');
                     }
                 }
             }
-            
+
             return {
                 ...e,
                 title: displayTitle,
-                dynamicIcon: dynamicIcon 
+                dynamicIcon: dynamicIcon,
             };
         });
     })();
-    $: filteredEvents = activeFilters.length > 0 
-        ? processedEvents.filter(e => activeFilters.includes(e.type)) 
-        : processedEvents;
-    $: calendarCells = window.calendarUtils 
+    $: filteredEvents =
+        activeFilters.length > 0 ? processedEvents.filter((e) => activeFilters.includes(e.type)) : processedEvents;
+    $: calendarCells = window.calendarUtils
         ? window.calendarUtils.generateGrid(year, month, filteredEvents, eventConfigs, getIconSrc)
         : [];
     onMount(async () => {
@@ -88,7 +82,7 @@
         loadRotationSettings();
         await fetchEvents();
         checkAdminStatus();
-        
+
         window.addEventListener('auth:loggedIn', (e) => {
             checkAdminStatus();
             loadFilters(e.detail.user.id);
@@ -109,17 +103,17 @@
     function startClock() {
         const update = () => {
             const now = new Date();
-            const datePart = new Intl.DateTimeFormat('en-GB', { 
-                day: 'numeric', 
-                month: 'short', 
-                timeZone: 'UTC' 
+            const datePart = new Intl.DateTimeFormat('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                timeZone: 'UTC',
             }).format(now);
-            
-            const timePart = new Intl.DateTimeFormat('en-GB', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                timeZone: 'UTC', 
-                hour12: false 
+
+            const timePart = new Intl.DateTimeFormat('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'UTC',
+                hour12: false,
             }).format(now);
 
             clockTime = `${datePart} • ${timePart} UTC`;
@@ -127,26 +121,28 @@
         update();
         clockInterval = setInterval(update, 1000);
     }
-    
+
     function checkAdminStatus() {
         const user = window.auth ? window.auth.getLoggedInUser() : null;
-        isAdmin = user?.is_calendar_admin || false; 
+        isAdmin = user?.is_calendar_admin || false;
     }
 
     function loadFilters(userId = null) {
-        const user = userId || (window.auth?.getLoggedInUser()?.id);
+        const user = userId || window.auth?.getLoggedInUser()?.id;
         const key = user ? `calendar_filters_${user}` : 'calendar_filters_guest';
         const stored = localStorage.getItem(key);
         if (stored) {
             try {
                 activeFilters = JSON.parse(stored);
-            } catch (e) { activeFilters = []; }
+            } catch (e) {
+                activeFilters = [];
+            }
         }
     }
 
     function toggleFilter(type) {
         if (activeFilters.includes(type)) {
-            activeFilters = activeFilters.filter(t => t !== type);
+            activeFilters = activeFilters.filter((t) => t !== type);
         } else {
             activeFilters = [...activeFilters, type];
         }
@@ -170,12 +166,13 @@
             const response = await fetch(`/api/events?t=${Date.now()}`, {
                 headers: {
                     'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache'
-                }
+                    Pragma: 'no-cache',
+                },
             });
-            
+
             if (response.ok) events = await response.json();
-        } catch (e) { console.error("Fetch error", e);
+        } catch (e) {
+            console.error('Fetch error', e);
         } finally {
             isLoading = false;
         }
@@ -183,7 +180,7 @@
 
     function getUniqueSeries(allEvents) {
         const map = new Map();
-        allEvents.forEach(e => {
+        allEvents.forEach((e) => {
             if (e.series_id && !map.has(e.series_id)) {
                 map.set(e.series_id, { id: e.series_id, title: e.title, type: e.type });
             }
@@ -207,28 +204,28 @@
 
         const currentYear = new Date().getUTCFullYear();
         const cutoffDate = new Date(Date.UTC(currentYear, 0, 1));
-        
+
         let adjustedStart = new Date(start);
         let backsteps = 0;
         if (interval > 0 && adjustedStart > cutoffDate) {
             const diffTime = adjustedStart - cutoffDate;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            
+
             backsteps = Math.floor(diffDays / interval);
             if (backsteps > 0) {
-                adjustedStart.setUTCDate(adjustedStart.getUTCDate() - (backsteps * interval));
+                adjustedStart.setUTCDate(adjustedStart.getUTCDate() - backsteps * interval);
                 if (troop_type && eventConfigs.troop_types) {
                     const types = eventConfigs.troop_types;
                     const currentIndex = types.indexOf(troop_type);
-                    
+
                     if (currentIndex !== -1) {
-                        const newIndex = ((currentIndex - backsteps) % types.length + types.length) % types.length;
+                        const newIndex = (((currentIndex - backsteps) % types.length) + types.length) % types.length;
                         troop_type = types[newIndex];
                     }
                 }
             }
         }
-        
+
         const finalStartDate = adjustedStart.toISOString().split('T')[0];
         const limitDate = new Date(Date.UTC(currentYear + 1, 11, 31)).toISOString().split('T')[0];
         const daysDiff = (new Date(limitDate) - new Date(finalStartDate)) / (1000 * 60 * 60 * 24);
@@ -240,13 +237,13 @@
         const tempSeriesId = 'temp-' + Date.now();
         let tempEvents = [];
         let currDate = new Date(finalStartDate);
-        
+
         let currentTroopIdx = -1;
         if (troop_type && eventConfigs.troop_types) {
             currentTroopIdx = eventConfigs.troop_types.indexOf(troop_type);
         }
 
-        for(let i=0; i<count; i++) {
+        for (let i = 0; i < count; i++) {
             let instanceTroop = null;
             if (currentTroopIdx !== -1) {
                 const typeIdx = (currentTroopIdx + i) % eventConfigs.troop_types.length;
@@ -261,14 +258,14 @@
                 troop_type: instanceTroop,
                 start_date: currDate.toISOString().split('T')[0],
                 duration: config.duration,
-                isTemp: true
+                isTemp: true,
             });
             currDate.setUTCDate(currDate.getUTCDate() + interval);
         }
 
         const previousEvents = [...events];
         events = [...events, ...tempEvents];
-        modalState.add = false; 
+        modalState.add = false;
 
         try {
             await window.auth.fetchWithAuth('/api/events', {
@@ -280,15 +277,15 @@
                     start: finalStartDate,
                     duration: config.duration,
                     repeat_count: count,
-                    repeat_interval: interval
-                })
+                    repeat_interval: interval,
+                }),
             });
             await fetchEvents();
             window.showAlert(`Generated ${count} events starting from ${finalStartDate}.`);
         } catch (err) {
-            console.error("Failed to generate events", err);
+            console.error('Failed to generate events', err);
             events = previousEvents;
-            window.showAlert("Failed to create events.", "Error");
+            window.showAlert('Failed to create events.', 'Error');
         }
     }
 
@@ -300,24 +297,23 @@
             if (!scope || scope === 'all') {
                 await window.auth.fetchWithAuth('/api/events/shift', {
                     method: 'POST',
-                    body: JSON.stringify({ series_id: seriesId, shift_days: shiftDays })
+                    body: JSON.stringify({ series_id: seriesId, shift_days: shiftDays }),
                 });
-            } 
-            else {
-                let eventsToUpdate = events.filter(ev => ev.series_id === seriesId);
+            } else {
+                let eventsToUpdate = events.filter((ev) => ev.series_id === seriesId);
                 if (scope === 'future') {
-                    eventsToUpdate = eventsToUpdate.filter(ev => ev.start_date >= anchorDate);
+                    eventsToUpdate = eventsToUpdate.filter((ev) => ev.start_date >= anchorDate);
                 } else if (scope === 'single') {
-                    eventsToUpdate = eventsToUpdate.filter(ev => ev.start_date === anchorDate);
+                    eventsToUpdate = eventsToUpdate.filter((ev) => ev.start_date === anchorDate);
                 }
 
                 if (eventsToUpdate.length === 0) {
-                    window.showAlert("No events found to shift.");
+                    window.showAlert('No events found to shift.');
                     isLoading = false;
                     return;
                 }
 
-                const updatePromises = eventsToUpdate.map(ev => {
+                const updatePromises = eventsToUpdate.map((ev) => {
                     const currentD = new Date(ev.start_date);
                     currentD.setUTCDate(currentD.getUTCDate() + shiftDays);
                     const newDate = currentD.toISOString().split('T')[0];
@@ -328,8 +324,8 @@
                             start_date: newDate,
                             title: ev.title,
                             type: ev.type,
-                            duration: ev.duration
-                        })
+                            duration: ev.duration,
+                        }),
                     });
                 });
                 await Promise.all(updatePromises);
@@ -337,10 +333,10 @@
             }
 
             await fetchEvents();
-        } catch (err) { 
+        } catch (err) {
             console.error(err);
-            window.showAlert("Failed to shift events.", "Error");
-        } finally { 
+            window.showAlert('Failed to shift events.', 'Error');
+        } finally {
             isLoading = false;
         }
     }
@@ -349,32 +345,34 @@
         const { seriesId } = e.detail;
         isLoading = true;
         try {
-            const toDelete = events.filter(ev => ev.series_id === seriesId);
+            const toDelete = events.filter((ev) => ev.series_id === seriesId);
             const prev = [...events];
-            events = events.filter(ev => ev.series_id !== seriesId);
-            await Promise.all(toDelete.map(ev => 
-                 window.auth.fetchWithAuth(`/api/events/${ev.id}`, { method: 'DELETE' })
-            ));
+            events = events.filter((ev) => ev.series_id !== seriesId);
+            await Promise.all(
+                toDelete.map((ev) => window.auth.fetchWithAuth(`/api/events/${ev.id}`, { method: 'DELETE' })),
+            );
             await fetchEvents();
-        } catch (err) { 
+        } catch (err) {
             console.error(err);
-            await fetchEvents(); 
-        }
-        finally { isLoading = false;
+            await fetchEvents();
+        } finally {
+            isLoading = false;
         }
     }
 
     function hexToRgb(hex) {
         const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+        hex = hex.replace(shorthandRegex, function (m, r, g, b) {
             return r + r + g + g + b + b;
         });
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : { r: 59, g: 130, b: 246 };
+        return result
+            ? {
+                  r: parseInt(result[1], 16),
+                  g: parseInt(result[2], 16),
+                  b: parseInt(result[3], 16),
+              }
+            : { r: 59, g: 130, b: 246 };
     }
 
     function getEventStyle(type, hex) {
@@ -385,14 +383,14 @@
             --event-color: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1);
         `;
     }
-    
+
     function getDisplayDate(dateStr) {
         const d = new Date(dateStr + 'T00:00:00Z');
-        return d.toLocaleDateString('en-GB', { 
-            weekday: 'short', 
-            day: 'numeric', 
-            month: 'short', 
-            timeZone: 'UTC' 
+        return d.toLocaleDateString('en-GB', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            timeZone: 'UTC',
         });
     }
 
@@ -439,39 +437,33 @@
                 eggRotationSettings = res;
                 localStorage.setItem('calendar_egg_rotation', JSON.stringify(res));
             }
-        } catch (e) { console.error("Failed to load settings", e);
+        } catch (e) {
+            console.error('Failed to load settings', e);
         }
     }
 
     async function handleSaveRotation(e) {
         const { anchorDate, anchorCycleId } = e.detail;
         eggRotationSettings = { anchorDate, anchorCycleId };
-        
+
         localStorage.setItem('calendar_egg_rotation', JSON.stringify(eggRotationSettings));
-        
+
         if (window.auth && window.auth.getLoggedInUser()) {
             try {
                 await window.auth.fetchWithAuth('/api/users/settings', {
                     method: 'POST',
-                    body: JSON.stringify(eggRotationSettings)
+                    body: JSON.stringify(eggRotationSettings),
                 });
-            } catch(err) { console.error(err); }
+            } catch (err) {
+                console.error(err);
+            }
         }
     }
-
 </script>
 
-<svelte:window 
-    on:click={handleGlobalClick} 
-    on:keydown={handleKeydown} 
-/>
+<svelte:window on:click={handleGlobalClick} on:keydown={handleKeydown} />
 
-<section 
-    class="tool-content"
-    on:touchstart={handleTouchStart} 
-    on:touchend={handleTouchEnd}
->
-</section>
+<section class="tool-content" on:touchstart={handleTouchStart} on:touchend={handleTouchEnd}></section>
 
 <section class="tool-hero">
     <div class="tool-hero-container">
@@ -481,9 +473,7 @@
 
 <section class="tool-content">
     <div class="tool-container calendar-container">
-        
         <div class="calendar-header-card">
-        
             <div class="utc-clock-modern">
                 <i class="fas fa-globe-americas clock-icon"></i>
                 <span class="clock-text">{clockTime}</span>
@@ -501,29 +491,42 @@
 
             <div class="right-controls">
                 <div class="filter-container">
-                    <button class="nav-btn filter-btn" on:click={() => isFilterOpen = !isFilterOpen} title="Filter Events">
+                    <button
+                        class="nav-btn filter-btn"
+                        on:click={() => (isFilterOpen = !isFilterOpen)}
+                        title="Filter Events"
+                    >
                         <i class="fas fa-filter"></i>
                         {#if activeFilters.length > 0}<span class="filter-badge">{activeFilters.length}</span>{/if}
                     </button>
-                    
+
                     {#if isFilterOpen}
-                        <div class="filter-dropdown" transition:slide={{duration: 200}}>
+                        <div class="filter-dropdown" transition:slide={{ duration: 200 }}>
                             <div class="filter-header">
                                 <span>Filter Events</span>
                                 {#if activeFilters.length > 0}
                                     <button class="clear-btn" on:click={clearFilters}>Clear</button>
                                 {/if}
                             </div>
-        
+
                             <div class="filter-list">
                                 {#each ALL_EVENT_TYPES as type}
                                     <label class="filter-item">
-                                        <input type="checkbox" 
+                                        <input
+                                            type="checkbox"
                                             checked={activeFilters.includes(type)}
-                                            on:change={() => toggleFilter(type)}>
-                                        <span class="checkmark" style="--evt-color: {eventConfigs.events[type].color_hex}"></span>
+                                            on:change={() => toggleFilter(type)}
+                                        />
+                                        <span
+                                            class="checkmark"
+                                            style="--evt-color: {eventConfigs.events[type].color_hex}"
+                                        ></span>
                                         {#if eventConfigs.events[type].icon}
-                                            <img src={getIconSrc(eventConfigs.events[type].icon)} alt="" class="filter-list-icon" />
+                                            <img
+                                                src={getIconSrc(eventConfigs.events[type].icon)}
+                                                alt=""
+                                                class="filter-list-icon"
+                                            />
                                         {/if}
                                         {eventConfigs.events[type].title}
                                     </label>
@@ -534,20 +537,29 @@
                 </div>
 
                 <button class="today-btn" on:click={jumpToToday}>Today</button>
-            
-                <button class="nav-btn" on:click={() => modalState.cycle = true} title="Configure Rotation" style="font-size: 1rem;">
+
+                <button
+                    class="nav-btn"
+                    on:click={() => (modalState.cycle = true)}
+                    title="Configure Rotation"
+                    style="font-size: 1rem;"
+                >
                     <i class="fas fa-sync-alt"></i>
                 </button>
-            
+
                 {#if isAdmin}
                     <div class="admin-panel">
-                        <button class="admin-btn add" on:click={() => modalState.add = true} aria-label="Add">
+                        <button class="admin-btn add" on:click={() => (modalState.add = true)} aria-label="Add">
                             <i class="fas fa-plus"></i>
                         </button>
-                        <button class="admin-btn shift" on:click={() => modalState.shift = true} aria-label="Shift">
+                        <button class="admin-btn shift" on:click={() => (modalState.shift = true)} aria-label="Shift">
                             <i class="fas fa-exchange-alt"></i>
                         </button>
-                        <button class="admin-btn remove" on:click={() => modalState.remove = true} aria-label="Remove">
+                        <button
+                            class="admin-btn remove"
+                            on:click={() => (modalState.remove = true)}
+                            aria-label="Remove"
+                        >
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
@@ -557,36 +569,51 @@
 
         <div class="calendar-card desktop-view">
             <div class="weekdays">
-                <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+                <div>Sun</div>
             </div>
-             
-            {#key viewDate} 
-                <div class="grid"> 
+
+            {#key viewDate}
+                <div class="grid">
                     {#each calendarCells as cell, cIndex}
-                        <div class="day-cell" 
-                             class:other-month={cell.isOtherMonth} 
-                             class:today={cell.isToday} 
-                             class:past={cell.isPast}
-                             class:skeleton-loading={isLoading && events.length === 0} >
-                            
+                        <div
+                            class="day-cell"
+                            class:other-month={cell.isOtherMonth}
+                            class:today={cell.isToday}
+                            class:past={cell.isPast}
+                            class:skeleton-loading={isLoading && events.length === 0}
+                        >
                             <span class="day-number">{cell.day}</span>
-                            
+
                             <div class="event-stack">
                                 {#each cell.events as event, i}
                                     {#if event}
-                                        <div 
-                                            class="event-bar" 
+                                        <div
+                                            class="event-bar"
                                             class:start={event.isStart}
-                                            class:row-start={event.isRowStart}  class:end={event.isEnd}            
-                                            class:row-end={event.isRowEnd}      class:middle={!event.isStart && !event.isRowStart && !event.isEnd && !event.isRowEnd}
+                                            class:row-start={event.isRowStart}
+                                            class:end={event.isEnd}
+                                            class:row-end={event.isRowEnd}
+                                            class:middle={!event.isStart &&
+                                                !event.isRowStart &&
+                                                !event.isEnd &&
+                                                !event.isRowEnd}
                                             class:temp-optimistic={event.isTemp}
                                             class:selected={selectedEventId === event.id}
                                             class:dimmed={hoveredSeriesId && hoveredSeriesId !== event.series_id}
                                             class:highlighted={hoveredSeriesId === event.series_id}
-                                            on:mouseenter={() => hoveredSeriesId = event.series_id}
-                                            on:mouseleave={() => hoveredSeriesId = null}
-                                            on:click|stopPropagation={() => selectedEventId = (selectedEventId === event.id ? null : event.id)}
-                                            on:keydown={(e) => e.key === 'Enter' && (selectedEventId = (selectedEventId === event.id ? null : event.id))}
+                                            on:mouseenter={() => (hoveredSeriesId = event.series_id)}
+                                            on:mouseleave={() => (hoveredSeriesId = null)}
+                                            on:click|stopPropagation={() =>
+                                                (selectedEventId = selectedEventId === event.id ? null : event.id)}
+                                            on:keydown={(e) =>
+                                                e.key === 'Enter' &&
+                                                (selectedEventId = selectedEventId === event.id ? null : event.id)}
                                             role="button"
                                             tabindex="0"
                                             style={getEventStyle(event.type, event.colorHex)}
@@ -594,17 +621,22 @@
                                             {#if event.isStart || event.isRowStart}
                                                 <div class="event-content">
                                                     {#if event.dynamicIcon || event.iconSrc}
-                                                        <img src={event.dynamicIcon || event.iconSrc} alt="" class="event-icon" />
+                                                        <img
+                                                            src={event.dynamicIcon || event.iconSrc}
+                                                            alt=""
+                                                            class="event-icon"
+                                                        />
                                                     {/if}
                                                     <span class="event-title">
-                                                        {event.title} {event.troop_type ? `(${event.troop_type})` : ''}
+                                                        {event.title}
+                                                        {event.troop_type ? `(${event.troop_type})` : ''}
                                                     </span>
                                                 </div>
-                                                
-                                                <div 
-                                                    class="event-tooltip" 
-                                                    on:click|stopPropagation 
-                                                    role="dialog" 
+
+                                                <div
+                                                    class="event-tooltip"
+                                                    on:click|stopPropagation
+                                                    role="dialog"
                                                     aria-label="Event details"
                                                     tabindex="-1"
                                                     on:keydown|stopPropagation
@@ -616,18 +648,31 @@
                                                         <span>{event.title}</span>
                                                     </div>
                                                     <div class="tooltip-body">
-                                                        <p class="time-info">Start: {getEventTimeString(event.start_date)}</p>
+                                                        <p class="time-info">
+                                                            Start: {getEventTimeString(event.start_date)}
+                                                        </p>
                                                         {#if event.troop_type}<p>Troop: {event.troop_type}</p>{/if}
                                                         <p>Duration: {event.duration} days</p>
-                                                        
+
                                                         {#if Array.isArray(event.guideLink)}
                                                             {#each event.guideLink as link}
-                                                                <a href={link.url} target="_blank" class="guide-link" aria-label="Guide for {link.title}">
-                                                                    <i class="fab fa-discord"></i> {link.title}
+                                                                <a
+                                                                    href={link.url}
+                                                                    target="_blank"
+                                                                    class="guide-link"
+                                                                    aria-label="Guide for {link.title}"
+                                                                >
+                                                                    <i class="fab fa-discord"></i>
+                                                                    {link.title}
                                                                 </a>
                                                             {/each}
                                                         {:else if event.guideLink}
-                                                            <a href={event.guideLink} target="_blank" class="guide-link" aria-label="Guide for {event.title}">
+                                                            <a
+                                                                href={event.guideLink}
+                                                                target="_blank"
+                                                                class="guide-link"
+                                                                aria-label="Guide for {event.title}"
+                                                            >
                                                                 <i class="fab fa-discord"></i> Event Guide
                                                             </a>
                                                         {/if}
@@ -649,15 +694,18 @@
         </div>
 
         <div class="mobile-list-view">
-            {#each calendarCells.filter(c => c.events.some(e => e !== null) && !c.isOtherMonth) as cell}
+            {#each calendarCells.filter((c) => c.events.some((e) => e !== null) && !c.isOtherMonth) as cell}
                 <div class="mobile-day-card" class:today-card={cell.isToday}>
                     <div class="mobile-date-header">
                         {getDisplayDate(cell.dateStr)}
                     </div>
                     <div class="mobile-events">
-                        {#each cell.events.filter(e => e !== null) as event}
-                            {#if event.isStart || event.isRowStart || event === cell.events.find(x => x && (x.isStart || x.isRowStart) === false)} 
-                                <div class="mobile-event-row" style="border-left: 4px solid {event.colorHex || '#3b82f6'}">
+                        {#each cell.events.filter((e) => e !== null) as event}
+                            {#if event.isStart || event.isRowStart || event === cell.events.find((x) => x && (x.isStart || x.isRowStart) === false)}
+                                <div
+                                    class="mobile-event-row"
+                                    style="border-left: 4px solid {event.colorHex || '#3b82f6'}"
+                                >
                                     <div class="mobile-event-info">
                                         <span class="mobile-event-title">{event.title}</span>
                                         {#if event.troop_type}
@@ -665,16 +713,27 @@
                                         {/if}
                                         <span class="mobile-time-badge">{getEventTimeString(event.start_date)}</span>
                                     </div>
-                                    
+
                                     <div class="mobile-actions">
                                         {#if Array.isArray(event.guideLink)}
                                             {#each event.guideLink as link}
-                                                <a href={link.url} target="_blank" class="mobile-guide-btn" title={link.title} aria-label="Guide for {link.title}">
+                                                <a
+                                                    href={link.url}
+                                                    target="_blank"
+                                                    class="mobile-guide-btn"
+                                                    title={link.title}
+                                                    aria-label="Guide for {link.title}"
+                                                >
                                                     <i class="fas fa-book-open"></i>
                                                 </a>
                                             {/each}
                                         {:else if event.guideLink}
-                                            <a href={event.guideLink} target="_blank" class="mobile-guide-btn" aria-label="Guide for {event.title}">
+                                            <a
+                                                href={event.guideLink}
+                                                target="_blank"
+                                                class="mobile-guide-btn"
+                                                aria-label="Guide for {event.title}"
+                                            >
                                                 <i class="fas fa-book-open"></i>
                                             </a>
                                         {/if}
@@ -685,58 +744,68 @@
                     </div>
                 </div>
             {/each}
-            {#if calendarCells.filter(c => c.events.some(e => e !== null) && !c.isOtherMonth).length === 0}
+            {#if calendarCells.filter((c) => c.events.some((e) => e !== null) && !c.isOtherMonth).length === 0}
                 <div class="empty-state">No events found for this month.</div>
             {/if}
         </div>
-
     </div>
 </section>
 
-<EventModal 
-    isOpen={modalState.add} 
+<EventModal
+    isOpen={modalState.add}
     {eventConfigs}
-    on:close={() => modalState.add = false}
+    on:close={() => (modalState.add = false)}
     on:save={handleSaveEvent}
 />
 
 <ShiftModal
     isOpen={modalState.shift}
-    activeSeries={activeSeries}
-    events={events}  on:close={() => modalState.shift = false}
+    {activeSeries}
+    {events}
+    on:close={() => (modalState.shift = false)}
     on:shift={handleShiftSeries}
 />
 
 <RemoveModal
     isOpen={modalState.remove}
     {activeSeries}
-    on:close={() => modalState.remove = false}
+    on:close={() => (modalState.remove = false)}
     on:remove={handleRemoveSeries}
 />
 
 <CycleConfigModal
     isOpen={modalState.cycle}
-    eggEvents={events.filter(e => ROTATION_TYPES.includes(e.type)).sort((a,b) => a.start_date.localeCompare(b.start_date))}
-    on:close={() => modalState.cycle = false}
+    eggEvents={events
+        .filter((e) => ROTATION_TYPES.includes(e.type))
+        .sort((a, b) => a.start_date.localeCompare(b.start_date))}
+    on:close={() => (modalState.cycle = false)}
     on:save={handleSaveRotation}
 />
 
 <style>
-    .calendar-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
-    .tool-hero { 
+    .calendar-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+    .tool-hero {
         padding-top: 5px;
         padding-bottom: 0;
     }
-    
+
     .calendar-header-card {
-        display: flex; justify-content: space-between; align-items: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         background: linear-gradient(145deg, var(--bg-secondary), #181a1f);
         border: 1px solid var(--border-color);
         border-bottom: 2px solid var(--accent-blue);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-        border-radius: 12px 12px 0 0; 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        border-radius: 12px 12px 0 0;
         padding: 16px 24px;
-        flex-wrap: wrap; gap: 16px;
+        flex-wrap: wrap;
+        gap: 16px;
         position: relative;
         z-index: 200;
     }
@@ -753,7 +822,7 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         transition: all 0.2s ease;
     }
-    
+
     .utc-clock-modern:hover {
         background: rgba(0, 0, 0, 0.6);
         border-color: rgba(255, 255, 255, 0.3);
@@ -771,11 +840,11 @@
         color: #e5e7eb;
         letter-spacing: 0.5px;
     }
-    
-    .nav-controls { 
-        display: flex; 
-        align-items: center; 
-        gap: 16px; 
+
+    .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
         justify-content: center;
         position: absolute;
         left: 50%;
@@ -783,189 +852,346 @@
         transform: translate(-50%, -50%);
         width: max-content;
     }
-    
-    .nav-controls h2 { margin: 0; font-size: 1.5rem; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1px;
-    min-width: 250px; text-align: center; }
-    .nav-controls .year { color: var(--text-secondary); font-weight: 400;
+
+    .nav-controls h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        min-width: 250px;
+        text-align: center;
     }
-    
-    .nav-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer;
-    padding: 8px; transition: color 0.2s; }
-    .nav-btn:hover { color: white;
+    .nav-controls .year {
+        color: var(--text-secondary);
+        font-weight: 400;
     }
 
-    .right-controls { display: flex; align-items: center; gap: 12px;
+    .nav-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 8px;
+        transition: color 0.2s;
+    }
+    .nav-btn:hover {
+        color: white;
+    }
+
+    .right-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
     .today-btn {
-        background: var(--bg-tertiary); color: var(--text-primary);
-        border: 1px solid var(--border-color); padding: 6px 12px;
-        border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem;
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
         transition: all 0.2s;
     }
-    .today-btn:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue);
+    .today-btn:hover {
+        background: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
     }
 
     .admin-panel {
-        display: flex; align-items: center; gap: 8px;
-        background: rgba(255, 255, 255, 0.05); padding: 4px; border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 4px;
+        border-radius: 8px;
         border: 1px solid var(--border-color);
     }
     .admin-btn {
-        width: 32px; height: 32px; display: flex;
-        align-items: center; justify-content: center;
-        border-radius: 6px; font-size: 0.9rem; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: all 0.2s;
     }
-    .admin-btn.add { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);
+    .admin-btn.add {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-blue);
     }
-    .admin-btn.add:hover { background: var(--accent-blue); color: white;
+    .admin-btn.add:hover {
+        background: var(--accent-blue);
+        color: white;
     }
-    .admin-btn.shift { background: rgba(255, 255, 255, 0.1); color: var(--text-primary);
+    .admin-btn.shift {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
     }
-    .admin-btn.shift:hover { background: rgba(255, 255, 255, 0.2);
+    .admin-btn.shift:hover {
+        background: rgba(255, 255, 255, 0.2);
     }
-    .admin-btn.remove { background: rgba(239, 68, 68, 0.1); color: #fca5a5;
+    .admin-btn.remove {
+        background: rgba(239, 68, 68, 0.1);
+        color: #fca5a5;
     }
-    .admin-btn.remove:hover { background: rgba(239, 68, 68, 0.8); color: white;
+    .admin-btn.remove:hover {
+        background: rgba(239, 68, 68, 0.8);
+        color: white;
     }
 
-    .filter-container { position: relative; }
-    .filter-btn { display: flex; align-items: center; gap: 5px;
-    position: relative; }
-    .filter-badge { background: var(--accent-blue); color: white; font-size: 0.7rem; border-radius: 50%; width: 16px; height: 16px;
-    display: flex; align-items: center; justify-content: center; position: absolute; top: 0; right: 0;
+    .filter-container {
+        position: relative;
     }
-    
+    .filter-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        position: relative;
+    }
+    .filter-badge {
+        background: var(--accent-blue);
+        color: white;
+        font-size: 0.7rem;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
     .filter-dropdown {
         position: absolute;
-        top: 100%; right: 0;
+        top: 100%;
+        right: 0;
         z-index: 1001;
-        background: var(--bg-tertiary); border: 1px solid var(--border-color);
-        border-radius: 8px; width: 280px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        width: 280px;
         padding: 10px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    
-    .filter-header { 
-        display: flex;
-        justify-content: space-between; 
-        align-items: center; 
-        height: 32px; 
-        margin-bottom: 8px; 
-        font-size: 0.9rem; 
-        color: var(--text-secondary); 
-        border-bottom: 1px solid var(--border-color); 
-        box-sizing: border-box;
-    }
-    
-    .clear-btn { background: none; border: none; color: var(--text-muted); font-size: 0.8rem; cursor: pointer;
-    text-decoration: underline; padding: 0; margin: 0; line-height: 1; }
-    .filter-list { max-height: 300px; overflow-y: auto; display: flex;
-    flex-direction: column; gap: 5px; }
-    
-    .filter-item { display: flex; align-items: center; gap: 8px;
-    padding: 5px; cursor: pointer; font-size: 0.9rem; color: var(--text-primary); }
-    .filter-item input { display: none;
-    }
-    .filter-list-icon { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0;
-    }
-    .checkmark { width: 12px; height: 12px; border-radius: 2px; border: 1px solid var(--text-muted); background: transparent; position: relative;
-    flex-shrink: 0; }
-    .filter-item input:checked + .checkmark { background: var(--evt-color); border-color: var(--evt-color);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
-    .calendar-card { 
-        background: var(--bg-secondary); 
+    .filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 32px;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-color);
+        box-sizing: border-box;
+    }
+
+    .clear-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+        margin: 0;
+        line-height: 1;
+    }
+    .filter-list {
+        max-height: 300px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .filter-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+    }
+    .filter-item input {
+        display: none;
+    }
+    .filter-list-icon {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+    .checkmark {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+        border: 1px solid var(--text-muted);
+        background: transparent;
+        position: relative;
+        flex-shrink: 0;
+    }
+    .filter-item input:checked + .checkmark {
+        background: var(--evt-color);
+        border-color: var(--evt-color);
+    }
+
+    .calendar-card {
+        background: var(--bg-secondary);
         border: 1px solid var(--border-color);
-        border-radius: 0 0 12px 12px; 
+        border-radius: 0 0 12px 12px;
         overflow: visible;
     }
-    .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--bg-tertiary);
-    padding: 10px 0; border-top: 1px solid var(--border-color);
-        border-bottom: 1px solid var(--border-color); }
-    .weekdays div { text-align: center;
-    color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
-    
-    .grid { 
+    .weekdays {
         display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr)); 
+        grid-template-columns: repeat(7, 1fr);
+        background: var(--bg-tertiary);
+        padding: 10px 0;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .weekdays div {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
         background: var(--bg-secondary);
-        gap: 0; 
+        gap: 0;
         border-top: 1px solid var(--border-color);
         border-left: 1px solid var(--border-color);
     }
-    .day-cell { 
-        background-color: var(--bg-secondary); 
+    .day-cell {
+        background-color: var(--bg-secondary);
         min-height: 80px;
-        padding: 4px 0; 
-        display: flex; 
-        flex-direction: column; 
-        position: relative; 
+        padding: 4px 0;
+        display: flex;
+        flex-direction: column;
+        position: relative;
         border-right: 1px solid var(--border-color);
         border-bottom: 1px solid var(--border-color);
     }
-    
-    .day-cell.today { 
+
+    .day-cell.today {
         background: transparent;
         box-shadow: none;
         z-index: auto;
     }
-    .day-cell.other-month { background-color: #0f1012;
+    .day-cell.other-month {
+        background-color: #0f1012;
     }
-    .day-cell.other-month .day-number { opacity: 0.3; }
-    
-    .day-number { 
+    .day-cell.other-month .day-number {
+        opacity: 0.3;
+    }
+
+    .day-number {
         margin: 4px 8px;
-        font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); align-self: flex-end;
-        width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        align-self: flex-end;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    .day-cell.today .day-number { 
+    .day-cell.today .day-number {
         background: linear-gradient(135deg, var(--accent-blue-bright), var(--accent-blue));
         color: white;
         border-radius: 50%;
-        box-shadow: 0 0 0 3px var(--bg-secondary), 0 0 15px var(--accent-blue);
+        box-shadow:
+            0 0 0 3px var(--bg-secondary),
+            0 0 15px var(--accent-blue);
         transform: scale(1.3);
         font-weight: 800;
         position: relative;
         z-index: 20;
     }
 
-    .day-cell.skeleton-loading { pointer-events: none;
+    .day-cell.skeleton-loading {
+        pointer-events: none;
     }
     .day-cell.skeleton-loading::before {
-        content: ""; position: absolute; inset: 10px;
+        content: '';
+        position: absolute;
+        inset: 10px;
         border-radius: 4px;
-        background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 100%);
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.03) 0%,
+            rgba(255, 255, 255, 0.08) 50%,
+            rgba(255, 255, 255, 0.03) 100%
+        );
         background-size: 200% 100%;
         animation: shimmer 1.5s infinite linear;
     }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0;
-    } }
-
-    .event-stack { display: flex; flex-direction: column; gap: 2px; width: 100%; margin-top: 2px;
+    @keyframes shimmer {
+        0% {
+            background-position: 200% 0;
+        }
+        100% {
+            background-position: -200% 0;
+        }
     }
-    
+
+    .event-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        width: 100%;
+        margin-top: 2px;
+    }
+
     .event-bar {
         height: 24px;
-        font-size: 0.75rem; color: white; display: flex; align-items: center; padding: 0 4px;
-        white-space: nowrap; overflow: visible; position: relative; 
-        
+        font-size: 0.75rem;
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0 4px;
+        white-space: nowrap;
+        overflow: visible;
+        position: relative;
+
         margin: 1px -1px;
         border-radius: 0;
-        
+
         border-top: 1px solid rgba(255, 255, 255, 0.4);
         border-bottom: 1px solid rgba(255, 255, 255, 0.4);
         border-left: none;
         border-right: none;
-        
+
         cursor: pointer;
         z-index: 10;
-        transition: opacity 0.2s, filter 0.2s;
+        transition:
+            opacity 0.2s,
+            filter 0.2s;
     }
 
-    .event-bar.dimmed { opacity: 0.2; filter: grayscale(1);
+    .event-bar.dimmed {
+        opacity: 0.2;
+        filter: grayscale(1);
     }
-    .event-bar.highlighted { 
-        opacity: 1; 
+    .event-bar.highlighted {
+        opacity: 1;
         filter: brightness(1.3) contrast(1.1);
         z-index: 50;
     }
@@ -978,35 +1204,43 @@
         z-index: 0;
     }
 
-    .event-bar.start { 
-        border-top-left-radius: 6px; border-bottom-left-radius: 6px;
+    .event-bar.start {
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
         border-left: 1px solid rgba(255, 255, 255, 0.4);
         margin-left: 6px;
     }
-    .event-bar.end { 
+    .event-bar.end {
         border-top-right-radius: 6px;
-        border-bottom-right-radius: 6px; 
+        border-bottom-right-radius: 6px;
         border-right: 1px solid rgba(255, 255, 255, 0.4);
         margin-right: 6px;
     }
-    
-    .event-bar.temp-optimistic { opacity: 0.7; filter: grayscale(0.3);
+
+    .event-bar.temp-optimistic {
+        opacity: 0.7;
+        filter: grayscale(0.3);
     }
-    
-    .event-content { 
+
+    .event-content {
         display: flex;
-        align-items: center; 
-        width: 100%; 
-        overflow: visible; 
-        position: relative; 
+        align-items: center;
+        width: 100%;
+        overflow: visible;
+        position: relative;
         height: 100%;
     }
-    .event-icon { width: 16px; height: 16px;
-    object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); flex-shrink: 0; }
-    .event-title { 
+    .event-icon {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+        flex-shrink: 0;
+    }
+    .event-title {
         font-weight: 600;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.5); 
-        
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+
         position: absolute;
         left: 24px;
         top: 0;
@@ -1020,27 +1254,35 @@
 
     .event-tooltip {
         display: none;
-        position: absolute; bottom: 100%;
-        left: 50%; transform: translateX(-50%);
-        background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px;
-        padding: 10px; min-width: 180px;
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 10px;
+        min-width: 180px;
         z-index: 50;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        margin-bottom: 8px; pointer-events: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        margin-bottom: 8px;
+        pointer-events: none;
     }
     .event-bar:hover .event-tooltip,
-    .event-bar.selected .event-tooltip { display: block; pointer-events: auto;
+    .event-bar.selected .event-tooltip {
+        display: block;
+        pointer-events: auto;
     }
-    .event-bar.start, 
+    .event-bar.start,
     .event-bar.row-start {
         z-index: 160 !important;
     }
-    
-    .event-bar.middle, 
+
+    .event-bar.middle,
     .event-bar.end {
         z-index: 20;
     }
-    
+
     .event-bar.selected,
     .event-bar.highlighted {
         z-index: 500 !important;
@@ -1052,67 +1294,141 @@
     .event-bar.row-start.selected {
         z-index: 520 !important;
     }
-    
-    .tooltip-header { display: flex; align-items: center; gap: 8px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; }
-    .tooltip-header img { width: 20px; height: 20px;
-    }
-    .tooltip-body p { margin: 2px 0; color: var(--text-secondary); font-size: 0.8rem;
-    }
-    .time-info { color: var(--accent-blue-bright) !important; font-weight: 500; }
 
-    .guide-link { display: inline-flex;
-    align-items: center; gap: 5px; margin-top: 5px; color: var(--accent-blue); font-weight: 600; text-decoration: none;
-        font-size: 0.8rem; display: block;
+    .tooltip-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 5px;
+        margin-bottom: 5px;
+        font-weight: bold;
     }
-    .guide-link:hover { text-decoration: underline; }
+    .tooltip-header img {
+        width: 20px;
+        height: 20px;
+    }
+    .tooltip-body p {
+        margin: 2px 0;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+    }
+    .time-info {
+        color: var(--accent-blue-bright) !important;
+        font-weight: 500;
+    }
 
-    .mobile-list-view { display: none; background: var(--bg-secondary);
-    border-radius: 0 0 12px 12px; padding: 10px; }
-    .mobile-day-card { background: var(--bg-primary); border: 1px solid var(--border-color);
-    border-radius: 8px; margin-bottom: 10px; padding: 10px; }
-    .mobile-day-card.today-card { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.03);
+    .guide-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 5px;
+        color: var(--accent-blue);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.8rem;
+        display: block;
     }
-    .mobile-date-header { font-weight: bold; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 10px;
+    .guide-link:hover {
+        text-decoration: underline;
     }
-    .mobile-event-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-tertiary); padding: 8px 12px; margin-bottom: 5px;
-    border-radius: 4px; }
-    .mobile-event-info { display: flex; flex-direction: column; }
-    .mobile-event-title { font-weight: 600;
-    color: var(--text-primary); }
-    .mobile-troop-badge { font-size: 0.75rem; color: var(--text-muted); }
-    .mobile-time-badge { font-size: 0.7rem;
-    color: var(--accent-blue); margin-top: 2px; }
-    .mobile-actions { display: flex; gap: 8px;
+
+    .mobile-list-view {
+        display: none;
+        background: var(--bg-secondary);
+        border-radius: 0 0 12px 12px;
+        padding: 10px;
     }
-    .mobile-guide-btn { color: var(--accent-blue); padding: 5px; font-size: 1.1rem; }
-    .empty-state { padding: 20px;
-    text-align: center; color: var(--text-muted); }
+    .mobile-day-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        padding: 10px;
+    }
+    .mobile-day-card.today-card {
+        border-color: var(--accent-blue);
+        background: rgba(59, 130, 246, 0.03);
+    }
+    .mobile-date-header {
+        font-weight: bold;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+    }
+    .mobile-event-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--bg-tertiary);
+        padding: 8px 12px;
+        margin-bottom: 5px;
+        border-radius: 4px;
+    }
+    .mobile-event-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .mobile-event-title {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    .mobile-troop-badge {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+    .mobile-time-badge {
+        font-size: 0.7rem;
+        color: var(--accent-blue);
+        margin-top: 2px;
+    }
+    .mobile-actions {
+        display: flex;
+        gap: 8px;
+    }
+    .mobile-guide-btn {
+        color: var(--accent-blue);
+        padding: 5px;
+        font-size: 1.1rem;
+    }
+    .empty-state {
+        padding: 20px;
+        text-align: center;
+        color: var(--text-muted);
+    }
 
     @media (max-width: 768px) {
-        .calendar-header-card { 
+        .calendar-header-card {
             flex-direction: row;
-            flex-wrap: wrap; align-items: center; padding: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 12px;
         }
-        .nav-controls { 
-            order: 1; 
+        .nav-controls {
+            order: 1;
             width: 100%;
             margin-bottom: 10px;
             position: static;
             transform: none;
         }
-        .utc-clock-modern { 
-            order: 2; 
-            width: auto; 
-            flex-grow: 1; 
-            justify-content: center; 
+        .utc-clock-modern {
+            order: 2;
+            width: auto;
+            flex-grow: 1;
+            justify-content: center;
         }
-        .right-controls { order: 3; width: auto; justify-content: flex-end;
+        .right-controls {
+            order: 3;
+            width: auto;
+            justify-content: flex-end;
         }
-        
-        .desktop-view { display: none;
+
+        .desktop-view {
+            display: none;
         }
-        .mobile-list-view { display: block; }
+        .mobile-list-view {
+            display: block;
+        }
     }
 </style>

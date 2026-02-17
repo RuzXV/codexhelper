@@ -18,12 +18,7 @@ const ERROR_MESSAGES: Record<number, string> = {
     503: 'Service Unavailable',
 };
 
-export function apiError(
-    c: AppContext,
-    status: number,
-    message?: string,
-    details?: unknown
-) {
+export function apiError(c: AppContext, status: number, message?: string, details?: unknown) {
     const errorMessage = message || ERROR_MESSAGES[status] || 'An error occurred';
 
     if (status >= 500) {
@@ -48,8 +43,7 @@ export const errors = {
     badRequest: (c: AppContext, message?: string, details?: unknown) =>
         apiError(c, 400, message || 'Invalid request data', details),
 
-    unauthorized: (c: AppContext, message?: string) =>
-        apiError(c, 401, message || 'Authentication required'),
+    unauthorized: (c: AppContext, message?: string) => apiError(c, 401, message || 'Authentication required'),
 
     forbidden: (c: AppContext, message?: string) =>
         apiError(c, 403, message || 'You do not have permission to perform this action'),
@@ -57,11 +51,9 @@ export const errors = {
     notFound: (c: AppContext, resource?: string) =>
         apiError(c, 404, resource ? `${resource} not found` : 'Resource not found'),
 
-    conflict: (c: AppContext, message?: string) =>
-        apiError(c, 409, message || 'Resource already exists'),
+    conflict: (c: AppContext, message?: string) => apiError(c, 409, message || 'Resource already exists'),
 
-    validation: (c: AppContext, message: string) =>
-        apiError(c, 422, message),
+    validation: (c: AppContext, message: string) => apiError(c, 422, message),
 
     rateLimit: (c: AppContext, message?: string) =>
         apiError(c, 429, message || 'Too many requests. Please try again later.'),
@@ -77,9 +69,7 @@ export const errors = {
         apiError(c, 503, message || 'Service temporarily unavailable'),
 };
 
-export function withErrorHandling<T extends AppContext>(
-    handler: (c: T) => Promise<Response>
-) {
+export function withErrorHandling<T extends AppContext>(handler: (c: T) => Promise<Response>) {
     return async (c: T): Promise<Response> => {
         try {
             return await handler(c);

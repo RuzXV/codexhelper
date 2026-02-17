@@ -10,10 +10,10 @@
 
     // ── Shared helpers ──
 
-    const shortMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     function ordinal(n: number): string {
-        const s = ['th','st','nd','rd'];
+        const s = ['th', 'st', 'nd', 'rd'];
         const v = n % 100;
         return n + (s[(v - 20) % 10] || s[v] || s[0]);
     }
@@ -118,7 +118,9 @@
     }
 
     onMount(() => {
-        tickInterval = setInterval(() => { tick++; }, 1000);
+        tickInterval = setInterval(() => {
+            tick++;
+        }, 1000);
         document.addEventListener('click', handleClickOutside);
         return () => {
             clearInterval(tickInterval);
@@ -139,8 +141,10 @@
 
     type BurnResult = {
         structure: string;
-        nextBurnUTC?: string; nextBurnLocal?: Date;
-        totalBurnUTC: string; totalBurnLocal: Date;
+        nextBurnUTC?: string;
+        nextBurnLocal?: Date;
+        totalBurnUTC: string;
+        totalBurnLocal: Date;
         remainingBurns?: number;
     } | null;
 
@@ -152,15 +156,24 @@
         burnResult = null;
 
         const hp = parseHP(burnHP);
-        if (!hp || hp <= 0) { burnError = 'HP must be a positive number.'; return; }
+        if (!hp || hp <= 0) {
+            burnError = 'HP must be a positive number.';
+            return;
+        }
 
         let now: Date;
         if (burnLastBurnTime.trim()) {
             const parts = burnLastBurnTime.trim().split(':');
-            if (parts.length !== 2) { burnError = 'Invalid time format. Use HH:MM (e.g. 19:36).'; return; }
+            if (parts.length !== 2) {
+                burnError = 'Invalid time format. Use HH:MM (e.g. 19:36).';
+                return;
+            }
             const h = parseInt(parts[0]);
             const m = parseInt(parts[1]);
-            if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) { burnError = 'Invalid time. Hours 0-23, minutes 0-59.'; return; }
+            if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) {
+                burnError = 'Invalid time. Hours 0-23, minutes 0-59.';
+                return;
+            }
             now = new Date();
             now.setUTCHours(h, m, 0, 0);
             // If that time is in the future, assume it was yesterday
@@ -179,8 +192,11 @@
             if (burnBuffPercent.trim()) {
                 const pctStr = burnBuffPercent.trim().replace('%', '');
                 const pct = parseFloat(pctStr);
-                if (isNaN(pct) || pct < 0) { burnError = 'Invalid burn speed buff percentage.'; return; }
-                burnRate *= (1 + pct / 100);
+                if (isNaN(pct) || pct < 0) {
+                    burnError = 'Invalid burn speed buff percentage.';
+                    return;
+                }
+                burnRate *= 1 + pct / 100;
             }
 
             const buffMs = dhmToMs('0', burnBuffHours, burnBuffMinutes);
@@ -195,7 +211,7 @@
             burnResult = {
                 structure: 'City',
                 totalBurnUTC: formatDateUTC(totalBurnTime),
-                totalBurnLocal: totalBurnTime
+                totalBurnLocal: totalBurnTime,
             };
             return;
         }
@@ -235,7 +251,7 @@
             nextBurnLocal: nextBurnTime,
             totalBurnUTC: formatDateUTC(totalBurnTime),
             totalBurnLocal: totalBurnTime,
-            remainingBurns
+            remainingBurns,
         };
     }
 
@@ -243,10 +259,10 @@
     // SHIELD TIMER
     // ============================================
     const shieldingStructures: Record<string, { shielding_time: number; unshielding_time: number }> = {
-        'RCF':          { shielding_time: 48,  unshielding_time: 6 },
-        'Lost Temple':  { shielding_time: 168, unshielding_time: 8 },
-        'Ziggurat':     { shielding_time: 72,  unshielding_time: 8 },
-        'Other':        { shielding_time: 48,  unshielding_time: 4 }
+        RCF: { shielding_time: 48, unshielding_time: 6 },
+        'Lost Temple': { shielding_time: 168, unshielding_time: 8 },
+        Ziggurat: { shielding_time: 72, unshielding_time: 8 },
+        Other: { shielding_time: 48, unshielding_time: 4 },
     };
 
     let shieldStructure: string = 'RCF';
@@ -258,8 +274,10 @@
     type ShieldResult = {
         structureName: string;
         status: 'shielded' | 'unshielded';
-        unshieldingUTC: string; unshieldingLocal: Date;
-        shieldingUTC: string; shieldingLocal: Date;
+        unshieldingUTC: string;
+        unshieldingLocal: Date;
+        shieldingUTC: string;
+        shieldingLocal: Date;
         config: { shielding_time: number; unshielding_time: number };
     } | null;
 
@@ -271,7 +289,10 @@
         shieldResult = null;
 
         const timerMs = dhmToMs(shieldDays, shieldHours, shieldMinutes);
-        if (timerMs <= 0) { shieldError = 'Please provide a time remaining.'; return; }
+        if (timerMs <= 0) {
+            shieldError = 'Please provide a time remaining.';
+            return;
+        }
 
         const now = new Date();
         const config = shieldingStructures[shieldStructure];
@@ -281,17 +302,25 @@
             const unshieldingTime = new Date(now.getTime() + timerMs);
             const shieldingTime = new Date(unshieldingTime.getTime() + config.unshielding_time * 3600000);
             shieldResult = {
-                structureName, status: shieldStatus, config,
-                unshieldingUTC: formatDateUTC(unshieldingTime), unshieldingLocal: unshieldingTime,
-                shieldingUTC: formatDateUTC(shieldingTime), shieldingLocal: shieldingTime
+                structureName,
+                status: shieldStatus,
+                config,
+                unshieldingUTC: formatDateUTC(unshieldingTime),
+                unshieldingLocal: unshieldingTime,
+                shieldingUTC: formatDateUTC(shieldingTime),
+                shieldingLocal: shieldingTime,
             };
         } else {
             const shieldingTime = new Date(now.getTime() + timerMs);
             const unshieldingTime = new Date(shieldingTime.getTime() + config.shielding_time * 3600000);
             shieldResult = {
-                structureName, status: shieldStatus, config,
-                shieldingUTC: formatDateUTC(shieldingTime), shieldingLocal: shieldingTime,
-                unshieldingUTC: formatDateUTC(unshieldingTime), unshieldingLocal: unshieldingTime
+                structureName,
+                status: shieldStatus,
+                config,
+                shieldingUTC: formatDateUTC(shieldingTime),
+                shieldingLocal: shieldingTime,
+                unshieldingUTC: formatDateUTC(unshieldingTime),
+                unshieldingLocal: unshieldingTime,
             };
         }
     }
@@ -303,7 +332,8 @@
     let healMaxHP: string = '';
 
     type HealResult = {
-        healUTC: string; healLocal: Date;
+        healUTC: string;
+        healLocal: Date;
     } | null;
 
     let healResult: HealResult = null;
@@ -316,9 +346,18 @@
         const currentHP = parseHP(healCurrentHP);
         const maxHP = parseHP(healMaxHP);
 
-        if (isNaN(currentHP) || isNaN(maxHP)) { healError = 'Please enter valid HP values.'; return; }
-        if (currentHP < 0 || maxHP < 0) { healError = 'HP values cannot be negative.'; return; }
-        if (maxHP < currentHP) { healError = 'Max HP must be greater than or equal to current HP.'; return; }
+        if (isNaN(currentHP) || isNaN(maxHP)) {
+            healError = 'Please enter valid HP values.';
+            return;
+        }
+        if (currentHP < 0 || maxHP < 0) {
+            healError = 'HP values cannot be negative.';
+            return;
+        }
+        if (maxHP < currentHP) {
+            healError = 'Max HP must be greater than or equal to current HP.';
+            return;
+        }
 
         const hpNeeded = maxHP - currentHP;
         const secondsNeeded = hpNeeded * 2; // 0.5 HP per second = 2 seconds per HP
@@ -328,7 +367,7 @@
 
         healResult = {
             healUTC: formatDateUTC(healingTime),
-            healLocal: healingTime
+            healLocal: healingTime,
         };
     }
 
@@ -340,7 +379,7 @@
         'Research Buff': 4,
         'Training Buff': 4,
         'Resource Buff': 8,
-        'Healing Buff': 8
+        'Healing Buff': 8,
     };
     const cooldownPeriodHours = 20;
 
@@ -350,9 +389,12 @@
 
     type BuffResult = {
         buffType: string;
-        activationUTC: string; activationLocal: Date;
-        buffEndUTC: string; buffEndLocal: Date;
-        readyUTC: string; readyLocal: Date;
+        activationUTC: string;
+        activationLocal: Date;
+        buffEndUTC: string;
+        buffEndLocal: Date;
+        readyUTC: string;
+        readyLocal: Date;
     } | null;
 
     let buffResult: BuffResult = null;
@@ -363,7 +405,10 @@
         buffResult = null;
 
         let timerMs = dhmToMs('0', buffHours, buffMinutes);
-        if (timerMs <= 0) { buffError = 'Please provide a time remaining.'; return; }
+        if (timerMs <= 0) {
+            buffError = 'Please provide a time remaining.';
+            return;
+        }
 
         const maxBuffMs = buffDurations[buffType] * 3600000;
         if (timerMs > maxBuffMs) {
@@ -383,33 +428,57 @@
             buffEndUTC: formatDateUTC(buffEndTime),
             buffEndLocal: buffEndTime,
             readyUTC: formatDateUTC(readyTime),
-            readyLocal: readyTime
+            readyLocal: readyTime,
         };
     }
 
     // ── Clear helpers ──
-    function clearBurn() { burnResult = null; burnError = ''; burnHP = ''; burnLastBurnTime = ''; burnBuffPercent = ''; burnBuffHours = ''; burnBuffMinutes = ''; }
-    function clearShield() { shieldResult = null; shieldError = ''; shieldDays = ''; shieldHours = ''; shieldMinutes = ''; }
-    function clearHeal() { healResult = null; healError = ''; healCurrentHP = ''; healMaxHP = ''; }
-    function clearBuff() { buffResult = null; buffError = ''; buffHours = ''; buffMinutes = ''; }
+    function clearBurn() {
+        burnResult = null;
+        burnError = '';
+        burnHP = '';
+        burnLastBurnTime = '';
+        burnBuffPercent = '';
+        burnBuffHours = '';
+        burnBuffMinutes = '';
+    }
+    function clearShield() {
+        shieldResult = null;
+        shieldError = '';
+        shieldDays = '';
+        shieldHours = '';
+        shieldMinutes = '';
+    }
+    function clearHeal() {
+        healResult = null;
+        healError = '';
+        healCurrentHP = '';
+        healMaxHP = '';
+    }
+    function clearBuff() {
+        buffResult = null;
+        buffError = '';
+        buffHours = '';
+        buffMinutes = '';
+    }
 
     // ── Dropdown display labels ──
     const burnStructureOptions = [
         { value: 'Flag', label: 'Flag', icon: 'fa-flag' },
         { value: 'Fort', label: 'Fort', icon: 'fa-chess-rook' },
-        { value: 'City', label: 'City', icon: 'fa-city' }
+        { value: 'City', label: 'City', icon: 'fa-city' },
     ];
 
     const shieldStructureOptions = [
         { value: 'RCF', label: 'RCF' },
         { value: 'Lost Temple', label: 'Lost Temple' },
         { value: 'Ziggurat', label: 'Ziggurat' },
-        { value: 'Other', label: 'Other' }
+        { value: 'Other', label: 'Other' },
     ];
 
     const shieldStatusOptions = [
         { value: 'shielded', label: 'Shielded', icon: 'fa-shield-halved' },
-        { value: 'unshielded', label: 'Unshielded', icon: 'fa-shield' }
+        { value: 'unshielded', label: 'Unshielded', icon: 'fa-shield' },
     ];
 
     const buffTypeOptions = [
@@ -417,26 +486,50 @@
         { value: 'Research Buff', label: 'Research Buff', icon: 'fa-flask' },
         { value: 'Training Buff', label: 'Training Buff', icon: 'fa-person-military-rifle' },
         { value: 'Resource Buff', label: 'Resource Buff', icon: 'fa-wheat-awn' },
-        { value: 'Healing Buff', label: 'Healing Buff', icon: 'fa-kit-medical' }
+        { value: 'Healing Buff', label: 'Healing Buff', icon: 'fa-kit-medical' },
     ];
 </script>
 
 <div class="timers-container">
     <!-- Tab Navigation -->
     <div class="timer-tabs">
-        <button class="timer-tab" class:active={activeTab === 'burn'} on:click={() => { activeTab = 'burn'; }}>
+        <button
+            class="timer-tab"
+            class:active={activeTab === 'burn'}
+            on:click={() => {
+                activeTab = 'burn';
+            }}
+        >
             <i class="fas fa-fire"></i>
             <span>Burn</span>
         </button>
-        <button class="timer-tab" class:active={activeTab === 'shield'} on:click={() => { activeTab = 'shield'; }}>
+        <button
+            class="timer-tab"
+            class:active={activeTab === 'shield'}
+            on:click={() => {
+                activeTab = 'shield';
+            }}
+        >
             <i class="fas fa-shield-halved"></i>
             <span>Shield</span>
         </button>
-        <button class="timer-tab" class:active={activeTab === 'heal'} on:click={() => { activeTab = 'heal'; }}>
+        <button
+            class="timer-tab"
+            class:active={activeTab === 'heal'}
+            on:click={() => {
+                activeTab = 'heal';
+            }}
+        >
             <i class="fas fa-heart-pulse"></i>
             <span>Heal</span>
         </button>
-        <button class="timer-tab" class:active={activeTab === 'buff'} on:click={() => { activeTab = 'buff'; }}>
+        <button
+            class="timer-tab"
+            class:active={activeTab === 'buff'}
+            on:click={() => {
+                activeTab = 'buff';
+            }}
+        >
             <i class="fas fa-bolt"></i>
             <span>Buff</span>
         </button>
@@ -444,7 +537,6 @@
 
     <!-- Tab Content -->
     <div class="timer-content">
-
         <!-- ══════════════════════════════════════ -->
         <!-- BURN TAB -->
         <!-- ══════════════════════════════════════ -->
@@ -462,15 +554,28 @@
                     <div class="input-group">
                         <label>Structure</label>
                         <div class="custom-select-container">
-                            <button class="custom-select-trigger" class:open={openDropdown === 'burn-structure'} on:click|stopPropagation={() => toggleDropdown('burn-structure')}>
-                                <i class="fas {burnStructureOptions.find(o => o.value === burnStructure)?.icon} option-icon"></i>
+                            <button
+                                class="custom-select-trigger"
+                                class:open={openDropdown === 'burn-structure'}
+                                on:click|stopPropagation={() => toggleDropdown('burn-structure')}
+                            >
+                                <i
+                                    class="fas {burnStructureOptions.find((o) => o.value === burnStructure)
+                                        ?.icon} option-icon"
+                                ></i>
                                 <span class="selected-text">{burnStructure}</span>
-                                <i class="fas fa-chevron-down arrow" class:rotated={openDropdown === 'burn-structure'}></i>
+                                <i class="fas fa-chevron-down arrow" class:rotated={openDropdown === 'burn-structure'}
+                                ></i>
                             </button>
                             {#if openDropdown === 'burn-structure'}
                                 <div class="custom-dropdown-menu">
                                     {#each burnStructureOptions as opt}
-                                        <button class="dropdown-option" class:selected={burnStructure === opt.value} on:click|stopPropagation={() => selectOption('burn-structure', opt.value, v => burnStructure = v)}>
+                                        <button
+                                            class="dropdown-option"
+                                            class:selected={burnStructure === opt.value}
+                                            on:click|stopPropagation={() =>
+                                                selectOption('burn-structure', opt.value, (v) => (burnStructure = v))}
+                                        >
                                             <i class="fas {opt.icon} option-icon"></i>
                                             <span>{opt.label}</span>
                                         </button>
@@ -481,17 +586,35 @@
                     </div>
                     <div class="input-group">
                         <label for="burn-hp">Current HP</label>
-                        <input id="burn-hp" type="text" inputmode="numeric" bind:value={burnHP} placeholder="Example: 50,000" on:input={() => { burnHP = formatHPInput(burnHP); }} />
+                        <input
+                            id="burn-hp"
+                            type="text"
+                            inputmode="numeric"
+                            bind:value={burnHP}
+                            placeholder="Example: 50,000"
+                            on:input={() => {
+                                burnHP = formatHPInput(burnHP);
+                            }}
+                        />
                     </div>
                     <div class="input-group">
                         <label for="burn-last-burn">Last Burn (UTC)</label>
-                        <input id="burn-last-burn" type="text" bind:value={burnLastBurnTime} placeholder="Example: 19:36" />
+                        <input
+                            id="burn-last-burn"
+                            type="text"
+                            bind:value={burnLastBurnTime}
+                            placeholder="Example: 19:36"
+                        />
                     </div>
                 </div>
 
                 {#if burnStructure !== 'City'}
                     <div class="toggle-row">
-                        <button class="toggle-btn" class:active={showTidesOfWar} on:click={() => showTidesOfWar = !showTidesOfWar}>
+                        <button
+                            class="toggle-btn"
+                            class:active={showTidesOfWar}
+                            on:click={() => (showTidesOfWar = !showTidesOfWar)}
+                        >
                             <div class="toggle-track">
                                 <div class="toggle-thumb"></div>
                             </div>
@@ -503,7 +626,12 @@
                         <div class="input-grid buff-fields" transition:slide={{ duration: 250 }}>
                             <div class="input-group">
                                 <label for="burn-buff">Burn Speed Buff %</label>
-                                <input id="burn-buff" type="text" bind:value={burnBuffPercent} placeholder="Example: 20" />
+                                <input
+                                    id="burn-buff"
+                                    type="text"
+                                    bind:value={burnBuffPercent}
+                                    placeholder="Example: 20"
+                                />
                             </div>
                             <div class="input-group">
                                 <label>Buff Duration</label>
@@ -513,7 +641,13 @@
                                         <span class="dhm-label">H</span>
                                     </div>
                                     <div class="dhm-field">
-                                        <input type="number" bind:value={burnBuffMinutes} placeholder="0" min="0" max="59" />
+                                        <input
+                                            type="number"
+                                            bind:value={burnBuffMinutes}
+                                            placeholder="0"
+                                            min="0"
+                                            max="59"
+                                        />
                                         <span class="dhm-label">M</span>
                                     </div>
                                 </div>
@@ -551,18 +685,49 @@
                             <div class="result-section">
                                 <div class="result-label">The city will be <strong>fully burned</strong> at:</div>
                                 <div class="time-rows">
-                                    <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{burnResult.totalBurnUTC}</span></div>
-                                    <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{formatDateLocal(burnResult.totalBurnLocal)}</span></div>
-                                    <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, formatRelative(burnResult.totalBurnLocal)}</span></div>
+                                    <div class="time-row">
+                                        <span class="time-tag">UTC</span><span class="time-value"
+                                            >{burnResult.totalBurnUTC}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Local</span><span class="time-value"
+                                            >{formatDateLocal(burnResult.totalBurnLocal)}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Relative</span><span class="time-value relative"
+                                            >{(void tick, formatRelative(burnResult.totalBurnLocal))}</span
+                                        >
+                                    </div>
                                 </div>
                             </div>
                         {:else}
                             <div class="result-section">
-                                <div class="result-label"><strong>Next burn</strong> for the {burnResult.structure} at:</div>
+                                <div class="result-label">
+                                    <strong>Next burn</strong> for the {burnResult.structure} at:
+                                </div>
                                 <div class="time-rows">
-                                    <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{burnResult.nextBurnUTC}</span></div>
-                                    <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{burnResult.nextBurnLocal ? formatDateLocal(burnResult.nextBurnLocal) : ''}</span></div>
-                                    <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, burnResult.nextBurnLocal ? formatRelative(burnResult.nextBurnLocal) : ''}</span></div>
+                                    <div class="time-row">
+                                        <span class="time-tag">UTC</span><span class="time-value"
+                                            >{burnResult.nextBurnUTC}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Local</span><span class="time-value"
+                                            >{burnResult.nextBurnLocal
+                                                ? formatDateLocal(burnResult.nextBurnLocal)
+                                                : ''}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Relative</span><span class="time-value relative"
+                                            >{(void tick,
+                                            burnResult.nextBurnLocal
+                                                ? formatRelative(burnResult.nextBurnLocal)
+                                                : '')}</span
+                                        >
+                                    </div>
                                 </div>
                                 <div class="result-stat">
                                     <span class="stat-label">Remaining burns:</span>
@@ -571,11 +736,25 @@
                             </div>
                             <div class="result-divider"></div>
                             <div class="result-section">
-                                <div class="result-label">If not healed, the {burnResult.structure} will be <strong>fully destroyed</strong> at:</div>
+                                <div class="result-label">
+                                    If not healed, the {burnResult.structure} will be <strong>fully destroyed</strong> at:
+                                </div>
                                 <div class="time-rows">
-                                    <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{burnResult.totalBurnUTC}</span></div>
-                                    <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{formatDateLocal(burnResult.totalBurnLocal)}</span></div>
-                                    <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, formatRelative(burnResult.totalBurnLocal)}</span></div>
+                                    <div class="time-row">
+                                        <span class="time-tag">UTC</span><span class="time-value"
+                                            >{burnResult.totalBurnUTC}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Local</span><span class="time-value"
+                                            >{formatDateLocal(burnResult.totalBurnLocal)}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Relative</span><span class="time-value relative"
+                                            >{(void tick, formatRelative(burnResult.totalBurnLocal))}</span
+                                        >
+                                    </div>
                                 </div>
                             </div>
                         {/if}
@@ -583,9 +762,9 @@
                 {/if}
             </div>
 
-        <!-- ══════════════════════════════════════ -->
-        <!-- SHIELD TAB -->
-        <!-- ══════════════════════════════════════ -->
+            <!-- ══════════════════════════════════════ -->
+            <!-- SHIELD TAB -->
+            <!-- ══════════════════════════════════════ -->
         {:else if activeTab === 'shield'}
             <div class="timer-panel">
                 <div class="panel-header">
@@ -600,14 +779,28 @@
                     <div class="input-group">
                         <label>Structure</label>
                         <div class="custom-select-container">
-                            <button class="custom-select-trigger" class:open={openDropdown === 'shield-structure'} on:click|stopPropagation={() => toggleDropdown('shield-structure')}>
+                            <button
+                                class="custom-select-trigger"
+                                class:open={openDropdown === 'shield-structure'}
+                                on:click|stopPropagation={() => toggleDropdown('shield-structure')}
+                            >
                                 <span class="selected-text">{shieldStructure}</span>
-                                <i class="fas fa-chevron-down arrow" class:rotated={openDropdown === 'shield-structure'}></i>
+                                <i class="fas fa-chevron-down arrow" class:rotated={openDropdown === 'shield-structure'}
+                                ></i>
                             </button>
                             {#if openDropdown === 'shield-structure'}
                                 <div class="custom-dropdown-menu">
                                     {#each shieldStructureOptions as opt}
-                                        <button class="dropdown-option" class:selected={shieldStructure === opt.value} on:click|stopPropagation={() => selectOption('shield-structure', opt.value, v => shieldStructure = v)}>
+                                        <button
+                                            class="dropdown-option"
+                                            class:selected={shieldStructure === opt.value}
+                                            on:click|stopPropagation={() =>
+                                                selectOption(
+                                                    'shield-structure',
+                                                    opt.value,
+                                                    (v) => (shieldStructure = v),
+                                                )}
+                                        >
                                             <span>{opt.label}</span>
                                         </button>
                                     {/each}
@@ -618,15 +811,30 @@
                     <div class="input-group">
                         <label>Current Status</label>
                         <div class="custom-select-container">
-                            <button class="custom-select-trigger" class:open={openDropdown === 'shield-status'} on:click|stopPropagation={() => toggleDropdown('shield-status')}>
-                                <i class="fas {shieldStatusOptions.find(o => o.value === shieldStatus)?.icon} option-icon"></i>
-                                <span class="selected-text">{shieldStatus === 'shielded' ? 'Shielded' : 'Unshielded'}</span>
-                                <i class="fas fa-chevron-down arrow" class:rotated={openDropdown === 'shield-status'}></i>
+                            <button
+                                class="custom-select-trigger"
+                                class:open={openDropdown === 'shield-status'}
+                                on:click|stopPropagation={() => toggleDropdown('shield-status')}
+                            >
+                                <i
+                                    class="fas {shieldStatusOptions.find((o) => o.value === shieldStatus)
+                                        ?.icon} option-icon"
+                                ></i>
+                                <span class="selected-text"
+                                    >{shieldStatus === 'shielded' ? 'Shielded' : 'Unshielded'}</span
+                                >
+                                <i class="fas fa-chevron-down arrow" class:rotated={openDropdown === 'shield-status'}
+                                ></i>
                             </button>
                             {#if openDropdown === 'shield-status'}
                                 <div class="custom-dropdown-menu">
                                     {#each shieldStatusOptions as opt}
-                                        <button class="dropdown-option" class:selected={shieldStatus === opt.value} on:click|stopPropagation={() => selectOption('shield-status', opt.value, v => shieldStatus = v)}>
+                                        <button
+                                            class="dropdown-option"
+                                            class:selected={shieldStatus === opt.value}
+                                            on:click|stopPropagation={() =>
+                                                selectOption('shield-status', opt.value, (v) => (shieldStatus = v))}
+                                        >
                                             <i class="fas {opt.icon} option-icon"></i>
                                             <span>{opt.label}</span>
                                         </button>
@@ -681,38 +889,96 @@
 
                         {#if shieldResult.status === 'shielded'}
                             <div class="result-section">
-                                <div class="result-label">The {shieldResult.structureName} will be <strong>unshielded</strong> at:</div>
+                                <div class="result-label">
+                                    The {shieldResult.structureName} will be <strong>unshielded</strong> at:
+                                </div>
                                 <div class="time-rows">
-                                    <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{shieldResult.unshieldingUTC}</span></div>
-                                    <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{formatDateLocal(shieldResult.unshieldingLocal)}</span></div>
-                                    <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, formatRelative(shieldResult.unshieldingLocal)}</span></div>
+                                    <div class="time-row">
+                                        <span class="time-tag">UTC</span><span class="time-value"
+                                            >{shieldResult.unshieldingUTC}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Local</span><span class="time-value"
+                                            >{formatDateLocal(shieldResult.unshieldingLocal)}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Relative</span><span class="time-value relative"
+                                            >{(void tick, formatRelative(shieldResult.unshieldingLocal))}</span
+                                        >
+                                    </div>
                                 </div>
                             </div>
                             <div class="result-divider"></div>
                             <div class="result-section">
-                                <div class="result-label">After being unshielded for {shieldResult.config.unshielding_time} hours, it will be <strong>shielded</strong> again at:</div>
+                                <div class="result-label">
+                                    After being unshielded for {shieldResult.config.unshielding_time} hours, it will be
+                                    <strong>shielded</strong> again at:
+                                </div>
                                 <div class="time-rows">
-                                    <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{shieldResult.shieldingUTC}</span></div>
-                                    <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{formatDateLocal(shieldResult.shieldingLocal)}</span></div>
-                                    <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, formatRelative(shieldResult.shieldingLocal)}</span></div>
+                                    <div class="time-row">
+                                        <span class="time-tag">UTC</span><span class="time-value"
+                                            >{shieldResult.shieldingUTC}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Local</span><span class="time-value"
+                                            >{formatDateLocal(shieldResult.shieldingLocal)}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Relative</span><span class="time-value relative"
+                                            >{(void tick, formatRelative(shieldResult.shieldingLocal))}</span
+                                        >
+                                    </div>
                                 </div>
                             </div>
                         {:else}
                             <div class="result-section">
-                                <div class="result-label">The {shieldResult.structureName} will be <strong>shielded</strong> at:</div>
+                                <div class="result-label">
+                                    The {shieldResult.structureName} will be <strong>shielded</strong> at:
+                                </div>
                                 <div class="time-rows">
-                                    <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{shieldResult.shieldingUTC}</span></div>
-                                    <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{formatDateLocal(shieldResult.shieldingLocal)}</span></div>
-                                    <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, formatRelative(shieldResult.shieldingLocal)}</span></div>
+                                    <div class="time-row">
+                                        <span class="time-tag">UTC</span><span class="time-value"
+                                            >{shieldResult.shieldingUTC}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Local</span><span class="time-value"
+                                            >{formatDateLocal(shieldResult.shieldingLocal)}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Relative</span><span class="time-value relative"
+                                            >{(void tick, formatRelative(shieldResult.shieldingLocal))}</span
+                                        >
+                                    </div>
                                 </div>
                             </div>
                             <div class="result-divider"></div>
                             <div class="result-section">
-                                <div class="result-label">After being shielded for {shieldResult.config.shielding_time} hours, it will be <strong>unshielded</strong> again at:</div>
+                                <div class="result-label">
+                                    After being shielded for {shieldResult.config.shielding_time} hours, it will be
+                                    <strong>unshielded</strong> again at:
+                                </div>
                                 <div class="time-rows">
-                                    <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{shieldResult.unshieldingUTC}</span></div>
-                                    <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{formatDateLocal(shieldResult.unshieldingLocal)}</span></div>
-                                    <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, formatRelative(shieldResult.unshieldingLocal)}</span></div>
+                                    <div class="time-row">
+                                        <span class="time-tag">UTC</span><span class="time-value"
+                                            >{shieldResult.unshieldingUTC}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Local</span><span class="time-value"
+                                            >{formatDateLocal(shieldResult.unshieldingLocal)}</span
+                                        >
+                                    </div>
+                                    <div class="time-row">
+                                        <span class="time-tag">Relative</span><span class="time-value relative"
+                                            >{(void tick, formatRelative(shieldResult.unshieldingLocal))}</span
+                                        >
+                                    </div>
                                 </div>
                             </div>
                         {/if}
@@ -720,9 +986,9 @@
                 {/if}
             </div>
 
-        <!-- ══════════════════════════════════════ -->
-        <!-- HEAL TAB -->
-        <!-- ══════════════════════════════════════ -->
+            <!-- ══════════════════════════════════════ -->
+            <!-- HEAL TAB -->
+            <!-- ══════════════════════════════════════ -->
         {:else if activeTab === 'heal'}
             <div class="timer-panel">
                 <div class="panel-header">
@@ -736,11 +1002,29 @@
                 <div class="input-grid">
                     <div class="input-group">
                         <label for="heal-current">Current HP</label>
-                        <input id="heal-current" type="text" inputmode="numeric" bind:value={healCurrentHP} placeholder="Example: 10,000" on:input={() => { healCurrentHP = formatHPInput(healCurrentHP); }} />
+                        <input
+                            id="heal-current"
+                            type="text"
+                            inputmode="numeric"
+                            bind:value={healCurrentHP}
+                            placeholder="Example: 10,000"
+                            on:input={() => {
+                                healCurrentHP = formatHPInput(healCurrentHP);
+                            }}
+                        />
                     </div>
                     <div class="input-group">
                         <label for="heal-max">Max HP</label>
-                        <input id="heal-max" type="text" inputmode="numeric" bind:value={healMaxHP} placeholder="Example: 50,000" on:input={() => { healMaxHP = formatHPInput(healMaxHP); }} />
+                        <input
+                            id="heal-max"
+                            type="text"
+                            inputmode="numeric"
+                            bind:value={healMaxHP}
+                            placeholder="Example: 50,000"
+                            on:input={() => {
+                                healMaxHP = formatHPInput(healMaxHP);
+                            }}
+                        />
                     </div>
                 </div>
 
@@ -771,18 +1055,29 @@
                         <div class="result-section">
                             <div class="result-label">The structure will be <strong>fully healed</strong> at:</div>
                             <div class="time-rows">
-                                <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{healResult.healUTC}</span></div>
-                                <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{formatDateLocal(healResult.healLocal)}</span></div>
-                                <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, formatRelative(healResult.healLocal)}</span></div>
+                                <div class="time-row">
+                                    <span class="time-tag">UTC</span><span class="time-value">{healResult.healUTC}</span
+                                    >
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-tag">Local</span><span class="time-value"
+                                        >{formatDateLocal(healResult.healLocal)}</span
+                                    >
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-tag">Relative</span><span class="time-value relative"
+                                        >{(void tick, formatRelative(healResult.healLocal))}</span
+                                    >
+                                </div>
                             </div>
                         </div>
                     </div>
                 {/if}
             </div>
 
-        <!-- ══════════════════════════════════════ -->
-        <!-- BUFF TAB -->
-        <!-- ══════════════════════════════════════ -->
+            <!-- ══════════════════════════════════════ -->
+            <!-- BUFF TAB -->
+            <!-- ══════════════════════════════════════ -->
         {:else if activeTab === 'buff'}
             <div class="timer-panel">
                 <div class="panel-header">
@@ -797,15 +1092,25 @@
                     <div class="input-group">
                         <label>Buff Type</label>
                         <div class="custom-select-container">
-                            <button class="custom-select-trigger" class:open={openDropdown === 'buff-type'} on:click|stopPropagation={() => toggleDropdown('buff-type')}>
-                                <i class="fas {buffTypeOptions.find(o => o.value === buffType)?.icon} option-icon"></i>
+                            <button
+                                class="custom-select-trigger"
+                                class:open={openDropdown === 'buff-type'}
+                                on:click|stopPropagation={() => toggleDropdown('buff-type')}
+                            >
+                                <i class="fas {buffTypeOptions.find((o) => o.value === buffType)?.icon} option-icon"
+                                ></i>
                                 <span class="selected-text">{buffType}</span>
                                 <i class="fas fa-chevron-down arrow" class:rotated={openDropdown === 'buff-type'}></i>
                             </button>
                             {#if openDropdown === 'buff-type'}
                                 <div class="custom-dropdown-menu">
                                     {#each buffTypeOptions as opt}
-                                        <button class="dropdown-option" class:selected={buffType === opt.value} on:click|stopPropagation={() => selectOption('buff-type', opt.value, v => buffType = v)}>
+                                        <button
+                                            class="dropdown-option"
+                                            class:selected={buffType === opt.value}
+                                            on:click|stopPropagation={() =>
+                                                selectOption('buff-type', opt.value, (v) => (buffType = v))}
+                                        >
                                             <i class="fas {opt.icon} option-icon"></i>
                                             <span>{opt.label}</span>
                                         </button>
@@ -832,7 +1137,8 @@
                 <div class="buff-info">
                     <i class="fas fa-info-circle"></i>
                     <span>
-                        {buffType} lasts <strong>{buffDurations[buffType]}h</strong> &middot; Cooldown is <strong>20h</strong> after activation
+                        {buffType} lasts <strong>{buffDurations[buffType]}h</strong> &middot; Cooldown is
+                        <strong>20h</strong> after activation
                     </span>
                 </div>
 
@@ -862,29 +1168,69 @@
                         </div>
 
                         <div class="result-section">
-                            <div class="result-label">The <strong>{buffResult.buffType}</strong> was <strong>popped</strong> at:</div>
+                            <div class="result-label">
+                                The <strong>{buffResult.buffType}</strong> was <strong>popped</strong> at:
+                            </div>
                             <div class="time-rows">
-                                <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{buffResult.activationUTC}</span></div>
-                                <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{formatDateLocal(buffResult.activationLocal)}</span></div>
-                                <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, formatRelative(buffResult.activationLocal)}</span></div>
+                                <div class="time-row">
+                                    <span class="time-tag">UTC</span><span class="time-value"
+                                        >{buffResult.activationUTC}</span
+                                    >
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-tag">Local</span><span class="time-value"
+                                        >{formatDateLocal(buffResult.activationLocal)}</span
+                                    >
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-tag">Relative</span><span class="time-value relative"
+                                        >{(void tick, formatRelative(buffResult.activationLocal))}</span
+                                    >
+                                </div>
                             </div>
                         </div>
                         <div class="result-divider"></div>
                         <div class="result-section">
                             <div class="result-label">It will <strong>end</strong> at:</div>
                             <div class="time-rows">
-                                <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{buffResult.buffEndUTC}</span></div>
-                                <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{formatDateLocal(buffResult.buffEndLocal)}</span></div>
-                                <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, formatRelative(buffResult.buffEndLocal)}</span></div>
+                                <div class="time-row">
+                                    <span class="time-tag">UTC</span><span class="time-value"
+                                        >{buffResult.buffEndUTC}</span
+                                    >
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-tag">Local</span><span class="time-value"
+                                        >{formatDateLocal(buffResult.buffEndLocal)}</span
+                                    >
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-tag">Relative</span><span class="time-value relative"
+                                        >{(void tick, formatRelative(buffResult.buffEndLocal))}</span
+                                    >
+                                </div>
                             </div>
                         </div>
                         <div class="result-divider"></div>
                         <div class="result-section">
-                            <div class="result-label">And will be <strong>ready again</strong> at (20h after popping):</div>
+                            <div class="result-label">
+                                And will be <strong>ready again</strong> at (20h after popping):
+                            </div>
                             <div class="time-rows">
-                                <div class="time-row"><span class="time-tag">UTC</span><span class="time-value">{buffResult.readyUTC}</span></div>
-                                <div class="time-row"><span class="time-tag">Local</span><span class="time-value">{formatDateLocal(buffResult.readyLocal)}</span></div>
-                                <div class="time-row"><span class="time-tag">Relative</span><span class="time-value relative">{void tick, formatRelative(buffResult.readyLocal)}</span></div>
+                                <div class="time-row">
+                                    <span class="time-tag">UTC</span><span class="time-value"
+                                        >{buffResult.readyUTC}</span
+                                    >
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-tag">Local</span><span class="time-value"
+                                        >{formatDateLocal(buffResult.readyLocal)}</span
+                                    >
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-tag">Relative</span><span class="time-value relative"
+                                        >{(void tick, formatRelative(buffResult.readyLocal))}</span
+                                    >
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1027,13 +1373,13 @@
     }
 
     /* Hide number input spinners */
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
 
-    input[type="number"] {
+    input[type='number'] {
         -moz-appearance: textfield;
     }
 
@@ -1063,7 +1409,9 @@
         border-radius: var(--radius-md);
         color: var(--text-primary);
         font-size: var(--font-size-sm);
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
         outline: none;
         font-family: inherit;
     }
@@ -1092,7 +1440,9 @@
         border: 1px solid var(--border-color);
         border-radius: var(--radius-md);
         padding-right: var(--spacing-2);
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
     }
 
     .dhm-field:focus-within {
@@ -1151,7 +1501,9 @@
         cursor: pointer;
         font-size: var(--font-size-sm);
         font-family: inherit;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
     }
 
     .custom-select-trigger:hover {
@@ -1437,10 +1789,18 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .burn-icon { color: #ef4444; }
-    .shield-icon { color: #3b82f6; }
-    .heal-icon { color: #10b981; }
-    .buff-icon { color: #f59e0b; }
+    .burn-icon {
+        color: #ef4444;
+    }
+    .shield-icon {
+        color: #3b82f6;
+    }
+    .heal-icon {
+        color: #10b981;
+    }
+    .buff-icon {
+        color: #f59e0b;
+    }
 
     .result-section {
         margin-bottom: var(--spacing-2);

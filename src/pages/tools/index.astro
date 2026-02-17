@@ -18,24 +18,29 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
     bodyClass="has-sub-nav"
 >
     <script type="application/ld+json" slot="head-scripts">
-    {
-        "@context": "https://schema.org",
-        "@type": "CollectionPage",
-        "name": "Codex Helper Community Tools",
-        "description": "Free Rise of Kingdoms calculators and tools. Speedup calculator, troop calculator, equipment planner, alliance mail generator, and more.",
-        "url": "https://codexhelper.com/tools/",
-        "isPartOf": { "@type": "WebSite", "name": "Codex Helper", "url": "https://codexhelper.com" }
-    }
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "Codex Helper Community Tools",
+            "description": "Free Rise of Kingdoms calculators and tools. Speedup calculator, troop calculator, equipment planner, alliance mail generator, and more.",
+            "url": "https://codexhelper.com/tools/",
+            "isPartOf": { "@type": "WebSite", "name": "Codex Helper", "url": "https://codexhelper.com" }
+        }
     </script>
 
     <main class="tool-page-wrapper">
         <section class="tool-hero">
             <div class="tool-hero-container">
-                <h1 class="hero-title-text"><span>Codex Helper</span> <span class="highlight">Community Tools</span></h1>
-                <p class="hero-subtitle">Optimize your gameplay with our suite of advanced calculators and generators.</p>
+                <h1 class="hero-title-text">
+                    <span>Codex Helper</span>
+                    <span class="highlight">Community Tools</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Optimize your gameplay with our suite of advanced calculators and generators.
+                </p>
             </div>
         </section>
-    
+
         <section class="tool-content">
             <div class="tool-grid-modern">
                 <a href="/tools/mail/" class="tool-card-modern">
@@ -143,7 +148,7 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
         font-size: var(--font-size-lg);
         max-width: 800px;
         margin: 0 auto;
-        
+
         white-space: nowrap;
     }
 
@@ -166,7 +171,7 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
         text-decoration: none;
         overflow: hidden;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        
+
         background: rgba(20, 21, 24, 0.6);
         border: 1px solid rgba(255, 255, 255, 0.08);
     }
@@ -204,7 +209,7 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
         width: 48px;
         height: 48px;
         object-fit: contain;
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
     }
     .tool-card-modern:hover .card-icon-container {
         transform: scale(1.1) rotate(3deg);
@@ -311,11 +316,11 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
         .hero-title-text span {
             display: block;
         }
-        
+
         .hero-title-text .highlight {
             margin-top: 4px;
         }
-        
+
         .hero-title-text {
             text-align: center;
             flex-direction: column;

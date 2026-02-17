@@ -1,6 +1,6 @@
 <script>
     import logo from '../assets/images/global/logo-new.webp';
-    
+
     const currentYear = new Date().getFullYear();
 </script>
 
@@ -9,7 +9,14 @@
         <div class="footer-content">
             <div class="footer-brand">
                 <div class="logo">
-                    <img src={logo.src} alt="Codex Helper Logo" class="logo-image" width="120" height="120" loading="lazy" />
+                    <img
+                        src={logo.src}
+                        alt="Codex Helper Logo"
+                        class="logo-image"
+                        width="120"
+                        height="120"
+                        loading="lazy"
+                    />
                     <span>Codex Helper</span>
                 </div>
                 <p>The ultimate Discord bot for Rise of Kingdoms players and discord servers.</p>
@@ -23,8 +30,12 @@
                 </div>
                 <div class="footer-column">
                     <h4>Support</h4>
-                    <a href="https://discord.com/channels/1031515159627300924/1314193270078967829" target="_blank">Discord Support</a>
-                    <a href="https://discord.com/channels/1031515159627300924/1320650068751155200" target="_blank">Feedback</a>
+                    <a href="https://discord.com/channels/1031515159627300924/1314193270078967829" target="_blank"
+                        >Discord Support</a
+                    >
+                    <a href="https://discord.com/channels/1031515159627300924/1320650068751155200" target="_blank"
+                        >Feedback</a
+                    >
                     <a href="https://www.patreon.com/settings/apps" target="_blank">Link Patreon</a>
                 </div>
                 <div class="footer-column">

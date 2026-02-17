@@ -14,7 +14,7 @@
         { id: 'commanders', label: 'Commanders', icon: 'fa-chess-knight' },
         { id: 'events', label: 'Events', icon: 'fa-calendar-alt' },
         { id: 'bundles', label: 'Bundles', icon: 'fa-box-open' },
-        { id: 'meta_lineups', label: 'Meta Pairings', icon: 'fa-users' }
+        { id: 'meta_lineups', label: 'Meta Pairings', icon: 'fa-users' },
     ];
 
     const COLOR_MAP = {
@@ -22,7 +22,7 @@
         commander_sub: '#313338',
         meta: '#00c6ff',
         bundle: '#e9be74',
-        event: '#2ecc71'
+        event: '#2ecc71',
     };
 
     function getEmbedColor(hexOrInt) {
@@ -37,7 +37,7 @@
     let activeSource = 'commanders';
     let searchQuery = '';
     let rawData = null;
-    let aliasData = null; 
+    let aliasData = null;
     let loading = false;
     let error = null;
 
@@ -58,8 +58,8 @@
             }
             rawData = response;
         } catch (err) {
-            console.error("Failed to fetch data:", err);
-            error = err.message || "Failed to load data";
+            console.error('Failed to fetch data:', err);
+            error = err.message || 'Failed to load data';
         } finally {
             loading = false;
         }
@@ -70,72 +70,76 @@
             const res = await window.auth.fetchWithAuth('/api/admin/heartbeat', {
                 method: 'POST',
                 body: JSON.stringify({
-                    username: user.username, 
-                    avatar: user.avatar 
-                })
+                    username: user.username,
+                    avatar: user.avatar,
+                }),
             });
             if (res.users) {
                 onlineUsers = res.users;
             }
         } catch (e) {
-            console.error("Heartbeat failed", e);
+            console.error('Heartbeat failed', e);
         }
     }
 
     onMount(() => {
         sendHeartbeat();
-        const interval = setInterval(sendHeartbeat, 600000); 
+        const interval = setInterval(sendHeartbeat, 600000);
         return () => clearInterval(interval);
     });
 
     function handleAddEntry() {
         const id = prompt(`Enter a unique ID (key) for the new ${activeSource.slice(0, -1)} (e.g., 'new_entry_key'):`);
         if (!id) return;
-        
+
         if (rawData[id]) {
-            alert("ID already exists!");
+            alert('ID already exists!');
             return;
         }
 
         let newData = {};
         if (activeSource === 'commanders') {
-            newData = [{
-                name: id,
-                json: {
-                    embeds: [{
-                        title: "New Commander", 
-                        description: "",
-                        fields: []
-                    }]
-                }
-            }];
+            newData = [
+                {
+                    name: id,
+                    json: {
+                        embeds: [
+                            {
+                                title: 'New Commander',
+                                description: '',
+                                fields: [],
+                            },
+                        ],
+                    },
+                },
+            ];
             if (aliasData) {
                 aliasData[id] = {
-                    display_name: "New Commander",
-                    aliases: []
+                    display_name: 'New Commander',
+                    aliases: [],
                 };
             }
         }
 
-        if (activeSource === 'events') newData = { title: "New Event", color: 3066993, fields: [] };
-        if (activeSource === 'bundles') newData = { title: "New Bundle", color: "#e9be74", description: [] };
-        if (activeSource === 'meta_lineups') newData = { title: "New Lineup", color: "#00c6ff", fields: [] };
+        if (activeSource === 'events') newData = { title: 'New Event', color: 3066993, fields: [] };
+        if (activeSource === 'bundles') newData = { title: 'New Bundle', color: '#e9be74', description: [] };
+        if (activeSource === 'meta_lineups') newData = { title: 'New Lineup', color: '#00c6ff', fields: [] };
 
         if (activeSource === 'commanders') {
             editingItem = {
                 id: id,
                 data: newData,
                 aliasData: aliasData[id],
-                originalData: null
+                originalData: null,
             };
         } else {
-            editingItem = { 
-                id, 
-                data: newData, 
-                originalData: null 
+            editingItem = {
+                id,
+                data: newData,
+                originalData: null,
             };
         }
-        
+
         isEditing = true;
     }
 
@@ -148,13 +152,13 @@
                 id: id,
                 data: rawData[id],
                 aliasData: aliasData[id],
-                originalData: originalData
+                originalData: originalData,
             };
         } else {
             editingItem = {
                 id: id,
                 data: rawData[id],
-                originalData: originalData
+                originalData: originalData,
             };
         }
         isEditing = true;
@@ -184,8 +188,8 @@
 
     function generateCommanderDiff(oldArr, newArr) {
         const diffs = {};
-        const oldMap = new Map((oldArr || []).map(t => [t.name, t]));
-        const newMap = new Map((newArr || []).map(t => [t.name, t]));
+        const oldMap = new Map((oldArr || []).map((t) => [t.name, t]));
+        const newMap = new Map((newArr || []).map((t) => [t.name, t]));
         const allKeys = new Set([...oldMap.keys(), ...newMap.keys()]);
 
         const isEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -217,18 +221,22 @@
                 const freshItemData = freshFullData[saveId];
 
                 if (freshItemData && JSON.stringify(freshItemData) !== JSON.stringify(editingItem.originalData)) {
-                    if (!confirm("⚠️ CONFLICT DETECTED!\n\nThe data on the server has changed since you opened this editor.\n\nSaving now will overwrite someone else's changes.\n\nClick OK to OVERWRITE anyway, or Cancel to back out.")) {
+                    if (
+                        !confirm(
+                            "⚠️ CONFLICT DETECTED!\n\nThe data on the server has changed since you opened this editor.\n\nSaving now will overwrite someone else's changes.\n\nClick OK to OVERWRITE anyway, or Cancel to back out.",
+                        )
+                    ) {
                         if (callback) callback(false);
                         return;
                     }
                 }
             } catch (checkErr) {
-                console.warn("Optimistic lock check failed (network error?), proceeding with save caution:", checkErr);
+                console.warn('Optimistic lock check failed (network error?), proceeding with save caution:', checkErr);
             }
         }
 
         const oldData = rawData[saveId] ? JSON.parse(JSON.stringify(rawData[saveId])) : {};
-        
+
         let changes;
         if (activeSource === 'commanders' && Array.isArray(data)) {
             const oldArr = Array.isArray(oldData) ? oldData : [];
@@ -246,24 +254,24 @@
             const logPayload = {
                 target_key: saveId,
                 target_name: data.title || data.displayName || data.name || saveId,
-                changes: changes
+                changes: changes,
             };
 
             await window.auth.fetchWithAuth(`/api/admin/data/${activeSource}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     data: rawData,
-                    logDetails: JSON.stringify(logPayload)
-                })
+                    logDetails: JSON.stringify(logPayload),
+                }),
             });
 
             if (activeSource === 'commanders' && aliasData) {
                 await window.auth.fetchWithAuth(`/api/admin/data/aliases`, {
                     method: 'POST',
-                    body: JSON.stringify(aliasData)
+                    body: JSON.stringify(aliasData),
                 });
             }
-            
+
             await loadData(activeSource);
             if (callback) {
                 callback(true);
@@ -272,13 +280,12 @@
                 isEditing = false;
                 editingItem = null;
             }
-
         } catch (err) {
-            console.error("Save failed:", err);
+            console.error('Save failed:', err);
             if (callback) {
                 callback(false);
             } else {
-                alert("Failed to save changes to API.");
+                alert('Failed to save changes to API.');
             }
             await loadData(activeSource);
         }
@@ -292,12 +299,12 @@
         try {
             await window.auth.fetchWithAuth(`/api/admin/data/${activeSource}`, {
                 method: 'POST',
-                body: JSON.stringify(rawData)
+                body: JSON.stringify(rawData),
             });
             alert(`${id} deleted successfully.`);
         } catch (err) {
-            console.error("Delete failed:", err);
-            alert("Failed to delete. Please refresh.");
+            console.error('Delete failed:', err);
+            alert('Failed to delete. Please refresh.');
             await loadData(activeSource);
         }
     }
@@ -309,7 +316,11 @@
 
     async function handleDeleteCommander(event) {
         const { id, name } = event.detail;
-        if (!confirm(`Are you sure you want to delete "${name}"? \n\nThis will remove the Main Template and ALL Sub-Templates. This cannot be undone.`)) {
+        if (
+            !confirm(
+                `Are you sure you want to delete "${name}"? \n\nThis will remove the Main Template and ALL Sub-Templates. This cannot be undone.`,
+            )
+        ) {
             return;
         }
 
@@ -322,18 +333,18 @@
         try {
             await window.auth.fetchWithAuth(`/api/admin/data/commanders`, {
                 method: 'POST',
-                body: JSON.stringify(rawData)
+                body: JSON.stringify(rawData),
             });
             if (aliasData) {
                 await window.auth.fetchWithAuth(`/api/admin/data/aliases`, {
                     method: 'POST',
-                    body: JSON.stringify(aliasData)
+                    body: JSON.stringify(aliasData),
                 });
             }
             alert(`${name} deleted successfully.`);
         } catch (err) {
-            console.error("Delete failed:", err);
-            alert("Failed to sync deletion to server. Please refresh.");
+            console.error('Delete failed:', err);
+            alert('Failed to sync deletion to server. Please refresh.');
             await loadData('commanders');
         }
     }
@@ -343,17 +354,17 @@
     <div class="dashboard-header">
         <div class="header-left">
             <h1>Master Admin Panel</h1>
-            
+
             <div class="online-section">
                 {#each onlineUsers as u}
                     <div class="user-pill">
-                        <img 
-                            src={u.avatar 
-                                ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png` 
-                                : `https://cdn.discordapp.com/embed/avatars/${(BigInt(u.id) >> 22n) % 6n}.png`} 
-                            alt={u.username} 
+                        <img
+                            src={u.avatar
+                                ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`
+                                : `https://cdn.discordapp.com/embed/avatars/${(BigInt(u.id) >> 22n) % 6n}.png`}
+                            alt={u.username}
                             class="pill-avatar"
-                            on:error={(e) => e.target.src = "https://cdn.discordapp.com/embed/avatars/0.png"}
+                            on:error={(e) => (e.target.src = 'https://cdn.discordapp.com/embed/avatars/0.png')}
                         />
                         <span class="pill-name">{u.username}</span>
                         <span class="status-indicator"></span>
@@ -372,15 +383,23 @@
 
             <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" placeholder="Search {activeSource}..." bind:value={searchQuery} class="search-input"/>
+                <input
+                    type="text"
+                    placeholder="Search {activeSource}..."
+                    bind:value={searchQuery}
+                    class="search-input"
+                />
             </div>
 
             <div class="source-selector">
                 {#each DATA_SOURCES as source}
-                    <button 
-                        class="source-btn" 
+                    <button
+                        class="source-btn"
                         class:active={activeSource === source.id}
-                        on:click={() => { activeSource = source.id; searchQuery = ''; }}
+                        on:click={() => {
+                            activeSource = source.id;
+                            searchQuery = '';
+                        }}
                         title={source.label}
                     >
                         <i class="fas {source.icon}"></i>
@@ -398,24 +417,30 @@
     <div class="panel-content">
         <div class="data-list-container">
             {#if loading}
-               <div class="state-msg"><i class="fas fa-circle-notch fa-spin"></i><p>Fetching {activeSource}...</p></div>
+                <div class="state-msg">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                    <p>Fetching {activeSource}...</p>
+                </div>
             {:else if error}
-                <div class="state-msg error"><i class="fas fa-exclamation-triangle"></i><p>{error}</p></div>
+                <div class="state-msg error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>{error}</p>
+                </div>
             {:else if rawData}
                 {#if activeSource === 'commanders'}
-                    <CommanderList 
-                        data={rawData} 
-                        aliases={aliasData || {}} 
-                        search={searchQuery} 
+                    <CommanderList
+                        data={rawData}
+                        aliases={aliasData || {}}
+                        search={searchQuery}
                         emojiMap={emojiData.commanders}
-                        on:edit={handleEdit} 
-                        on:delete={handleDeleteCommander} 
+                        on:edit={handleEdit}
+                        on:delete={handleDeleteCommander}
                     />
                 {:else}
-                    <GenericList 
-                        data={rawData} 
-                        type={activeSource} 
-                        search={searchQuery} 
+                    <GenericList
+                        data={rawData}
+                        type={activeSource}
+                        search={searchQuery}
                         {getEmbedColor}
                         {COLOR_MAP}
                         on:edit={handleEdit}
@@ -433,7 +458,7 @@
             commanderId={editingItem.id}
             commanderData={editingItem.data}
             aliasData={editingItem.aliasData}
-            emojiData={emojiData} 
+            {emojiData}
             {user}
             on:close={handleCloseEditor}
             on:save={handleSave}
@@ -458,7 +483,7 @@
         <MetaPairingEditor
             metaId={editingItem.id}
             metaData={editingItem.data}
-            emojiData={emojiData}
+            {emojiData}
             {user}
             on:close={handleCloseEditor}
             on:save={handleSave}
@@ -555,78 +580,136 @@
         gap: 12px;
     }
 
-    .source-selector { 
+    .source-selector {
         display: flex;
-        gap: 5px; 
+        gap: 5px;
         background: var(--bg-tertiary);
         padding: 4px;
         border-radius: var(--radius-md);
         border: 1px solid var(--border-color);
     }
 
-    .source-btn { 
+    .source-btn {
         background: transparent;
         border: none;
-        color: var(--text-secondary); 
-        padding: 8px 12px; 
-        border-radius: 4px; 
-        font-weight: 600; 
-        cursor: pointer; 
+        color: var(--text-secondary);
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
         display: flex;
-        align-items: center; 
+        align-items: center;
         gap: 8px;
-        transition: all 0.2s ease; 
+        transition: all 0.2s ease;
         font-size: 0.85rem;
     }
 
-    .source-btn:hover { 
+    .source-btn:hover {
         color: var(--text-primary);
-        background: rgba(255,255,255,0.05);
+        background: rgba(255, 255, 255, 0.05);
     }
 
-    .source-btn.active { 
+    .source-btn.active {
         background: var(--bg-card);
         color: var(--accent-blue);
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .entry-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; margin-right: 5px; white-space: nowrap; }
+    .entry-count {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        margin-right: 5px;
+        white-space: nowrap;
+    }
 
-    .search-wrapper { position: relative; width: 220px; }
-    
-    .search-icon { 
+    .search-wrapper {
+        position: relative;
+        width: 220px;
+    }
+
+    .search-icon {
         position: absolute;
-        left: 10px; top: 50%; transform: translateY(-50%); 
-        color: var(--text-secondary); pointer-events: none; font-size: 0.8rem;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        pointer-events: none;
+        font-size: 0.8rem;
     }
-    
-    .search-input { 
+
+    .search-input {
         width: 100%;
         background: var(--bg-tertiary);
-        border: 1px solid var(--border-color); padding: 8px 8px 8px 30px; 
-        border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.9rem;
+        border: 1px solid var(--border-color);
+        padding: 8px 8px 8px 30px;
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.9rem;
     }
-    .search-input:focus { outline: none; border-color: var(--accent-blue); background: var(--bg-primary); }
-    
-    .btn-add { 
-        background: var(--accent-green);
-        color: #000; border: none; 
-        width: 36px; height: 36px;
-        border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; 
-        cursor: pointer;
-        transition: all 0.2s; font-size: 1rem;
+    .search-input:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+        background: var(--bg-primary);
     }
-    .btn-add:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-    .data-list-container { min-height: 400px; position: relative; }
-    .state-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary); gap: 10px; font-size: 1.2rem; }
-    .state-msg.error { color: #ef4444; }
-    .state-msg i { font-size: 2rem; opacity: 0.7; }
+    .btn-add {
+        background: var(--accent-green);
+        color: #000;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 1rem;
+    }
+    .btn-add:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+    }
+
+    .data-list-container {
+        min-height: 400px;
+        position: relative;
+    }
+    .state-msg {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 300px;
+        color: var(--text-secondary);
+        gap: 10px;
+        font-size: 1.2rem;
+    }
+    .state-msg.error {
+        color: #ef4444;
+    }
+    .state-msg i {
+        font-size: 2rem;
+        opacity: 0.7;
+    }
 
     @media (max-width: 1000px) {
-        .dashboard-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-        .header-controls { width: 100%; flex-wrap: wrap; }
-        .search-wrapper { flex-grow: 1; width: auto; }
-        .btn-label { display: none; } 
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .header-controls {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        .search-wrapper {
+            flex-grow: 1;
+            width: auto;
+        }
+        .btn-label {
+            display: none;
+        }
     }
 </style>

@@ -1,46 +1,50 @@
 ---
 import Layout from '../layouts/Layout.astro';
 ---
-<Layout title="FAQ" description="Find answers to frequently asked questions about Codex Helper, including setup instructions, subscription details, and how to get support.">
+
+<Layout
+    title="FAQ"
+    description="Find answers to frequently asked questions about Codex Helper, including setup instructions, subscription details, and how to get support."
+>
     <script type="application/ld+json" slot="head-scripts">
-    {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "How do I setup the bot on my discord server?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Subscribe to our Patreon page, follow the invite link, link your Discord to Patreon, then run /patreon verify in your server. Use /help for a list of commands."
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "How do I setup the bot on my discord server?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Subscribe to our Patreon page, follow the invite link, link your Discord to Patreon, then run /patreon verify in your server. Use /help for a list of commands."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Do the higher membership tiers of the Patreon page unlock other features?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No, the only tier required to use the bot is the lowest tier ($3 USD/month). Higher tiers are for extra support to The King's Codex."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I activate the Codex Helper bot in multiple servers after subscribing?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, the subscription is tied per person. As long as you are an Administrator or have Manage Server permissions, you can freely add the bot to multiple servers."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "I'm having issues with the Codex Helper bot, where can I find support?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "You can open a ticket in the King's Codex Discord Server in the discord.support channel, or leave feedback in the feedback channel."
+                    }
                 }
-            },
-            {
-                "@type": "Question",
-                "name": "Do the higher membership tiers of the Patreon page unlock other features?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "No, the only tier required to use the bot is the lowest tier ($3 USD/month). Higher tiers are for extra support to The King's Codex."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I activate the Codex Helper bot in multiple servers after subscribing?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes, the subscription is tied per person. As long as you are an Administrator or have Manage Server permissions, you can freely add the bot to multiple servers."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "I'm having issues with the Codex Helper bot, where can I find support?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "You can open a ticket in the King's Codex Discord Server in the discord.support channel, or leave feedback in the feedback channel."
-                }
-            }
-        ]
-    }
+            ]
+        }
     </script>
 
     <main class="faq-page-wrapper">
@@ -50,7 +54,7 @@ import Layout from '../layouts/Layout.astro';
                 <p>Find answers to common questions about Codex Helper and get the help you need.</p>
             </div>
         </section>
-    
+
         <section class="faq-content">
             <div class="faq-container">
                 <div class="faq-grid">
@@ -59,63 +63,129 @@ import Layout from '../layouts/Layout.astro';
                             <button class="faq-question">
                                 <span>How do I setup the bot on my discord server?</span>
                                 <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path
+                                        d="M6 9L12 15L18 9"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></path>
                                 </svg>
                             </button>
                             <div class="faq-answer">
-                                <p><strong>1.</strong> Subscribe to our Patreon page, then follow the link in the pinned post to invite the Codex Helper bot to your server of choice.</p>
-                                <p><strong>2.</strong> Link your Discord account to your Patreon account through the link sent to your Discord DM's by the bot, or here: <br/><a href="https://www.patreon.com/settings/apps" target="_blank">https://www.patreon.com/settings/apps</a></p>
-                                <p><strong>3.</strong> Run the <code>/patreon verify</code> command in any channel of the server you invited the Codex Helper bot to.</p>
-                                <p><strong>4.</strong> Use <code>/help</code> for a list of commands, especially <code>/channel</code> or other <code>/(feature) setup</code> commands to get started.</p>
+                                <p>
+                                    <strong>1.</strong> Subscribe to our Patreon page, then follow the link in the pinned
+                                    post to invite the Codex Helper bot to your server of choice.
+                                </p>
+                                <p>
+                                    <strong>2.</strong> Link your Discord account to your Patreon account through the link
+                                    sent to your Discord DM's by the bot, or here: <br /><a
+                                        href="https://www.patreon.com/settings/apps"
+                                        target="_blank">https://www.patreon.com/settings/apps</a>
+                                </p>
+                                <p>
+                                    <strong>3.</strong> Run the <code>/patreon verify</code> command in any channel of the
+                                    server you invited the Codex Helper bot to.
+                                </p>
+                                <p>
+                                    <strong>4.</strong> Use <code>/help</code> for a list of commands, especially <code
+                                        >/channel</code
+                                    > or other <code>/(feature) setup</code> commands to get started.
+                                </p>
                             </div>
                         </div>
-                        
+
                         <div class="faq-item">
                             <button class="faq-question">
                                 <span>Do the higher membership tiers of the Patreon page unlock other features?</span>
                                 <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path
+                                        d="M6 9L12 15L18 9"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></path>
                                 </svg>
                             </button>
                             <div class="faq-answer">
-                                <p>No, the only tier required to use the bot is the lowest tier ($3 USD/month). The higher tiers are simply for extra support to The King's Codex.</p>
+                                <p>
+                                    No, the only tier required to use the bot is the lowest tier ($3 USD/month). The
+                                    higher tiers are simply for extra support to The King's Codex.
+                                </p>
                             </div>
                         </div>
-                        
+
                         <div class="faq-item">
                             <button class="faq-question">
                                 <span>Can I activate the Codex Helper bot in multiple servers after subscribing?</span>
                                 <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path
+                                        d="M6 9L12 15L18 9"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></path>
                                 </svg>
                             </button>
                             <div class="faq-answer">
-                                <p>Yes, the subscription is tied per person therefore as long as you are an Administrator or have Manage Server permissions within a discord server, you can freely add the bot.</p>
+                                <p>
+                                    Yes, the subscription is tied per person therefore as long as you are an
+                                    Administrator or have Manage Server permissions within a discord server, you can
+                                    freely add the bot.
+                                </p>
                             </div>
                         </div>
-                        
+
                         <div class="faq-item">
                             <button class="faq-question">
                                 <span>I'm having issues with the Codex Helper bot, where can I find support?</span>
                                 <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path
+                                        d="M6 9L12 15L18 9"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></path>
                                 </svg>
                             </button>
                             <div class="faq-answer">
-                                <p>You can open a ticket in the King's Codex Discord Server, specifically in the <strong>discord․support</strong> channel found here: <br/><a href="https://discord.com/channels/1031515159627300924/1314193270078967829" target="_blank">https://discord.com/channels/1031515159627300924/1314193270078967829</a><br/>Open a "Codex Helper" ticket and Ruz will respond when available.</p>
-                                <p>Likewise you can also leave feedback about the bot in the <strong>feedback</strong> channel found here: <br/><a href="https://discord.com/channels/1031515159627300924/1320650068751155200" target="_blank">https://discord.com/channels/1031515159627300924/1320650068751155200</a></p>
+                                <p>
+                                    You can open a ticket in the King's Codex Discord Server, specifically in the <strong
+                                        >discord․support</strong
+                                    > channel found here: <br /><a
+                                        href="https://discord.com/channels/1031515159627300924/1314193270078967829"
+                                        target="_blank"
+                                        >https://discord.com/channels/1031515159627300924/1314193270078967829</a
+                                    ><br />Open a "Codex Helper" ticket and Ruz will respond when available.
+                                </p>
+                                <p>
+                                    Likewise you can also leave feedback about the bot in the <strong>feedback</strong> channel
+                                    found here: <br /><a
+                                        href="https://discord.com/channels/1031515159627300924/1320650068751155200"
+                                        target="_blank"
+                                        >https://discord.com/channels/1031515159627300924/1320650068751155200</a>
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
-    
+
                 <div class="faq-contact">
                     <div class="contact-card">
                         <h3>Still need help?</h3>
-                        <p>Can't find the answer you're looking for? Join The King's Codex Discord server for support.</p>
+                        <p>
+                            Can't find the answer you're looking for? Join The King's Codex Discord server for support.
+                        </p>
                         <div class="contact-buttons">
-                            <a href="https://discord.com/channels/1031515159627300924/1314193270078967829" target="_blank" class="btn-primary"><i class="fa-brands fa-discord"></i> Join Support Server</a>
-                            <a href="https://discord.com/channels/1031515159627300924/1320650068751155200" target="_blank" class="btn-secondary">Leave Feedback</a>
+                            <a
+                                href="https://discord.com/channels/1031515159627300924/1314193270078967829"
+                                target="_blank"
+                                class="btn-primary"><i class="fa-brands fa-discord"></i> Join Support Server</a
+                            >
+                            <a
+                                href="https://discord.com/channels/1031515159627300924/1320650068751155200"
+                                target="_blank"
+                                class="btn-secondary">Leave Feedback</a
+                            >
                         </div>
                     </div>
                 </div>

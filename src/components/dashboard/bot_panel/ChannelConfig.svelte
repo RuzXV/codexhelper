@@ -9,12 +9,12 @@
     export let initialSettings = {};
 
     const COMMAND_GROUPS = [
-        { id: "all_commands", label: "All Commands", icon: "fa-asterisk" },
-        { id: "commands_commanders", label: "Commander Info", icon: "fa-chess-knight" },
-        { id: "commands_meta_lineups", label: "Meta Lineups", icon: "fa-shield-alt" },
-        { id: "commands_kvk", label: "KvK Commands", icon: "fa-map-marked-alt" },
-        { id: "commands_event_info", label: "Event Info", icon: "fa-calendar-alt" },
-        { id: "commands_bundle_info", label: "Bundle Info", icon: "fa-gift" }
+        { id: 'all_commands', label: 'All Commands', icon: 'fa-asterisk' },
+        { id: 'commands_commanders', label: 'Commander Info', icon: 'fa-chess-knight' },
+        { id: 'commands_meta_lineups', label: 'Meta Lineups', icon: 'fa-shield-alt' },
+        { id: 'commands_kvk', label: 'KvK Commands', icon: 'fa-map-marked-alt' },
+        { id: 'commands_event_info', label: 'Event Info', icon: 'fa-calendar-alt' },
+        { id: 'commands_bundle_info', label: 'Bundle Info', icon: 'fa-gift' },
     ];
 
     let currentSettings = { ...initialSettings };
@@ -22,7 +22,7 @@
     let saving = false;
     let hasUnsavedChanges = false;
     let openDropdownId = null;
-    let dropdownSearch = "";
+    let dropdownSearch = '';
 
     $: hasUnsavedChanges = JSON.stringify(currentSettings) !== JSON.stringify(originalSettings);
 
@@ -30,7 +30,7 @@
         saving = true;
         try {
             const changedGroups = Object.keys(currentSettings).filter(
-                groupId => currentSettings[groupId] !== originalSettings[groupId]
+                (groupId) => currentSettings[groupId] !== originalSettings[groupId],
             );
 
             for (const groupId of changedGroups) {
@@ -40,15 +40,15 @@
                     body: JSON.stringify({
                         command_group: groupId,
                         channel_id: channelId,
-                        action: (channelId === 'none' || !channelId) ? 'Remove Channel' : 'Add Channel'
-                    })
+                        action: channelId === 'none' || !channelId ? 'Remove Channel' : 'Add Channel',
+                    }),
                 });
             }
             originalSettings = { ...currentSettings };
             dispatch('settingsUpdated', { settings: currentSettings });
         } catch (e) {
-            console.error("Failed to save", e);
-            alert("Failed to save settings. Check console/network.");
+            console.error('Failed to save', e);
+            alert('Failed to save settings. Check console/network.');
         } finally {
             saving = false;
         }
@@ -60,7 +60,7 @@
 
     function toggleDropdown(id, event) {
         event.stopPropagation();
-        dropdownSearch = "";
+        dropdownSearch = '';
         if (openDropdownId === id) {
             openDropdownId = null;
         } else {
@@ -78,9 +78,9 @@
     }
 
     function getChannelName(id) {
-        if (!id || id === 'none') return "⛔ Disabled / Not Set";
-        const ch = guildChannels.find(c => c.id === id);
-        return ch ? `# ${ch.name}` : "Unknown Channel";
+        if (!id || id === 'none') return '⛔ Disabled / Not Set';
+        const ch = guildChannels.find((c) => c.id === id);
+        return ch ? `# ${ch.name}` : 'Unknown Channel';
     }
 
     function handleWindowClick() {
@@ -94,15 +94,18 @@
     <div class="section-header">
         <h3>Command Restrictions</h3>
         <p class="section-desc">
-            Select the specific channel where commands are allowed.
-            If <strong>Disabled / Not Set</strong>, commands for that group will not work in any channel.
+            Select the specific channel where commands are allowed. If <strong>Disabled / Not Set</strong>, commands for
+            that group will not work in any channel.
         </p>
-    
+
         <div class="info-note">
             <i class="fas fa-info-circle"></i>
-            <div class="note-text"> <strong>Note:</strong> The <em>"All Commands"</em> setting is additive. It enables commands in the selected channel <strong>in addition</strong> to any channels assigned to specific groups below.
-                <br><br>
-                If you want to simply restrict the bot to a single channel for everything, just set <strong>"All Commands"</strong> and leave the specific groups disabled.
+            <div class="note-text">
+                <strong>Note:</strong> The <em>"All Commands"</em> setting is additive. It enables commands in the
+                selected channel <strong>in addition</strong> to any channels assigned to specific groups below.
+                <br /><br />
+                If you want to simply restrict the bot to a single channel for everything, just set
+                <strong>"All Commands"</strong> and leave the specific groups disabled.
             </div>
         </div>
     </div>
@@ -116,12 +119,12 @@
                         <span class="group-name">{group.label}</span>
                     </div>
                 </div>
-                
+
                 <div class="control-wrapper">
                     <div class="custom-select-container">
-                        <button 
+                        <button
                             type="button"
-                            class="custom-select-trigger" 
+                            class="custom-select-trigger"
                             on:click={(e) => toggleDropdown(group.id, e)}
                             disabled={saving}
                         >
@@ -136,34 +139,38 @@
                             <!-- svelte-ignore a11y_no_static_element_interactions -->
                             <div class="custom-dropdown-menu" on:click|stopPropagation>
                                 <div class="dropdown-search">
-                                    <input 
+                                    <input
                                         id="search-{group.id}"
-                                        type="text" 
-                                        placeholder="Search channels..." 
+                                        type="text"
+                                        placeholder="Search channels..."
                                         bind:value={dropdownSearch}
                                     />
                                 </div>
                                 <div class="dropdown-options-list">
-                                    <button 
+                                    <button
                                         type="button"
                                         class="dropdown-option danger"
-                                        class:selected={!currentSettings[group.id] || currentSettings[group.id] === 'none'}
+                                        class:selected={!currentSettings[group.id] ||
+                                            currentSettings[group.id] === 'none'}
                                         on:click={() => selectChannel(group.id, 'none')}
                                     >
                                         ⛔ Disabled / Not Set
                                     </button>
 
-                                    {#each guildChannels.filter(c => c.name.toLowerCase().includes(dropdownSearch.toLowerCase())) as channel}
-                                        <button 
+                                    {#each guildChannels.filter((c) => c.name
+                                            .toLowerCase()
+                                            .includes(dropdownSearch.toLowerCase())) as channel}
+                                        <button
                                             type="button"
                                             class="dropdown-option"
                                             class:selected={currentSettings[group.id] === channel.id}
                                             on:click={() => selectChannel(group.id, channel.id)}
                                         >
-                                            <span class="channel-hash">#</span> {channel.name}
+                                            <span class="channel-hash">#</span>
+                                            {channel.name}
                                         </button>
                                     {/each}
-                                    
+
                                     {#if guildChannels.length === 0}
                                         <div class="empty-msg">No text channels found</div>
                                     {/if}
@@ -192,22 +199,63 @@
 {/if}
 
 <style>
-    .section-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; overflow: visible; }
-    .section-header { padding: 20px; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.1); }
-    .section-desc { color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px; }
-    .settings-grid { display: flex; flex-direction: column; }
-    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border-color); transition: background 0.2s; }
-    .setting-row:hover { background: var(--bg-tertiary); }
-    .group-title-row { display: flex; align-items: center; gap: 10px; }
-    .group-icon { color: var(--accent-blue); width: 20px; text-align: center; }
-    .group-name { font-weight: 600; color: var(--text-primary); }
-    .control-wrapper { width: 300px; }
-    .custom-select-container { position: relative; width: 100%; }
+    .section-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: visible;
+    }
+    .section-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        background: rgba(0, 0, 0, 0.1);
+    }
+    .section-desc {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+    .settings-grid {
+        display: flex;
+        flex-direction: column;
+    }
+    .setting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-color);
+        transition: background 0.2s;
+    }
+    .setting-row:hover {
+        background: var(--bg-tertiary);
+    }
+    .group-title-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .group-icon {
+        color: var(--accent-blue);
+        width: 20px;
+        text-align: center;
+    }
+    .group-name {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    .control-wrapper {
+        width: 300px;
+    }
+    .custom-select-container {
+        position: relative;
+        width: 100%;
+    }
     .custom-select-trigger {
         width: 100%;
         display: flex;
         align-items: center;
-        justify-content: center; 
+        justify-content: center;
         padding: 10px 14px;
         background: var(--bg-primary);
         border: 1px solid var(--border-color);
@@ -219,18 +267,52 @@
         position: relative;
     }
     .selected-text {
-        text-align: center; 
+        text-align: center;
         flex-grow: 1;
     }
-    .arrow { font-size: 0.8rem; opacity: 0.7; transition: transform 0.2s; position: absolute; right: 14px; }
-    .arrow.rotated { transform: rotate(180deg); }
-    .custom-dropdown-menu { position: absolute; top: calc(100% + 5px); right: 0; width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; z-index: 50; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-    .dropdown-search { padding: 8px; border-bottom: 1px solid var(--border-color); background: var(--bg-tertiary); }
-    .dropdown-search input { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 4px; color: var(--text-primary); font-size: 0.9rem; }
-    .dropdown-options-list { max-height: 250px; overflow-y: auto; }
+    .arrow {
+        font-size: 0.8rem;
+        opacity: 0.7;
+        transition: transform 0.2s;
+        position: absolute;
+        right: 14px;
+    }
+    .arrow.rotated {
+        transform: rotate(180deg);
+    }
+    .custom-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 5px);
+        right: 0;
+        width: 100%;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        z-index: 50;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    .dropdown-search {
+        padding: 8px;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--bg-tertiary);
+    }
+    .dropdown-search input {
+        width: 100%;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        padding: 6px 10px;
+        border-radius: 4px;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+    .dropdown-options-list {
+        max-height: 250px;
+        overflow-y: auto;
+    }
     .dropdown-option {
         width: 100%;
-        text-align: left; 
+        text-align: left;
         background: transparent;
         justify-content: flex-start;
         border: none;
@@ -243,9 +325,18 @@
         gap: 8px;
         font-size: 0.9rem;
     }
-    .dropdown-option:hover { background: var(--accent-blue); color: white; }
-    .dropdown-option.selected { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); font-weight: 600; }
-    .dropdown-option.danger { color: #ef4444; }
+    .dropdown-option:hover {
+        background: var(--accent-blue);
+        color: white;
+    }
+    .dropdown-option.selected {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-blue);
+        font-weight: 600;
+    }
+    .dropdown-option.danger {
+        color: #ef4444;
+    }
     .info-note {
         margin-top: 15px;
         background: rgba(59, 130, 246, 0.1);
@@ -264,17 +355,65 @@
         color: var(--accent-blue);
         margin-top: 2.2px;
     }
-    
-    .save-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 24px; border-radius: 50px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); z-index: 1000; min-width: 350px; }
-    .save-bar-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-    .save-actions { display: flex; gap: 10px; }
-    .btn-calculate { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; border: 2px solid #60a5fa; padding: 8px 24px; border-radius: 20px; font-weight: 600; cursor: pointer; }
-    .btn-discard { background: transparent; color: #ef4444; border: 2px solid #ef4444; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; }
+
+    .save-bar {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        padding: 12px 24px;
+        border-radius: 50px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        min-width: 350px;
+    }
+    .save-bar-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+    .save-actions {
+        display: flex;
+        gap: 10px;
+    }
+    .btn-calculate {
+        background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+        color: white;
+        border: 2px solid #60a5fa;
+        padding: 8px 24px;
+        border-radius: 20px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .btn-discard {
+        background: transparent;
+        color: #ef4444;
+        border: 2px solid #ef4444;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        cursor: pointer;
+    }
 
     @media (max-width: 768px) {
-        .setting-row { flex-direction: column; align-items: flex-start; gap: 15px; }
-        .control-wrapper { width: 100%; }
-        .save-bar { width: 90%; bottom: 10px; border-radius: 12px; }
-        .save-bar-content { flex-direction: column; }
+        .setting-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .control-wrapper {
+            width: 100%;
+        }
+        .save-bar {
+            width: 90%;
+            bottom: 10px;
+            border-radius: 12px;
+        }
+        .save-bar-content {
+            flex-direction: column;
+        }
     }
 </style>

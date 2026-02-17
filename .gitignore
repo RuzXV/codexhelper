@@ -24,3 +24,5 @@ wrangler.toml
 .claude
 .github
 helper_bot/
+coverage/
+*.tsbuildinfo

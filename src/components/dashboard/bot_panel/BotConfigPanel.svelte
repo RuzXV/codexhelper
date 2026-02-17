@@ -54,12 +54,12 @@
         try {
             const [settingsRes, channelsRes] = await Promise.all([
                 window.auth.fetchWithAuth(`/api/guilds/${guildId}/settings/channels`),
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/channels`)
+                window.auth.fetchWithAuth(`/api/guilds/${guildId}/channels`),
             ]);
             currentSettings = settingsRes?.settings || {};
             guildChannels = channelsRes?.channels || [];
         } catch (e) {
-            console.error("Failed to load server data", e);
+            console.error('Failed to load server data', e);
         } finally {
             loading = false;
         }
@@ -103,22 +103,38 @@
             </div>
 
             <div class="config-tabs">
-                <button class="config-tab-btn" class:active={activeTab === 'overview'} on:click={() => activeTab = 'overview'}>
+                <button
+                    class="config-tab-btn"
+                    class:active={activeTab === 'overview'}
+                    on:click={() => (activeTab = 'overview')}
+                >
                     <i class="fas fa-tachometer-alt"></i> Overview
                 </button>
-                <button class="config-tab-btn" class:active={activeTab === 'channels'} on:click={() => activeTab = 'channels'}>
+                <button
+                    class="config-tab-btn"
+                    class:active={activeTab === 'channels'}
+                    on:click={() => (activeTab = 'channels')}
+                >
                     <i class="fas fa-network-wired"></i> Channels
                 </button>
-                <button class="config-tab-btn" class:active={activeTab === 'calendar'} on:click={() => activeTab = 'calendar'}>
+                <button
+                    class="config-tab-btn"
+                    class:active={activeTab === 'calendar'}
+                    on:click={() => (activeTab = 'calendar')}
+                >
                     <i class="fas fa-calendar-alt"></i> Event Calendar
                 </button>
-                <button class="config-tab-btn" class:active={activeTab === 'reminders'} on:click={() => activeTab = 'reminders'}>
+                <button
+                    class="config-tab-btn"
+                    class:active={activeTab === 'reminders'}
+                    on:click={() => (activeTab = 'reminders')}
+                >
                     <i class="fas fa-bell"></i> Reminders
                 </button>
-                <button class="config-tab-btn" class:active={activeTab === 'mge'} on:click={() => activeTab = 'mge'}>
+                <button class="config-tab-btn" class:active={activeTab === 'mge'} on:click={() => (activeTab = 'mge')}>
                     <i class="fas fa-crown"></i> MGE
                 </button>
-                <button class="config-tab-btn" class:active={activeTab === 'ark'} on:click={() => activeTab = 'ark'}>
+                <button class="config-tab-btn" class:active={activeTab === 'ark'} on:click={() => (activeTab = 'ark')}>
                     <i class="fas fa-scroll"></i> Ark
                 </button>
             </div>
@@ -153,24 +169,23 @@
                     <i class="fas fa-spinner fa-spin"></i> Loading configuration...
                 </div>
             {:else if activeTab === 'overview'}
-                <OverviewConfig {selectedServer} {guildChannels} channelSettings={currentSettings} on:deauthorized={() => dispatch('selectServer', null)} />
-
-            {:else if activeTab === 'channels'}
-                <ChannelConfig 
-                    guildId={selectedServer.id} 
-                    {guildChannels} 
-                    initialSettings={currentSettings}
-                    on:settingsUpdated={handleSettingsUpdate} 
+                <OverviewConfig
+                    {selectedServer}
+                    {guildChannels}
+                    channelSettings={currentSettings}
+                    on:deauthorized={() => dispatch('selectServer', null)}
                 />
-
+            {:else if activeTab === 'channels'}
+                <ChannelConfig
+                    guildId={selectedServer.id}
+                    {guildChannels}
+                    initialSettings={currentSettings}
+                    on:settingsUpdated={handleSettingsUpdate}
+                />
             {:else if activeTab === 'calendar'}
                 <EventCalendarConfig guildId={selectedServer.id} channels={guildChannels} />
-                
             {:else if activeTab === 'reminders'}
-                <RemindersConfig 
-                    guildId={selectedServer.id} 
-                    channels={guildChannels} 
-                />
+                <RemindersConfig guildId={selectedServer.id} channels={guildChannels} />
             {:else if activeTab === 'ark'}
                 <ArkConfig guildId={selectedServer.id} />
             {:else if activeTab === 'mge'}
@@ -181,8 +196,20 @@
 </div>
 
 <style>
-    .panel-container { display: flex; flex-direction: column; gap: 20px; }
-    .no-server-selected { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px; text-align: center; opacity: 0.6; }
+    .panel-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .no-server-selected {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px;
+        text-align: center;
+        opacity: 0.6;
+    }
     .dashboard-header {
         display: flex;
         justify-content: space-between;
@@ -193,7 +220,13 @@
         gap: 16px;
         flex-wrap: nowrap;
     }
-    .dashboard-header h1 { font-size: 1.4rem; font-weight: 700; margin: 0; color: var(--text-primary); white-space: nowrap; }
+    .dashboard-header h1 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-primary);
+        white-space: nowrap;
+    }
     .config-tabs {
         display: flex;
         gap: 4px;
@@ -214,8 +247,12 @@
         position: relative;
         white-space: nowrap;
     }
-    .config-tab-btn:hover { color: var(--text-primary); }
-    .config-tab-btn.active { color: var(--accent-blue); }
+    .config-tab-btn:hover {
+        color: var(--text-primary);
+    }
+    .config-tab-btn.active {
+        color: var(--accent-blue);
+    }
     .config-tab-btn.active::after {
         content: '';
         position: absolute;
@@ -225,10 +262,16 @@
         height: 2px;
         background: var(--accent-blue);
     }
-    .loading-state { padding: 40px; text-align: center; color: var(--text-secondary); font-size: 1.1rem; }
+    .loading-state {
+        padding: 40px;
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+    }
 
     /* Server Selector */
-    .no-server-selector, .header-server-selector {
+    .no-server-selector,
+    .header-server-selector {
         position: relative;
         z-index: 20;
     }
@@ -302,7 +345,7 @@
         border-radius: var(--radius-md);
         width: 100%;
         min-width: 220px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         z-index: 100;
         overflow-y: auto;
         max-height: 400px;
@@ -318,7 +361,7 @@
         padding: 10px 14px;
         background: transparent;
         border: none;
-        border-bottom: 1px solid rgba(255,255,255,0.04);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         color: var(--text-secondary);
         cursor: pointer;
         text-align: left;
@@ -353,7 +396,15 @@
     }
 
     @media (max-width: 768px) {
-        .dashboard-header { flex-direction: column; align-items: flex-start; }
-        .config-tabs { grid-template-columns: 1fr; min-width: auto; width: 100%; margin-top: 15px; }
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .config-tabs {
+            grid-template-columns: 1fr;
+            min-width: auto;
+            width: 100%;
+            margin-top: 15px;
+        }
     }
 </style>
