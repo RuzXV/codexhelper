@@ -26,13 +26,20 @@ app.use(
 
 /**
  * Rate limiting middleware using KV.
+ * - Bot endpoints: exempt (authenticated via secret key, trusted internal service)
  * - Auth endpoints: 10 req/min (prevent brute-force)
- * - Bot endpoints: 120 req/min (internal, higher limit)
  * - General API: 60 req/min
  */
 app.use('/api/*', async (c: Context<{ Bindings: Bindings }>, next: Next) => {
     const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
     const path = new URL(c.req.url).pathname;
+
+    // Bot endpoints are authenticated via secret key — skip rate limiting entirely.
+    // The bot is a trusted internal service and needs burst capacity on startup.
+    if (path.startsWith('/api/bot')) {
+        await next();
+        return;
+    }
 
     let limit = 60;
     const window = 60;
@@ -41,9 +48,6 @@ app.use('/api/*', async (c: Context<{ Bindings: Bindings }>, next: Next) => {
     if (path.startsWith('/api/auth')) {
         limit = 10;
         prefix = 'rl:auth';
-    } else if (path.startsWith('/api/bot')) {
-        limit = 120;
-        prefix = 'rl:bot';
     }
 
     const key = `${prefix}:${ip}`;
