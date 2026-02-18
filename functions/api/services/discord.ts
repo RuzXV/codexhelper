@@ -70,6 +70,14 @@ async function refreshDiscordToken(
         refreshToken: tokenJson.refresh_token,
     });
 
+    // Invalidate stale guild cache so next lookup uses fresh token
+    const guildCacheKey = `discord:guilds:${user.id}`;
+    try {
+        await c.env.API_CACHE.delete(guildCacheKey);
+    } catch (_) {
+        /* best-effort cache clear */
+    }
+
     return true;
 }
 
@@ -104,8 +112,9 @@ export async function discordFetchWithRefresh(
 }
 
 /**
- * Fetch the user's guild list from Discord, with a 1-hour KV cache
+ * Fetch the user's guild list from Discord, with a 10-minute KV cache
  * to reduce redundant API calls during dashboard navigation.
+ * Short TTL ensures token refresh is triggered before tokens go fully stale.
  */
 async function fetchUserGuilds(
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
@@ -125,8 +134,8 @@ async function fetchUserGuilds(
     if (!response.ok) return null;
     const guilds = (await response.json()) as DiscordGuild[];
 
-    // Cache for 1 hour (non-blocking write)
-    const putPromise = c.env.API_CACHE.put(cacheKey, JSON.stringify(guilds), { expirationTtl: 3600 });
+    // Cache for 10 minutes (non-blocking write)
+    const putPromise = c.env.API_CACHE.put(cacheKey, JSON.stringify(guilds), { expirationTtl: 600 });
     if (c.executionCtx && 'waitUntil' in c.executionCtx) {
         c.executionCtx.waitUntil(putPromise);
     } else {

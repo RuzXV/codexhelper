@@ -209,6 +209,7 @@
         padding: 20px;
         border-bottom: 1px solid var(--border-color);
         background: rgba(0, 0, 0, 0.1);
+        display: block;
     }
     .section-desc {
         color: var(--text-secondary);

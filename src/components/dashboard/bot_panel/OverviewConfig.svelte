@@ -60,7 +60,7 @@
     function getChannelMention(id) {
         if (!id || id === 'none') return 'Not Set';
         const ch = guildChannels.find((c) => c.id === id);
-        return ch ? `#${ch.name}` : `<#${id}>`;
+        return ch ? `#${ch.name}` : `#unknown-channel`;
     }
 
     function getAvatarUrl(user) {
