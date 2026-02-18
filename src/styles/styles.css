@@ -679,9 +679,9 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 
 .review-body { flex: 1; }
 
-.review-text { font-size: 0.88rem; color: #b8bfcc; line-height: 1.7; margin: 0; }
+.review-text { font-size: 0.88rem; color: #d4d8e0; line-height: 1.7; margin: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 
-.review-text strong { color: #e2e5ea; font-weight: 600; }
+.review-text strong { font-weight: 700; background: linear-gradient(180deg, #7dd3fc 0%, #f0f4f8 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
 .review-text u { text-decoration-color: rgba(255, 255, 255, 0.3); text-underline-offset: 2px; }
 
