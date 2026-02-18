@@ -331,12 +331,19 @@ function renderReviews(reviews) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    function renderDiscordEmojis(text) {
+        return text.replace(/&lt;(a?):(\w+):(\d+)&gt;/g, (_, animated, name, id) => {
+            const ext = animated ? 'gif' : 'png';
+            return `<img src="https://cdn.discordapp.com/emojis/${id}.${ext}" alt=":${name}:" class="review-emoji">`;
+        });
+    }
+
     function createReviewItem(review) {
         const item = document.createElement('li');
         item.className = 'review-item';
 
         const safeName = escapeHtml(review.username);
-        const safeText = escapeHtml(review.review_text);
+        const safeText = renderDiscordEmojis(escapeHtml(review.review_text));
         const avatarUrl = review.avatar_url || '/images/global/logo-new.webp';
         const safeAvatar = escapeHtml(avatarUrl);
 

@@ -667,15 +667,17 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 
 .reviews-list.is-animated { animation: scroll-left 30s linear infinite; }
 
-.review-item { display: flex; flex-direction: column; justify-content: space-between; min-width: 370px; max-width: 370px; min-height: 220px; padding: 28px; background: linear-gradient(145deg, rgba(30, 34, 45, 0.9) 0%, rgba(20, 22, 28, 0.95) 100%); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.04) inset; transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease; }
+.review-item { display: flex; flex-direction: column; justify-content: space-between; min-width: 370px; max-width: 370px; min-height: 220px; padding: 28px; background: linear-gradient(145deg, rgba(30, 34, 45, 0.9) 0%, rgba(20, 22, 28, 0.95) 100%); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; transition: border-color 0.3s ease; }
 
-.review-item:hover { border-color: rgba(59, 130, 246, 0.35); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(59, 130, 246, 0.08), 0 1px 0 rgba(255, 255, 255, 0.04) inset; transform: translateY(-2px); }
+.review-item:hover { border-color: rgba(255, 255, 255, 0.2); }
 
 .review-text { font-size: 0.9rem; color: #c4c9d4; font-style: italic; line-height: 1.7; margin: 0 0 auto 0; padding-bottom: 16px; flex: 1; }
 
+.review-emoji { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: -0.2em; object-fit: contain; }
+
 .review-author { display: flex; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
 
-.review-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(59, 130, 246, 0.3); box-shadow: 0 0 12px rgba(59, 130, 246, 0.15); }
+.review-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255, 255, 255, 0.1); }
 
 .review-username { font-weight: 600; font-size: 0.9rem; color: #f2f3f5; }
 
