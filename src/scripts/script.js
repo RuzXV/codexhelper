@@ -358,11 +358,13 @@ function renderReviews(reviews) {
         const safeAvatar = escapeHtml(avatarUrl);
 
         item.innerHTML = `
-            <div class="review-thumbnail">
-                <img src="${safeAvatar}" alt="${safeName}" class="review-avatar" onerror="this.src='/images/global/logo-new.webp'">
+            <div class="review-header">
                 <span class="review-username">${safeName}</span>
+                <img src="${safeAvatar}" alt="${safeName}" class="review-avatar" onerror="this.src='/images/global/logo-new.webp'">
             </div>
-            <p class="review-text">${safeText}</p>
+            <div class="review-body">
+                <p class="review-text">${safeText}</p>
+            </div>
         `;
         return item;
     }
