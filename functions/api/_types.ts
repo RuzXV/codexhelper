@@ -22,6 +22,8 @@ export type Variables = {
         id: string;
         username: string;
         accessToken: string;
+        refreshToken: string;
+        sessionToken: string;
     };
 };
 
@@ -85,6 +87,7 @@ export interface EventRecord {
 export interface UserSession {
     user_id: string;
     discord_access_token: string;
+    discord_refresh_token: string | null;
     expiry_date: number;
 }
 

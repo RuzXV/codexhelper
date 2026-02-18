@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
-import { getCookie } from 'hono/cookie';
 import { Bindings, Variables, DiscordUser, DiscordGuild } from '../_types';
 import { authMiddleware } from '../_middleware';
 import { parseAdminIds } from '../_constants';
 import { errors } from '../_errors';
 import { UserSettingsSchema, validateBody } from '../_validation';
+import { discordFetchWithRefresh } from '../services/discord';
 
 interface GuildIdRecord {
     guild_id: string | number;
@@ -17,14 +17,9 @@ users.use('*', authMiddleware);
 users.get('/@me', async (c) => {
     const user = c.get('user');
 
-    const userResponse = await fetch('https://discord.com/api/users/@me', {
-        headers: { Authorization: `Bearer ${user.accessToken}` },
-    });
+    const userResponse = await discordFetchWithRefresh(c, 'https://discord.com/api/users/@me');
 
     if (userResponse.status === 401) {
-        const sessionToken = getCookie(c, 'session_token');
-        await c.env.DB.prepare('DELETE FROM user_sessions WHERE session_token = ?').bind(sessionToken).run();
-        c.header('Set-Cookie', 'session_token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax');
         return errors.unauthorized(c, 'Session expired');
     }
 
@@ -80,14 +75,9 @@ users.post('/settings', async (c) => {
 users.get('/guilds', async (c) => {
     const user = c.get('user');
 
-    const response = await fetch('https://discord.com/api/users/@me/guilds', {
-        headers: { Authorization: `Bearer ${user.accessToken}` },
-    });
+    const response = await discordFetchWithRefresh(c, 'https://discord.com/api/users/@me/guilds');
 
     if (response.status === 401) {
-        const sessionToken = getCookie(c, 'session_token');
-        await c.env.DB.prepare('DELETE FROM user_sessions WHERE session_token = ?').bind(sessionToken).run();
-        c.header('Set-Cookie', 'session_token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax');
         return errors.unauthorized(c, 'Session expired (Discord token invalid)');
     }
 

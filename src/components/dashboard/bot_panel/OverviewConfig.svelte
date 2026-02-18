@@ -36,8 +36,10 @@
     async function loadFeatureStatus(guildId) {
         loading = true;
         try {
-            const featureRes = await window.auth.fetchWithAuth(`/api/guilds/${guildId}/features`);
-            const calendarRes = await window.auth.fetchWithAuth(`/api/guilds/${guildId}/calendar`);
+            const [featureRes, calendarRes] = await Promise.all([
+                window.auth.fetchWithAuth(`/api/guilds/${guildId}/features`),
+                window.auth.fetchWithAuth(`/api/guilds/${guildId}/calendar`),
+            ]);
 
             features = {
                 ...featureRes.features,

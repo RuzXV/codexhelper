@@ -4,14 +4,14 @@
     import MGEApplicationsPanel from './MGEApplicationsPanel.svelte';
 
     export let guildId;
+    export let channels = [];
+    export let roles = [];
 
     let activeSubTab = 'settings';
     let loading = true;
     let saving = false;
     let settings = {};
     let originalSettings = {};
-    let channels = [];
-    let roles = [];
     let openDropdownId = null;
     let dropdownSearch = '';
 
@@ -29,15 +29,9 @@
 
     onMount(async () => {
         try {
-            const [settingsRes, channelsRes, rolesRes] = await Promise.all([
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/mge`),
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/channels`),
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/roles`),
-            ]);
+            const settingsRes = await window.auth.fetchWithAuth(`/api/guilds/${guildId}/mge`);
             settings = settingsRes?.config || {};
             originalSettings = { ...settings };
-            channels = channelsRes?.channels || [];
-            roles = rolesRes?.roles || [];
         } catch (e) {
             console.error('Failed to load MGE settings', e);
         } finally {

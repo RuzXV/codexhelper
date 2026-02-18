@@ -8,11 +8,10 @@
 
     export let guildId;
     export let channels = [];
+    export let roles = [];
 
     let loading = true;
     let saving = false;
-
-    let roles = [];
     let reminders = [];
     let customReminders = [];
     let deletedCustomIds = [];
@@ -38,12 +37,7 @@
     async function loadData() {
         loading = true;
         try {
-            const [res, rolesRes] = await Promise.all([
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/reminders`),
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/roles`),
-            ]);
-
-            roles = rolesRes.roles || [];
+            const res = await window.auth.fetchWithAuth(`/api/guilds/${guildId}/reminders`);
 
             const loadedReminders = (res.reminders || []).map((r) => ({
                 ...r,

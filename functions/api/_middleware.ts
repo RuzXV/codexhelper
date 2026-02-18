@@ -13,11 +13,12 @@ export const authMiddleware = async (c: Context<{ Bindings: Bindings; Variables:
     type Session = {
         user_id: string;
         discord_access_token: string;
+        discord_refresh_token: string | null;
         expiry_date: number;
     };
 
     const session = (await c.env.DB.prepare(
-        'SELECT user_id, discord_access_token, expiry_date FROM user_sessions WHERE session_token = ?',
+        'SELECT user_id, discord_access_token, discord_refresh_token, expiry_date FROM user_sessions WHERE session_token = ?',
     )
         .bind(sessionToken)
         .first()) as Session | null;
@@ -25,7 +26,17 @@ export const authMiddleware = async (c: Context<{ Bindings: Bindings; Variables:
     if (session && Date.now() / 1000 < session.expiry_date) {
         try {
             const decryptedToken = await decryptFernetToken(c.env.DB_ENCRYPTION_KEY, session.discord_access_token);
-            c.set('user', { id: session.user_id, accessToken: decryptedToken, username: '' });
+            let decryptedRefresh = '';
+            if (session.discord_refresh_token) {
+                decryptedRefresh = await decryptFernetToken(c.env.DB_ENCRYPTION_KEY, session.discord_refresh_token);
+            }
+            c.set('user', {
+                id: session.user_id,
+                accessToken: decryptedToken,
+                refreshToken: decryptedRefresh,
+                sessionToken: sessionToken,
+                username: '',
+            });
             await next();
         } catch (e) {
             console.error('Token decryption failed:', e);

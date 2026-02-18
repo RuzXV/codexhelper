@@ -40,8 +40,9 @@ auth.get('/callback', async (c) => {
 
     if (!tokenResponse.ok) return c.text('Failed to authenticate with Discord.', 500);
 
-    const tokenJson = (await tokenResponse.json()) as { access_token: string };
+    const tokenJson = (await tokenResponse.json()) as { access_token: string; refresh_token: string };
     const accessToken = tokenJson.access_token;
+    const refreshToken = tokenJson.refresh_token;
 
     const userResponse = await fetch('https://discord.com/api/users/@me', {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -56,11 +57,12 @@ auth.get('/callback', async (c) => {
     const expiryDate = Date.now() / 1000 + SESSION_DURATION_SECONDS;
 
     const encryptedAccessToken = await encryptFernetToken(c.env.DB_ENCRYPTION_KEY, accessToken);
+    const encryptedRefreshToken = await encryptFernetToken(c.env.DB_ENCRYPTION_KEY, refreshToken);
 
     await c.env.DB.prepare(
-        'INSERT INTO user_sessions (session_token, user_id, discord_access_token, expiry_date) VALUES (?, ?, ?, ?)',
+        'INSERT INTO user_sessions (session_token, user_id, discord_access_token, discord_refresh_token, expiry_date) VALUES (?, ?, ?, ?, ?)',
     )
-        .bind(sessionToken, userId, encryptedAccessToken, expiryDate)
+        .bind(sessionToken, userId, encryptedAccessToken, encryptedRefreshToken, expiryDate)
         .run();
 
     const cookieOptions = `Max-Age=${SESSION_DURATION_SECONDS}; Path=/; HttpOnly; Secure; SameSite=Lax`;

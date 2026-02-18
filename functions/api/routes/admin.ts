@@ -14,6 +14,7 @@ import { errors } from '../_errors';
 import { authMiddleware, masterAdminMiddleware } from '../_middleware';
 import { EVENT_INTERVALS, TROOP_CYCLE, EVENT_COLOR_MAP, parseAdminIds } from '../_constants';
 import { GoogleCalendarService } from '../services/googleCalendar';
+import { discordFetchWithRefresh } from '../services/discord';
 
 const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
@@ -310,9 +311,7 @@ admin.post('/admin/data/:key', async (c) => {
     let adminAvatar = null;
 
     try {
-        const userRes = await fetch('https://discord.com/api/users/@me', {
-            headers: { Authorization: `Bearer ${c.get('user').accessToken}` },
-        });
+        const userRes = await discordFetchWithRefresh(c, 'https://discord.com/api/users/@me');
         const uData = (await userRes.json()) as DiscordUser;
         username = uData.username || uData.global_name || c.get('user').id;
         adminId = uData.id;

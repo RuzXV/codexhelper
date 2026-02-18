@@ -44,6 +44,7 @@
     let loading = false;
     let currentSettings = {};
     let guildChannels = [];
+    let guildRoles = [];
 
     $: if (selectedServer) {
         loadServerData(selectedServer.id);
@@ -52,12 +53,14 @@
     async function loadServerData(guildId) {
         loading = true;
         try {
-            const [settingsRes, channelsRes] = await Promise.all([
+            const [settingsRes, channelsRes, rolesRes] = await Promise.all([
                 window.auth.fetchWithAuth(`/api/guilds/${guildId}/settings/channels`),
                 window.auth.fetchWithAuth(`/api/guilds/${guildId}/channels`),
+                window.auth.fetchWithAuth(`/api/guilds/${guildId}/roles`),
             ]);
             currentSettings = settingsRes?.settings || {};
             guildChannels = channelsRes?.channels || [];
+            guildRoles = rolesRes?.roles || [];
         } catch (e) {
             console.error('Failed to load server data', e);
         } finally {
@@ -185,11 +188,11 @@
             {:else if activeTab === 'calendar'}
                 <EventCalendarConfig guildId={selectedServer.id} channels={guildChannels} />
             {:else if activeTab === 'reminders'}
-                <RemindersConfig guildId={selectedServer.id} channels={guildChannels} />
+                <RemindersConfig guildId={selectedServer.id} channels={guildChannels} roles={guildRoles} />
             {:else if activeTab === 'ark'}
-                <ArkConfig guildId={selectedServer.id} />
+                <ArkConfig guildId={selectedServer.id} channels={guildChannels} roles={guildRoles} />
             {:else if activeTab === 'mge'}
-                <MGEConfig guildId={selectedServer.id} />
+                <MGEConfig guildId={selectedServer.id} channels={guildChannels} roles={guildRoles} />
             {/if}
         </div>
     {/if}

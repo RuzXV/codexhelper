@@ -4,12 +4,12 @@
     import ArkAlliancePanel from './ArkAlliancePanel.svelte';
 
     export let guildId;
+    export let channels = [];
+    export let roles = [];
 
     let loading = true;
     let alliances = {};
     let activeTab = null;
-    let channels = [];
-    let roles = [];
 
     let showCreateModal = false;
     let newAllianceTag = '';
@@ -22,14 +22,8 @@
     async function loadData() {
         loading = true;
         try {
-            const [arkRes, chRes, rolesRes] = await Promise.all([
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/all`),
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/channels`),
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/roles`),
-            ]);
+            const arkRes = await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/all`);
             alliances = arkRes.alliances || {};
-            channels = chRes.channels || [];
-            roles = rolesRes.roles || [];
 
             const tags = Object.keys(alliances);
             if (tags.length > 0 && !activeTab) {
