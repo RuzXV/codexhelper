@@ -659,37 +659,36 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 
 .reviews-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-.reviews-carousel-wrapper { margin-top: 40px; }
+.reviews-carousel-wrapper { margin-top: 40px; overflow: hidden; }
 
-.reviews-list-container { overflow: hidden; position: relative; width: 100%; height: 200px; -webkit-mask-image: linear-gradient(to right, transparent, black 80px, black calc(100% - 80px), transparent); mask-image: linear-gradient(to right, transparent, black 80px, black calc(100% - 80px), transparent); }
+.reviews-list-container { overflow: visible; position: relative; width: 100%; -webkit-mask-image: linear-gradient(to right, transparent, black 80px, black calc(100% - 80px), transparent); mask-image: linear-gradient(to right, transparent, black 80px, black calc(100% - 80px), transparent); }
 
-.reviews-list { display: flex; list-style: none; padding: 0; margin: 0; width: max-content; gap: 24px; will-change: transform; }
+.reviews-list { display: flex; list-style: none; padding: 10px 0; margin: 0; width: max-content; gap: 24px; will-change: transform; }
 
 .reviews-list.is-animated { animation: scroll-left 30s linear infinite; }
 
-.review-item { display: flex; flex-direction: column; justify-content: space-between; min-width: 350px; max-width: 350px; padding: 24px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; backdrop-filter: blur(8px); transition: border-color 0.3s ease; }
+.review-item { display: flex; flex-direction: column; justify-content: space-between; min-width: 370px; max-width: 370px; min-height: 220px; padding: 28px; background: linear-gradient(145deg, rgba(30, 34, 45, 0.9) 0%, rgba(20, 22, 28, 0.95) 100%); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.04) inset; transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease; }
 
-.review-item:hover { border-color: rgba(59, 130, 246, 0.3); }
+.review-item:hover { border-color: rgba(59, 130, 246, 0.35); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(59, 130, 246, 0.08), 0 1px 0 rgba(255, 255, 255, 0.04) inset; transform: translateY(-2px); }
 
-.review-text { font-size: 0.9rem; color: #c4c9d4; font-style: italic; line-height: 1.6; margin: 0 0 16px 0; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.review-text { font-size: 0.9rem; color: #c4c9d4; font-style: italic; line-height: 1.7; margin: 0 0 auto 0; padding-bottom: 16px; flex: 1; }
 
-.review-author { display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.review-author { display: flex; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
 
-.review-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(59, 130, 246, 0.3); }
+.review-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(59, 130, 246, 0.3); box-shadow: 0 0 12px rgba(59, 130, 246, 0.15); }
 
 .review-username { font-weight: 600; font-size: 0.9rem; color: #f2f3f5; }
 
-.review-placeholder { display: flex; align-items: center; justify-content: center; height: 200px; width: 100%; color: #94a3b8; font-style: italic; }
+.review-placeholder { display: flex; align-items: center; justify-content: center; height: 220px; width: 100%; color: #94a3b8; font-style: italic; }
 
 @media (max-width: 768px) {
     .server-item { min-width: 200px; padding: 0 15px; }
     .server-name { font-size: 0.8rem; max-width: 140px; }
     .server-logo { width: 35px; height: 35px; margin-right: 10px; }
-    .review-item { min-width: 280px; max-width: 280px; padding: 18px; }
+    .review-item { min-width: 300px; max-width: 300px; min-height: 200px; padding: 20px; }
     .review-text { font-size: 0.8rem; }
     .reviews-section { padding: 0 0 80px; }
     .reviews-list { gap: 16px; }
-    .reviews-list-container { height: 190px; }
     .sub-nav-container::-webkit-scrollbar {
         display: none;
     }
