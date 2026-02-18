@@ -655,7 +655,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 .top-servers-text p { color: #94a3b8; max-width: 600px; margin: 15px auto 0; }
 
 /* Reviews Carousel */
-.reviews-section { padding: 20px 0 120px; position: relative; }
+.reviews-section { padding: 0 0 120px; position: relative; }
 
 .reviews-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
@@ -685,7 +685,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
     .server-logo { width: 35px; height: 35px; margin-right: 10px; }
     .review-item { min-width: 260px; max-width: 260px; padding: 16px; }
     .review-text { font-size: 0.8rem; }
-    .reviews-section { padding: 15px 0 80px; }
+    .reviews-section { padding: 0 0 80px; }
     .reviews-list { gap: 12px; }
     .sub-nav-container::-webkit-scrollbar {
         display: none;
