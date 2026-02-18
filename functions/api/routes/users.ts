@@ -102,6 +102,15 @@ users.get('/guilds', async (c) => {
     }
 
     if (user.id === c.env.MASTER_OVERRIDE_ID) {
+        // Serve from KV cache if available (5-min TTL)
+        const MASTER_CACHE_KEY = 'master:guild_list';
+        try {
+            const cached = await c.env.API_CACHE.get(MASTER_CACHE_KEY);
+            if (cached) return c.json(JSON.parse(cached));
+        } catch (_) {
+            /* cache miss */
+        }
+
         const discordGuildMap = new Map(discordGuilds.map((g) => [g.id, g]));
         const allBotGuilds = Array.from(activeBotGuildIds);
 
@@ -126,6 +135,15 @@ users.get('/guilds', async (c) => {
 
         const fullList = await Promise.all(promises);
         fullList.sort((a, b) => a.name.localeCompare(b.name));
+
+        // Cache result for 5 minutes (non-blocking)
+        const putPromise = c.env.API_CACHE.put(MASTER_CACHE_KEY, JSON.stringify(fullList), { expirationTtl: 300 });
+        if (c.executionCtx && 'waitUntil' in c.executionCtx) {
+            c.executionCtx.waitUntil(putPromise);
+        } else {
+            await putPromise;
+        }
+
         return c.json(fullList);
     }
 
