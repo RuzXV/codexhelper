@@ -39,6 +39,8 @@ const ALLOWED_TABLES = [
     'command_usage',
     'egg_hammer_personalization',
     'guild_event_sequence',
+    'review_solicitations',
+    'pending_reviews',
 ];
 
 // SQL keywords that can appear after UPDATE/FROM/INTO/JOIN but are NOT table names

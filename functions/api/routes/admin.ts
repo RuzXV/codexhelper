@@ -49,14 +49,66 @@ admin.post('/internal/update-cache', async (c) => {
     const secret = c.req.header('X-Internal-Secret');
     if (secret !== c.env.BOT_SECRET_KEY) return errors.unauthorized(c);
 
-    const { top_servers, bot_stats, active_patrons } = await c.req.json();
+    const { top_servers, bot_stats, active_patrons, approved_reviews } = await c.req.json();
 
     const promises = [];
     if (top_servers) promises.push(c.env.API_CACHE.put('top_servers', JSON.stringify(top_servers)));
     if (bot_stats) promises.push(c.env.API_CACHE.put('bot_stats', JSON.stringify(bot_stats)));
     if (active_patrons) promises.push(c.env.API_CACHE.put('active_patrons', JSON.stringify(active_patrons)));
+    if (approved_reviews) promises.push(c.env.API_CACHE.put('approved_reviews', JSON.stringify(approved_reviews)));
 
     await Promise.all(promises);
+    return c.json({ success: true });
+});
+
+admin.post('/internal/submit-review', async (c) => {
+    const secret = c.req.header('X-Internal-Secret');
+    if (secret !== c.env.BOT_SECRET_KEY) return errors.unauthorized(c);
+
+    const { discord_user_id, discord_username, discord_avatar, review_text } = await c.req.json();
+
+    if (!discord_user_id || !discord_username || !review_text) {
+        return errors.badRequest(c, 'Missing required fields: discord_user_id, discord_username, review_text');
+    }
+
+    const result = await c.env.BOT_DB.prepare(
+        `INSERT INTO pending_reviews (discord_user_id, discord_username, discord_avatar, review_text, submitted_at, status) VALUES (?, ?, ?, ?, ?, ?)`,
+    )
+        .bind(discord_user_id, discord_username, discord_avatar || null, review_text, Math.floor(Date.now() / 1000), 'pending')
+        .run();
+
+    return c.json({ success: true, review_id: result.meta.last_row_id });
+});
+
+admin.post('/internal/approve-review', async (c) => {
+    const secret = c.req.header('X-Internal-Secret');
+    if (secret !== c.env.BOT_SECRET_KEY) return errors.unauthorized(c);
+
+    const { review_id, action } = await c.req.json();
+
+    if (!review_id || !action || !['approved', 'rejected'].includes(action)) {
+        return errors.badRequest(c, 'Missing or invalid fields: review_id, action (approved|rejected)');
+    }
+
+    await c.env.BOT_DB.prepare(`UPDATE pending_reviews SET status = ?, reviewed_at = ? WHERE id = ?`)
+        .bind(action, Math.floor(Date.now() / 1000), review_id)
+        .run();
+
+    if (action === 'approved') {
+        const { results } = await c.env.BOT_DB.prepare(
+            `SELECT discord_username, discord_avatar, review_text, submitted_at FROM pending_reviews WHERE status = 'approved' ORDER BY reviewed_at DESC`,
+        ).all();
+
+        const payload = (results || []).map((r: Record<string, unknown>) => ({
+            username: r.discord_username,
+            avatar_url: r.discord_avatar,
+            review_text: r.review_text,
+            submitted_at: r.submitted_at,
+        }));
+
+        await c.env.API_CACHE.put('approved_reviews', JSON.stringify(payload));
+    }
+
     return c.json({ success: true });
 });
 
@@ -199,6 +251,11 @@ admin.get('/data/:key', async (c) => {
 
     const data = await c.env.BOT_DATA.get(key, 'json');
     return c.json(data || {});
+});
+
+admin.get('/reviews', async (c) => {
+    const reviews = await c.env.API_CACHE.get('approved_reviews', 'json');
+    return c.json(reviews || []);
 });
 
 admin.use('/admin/*', authMiddleware, masterAdminMiddleware);

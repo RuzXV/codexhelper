@@ -654,10 +654,41 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 
 .top-servers-text p { color: #94a3b8; max-width: 600px; margin: 15px auto 0; }
 
+/* Reviews Carousel */
+.reviews-section { padding: 60px 0 80px; position: relative; }
+
+.reviews-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+.reviews-carousel-wrapper { margin-top: 40px; }
+
+.reviews-list-container { overflow: hidden; position: relative; width: 100%; height: 160px; }
+
+.reviews-list { display: flex; list-style: none; padding: 0; margin: 0; width: max-content; gap: 20px; }
+
+.reviews-list.is-animated { animation: scroll-left 45s linear infinite; }
+
+.review-item { display: flex; flex-direction: column; justify-content: space-between; min-width: 320px; max-width: 320px; padding: 20px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; }
+
+.review-stars { color: #f59e0b; font-size: 1rem; letter-spacing: 2px; margin-bottom: 8px; }
+
+.review-text { font-size: 0.875rem; color: #b0b8c4; font-style: italic; line-height: 1.5; margin: 0 0 12px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+.review-author { display: flex; align-items: center; gap: 10px; }
+
+.review-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+
+.review-username { font-weight: 600; font-size: 0.85rem; color: #f2f3f5; }
+
+.review-placeholder { display: flex; align-items: center; justify-content: center; height: 160px; width: 100%; color: #94a3b8; font-style: italic; }
+
 @media (max-width: 768px) {
     .server-item { min-width: 200px; padding: 0 15px; }
     .server-name { font-size: 0.8rem; max-width: 140px; }
     .server-logo { width: 35px; height: 35px; margin-right: 10px; }
+    .review-item { min-width: 260px; max-width: 260px; padding: 16px; }
+    .review-text { font-size: 0.8rem; }
+    .reviews-section { padding: 40px 0 60px; }
+    .reviews-list { gap: 12px; }
     .sub-nav-container::-webkit-scrollbar {
         display: none;
     }

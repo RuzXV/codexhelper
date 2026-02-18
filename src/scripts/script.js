@@ -114,6 +114,7 @@ if (window.auth) {
 const API_BASE_URL = '';
 const STATS_ENDPOINT = '/api/stats';
 const TOP_SERVERS_ENDPOINT = '/api/top-servers';
+const REVIEWS_ENDPOINT = '/api/reviews';
 
 function logMessage(message, type = 'info') {
     const timestamp = new Date().toISOString();
@@ -312,6 +313,57 @@ function renderTopServers(servers) {
     }
 }
 
+function renderReviews(reviews) {
+    const reviewsList = document.getElementById('reviewsList');
+    if (!reviewsList) return;
+
+    if (!reviews || reviews.length === 0) {
+        reviewsList.innerHTML = '';
+        const section = reviewsList.closest('.reviews-section');
+        if (section) section.style.display = 'none';
+        return;
+    }
+
+    reviewsList.innerHTML = '';
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function createReviewItem(review) {
+        const item = document.createElement('li');
+        item.className = 'review-item';
+
+        const safeName = escapeHtml(review.username);
+        const safeText = escapeHtml(review.review_text);
+        const avatarUrl = review.avatar_url || '/images/global/logo-new.webp';
+        const safeAvatar = escapeHtml(avatarUrl);
+
+        item.innerHTML = `
+            <div class="review-stars">\u2605\u2605\u2605\u2605\u2605</div>
+            <p class="review-text">\u201c${safeText}\u201d</p>
+            <div class="review-author">
+                <img src="${safeAvatar}" alt="${safeName}" class="review-avatar" onerror="this.src='/images/global/logo-new.webp'">
+                <span class="review-username">${safeName}</span>
+            </div>
+        `;
+        return item;
+    }
+
+    reviews.forEach((review) => {
+        reviewsList.appendChild(createReviewItem(review));
+    });
+
+    reviews.forEach((review) => {
+        const duplicate = createReviewItem(review);
+        duplicate.setAttribute('aria-hidden', 'true');
+        reviewsList.appendChild(duplicate);
+    });
+
+    reviewsList.classList.add('is-animated');
+}
+
 function loadFallbackData() {
     logMessage('Loading fallback data due to API issues', 'warn');
 
@@ -489,6 +541,13 @@ async function loadApiData() {
         serverListElements.forEach((serverList) => {
             serverList.innerHTML = '<li class="server-error">Could not load server list</li>';
         });
+    });
+
+    await handleApiRequest(REVIEWS_ENDPOINT, 'reviewsCache', renderReviews, () => {
+        const reviewsList = document.getElementById('reviewsList');
+        if (reviewsList) reviewsList.innerHTML = '';
+        const section = document.querySelector('.reviews-section');
+        if (section) section.style.display = 'none';
     });
 
     if (statsCacheUsed || serversCacheUsed) {
