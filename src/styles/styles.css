@@ -667,19 +667,25 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 
 .reviews-list.is-animated { animation: scroll-left 30s linear infinite; }
 
-.review-item { display: flex; flex-direction: column; justify-content: space-between; min-width: 370px; max-width: 370px; min-height: 220px; padding: 28px; background: linear-gradient(145deg, rgba(30, 34, 45, 0.9) 0%, rgba(20, 22, 28, 0.95) 100%); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; transition: border-color 0.3s ease; }
+.review-item { display: flex; flex-direction: column; min-width: 380px; max-width: 380px; padding: 24px 28px; background: linear-gradient(145deg, rgba(30, 34, 45, 0.9) 0%, rgba(20, 22, 28, 0.95) 100%); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; transition: border-color 0.3s ease; user-select: none; cursor: default; }
 
-.review-item:hover { border-color: rgba(255, 255, 255, 0.2); }
+.review-item:hover { border-color: rgba(255, 255, 255, 0.18); }
 
-.review-text { font-size: 0.9rem; color: #c4c9d4; font-style: italic; line-height: 1.7; margin: 0 0 auto 0; padding-bottom: 16px; flex: 1; }
+.review-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+
+.review-username { font-weight: 700; font-size: 0.95rem; color: #f2f3f5; letter-spacing: 0.01em; }
+
+.review-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255, 255, 255, 0.1); flex-shrink: 0; }
+
+.review-body { flex: 1; }
+
+.review-text { font-size: 0.88rem; color: #b8bfcc; line-height: 1.7; margin: 0; }
+
+.review-text strong { color: #e2e5ea; font-weight: 600; }
+
+.review-text u { text-decoration-color: rgba(255, 255, 255, 0.3); text-underline-offset: 2px; }
 
 .review-emoji { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: -0.2em; object-fit: contain; }
-
-.review-author { display: flex; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
-
-.review-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255, 255, 255, 0.1); }
-
-.review-username { font-weight: 600; font-size: 0.9rem; color: #f2f3f5; }
 
 .review-placeholder { display: flex; align-items: center; justify-content: center; height: 220px; width: 100%; color: #94a3b8; font-style: italic; }
 
@@ -687,7 +693,8 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
     .server-item { min-width: 200px; padding: 0 15px; }
     .server-name { font-size: 0.8rem; max-width: 140px; }
     .server-logo { width: 35px; height: 35px; margin-right: 10px; }
-    .review-item { min-width: 300px; max-width: 300px; min-height: 200px; padding: 20px; }
+    .review-item { min-width: 300px; max-width: 300px; padding: 20px; }
+    .review-avatar { width: 38px; height: 38px; }
     .review-text { font-size: 0.8rem; }
     .reviews-section { padding: 0 0 80px; }
     .reviews-list { gap: 16px; }

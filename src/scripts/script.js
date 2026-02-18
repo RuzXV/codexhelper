@@ -331,11 +331,21 @@ function renderReviews(reviews) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    function renderDiscordEmojis(text) {
-        return text.replace(/&lt;(a?):(\w+):(\d+)&gt;/g, (_, animated, name, id) => {
+    function renderDiscordFormatting(text) {
+        // Discord custom emojis
+        text = text.replace(/&lt;(a?):(\w+):(\d+)&gt;/g, (_, animated, name, id) => {
             const ext = animated ? 'gif' : 'png';
             return `<img src="https://cdn.discordapp.com/emojis/${id}.${ext}" alt=":${name}:" class="review-emoji">`;
         });
+        // Bold **text**
+        text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        // Italic *text*
+        text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+        // Underline __text__
+        text = text.replace(/__(.+?)__/g, '<u>$1</u>');
+        // Strikethrough ~~text~~
+        text = text.replace(/~~(.+?)~~/g, '<s>$1</s>');
+        return text;
     }
 
     function createReviewItem(review) {
@@ -343,15 +353,17 @@ function renderReviews(reviews) {
         item.className = 'review-item';
 
         const safeName = escapeHtml(review.username);
-        const safeText = renderDiscordEmojis(escapeHtml(review.review_text));
+        const safeText = renderDiscordFormatting(escapeHtml(review.review_text));
         const avatarUrl = review.avatar_url || '/images/global/logo-new.webp';
         const safeAvatar = escapeHtml(avatarUrl);
 
         item.innerHTML = `
-            <p class="review-text">\u201c${safeText}\u201d</p>
-            <div class="review-author">
-                <img src="${safeAvatar}" alt="${safeName}" class="review-avatar" onerror="this.src='/images/global/logo-new.webp'">
+            <div class="review-header">
                 <span class="review-username">${safeName}</span>
+                <img src="${safeAvatar}" alt="${safeName}" class="review-avatar" onerror="this.src='/images/global/logo-new.webp'">
+            </div>
+            <div class="review-body">
+                <p class="review-text">${safeText}</p>
             </div>
         `;
         return item;
