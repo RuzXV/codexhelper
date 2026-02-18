@@ -341,7 +341,6 @@ function renderReviews(reviews) {
         const safeAvatar = escapeHtml(avatarUrl);
 
         item.innerHTML = `
-            <div class="review-stars">\u2605\u2605\u2605\u2605\u2605</div>
             <p class="review-text">\u201c${safeText}\u201d</p>
             <div class="review-author">
                 <img src="${safeAvatar}" alt="${safeName}" class="review-avatar" onerror="this.src='/images/global/logo-new.webp'">
