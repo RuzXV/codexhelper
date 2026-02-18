@@ -104,7 +104,7 @@ export async function discordFetchWithRefresh(
 }
 
 /**
- * Fetch the user's guild list from Discord, with a 60-second KV cache
+ * Fetch the user's guild list from Discord, with a 1-hour KV cache
  * to reduce redundant API calls during dashboard navigation.
  */
 async function fetchUserGuilds(
@@ -125,8 +125,8 @@ async function fetchUserGuilds(
     if (!response.ok) return null;
     const guilds = (await response.json()) as DiscordGuild[];
 
-    // Cache for 60 seconds (non-blocking write)
-    const putPromise = c.env.API_CACHE.put(cacheKey, JSON.stringify(guilds), { expirationTtl: 60 });
+    // Cache for 1 hour (non-blocking write)
+    const putPromise = c.env.API_CACHE.put(cacheKey, JSON.stringify(guilds), { expirationTtl: 3600 });
     if (c.executionCtx && 'waitUntil' in c.executionCtx) {
         c.executionCtx.waitUntil(putPromise);
     } else {
