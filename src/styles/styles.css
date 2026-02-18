@@ -687,6 +687,10 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 
 .review-emoji { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: -0.2em; object-fit: contain; }
 
+.review-date { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #6b7280; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+
+.review-discord-icon { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.6; }
+
 .review-placeholder { display: flex; align-items: center; justify-content: center; height: 220px; width: 100%; color: #94a3b8; font-style: italic; }
 
 @media (max-width: 768px) {
