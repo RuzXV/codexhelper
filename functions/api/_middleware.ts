@@ -17,11 +17,34 @@ export const authMiddleware = async (c: Context<{ Bindings: Bindings; Variables:
         expiry_date: number;
     };
 
-    const session = (await c.env.DB.prepare(
-        'SELECT user_id, discord_access_token, discord_refresh_token, expiry_date FROM user_sessions WHERE session_token = ?',
-    )
-        .bind(sessionToken)
-        .first()) as Session | null;
+    // Check KV cache first to avoid D1 query on every request
+    const cacheKey = `session:${sessionToken}`;
+    let session: Session | null = null;
+
+    try {
+        const cached = await c.env.API_CACHE.get(cacheKey);
+        if (cached) {
+            session = JSON.parse(cached) as Session;
+        }
+    } catch (_) {
+        /* cache miss or parse error, fall through to D1 */
+    }
+
+    if (!session) {
+        session = (await c.env.DB.prepare(
+            'SELECT user_id, discord_access_token, discord_refresh_token, expiry_date FROM user_sessions WHERE session_token = ?',
+        )
+            .bind(sessionToken)
+            .first()) as Session | null;
+
+        // Cache session in KV for 3 minutes (non-blocking)
+        if (session) {
+            const putPromise = c.env.API_CACHE.put(cacheKey, JSON.stringify(session), { expirationTtl: 180 });
+            if (c.executionCtx && 'waitUntil' in c.executionCtx) {
+                c.executionCtx.waitUntil(putPromise);
+            }
+        }
+    }
 
     if (session && Date.now() / 1000 < session.expiry_date) {
         try {

@@ -1,7 +1,9 @@
 <script>
     import { onMount } from 'svelte';
-    import { fade, fly } from 'svelte/transition';
+    import { fade } from 'svelte/transition';
     import MGEApplicationsPanel from './MGEApplicationsPanel.svelte';
+    import SaveBar from '../../shared/SaveBar.svelte';
+    import { fetchWithAuth } from '../../../stores/auth.js';
 
     export let guildId;
     export let channels = [];
@@ -29,7 +31,7 @@
 
     onMount(async () => {
         try {
-            const settingsRes = await window.auth.fetchWithAuth(`/api/guilds/${guildId}/mge`);
+            const settingsRes = await fetchWithAuth(`/api/guilds/${guildId}/mge`);
             settings = settingsRes?.config || {};
             originalSettings = { ...settings };
         } catch (e) {
@@ -42,7 +44,7 @@
     async function saveSettings() {
         saving = true;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/mge`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/mge`, {
                 method: 'POST',
                 body: JSON.stringify(settings),
             });
@@ -159,7 +161,7 @@
                             <div class="group-info">
                                 <div class="group-title-row">
                                     <i class="fas {field.icon} group-icon"></i>
-                                    <span class="group-name">{field.label}</span>
+                                    <span class="group-name" id="label-{field.id}">{field.label}</span>
                                 </div>
                             </div>
 
@@ -168,6 +170,7 @@
                                     <button
                                         type="button"
                                         class="custom-select-trigger"
+                                        aria-labelledby="label-{field.id}"
                                         on:click={(e) => toggleDropdown(field.id, e)}
                                         disabled={saving}
                                     >
@@ -243,19 +246,7 @@
             {/if}
         </div>
 
-        {#if hasUnsavedChanges}
-            <div class="save-bar" transition:fly={{ y: 50, duration: 300 }}>
-                <div class="save-bar-content">
-                    <span>You have unsaved changes.</span>
-                    <div class="save-actions">
-                        <button class="btn-discard" on:click={discardChanges} disabled={saving}>Discard</button>
-                        <button class="btn-calculate" on:click={saveSettings} disabled={saving}>
-                            {#if saving}<i class="fas fa-spinner fa-spin"></i>{:else}Save Changes{/if}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        {/if}
+        <SaveBar {hasUnsavedChanges} {saving} on:save={saveSettings} on:discard={discardChanges} />
     {:else if activeSubTab === 'applications'}
         <div transition:fade={{ duration: 150 }}>
             <MGEApplicationsPanel {guildId} />
@@ -546,48 +537,6 @@
         border-radius: 4px;
         font-size: 0.85em;
     }
-    .save-bar {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--bg-card, #1f2937);
-        border: 1px solid var(--border-color);
-        padding: 12px 24px;
-        border-radius: 50px;
-        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        min-width: 350px;
-    }
-    .save-bar-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-    }
-    .save-actions {
-        display: flex;
-        gap: 10px;
-    }
-    .btn-calculate {
-        background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple, #8b5cf6));
-        color: white;
-        border: none;
-        padding: 8px 24px;
-        border-radius: 20px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-    .btn-discard {
-        background: transparent;
-        color: #ef4444;
-        border: 1px solid #ef4444;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
     @media (max-width: 768px) {
         .setting-row {
             flex-direction: column;
@@ -596,9 +545,6 @@
         }
         .control-wrapper {
             width: 100%;
-        }
-        .save-bar {
-            width: 90%;
         }
     }
 </style>

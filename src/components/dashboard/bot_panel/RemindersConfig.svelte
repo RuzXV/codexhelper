@@ -5,6 +5,7 @@
     import CustomReminderCard from './reminders/CustomReminderCard.svelte';
     import SaveBar from '../../shared/SaveBar.svelte';
     import '../../../styles/reminders-shared.css';
+    import { fetchWithAuth } from '../../../stores/auth.js';
 
     export let guildId;
     export let channels = [];
@@ -37,7 +38,7 @@
     async function loadData() {
         loading = true;
         try {
-            const res = await window.auth.fetchWithAuth(`/api/guilds/${guildId}/reminders`);
+            const res = await fetchWithAuth(`/api/guilds/${guildId}/reminders`);
 
             const loadedReminders = (res.reminders || []).map((r) => ({
                 ...r,
@@ -89,7 +90,7 @@
     async function saveChanges() {
         saving = true;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/reminders`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/reminders`, {
                 method: 'POST',
                 body: JSON.stringify({
                     reminders: reminders,
@@ -223,7 +224,7 @@
 
         saving = true;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/reminders`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/reminders`, {
                 method: 'POST',
                 body: JSON.stringify({
                     reminders: [

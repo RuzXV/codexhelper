@@ -1,6 +1,7 @@
 ---
 import Navbar from '../components/Navbar.svelte';
 import Footer from '../components/Footer.svelte';
+import CookieConsent from '../components/CookieConsent.svelte';
 
 import '../styles/styles.css';
 
@@ -10,7 +11,6 @@ import favicon32 from '../assets/images/favicon/favicon-32x32.png';
 import favicon16 from '../assets/images/favicon/favicon-16x16.png';
 
 import toolBgImage from '../assets/images/global/tool_bg.webp';
-import { ViewTransitions } from 'astro:transitions';
 
 const {
     title,
@@ -29,7 +29,7 @@ const fullTitle = `${title} - Codex Helper | Rise of Kingdoms Tools`;
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <title>{fullTitle}</title>
         <meta name="title" content={fullTitle} />
@@ -56,11 +56,15 @@ const fullTitle = `${title} - Codex Helper | Rise of Kingdoms Tools`;
         <meta name="application-name" content="Codex Helper" />
         <meta name="apple-mobile-web-app-title" content="Codex Helper" />
 
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
         <link
             href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
             rel="stylesheet"
         />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
 
         <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src} />
         <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src} />
@@ -73,6 +77,10 @@ const fullTitle = `${title} - Codex Helper | Rise of Kingdoms Tools`;
             function gtag() {
                 dataLayer.push(arguments);
             }
+            // Default to denied; CookieConsent component will update on user choice
+            gtag('consent', 'default', {
+                analytics_storage: localStorage.getItem('cookie_consent') === 'accepted' ? 'granted' : 'denied',
+            });
             gtag('js', new Date());
             gtag('config', 'G-156DRH9ZB0');
         </script>
@@ -84,13 +92,15 @@ const fullTitle = `${title} - Codex Helper | Rise of Kingdoms Tools`;
 
         {isToolPage && <div class="global-tool-bg" style={`background-image: url(${toolBgImage.src})`} />}
 
-        <Navbar client:load {currentPath} />
+        <Navbar client:idle {currentPath} />
 
         <div id="main-content">
             <slot />
         </div>
 
         <Footer />
+
+        <CookieConsent client:idle />
 
         <button id="back-to-top" class="back-to-top" aria-label="Back to top">
             <i class="fas fa-chevron-up"></i>

@@ -1,8 +1,8 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-@font-face { font-family: 'NotoSansHans DemiLight'; src: url('/fonts/NotoSansHans-DemiLight.woff2') format('woff2'), url('/fonts/NotoSansHans-DemiLight.otf') format('opentype'); font-weight: normal; font-style: normal; font-display: swap; }
+@font-face { font-family: 'NotoSansHans DemiLight'; src: url('/fonts/NotoSansHans-DemiLight.woff2') format('woff2'); font-weight: normal; font-style: normal; font-display: swap; }
 
-@font-face { font-family: 'NotoSansHans Bold'; src: url('/fonts/NotoSansHans-Bold.woff2') format('woff2'), url('/fonts/NotoSansHans-Bold.otf') format('opentype'); font-weight: normal; font-style: normal; font-display: swap; }
+@font-face { font-family: 'NotoSansHans Bold'; src: url('/fonts/NotoSansHans-Bold.woff2') format('woff2'); font-weight: normal; font-style: normal; font-display: swap; }
 
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 
@@ -739,3 +739,17 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 .legal-tab-btn.active { background: var(--accent-blue); border-color: transparent; color: #fff; box-shadow: 0 2px 12px rgba(59, 130, 246, 0.35); }
 .legal-tab-content { display: none; }
 .legal-tab-content.active { display: block; animation: fadeInUp 0.4s ease-out; }
+
+/* ============================================
+   Focus-visible Styles (Accessibility)
+   ============================================ */
+
+:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+}

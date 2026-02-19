@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'NotoSansHans';
-    src: url('/fonts/NotoSansHans-Black.woff2') format('woff2'), url('/fonts/NotoSansHans-Black.otf') format('opentype');
+    src: url('/fonts/NotoSansHans-Black.woff2') format('woff2');
     font-weight: 700;
     font-style: normal;
     font-display: swap;

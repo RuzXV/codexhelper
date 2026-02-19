@@ -25,6 +25,35 @@ app.use(
 );
 
 /**
+ * Security headers middleware — adds standard security headers to all API responses.
+ */
+app.use('/api/*', async (c: Context<{ Bindings: Bindings }>, next: Next) => {
+    await next();
+    c.header('X-Content-Type-Options', 'nosniff');
+    c.header('X-Frame-Options', 'DENY');
+    c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+});
+
+/**
+ * CSRF protection middleware — requires application/json content-type for state-changing requests.
+ * Forms cannot send application/json cross-origin, so this blocks CSRF attacks.
+ * Bot/internal/auth endpoints are exempt (authenticated via secret key or OAuth flow).
+ */
+app.use('/api/*', async (c: Context<{ Bindings: Bindings }>, next: Next) => {
+    const method = c.req.method;
+    if (['GET', 'OPTIONS', 'HEAD'].includes(method)) return next();
+
+    const path = new URL(c.req.url).pathname;
+    if (path.startsWith('/api/bot') || path.startsWith('/api/internal') || path.startsWith('/api/auth')) return next();
+
+    const contentType = c.req.header('content-type') || '';
+    if (!contentType.includes('application/json')) {
+        return c.json({ error: 'Invalid content type' }, 415);
+    }
+    await next();
+});
+
+/**
  * Rate limiting middleware using KV.
  * - Bot endpoints: exempt (authenticated via secret key, trusted internal service)
  * - Auth endpoints: 10 req/min (prevent brute-force)

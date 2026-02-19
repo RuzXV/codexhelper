@@ -60,7 +60,7 @@ import Layout from '../layouts/Layout.astro';
                 <div class="faq-grid">
                     <div class="faq-items">
                         <div class="faq-item">
-                            <button class="faq-question">
+                            <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-1">
                                 <span>How do I setup the bot on my discord server?</span>
                                 <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <path
@@ -71,7 +71,7 @@ import Layout from '../layouts/Layout.astro';
                                         stroke-linejoin="round"></path>
                                 </svg>
                             </button>
-                            <div class="faq-answer">
+                            <div class="faq-answer" id="faq-answer-1" role="region">
                                 <p>
                                     <strong>1.</strong> Subscribe to our Patreon page, then follow the link in the pinned
                                     post to invite the Codex Helper bot to your server of choice.
@@ -95,7 +95,7 @@ import Layout from '../layouts/Layout.astro';
                         </div>
 
                         <div class="faq-item">
-                            <button class="faq-question">
+                            <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-2">
                                 <span>Do the higher membership tiers of the Patreon page unlock other features?</span>
                                 <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <path
@@ -106,7 +106,7 @@ import Layout from '../layouts/Layout.astro';
                                         stroke-linejoin="round"></path>
                                 </svg>
                             </button>
-                            <div class="faq-answer">
+                            <div class="faq-answer" id="faq-answer-2" role="region">
                                 <p>
                                     No, the only tier required to use the bot is the lowest tier ($3 USD/month). The
                                     higher tiers are simply for extra support to The King's Codex.
@@ -115,7 +115,7 @@ import Layout from '../layouts/Layout.astro';
                         </div>
 
                         <div class="faq-item">
-                            <button class="faq-question">
+                            <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-3">
                                 <span>Can I activate the Codex Helper bot in multiple servers after subscribing?</span>
                                 <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <path
@@ -126,7 +126,7 @@ import Layout from '../layouts/Layout.astro';
                                         stroke-linejoin="round"></path>
                                 </svg>
                             </button>
-                            <div class="faq-answer">
+                            <div class="faq-answer" id="faq-answer-3" role="region">
                                 <p>
                                     Yes, the subscription is tied per person therefore as long as you are an
                                     Administrator or have Manage Server permissions within a discord server, you can
@@ -136,7 +136,7 @@ import Layout from '../layouts/Layout.astro';
                         </div>
 
                         <div class="faq-item">
-                            <button class="faq-question">
+                            <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-4">
                                 <span>I'm having issues with the Codex Helper bot, where can I find support?</span>
                                 <svg class="faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <path
@@ -147,7 +147,7 @@ import Layout from '../layouts/Layout.astro';
                                         stroke-linejoin="round"></path>
                                 </svg>
                             </button>
-                            <div class="faq-answer">
+                            <div class="faq-answer" id="faq-answer-4" role="region">
                                 <p>
                                     You can open a ticket in the King's Codex Discord Server, specifically in the <strong
                                         >discord․support</strong

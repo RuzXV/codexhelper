@@ -4,11 +4,10 @@ import DashboardComponent from '../../components/dashboard/Dashboard.svelte';
 ---
 
 <Layout title="Dashboard - Codex Helper" bodyClass="dashboard-page has-sub-nav">
+    <meta name="robots" content="noindex, nofollow" slot="head-scripts" />
     <DashboardComponent client:only="svelte" />
 
     <script>
         import '../../scripts/auth.js';
-
-        document.addEventListener('DOMContentLoaded', () => {});
     </script>
 </Layout>

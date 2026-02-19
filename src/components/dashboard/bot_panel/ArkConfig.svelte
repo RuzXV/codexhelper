@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { fade, slide } from 'svelte/transition';
     import ArkAlliancePanel from './ArkAlliancePanel.svelte';
+    import { fetchWithAuth } from '../../../stores/auth.js';
 
     export let guildId;
     export let channels = [];
@@ -22,7 +23,7 @@
     async function loadData() {
         loading = true;
         try {
-            const arkRes = await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/all`);
+            const arkRes = await fetchWithAuth(`/api/guilds/${guildId}/ark/all`);
             alliances = arkRes.alliances || {};
 
             const tags = Object.keys(alliances);
@@ -40,7 +41,7 @@
         if (!newAllianceTag.trim()) return alert('Please enter an alliance tag.');
         creating = true;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/alliance`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/ark/alliance`, {
                 method: 'POST',
                 body: JSON.stringify({
                     alliance_tag: newAllianceTag.trim(),

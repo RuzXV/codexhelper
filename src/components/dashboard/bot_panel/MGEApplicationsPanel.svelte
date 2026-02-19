@@ -1,6 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import { slide, fade } from 'svelte/transition';
+    import { fetchWithAuth } from '../../../stores/auth.js';
 
     export let guildId;
 
@@ -21,7 +22,7 @@
     async function loadData() {
         loading = true;
         try {
-            const res = await window.auth.fetchWithAuth(`/api/guilds/${guildId}/mge/applications`);
+            const res = await fetchWithAuth(`/api/guilds/${guildId}/mge/applications`);
             mgeName = res.mge_name;
             placementPoints = res.placement_points || '';
             applications = res.applications || [];
@@ -69,7 +70,7 @@
 
         actionLoading = app.application_id;
         try {
-            const res = await window.auth.fetchWithAuth(
+            const res = await fetchWithAuth(
                 `/api/guilds/${guildId}/mge/applications/${app.application_id}/accept`,
                 {
                     method: 'POST',
@@ -95,7 +96,7 @@
 
         actionLoading = app.application_id;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/mge/applications/${app.application_id}/reject`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/mge/applications/${app.application_id}/reject`, {
                 method: 'POST',
             });
             await loadData();
@@ -110,7 +111,7 @@
         event.stopPropagation();
         actionLoading = app.application_id;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/mge/applications/${app.application_id}/restore`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/mge/applications/${app.application_id}/restore`, {
                 method: 'POST',
             });
             await loadData();

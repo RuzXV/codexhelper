@@ -7,10 +7,8 @@
     import RemindersConfig from './RemindersConfig.svelte';
     import ArkConfig from './ArkConfig.svelte';
     import MGEConfig from './MGEConfig.svelte';
-
-    export let selectedServer;
-    export let availableServers = [];
-    export let selectedServerIcon = '';
+    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { selectedServer, availableServers } from '../../../stores/guild.js';
 
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
@@ -46,17 +44,17 @@
     let guildChannels = [];
     let guildRoles = [];
 
-    $: if (selectedServer) {
-        loadServerData(selectedServer.id);
+    $: if ($selectedServer) {
+        loadServerData($selectedServer.id);
     }
 
     async function loadServerData(guildId) {
         loading = true;
         try {
             const [settingsRes, channelsRes, rolesRes] = await Promise.all([
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/settings/channels`),
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/channels`),
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/roles`),
+                fetchWithAuth(`/api/guilds/${guildId}/settings/channels`),
+                fetchWithAuth(`/api/guilds/${guildId}/channels`),
+                fetchWithAuth(`/api/guilds/${guildId}/roles`),
             ]);
             currentSettings = settingsRes?.settings || {};
             guildChannels = channelsRes?.channels || [];
@@ -74,7 +72,7 @@
 </script>
 
 <div class="panel-container">
-    {#if !selectedServer}
+    {#if !$selectedServer}
         <div class="no-server-selected">
             <i class="fas fa-server" style="font-size: 4rem; color: var(--bg-tertiary); margin-bottom: 20px;"></i>
             <h2>No Server Selected</h2>
@@ -86,13 +84,13 @@
                 </button>
                 {#if isServerDropdownOpen}
                     <div class="server-dropdown">
-                        {#each availableServers as server}
+                        {#each $availableServers as server}
                             <button class="server-option" on:click={() => handleSelectServer(server)}>
                                 <img src={getIcon(server)} alt="" class="server-icon-mini" />
                                 <span>{server.name}</span>
                             </button>
                         {/each}
-                        {#if availableServers.length === 0}
+                        {#if $availableServers.length === 0}
                             <div class="server-option empty">No common servers found</div>
                         {/if}
                     </div>
@@ -145,20 +143,20 @@
             <div class="header-server-selector">
                 <button class="server-select-btn" on:click={toggleServerDropdown}>
                     <div class="server-btn-content">
-                        <img src={getIcon(selectedServer)} alt="" class="server-icon-mini" />
-                        <span class="server-name">{selectedServer.name}</span>
+                        <img src={getIcon($selectedServer)} alt="" class="server-icon-mini" />
+                        <span class="server-name">{$selectedServer.name}</span>
                     </div>
                     <i class="fas fa-chevron-down chevron-icon" class:open={isServerDropdownOpen}></i>
                 </button>
                 {#if isServerDropdownOpen}
                     <div class="server-dropdown">
-                        {#each availableServers as server}
+                        {#each $availableServers as server}
                             <button class="server-option" on:click={() => handleSelectServer(server)}>
                                 <img src={getIcon(server)} alt="" class="server-icon-mini" />
                                 <span>{server.name}</span>
                             </button>
                         {/each}
-                        {#if availableServers.length === 0}
+                        {#if $availableServers.length === 0}
                             <div class="server-option empty">No common servers found</div>
                         {/if}
                     </div>
@@ -173,26 +171,26 @@
                 </div>
             {:else if activeTab === 'overview'}
                 <OverviewConfig
-                    {selectedServer}
+                    selectedServer={$selectedServer}
                     {guildChannels}
                     channelSettings={currentSettings}
                     on:deauthorized={() => dispatch('selectServer', null)}
                 />
             {:else if activeTab === 'channels'}
                 <ChannelConfig
-                    guildId={selectedServer.id}
+                    guildId={$selectedServer.id}
                     {guildChannels}
                     initialSettings={currentSettings}
                     on:settingsUpdated={handleSettingsUpdate}
                 />
             {:else if activeTab === 'calendar'}
-                <EventCalendarConfig guildId={selectedServer.id} channels={guildChannels} />
+                <EventCalendarConfig guildId={$selectedServer.id} channels={guildChannels} />
             {:else if activeTab === 'reminders'}
-                <RemindersConfig guildId={selectedServer.id} channels={guildChannels} roles={guildRoles} />
+                <RemindersConfig guildId={$selectedServer.id} channels={guildChannels} roles={guildRoles} />
             {:else if activeTab === 'ark'}
-                <ArkConfig guildId={selectedServer.id} channels={guildChannels} roles={guildRoles} />
+                <ArkConfig guildId={$selectedServer.id} channels={guildChannels} roles={guildRoles} />
             {:else if activeTab === 'mge'}
-                <MGEConfig guildId={selectedServer.id} channels={guildChannels} roles={guildRoles} />
+                <MGEConfig guildId={$selectedServer.id} channels={guildChannels} roles={guildRoles} />
             {/if}
         </div>
     {/if}

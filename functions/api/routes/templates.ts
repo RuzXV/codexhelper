@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { Bindings, Variables } from '../_types';
 import { authMiddleware } from '../_middleware';
+import { TemplateCreateSchema, validateBody } from '../_validation';
+import { errors } from '../_errors';
 
 const templates = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
@@ -9,7 +11,7 @@ templates.use('*', authMiddleware);
 templates.get('/', async (c) => {
     const user = c.get('user');
     const { results } = await c.env.DB.prepare(
-        `SELECT template_id, template_name, content, char_count, date_saved, last_loaded 
+        `SELECT template_id, template_name, content, char_count, date_saved, last_loaded
          FROM user_templates WHERE user_id = ? ORDER BY date_saved DESC`,
     )
         .bind(user.id)
@@ -20,11 +22,15 @@ templates.get('/', async (c) => {
 templates.post('/', async (c) => {
     const user = c.get('user');
     const body = await c.req.json();
+    const validation = validateBody(TemplateCreateSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
+    const { template_name, content, char_count } = validation.data;
     await c.env.DB.prepare(
-        `INSERT INTO user_templates (user_id, template_name, content, char_count, date_saved) 
+        `INSERT INTO user_templates (user_id, template_name, content, char_count, date_saved)
          VALUES (?, ?, ?, ?, ?)`,
     )
-        .bind(user.id, body.template_name, body.content, body.char_count, Date.now() / 1000)
+        .bind(user.id, template_name, content, char_count, Date.now() / 1000)
         .run();
     return c.json({ status: 'success' }, 201);
 });

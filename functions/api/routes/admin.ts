@@ -15,6 +15,23 @@ import { authMiddleware, masterAdminMiddleware } from '../_middleware';
 import { EVENT_INTERVALS, TROOP_CYCLE, EVENT_COLOR_MAP, parseAdminIds } from '../_constants';
 import { GoogleCalendarService } from '../services/googleCalendar';
 import { discordFetchWithRefresh } from '../services/discord';
+import { SubmitReviewSchema, ApproveReviewSchema, validateBody } from '../_validation';
+
+/** Allowed keys for /data/:key endpoints — prevents arbitrary KV access */
+const ALLOWED_DATA_KEYS = [
+    'commanders',
+    'pairings',
+    'equipment',
+    'equipment_sets',
+    'iconic_commanders',
+    'inscriptions',
+    'inscription_stats',
+    'inscription_tier_list',
+    'inscription_descriptions',
+    'stat_weighting',
+    'score_pairings',
+    'system_changelog',
+];
 
 const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
@@ -66,11 +83,11 @@ admin.post('/internal/submit-review', async (c) => {
     const secret = c.req.header('X-Internal-Secret');
     if (secret !== c.env.BOT_SECRET_KEY) return errors.unauthorized(c);
 
-    const { discord_user_id, discord_username, discord_avatar, review_text } = await c.req.json();
+    const body = await c.req.json();
+    const validation = validateBody(SubmitReviewSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!discord_user_id || !discord_username || !review_text) {
-        return errors.badRequest(c, 'Missing required fields: discord_user_id, discord_username, review_text');
-    }
+    const { discord_user_id, discord_username, discord_avatar, review_text } = validation.data;
 
     const result = await c.env.BOT_DB.prepare(
         `INSERT INTO pending_reviews (discord_user_id, discord_username, discord_avatar, review_text, submitted_at, status) VALUES (?, ?, ?, ?, ?, ?)`,
@@ -85,11 +102,11 @@ admin.post('/internal/approve-review', async (c) => {
     const secret = c.req.header('X-Internal-Secret');
     if (secret !== c.env.BOT_SECRET_KEY) return errors.unauthorized(c);
 
-    const { review_id, action } = await c.req.json();
+    const body = await c.req.json();
+    const validation = validateBody(ApproveReviewSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
 
-    if (!review_id || !action || !['approved', 'rejected'].includes(action)) {
-        return errors.badRequest(c, 'Missing or invalid fields: review_id, action (approved|rejected)');
-    }
+    const { review_id, action } = validation.data;
 
     await c.env.BOT_DB.prepare(`UPDATE pending_reviews SET status = ?, reviewed_at = ? WHERE id = ?`)
         .bind(action, Math.floor(Date.now() / 1000), review_id)
@@ -111,6 +128,23 @@ admin.post('/internal/approve-review', async (c) => {
     }
 
     return c.json({ success: true });
+});
+
+admin.post('/internal/cleanup-sessions', async (c) => {
+    const secret = c.req.header('X-Internal-Secret');
+    if (secret !== c.env.BOT_SECRET_KEY) return errors.unauthorized(c);
+
+    try {
+        const now = Math.floor(Date.now() / 1000);
+        const result = await c.env.DB.prepare('DELETE FROM user_sessions WHERE expiry_date < ?').bind(now).run();
+        return c.json({
+            success: true,
+            message: `Cleaned up expired sessions`,
+            changes: result.meta.changes,
+        });
+    } catch (e) {
+        return errors.internal(c, e);
+    }
 });
 
 admin.post('/internal/extend-events', async (c) => {
@@ -236,6 +270,10 @@ admin.get('/data/:key', async (c) => {
     const key = c.req.param('key');
     const secret = c.req.header('X-Internal-Secret');
 
+    if (!ALLOWED_DATA_KEYS.includes(key)) {
+        return errors.badRequest(c, `Invalid data key: ${key}`);
+    }
+
     const isBot = secret === c.env.BOT_SECRET_KEY;
     if (!isBot) {
         const sessionToken = getCookie(c, 'session_token');
@@ -296,6 +334,11 @@ admin.post('/admin/heartbeat', async (c) => {
 
 admin.post('/admin/data/:key', async (c) => {
     const key = c.req.param('key');
+
+    if (!ALLOWED_DATA_KEYS.includes(key)) {
+        return errors.badRequest(c, `Invalid data key: ${key}`);
+    }
+
     const rawBody = await c.req.json();
 
     let bodyData = rawBody;

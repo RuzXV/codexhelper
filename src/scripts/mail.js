@@ -1,29 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    function getStorageKey(key) {
-        const user = window.auth ? window.auth.getLoggedInUser() : null;
-        if (user && user.id) {
-            return `codex-user-${user.id}-${key}`;
-        }
-        return `codex-guest-${key}`;
-    }
-
-    window.saveUserData = (key, data) => {
-        try {
-            localStorage.setItem(getStorageKey(key), JSON.stringify(data));
-        } catch (e) {
-            console.error('Failed to save user data to localStorage', e);
-        }
-    };
-
-    window.loadUserData = (key) => {
-        try {
-            const data = localStorage.getItem(getStorageKey(key));
-            return data ? JSON.parse(data) : null;
-        } catch (e) {
-            console.error('Failed to load user data from localStorage', e);
-            return null;
-        }
-    };
+    // saveUserData / loadUserData / getStorageKey are defined in utils.js (loaded first via Layout.astro)
 
     window.onAuthSuccess = function () {
         renderSavedTemplatesView();

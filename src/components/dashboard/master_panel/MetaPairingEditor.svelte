@@ -1,7 +1,8 @@
 <script>
     import { createEventDispatcher, onMount, tick } from 'svelte';
-    import { fly, fade, scale } from 'svelte/transition';
+    import { fade, scale } from 'svelte/transition';
     import MetaFieldEditor from './meta_editor/MetaFieldEditor.svelte';
+    import SaveBar from '../../shared/SaveBar.svelte';
 
     export let metaId;
     export let metaData;
@@ -33,6 +34,7 @@
     let fields = [];
     let openDropdownId = null;
     let saveState = 'idle';
+    $: saving = saveState === 'saving';
     let showDiscardModal = false;
     let lightboxImage = null;
 
@@ -359,33 +361,7 @@
         </div>
     </div>
 
-    {#if hasUnsavedChanges || saveState === 'saving' || saveState === 'success'}
-        <div class="save-bar" transition:fly={{ y: 50, duration: 300 }}>
-            <div class="save-bar-content">
-                {#if saveState === 'success'}
-                    <span style="color: #4ade80;"><i class="fas fa-check-circle"></i> Saved Successfully!</span>
-                {:else}
-                    <span>You have unsaved changes.</span>
-                    <div class="save-actions">
-                        <button class="btn-discard" on:click={attemptClose} disabled={saveState === 'saving'}
-                            >Discard</button
-                        >
-                        <button
-                            class="btn-calculate"
-                            on:click={save}
-                            disabled={saveState === 'saving' || isTotalOverLimit}
-                        >
-                            {#if saveState === 'saving'}
-                                <i class="fas fa-spinner fa-spin"></i>
-                            {:else}
-                                Save Changes
-                            {/if}
-                        </button>
-                    </div>
-                {/if}
-            </div>
-        </div>
-    {/if}
+    <SaveBar {hasUnsavedChanges} {saving} on:save={save} on:discard={attemptClose} />
 
     {#if showDiscardModal}
         <div
@@ -770,71 +746,6 @@
     }
     .preview-image:hover {
         transform: scale(1.01);
-    }
-
-    .save-bar {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
-        padding: 12px 24px;
-        border-radius: 50px;
-        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-        min-width: 350px;
-    }
-    .save-bar-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        width: 100%;
-    }
-    .save-bar span {
-        font-weight: 500;
-        color: white;
-    }
-    .save-actions {
-        display: flex;
-        gap: 10px;
-    }
-
-    .btn-calculate {
-        background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-        color: white;
-        border: 2px solid #60a5fa;
-        padding: 8px 24px;
-        border-radius: 20px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-    }
-    .btn-calculate:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-    }
-    .btn-calculate:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-        box-shadow: none;
-    }
-
-    .btn-discard {
-        background: transparent;
-        color: #ef4444;
-        border: 2px solid #ef4444;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .btn-discard:hover {
-        background: rgba(239, 68, 68, 0.15);
-        color: #ef4444;
     }
 
     .modal-backdrop {

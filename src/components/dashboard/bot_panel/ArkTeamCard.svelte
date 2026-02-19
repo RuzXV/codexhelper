@@ -1,5 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte';
+    import { fetchWithAuth } from '../../../stores/auth.js';
     export let guildId;
     export let allianceTag;
     export let teamNumber;
@@ -32,7 +33,7 @@
         const utcTimestamp = Math.floor(d.getTime() / 1000);
 
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/team`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/ark/team`, {
                 method: 'POST',
                 body: JSON.stringify({
                     alliance_tag: allianceTag,
@@ -53,7 +54,7 @@
     async function removeSignup(ign) {
         if (!confirm(`Remove ${ign}?`)) return;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/signup`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/ark/signup`, {
                 method: 'DELETE',
                 body: JSON.stringify({ alliance_tag: allianceTag, in_game_name: ign }),
             });
@@ -66,7 +67,7 @@
     async function addManualSignup() {
         if (!newSignupName.trim()) return;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/signup`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/ark/signup`, {
                 method: 'POST',
                 body: JSON.stringify({
                     alliance_tag: allianceTag,
@@ -85,7 +86,7 @@
         if (!confirm(`Delete ${editName}? This will remove the team and all its signups.`)) return;
 
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/team/${allianceTag}/${teamNumber}`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/ark/team/${allianceTag}/${teamNumber}`, {
                 method: 'DELETE',
             });
             dispatch('updated');

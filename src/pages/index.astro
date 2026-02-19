@@ -315,6 +315,7 @@ import mgeShowcase from '../assets/images/features/showcase/mge_1.webp';
                             frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             referrerpolicy="strict-origin-when-cross-origin"
+                            loading="lazy"
                             allowfullscreen></iframe>
                     </div>
                 </div>
@@ -613,15 +614,15 @@ import mgeShowcase from '../assets/images/features/showcase/mge_1.webp';
             </div>
         </div>
     </section>
-</Layout>
 
-<section class="cta-section">
-    <div class="cta-container">
-        <span class="cta-text-prefix animated-gradient-text">What are you waiting for?</span>
-        <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="btn-primary">
-            <Image src={patreonLogo} alt="Patreon Logo" class="patreon-logo" width="84" height="84" quality={100} />
-            <span>Subscribe</span>
-        </a>
-        <h2 class="animated-gradient-text">to Codex Helper now!</h2>
-    </div>
-</section>
+    <section class="cta-section">
+        <div class="cta-container">
+            <span class="cta-text-prefix animated-gradient-text">What are you waiting for?</span>
+            <a href="https://www.patreon.com/c/kingscodex" target="_blank" class="btn-primary">
+                <Image src={patreonLogo} alt="Patreon Logo" class="patreon-logo" width="84" height="84" quality={100} />
+                <span>Subscribe</span>
+            </a>
+            <h2 class="animated-gradient-text">to Codex Helper now!</h2>
+        </div>
+    </section>
+</Layout>

@@ -66,6 +66,12 @@ export const TemplateSchema = z.object({
     template_data: z.string().max(100000, 'Template data is too large'),
 });
 
+export const TemplateCreateSchema = z.object({
+    template_name: z.string().min(1, 'Template name is required').max(100, 'Template name must be 100 characters or less'),
+    content: z.string().max(100000, 'Template content is too large'),
+    char_count: z.number().int().nonnegative().max(100000, 'Character count too large'),
+});
+
 // ============================================
 // Ark of Osiris Validation Schemas
 // ============================================
@@ -189,10 +195,51 @@ export const BotQuerySchema = z.object({
 });
 
 // ============================================
+// Score Validation Schemas
+// ============================================
+
+export const ScoreCreateSchema = z.object({
+    pairing: z.string().min(1, 'Pairing is required').max(200, 'Pairing must be 200 characters or less'),
+    formation: z.string().min(1, 'Formation is required').max(50, 'Formation must be 50 characters or less'),
+    inscriptions: z.array(z.unknown()).max(50, 'Too many inscriptions'),
+    stats: z.record(z.string(), z.unknown()),
+    total_score: z.number().nonnegative('Score must be non-negative').max(1000000, 'Score too large'),
+});
+
+// ============================================
+// Ark Signup Delete Schema
+// ============================================
+
+export const ArkSignupDeleteSchema = z.object({
+    alliance_tag: z.string().min(1, 'Alliance tag is required').max(10, 'Alliance tag must be 10 characters or less'),
+    in_game_name: z.string().min(1, 'In-game name is required').max(50, 'In-game name must be 50 characters or less'),
+});
+
+// ============================================
+// Review Validation Schemas
+// ============================================
+
+export const SubmitReviewSchema = z.object({
+    discord_user_id: z.string().regex(/^\d{17,20}$/, 'Invalid Discord user ID'),
+    discord_username: z.string().min(1, 'Username is required').max(100, 'Username must be 100 characters or less'),
+    discord_avatar: z.string().max(200, 'Avatar URL too long').nullable().optional(),
+    review_text: z.string().min(1, 'Review text is required').max(2000, 'Review must be 2000 characters or less'),
+});
+
+export const ApproveReviewSchema = z.object({
+    review_id: z.number().int().positive('Review ID must be a positive integer'),
+    action: z.enum(['approved', 'rejected']),
+});
+
+// ============================================
 // User Settings Validation Schemas
 // ============================================
 
-export const UserSettingsSchema = z.record(z.string(), z.unknown());
+export const UserSettingsSchema = z
+    .record(z.string().max(50), z.unknown())
+    .refine((obj) => Object.keys(obj).length <= 50, {
+        message: 'Settings cannot have more than 50 keys',
+    });
 
 // ============================================
 // Validation Helper

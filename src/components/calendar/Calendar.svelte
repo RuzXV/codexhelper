@@ -7,6 +7,7 @@
     import RemoveModal from './RemoveModal.svelte';
     import CycleConfigModal from './CycleConfigModal.svelte';
     import { getIconSrc } from './calendarIcons';
+    import { fetchWithAuth, getLoggedInUser } from '../../stores/auth.js';
 
     let viewDate = new Date();
     let events = [];
@@ -123,12 +124,12 @@
     }
 
     function checkAdminStatus() {
-        const user = window.auth ? window.auth.getLoggedInUser() : null;
+        const user = getLoggedInUser();
         isAdmin = user?.is_calendar_admin || false;
     }
 
     function loadFilters(userId = null) {
-        const user = userId || window.auth?.getLoggedInUser()?.id;
+        const user = userId || getLoggedInUser()?.id;
         const key = user ? `calendar_filters_${user}` : 'calendar_filters_guest';
         const stored = localStorage.getItem(key);
         if (stored) {
@@ -150,7 +151,7 @@
     }
 
     function saveFilters() {
-        const user = window.auth?.getLoggedInUser()?.id;
+        const user = getLoggedInUser()?.id;
         const key = user ? `calendar_filters_${user}` : 'calendar_filters_guest';
         localStorage.setItem(key, JSON.stringify(activeFilters));
     }
@@ -268,7 +269,7 @@
         modalState.add = false;
 
         try {
-            await window.auth.fetchWithAuth('/api/events', {
+            await fetchWithAuth('/api/events', {
                 method: 'POST',
                 body: JSON.stringify({
                     title: config.title,
@@ -295,7 +296,7 @@
 
         try {
             if (!scope || scope === 'all') {
-                await window.auth.fetchWithAuth('/api/events/shift', {
+                await fetchWithAuth('/api/events/shift', {
                     method: 'POST',
                     body: JSON.stringify({ series_id: seriesId, shift_days: shiftDays }),
                 });
@@ -318,7 +319,7 @@
                     currentD.setUTCDate(currentD.getUTCDate() + shiftDays);
                     const newDate = currentD.toISOString().split('T')[0];
 
-                    return window.auth.fetchWithAuth(`/api/events/${ev.id}`, {
+                    return fetchWithAuth(`/api/events/${ev.id}`, {
                         method: 'PATCH',
                         body: JSON.stringify({
                             start_date: newDate,
@@ -349,7 +350,7 @@
             const prev = [...events];
             events = events.filter((ev) => ev.series_id !== seriesId);
             await Promise.all(
-                toDelete.map((ev) => window.auth.fetchWithAuth(`/api/events/${ev.id}`, { method: 'DELETE' })),
+                toDelete.map((ev) => fetchWithAuth(`/api/events/${ev.id}`, { method: 'DELETE' })),
             );
             await fetchEvents();
         } catch (err) {
@@ -432,7 +433,7 @@
 
     async function fetchRotationSettingsFromAPI() {
         try {
-            const res = await window.auth.fetchWithAuth('/api/users/settings');
+            const res = await fetchWithAuth('/api/users/settings');
             if (res && res.anchorDate) {
                 eggRotationSettings = res;
                 localStorage.setItem('calendar_egg_rotation', JSON.stringify(res));
@@ -448,9 +449,9 @@
 
         localStorage.setItem('calendar_egg_rotation', JSON.stringify(eggRotationSettings));
 
-        if (window.auth && window.auth.getLoggedInUser()) {
+        if (getLoggedInUser()) {
             try {
-                await window.auth.fetchWithAuth('/api/users/settings', {
+                await fetchWithAuth('/api/users/settings', {
                     method: 'POST',
                     body: JSON.stringify(eggRotationSettings),
                 });

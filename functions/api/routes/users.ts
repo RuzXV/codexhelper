@@ -17,16 +17,37 @@ users.use('*', authMiddleware);
 users.get('/@me', async (c) => {
     const user = c.get('user');
 
-    const userResponse = await discordFetchWithRefresh(c, 'https://discord.com/api/users/@me');
+    // Check KV cache for Discord profile (5-min TTL)
+    const profileCacheKey = `discord:profile:${user.id}`;
+    let userData: DiscordUser | null = null;
 
-    if (userResponse.status === 401) {
-        return errors.unauthorized(c, 'Session expired');
+    try {
+        const cached = await c.env.API_CACHE.get(profileCacheKey);
+        if (cached) {
+            userData = JSON.parse(cached) as DiscordUser;
+        }
+    } catch (_) {
+        /* cache miss */
     }
 
-    if (!userResponse.ok) {
-        return errors.internal(c, 'Failed to fetch user data from Discord');
+    if (!userData) {
+        const userResponse = await discordFetchWithRefresh(c, 'https://discord.com/api/users/@me');
+
+        if (userResponse.status === 401) {
+            return errors.unauthorized(c, 'Session expired');
+        }
+
+        if (!userResponse.ok) {
+            return errors.internal(c, 'Failed to fetch user data from Discord');
+        }
+        userData = (await userResponse.json()) as DiscordUser;
+
+        // Cache Discord profile for 5 minutes (non-blocking)
+        const putPromise = c.env.API_CACHE.put(profileCacheKey, JSON.stringify(userData), { expirationTtl: 300 });
+        if (c.executionCtx && 'waitUntil' in c.executionCtx) {
+            c.executionCtx.waitUntil(putPromise);
+        }
     }
-    const userData = (await userResponse.json()) as DiscordUser;
 
     const activePatrons: string[] | null = await c.env.API_CACHE.get('active_patrons', 'json');
 

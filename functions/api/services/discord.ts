@@ -27,6 +27,19 @@ async function refreshDiscordToken(
 ): Promise<boolean> {
     const user = c.get('user');
 
+    // Rate limit: only allow one refresh per user per 10 seconds to prevent abuse
+    const refreshLock = `refresh_lock:${user.id}`;
+    try {
+        const locked = await c.env.API_CACHE.get(refreshLock);
+        if (locked) {
+            await invalidateSession(c);
+            return false;
+        }
+        await c.env.API_CACHE.put(refreshLock, '1', { expirationTtl: 10 });
+    } catch (_) {
+        /* KV failure — allow refresh attempt to proceed */
+    }
+
     const tokenData = new URLSearchParams({
         client_id: c.env.WEBSITE_APP_ID,
         client_secret: c.env.WEBSITE_APP_SECRET,
@@ -180,7 +193,14 @@ export async function verifyGuildPatreonAccess(
         .first();
 
     if (authRecord) {
-        return true;
+        // Verify that the patron who authorized this guild is still active
+        const patronCheck = await c.env.BOT_DB.prepare(
+            'SELECT 1 FROM patron_users WHERE discord_user_id = ? AND is_active = 1',
+        )
+            .bind(authRecord.authorized_by_discord_user_id)
+            .first();
+        if (patronCheck) return true;
+        // Patron no longer active — fall through to bypass check
     }
 
     const bypassRecord = await c.env.BOT_DB.prepare('SELECT 1 FROM guild_bypass WHERE guild_id = ?')

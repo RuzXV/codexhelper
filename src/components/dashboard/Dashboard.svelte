@@ -5,6 +5,13 @@
     import ChangelogPanel from './master_panel/ChangelogPanel.svelte';
     import HistoryPanel from './master_panel/HistoryPanel.svelte';
     import { fade } from 'svelte/transition';
+    import { initAuthStore, fetchWithAuth, getLoggedInUser } from '../../stores/auth.js';
+    import {
+        selectedServer as selectedServerStore,
+        availableServers as availableServersStore,
+        selectServer as guildSelectServer,
+        restoreLastServer,
+    } from '../../stores/guild.js';
 
     const SUPER_ADMIN_ID = '285201373266575361';
 
@@ -13,13 +20,13 @@
     let currentView = '';
     let allowedViews = [];
 
-    let availableServers = [];
-    let selectedServer = null;
     let isMobile = false;
 
     onMount(async () => {
         checkMobile();
         window.addEventListener('resize', checkMobile);
+
+        initAuthStore();
 
         if (window.auth && typeof window.auth.init === 'function') {
             await window.auth.init('#auth-container-dashboard');
@@ -35,13 +42,11 @@
         document.addEventListener('auth:loggedIn', authHandler);
 
         setTimeout(() => {
-            if (window.auth && typeof window.auth.getLoggedInUser === 'function') {
-                const loggedInUser = window.auth.getLoggedInUser();
-                if (loggedInUser) {
-                    user = loggedInUser;
-                    determineAccess(user);
-                    fetchUserServers(user);
-                }
+            const loggedInUser = getLoggedInUser();
+            if (loggedInUser) {
+                user = loggedInUser;
+                determineAccess(user);
+                fetchUserServers(user);
             }
             loading = false;
         }, 500);
@@ -87,36 +92,28 @@
     async function fetchUserServers(user) {
         loading = true;
         try {
-            const servers = await window.auth.fetchWithAuth('/api/users/guilds');
+            const servers = await fetchWithAuth('/api/users/guilds');
             if (Array.isArray(servers)) {
-                availableServers = servers;
-                if (availableServers.length > 0) {
-                    const storedId = localStorage.getItem('codex_last_server_id');
-                    const previousSelection = availableServers.find((s) => s.id === storedId);
-
-                    if (previousSelection) {
-                        selectServer(previousSelection);
-                    } else {
-                        selectedServer = null;
-                    }
+                availableServersStore.set(servers);
+                if (servers.length > 0) {
+                    restoreLastServer(servers);
                 } else {
-                    selectedServer = null;
+                    guildSelectServer(null);
                 }
             }
         } catch (e) {
             console.error('Failed to fetch user servers:', e);
-            availableServers = [];
+            availableServersStore.set([]);
         } finally {
         }
     }
 
-    function selectServer(server) {
-        selectedServer = server;
-        localStorage.setItem('codex_last_server_id', server.id);
-    }
-
     function handleSelectServer(e) {
-        selectServer(e.detail);
+        if (e.detail) {
+            guildSelectServer(e.detail);
+        } else {
+            guildSelectServer(null);
+        }
     }
 </script>
 
@@ -189,8 +186,6 @@
                         {:else if currentView === 'config'}
                             <BotConfigPanel
                                 {user}
-                                {selectedServer}
-                                {availableServers}
                                 on:selectServer={handleSelectServer}
                             />
                         {:else if currentView === 'changelog'}

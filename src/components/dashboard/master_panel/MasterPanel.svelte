@@ -7,6 +7,7 @@
     import BundleEditor from './BundleEditor.svelte';
     import MetaPairingEditor from './MetaPairingEditor.svelte';
     import emojiData from '../../../data/emoji_mappings.json';
+    import { fetchWithAuth } from '../../../stores/auth.js';
 
     export let user;
 
@@ -52,9 +53,9 @@
         error = null;
         rawData = null;
         try {
-            const response = await window.auth.fetchWithAuth(`/api/data/${source}`);
+            const response = await fetchWithAuth(`/api/data/${source}`);
             if (source === 'commanders') {
-                aliasData = await window.auth.fetchWithAuth(`/api/data/aliases`);
+                aliasData = await fetchWithAuth(`/api/data/aliases`);
             }
             rawData = response;
         } catch (err) {
@@ -67,7 +68,7 @@
 
     async function sendHeartbeat() {
         try {
-            const res = await window.auth.fetchWithAuth('/api/admin/heartbeat', {
+            const res = await fetchWithAuth('/api/admin/heartbeat', {
                 method: 'POST',
                 body: JSON.stringify({
                     username: user.username,
@@ -217,7 +218,7 @@
 
         if (editingItem && editingItem.originalData) {
             try {
-                const freshFullData = await window.auth.fetchWithAuth(`/api/data/${activeSource}`);
+                const freshFullData = await fetchWithAuth(`/api/data/${activeSource}`);
                 const freshItemData = freshFullData[saveId];
 
                 if (freshItemData && JSON.stringify(freshItemData) !== JSON.stringify(editingItem.originalData)) {
@@ -257,7 +258,7 @@
                 changes: changes,
             };
 
-            await window.auth.fetchWithAuth(`/api/admin/data/${activeSource}`, {
+            await fetchWithAuth(`/api/admin/data/${activeSource}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     data: rawData,
@@ -266,7 +267,7 @@
             });
 
             if (activeSource === 'commanders' && aliasData) {
-                await window.auth.fetchWithAuth(`/api/admin/data/aliases`, {
+                await fetchWithAuth(`/api/admin/data/aliases`, {
                     method: 'POST',
                     body: JSON.stringify(aliasData),
                 });
@@ -297,7 +298,7 @@
         rawData = { ...rawData };
 
         try {
-            await window.auth.fetchWithAuth(`/api/admin/data/${activeSource}`, {
+            await fetchWithAuth(`/api/admin/data/${activeSource}`, {
                 method: 'POST',
                 body: JSON.stringify(rawData),
             });
@@ -331,12 +332,12 @@
 
         rawData = { ...rawData };
         try {
-            await window.auth.fetchWithAuth(`/api/admin/data/commanders`, {
+            await fetchWithAuth(`/api/admin/data/commanders`, {
                 method: 'POST',
                 body: JSON.stringify(rawData),
             });
             if (aliasData) {
-                await window.auth.fetchWithAuth(`/api/admin/data/aliases`, {
+                await fetchWithAuth(`/api/admin/data/aliases`, {
                     method: 'POST',
                     body: JSON.stringify(aliasData),
                 });

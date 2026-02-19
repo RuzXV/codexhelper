@@ -1,5 +1,6 @@
 <script>
     import { onMount } from 'svelte';
+    import { fetchWithAuth } from '../../../stores/auth.js';
 
     export let user;
 
@@ -27,7 +28,7 @@
         error = null;
         backups = [];
         try {
-            const history = await window.auth.fetchWithAuth(`/api/admin/data/backup_history:${source}`);
+            const history = await fetchWithAuth(`/api/admin/data/backup_history:${source}`);
 
             if (Array.isArray(history)) {
                 backups = history.sort((a, b) => b.timestamp - a.timestamp);
@@ -50,7 +51,7 @@
 
         restoring = true;
         try {
-            await window.auth.fetchWithAuth(`/api/admin/data/${activeSource}`, {
+            await fetchWithAuth(`/api/admin/data/${activeSource}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     data: backup.data,

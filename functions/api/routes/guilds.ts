@@ -23,6 +23,7 @@ import {
     ArkAllianceSchema,
     ArkTeamSchema,
     ArkSignupSchema,
+    ArkSignupDeleteSchema,
     ArkTagSchema,
     MgeSettingsSchema,
     MgeAcceptSchema,
@@ -250,6 +251,15 @@ guilds.get('/:guildId/channels', async (c) => {
     const { guildId } = c.req.param();
     if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
+    // Check KV cache first (5-min TTL)
+    const cacheKey = `discord:channels:${guildId}`;
+    try {
+        const cached = await c.env.API_CACHE.get(cacheKey);
+        if (cached) return c.json(JSON.parse(cached));
+    } catch (_) {
+        /* cache miss */
+    }
+
     const response = await fetch(`https://discord.com/api/guilds/${guildId}/channels`, {
         headers: { Authorization: `Bot ${c.env.DISCORD_BOT_TOKEN}` },
     });
@@ -266,7 +276,15 @@ guilds.get('/:guildId/channels', async (c) => {
         .map((ch) => ({ id: ch.id, name: ch.name, type: ch.type, position: ch.position }))
         .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
 
-    return c.json({ channels: validChannels });
+    const result = { channels: validChannels };
+
+    // Cache for 5 minutes (non-blocking)
+    const putPromise = c.env.API_CACHE.put(cacheKey, JSON.stringify(result), { expirationTtl: 300 });
+    if (c.executionCtx && 'waitUntil' in c.executionCtx) {
+        c.executionCtx.waitUntil(putPromise);
+    }
+
+    return c.json(result);
 });
 
 guilds.get('/:guildId/features', async (c) => {
@@ -490,12 +508,30 @@ guilds.post('/:guildId/reminders', async (c) => {
 guilds.get('/:guildId/roles', async (c) => {
     const { guildId } = c.req.param();
     if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
+
+    // Check KV cache first (5-min TTL)
+    const cacheKey = `discord:roles:${guildId}`;
+    try {
+        const cached = await c.env.API_CACHE.get(cacheKey);
+        if (cached) return c.json(JSON.parse(cached));
+    } catch (_) {
+        /* cache miss */
+    }
+
     const response = await fetch(`https://discord.com/api/guilds/${guildId}/roles`, {
         headers: { Authorization: `Bot ${c.env.DISCORD_BOT_TOKEN}` },
     });
     if (!response.ok) return c.json({ roles: [] });
     const roles = (await response.json()) as DiscordRole[];
-    return c.json({ roles: roles.map((r) => ({ id: r.id, name: r.name, color: r.color })) });
+    const result = { roles: roles.map((r) => ({ id: r.id, name: r.name, color: r.color })) };
+
+    // Cache for 5 minutes (non-blocking)
+    const putPromise = c.env.API_CACHE.put(cacheKey, JSON.stringify(result), { expirationTtl: 300 });
+    if (c.executionCtx && 'waitUntil' in c.executionCtx) {
+        c.executionCtx.waitUntil(putPromise);
+    }
+
+    return c.json(result);
 });
 
 guilds.get('/:guildId/ark/all', async (c) => {
@@ -693,7 +729,11 @@ guilds.delete('/:guildId/ark/signup', async (c) => {
     const { guildId } = c.req.param();
     if (!(await verifyGuildPatreonAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
-    const { alliance_tag, in_game_name } = await c.req.json();
+    const body = await c.req.json();
+    const validation = validateBody(ArkSignupDeleteSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
+    const { alliance_tag, in_game_name } = validation.data;
 
     await c.env.BOT_DB.batch([
         c.env.BOT_DB.prepare(

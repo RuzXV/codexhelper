@@ -1,8 +1,10 @@
 <script>
     import { createEventDispatcher, tick } from 'svelte';
-    import { slide, fly, fade } from 'svelte/transition';
+    import { slide, fade } from 'svelte/transition';
     // xlsx is dynamically imported in exportToExcel() to avoid 880KB in the initial bundle
     import ArkTeamCard from './ArkTeamCard.svelte';
+    import SaveBar from '../../shared/SaveBar.svelte';
+    import { fetchWithAuth } from '../../../stores/auth.js';
 
     export let guildId;
     export let allianceTag;
@@ -43,7 +45,7 @@
     async function saveAllSettings() {
         saving = true;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/alliance`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/ark/alliance`, {
                 method: 'POST',
                 body: JSON.stringify({
                     alliance_tag: allianceTag,
@@ -66,6 +68,11 @@
         }
     }
 
+    function discardChanges() {
+        currentConfig = JSON.parse(JSON.stringify(originalConfig));
+        reminderTime = secondsToTime(currentConfig.reminder_interval);
+    }
+
     async function deleteAlliance() {
         if (
             !confirm(
@@ -74,7 +81,7 @@
         )
             return;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/alliance/${allianceTag}`, { method: 'DELETE' });
+            await fetchWithAuth(`/api/guilds/${guildId}/ark/alliance/${allianceTag}`, { method: 'DELETE' });
             dispatch('deleted', { tag: allianceTag });
         } catch (e) {
             alert('Failed to delete alliance.');
@@ -84,7 +91,7 @@
     async function refreshEmbed() {
         refreshingEmbed = true;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/refresh-embed`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/ark/refresh-embed`, {
                 method: 'POST',
                 body: JSON.stringify({ alliance_tag: allianceTag }),
             });
@@ -100,7 +107,7 @@
         if (!confirm(`Post a new signup embed for [${allianceTag}] to the configured channel?`)) return;
         postingSignup = true;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/post-signup`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/ark/post-signup`, {
                 method: 'POST',
                 body: JSON.stringify({ alliance_tag: allianceTag }),
             });
@@ -121,7 +128,7 @@
         }
         const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${guildId}/ark/team`, {
+            await fetchWithAuth(`/api/guilds/${guildId}/ark/team`, {
                 method: 'POST',
                 body: JSON.stringify({
                     alliance_tag: allianceTag,
@@ -415,28 +422,7 @@
         </div>
     </div>
 
-    {#if hasUnsavedChanges}
-        <div class="save-bar" transition:fly={{ y: 50 }}>
-            <div class="save-bar-content">
-                <div class="save-text">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>You have unsaved changes.</span>
-                </div>
-                <div class="save-actions">
-                    <button
-                        class="btn-discard"
-                        on:click={() => {
-                            currentConfig = JSON.parse(JSON.stringify(originalConfig));
-                            reminderTime = secondsToTime(currentConfig.reminder_interval);
-                        }}>Discard</button
-                    >
-                    <button class="btn-save" on:click={saveAllSettings} disabled={saving}>
-                        {saving ? 'Saving...' : 'Save Changes'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    {/if}
+    <SaveBar {hasUnsavedChanges} {saving} on:save={saveAllSettings} on:discard={discardChanges} />
 </div>
 
 <style>
@@ -752,62 +738,4 @@
         background: rgba(59, 130, 246, 0.2);
     }
 
-    .save-bar {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #1f2937;
-        border: 1px solid var(--accent-blue);
-        padding: 12px 24px;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-        z-index: 1000;
-        min-width: 400px;
-    }
-    .save-bar-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-    }
-    .save-text {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        color: white;
-        font-weight: 500;
-    }
-    .save-text i {
-        color: #f59e0b;
-    }
-    .save-actions {
-        display: flex;
-        gap: 10px;
-    }
-    .btn-save {
-        background: var(--accent-blue);
-        color: white;
-        border: none;
-        padding: 8px 24px;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-    .btn-save:hover {
-        background: #2563eb;
-    }
-    .btn-discard {
-        background: transparent;
-        color: #ef4444;
-        border: 1px solid transparent;
-        padding: 8px 16px;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-    .btn-discard:hover {
-        text-decoration: underline;
-    }
 </style>

@@ -1,5 +1,6 @@
 <script>
     import { onMount } from 'svelte';
+    import { fetchWithAuth } from '../../../stores/auth.js';
 
     let logs = [];
     let loading = true;
@@ -7,7 +8,7 @@
 
     onMount(async () => {
         try {
-            const res = await window.auth.fetchWithAuth('/api/admin/logs');
+            const res = await fetchWithAuth('/api/admin/logs');
             if (res) {
                 logs = res.map((log, index) => {
                     let section = 'Unknown';

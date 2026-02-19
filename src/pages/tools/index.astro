@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { Image } from 'astro:assets';
 import '../../styles/tools.css';
 
 import mailIcon from '../../assets/images/navi/mail.webp';
@@ -46,7 +47,7 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
                 <a href="/tools/mail/" class="tool-card-modern">
                     <div class="card-glow"></div>
                     <div class="card-icon-container">
-                        <img src={mailIcon.src} alt="Mail Icon" width="64" height="64" loading="eager" />
+                        <Image src={mailIcon} alt="Alliance Mail Generator" width={64} height={64} />
                     </div>
                     <div class="card-text">
                         <h3>Alliance Mail Generator</h3>
@@ -58,7 +59,7 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
                 <a href="/tools/calculators/" class="tool-card-modern">
                     <div class="card-glow"></div>
                     <div class="card-icon-container">
-                        <img src={generalIcon.src} alt="Calculator Icon" width="64" height="64" loading="eager" />
+                        <Image src={generalIcon} alt="General Calculators" width={64} height={64} />
                     </div>
                     <div class="card-text">
                         <h3>General Calculators</h3>
@@ -70,7 +71,7 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
                 <a href="/tools/equipment/" class="tool-card-modern">
                     <div class="card-glow"></div>
                     <div class="card-icon-container">
-                        <img src={equipmentIcon.src} alt="Equipment Icon" width="64" height="64" loading="eager" />
+                        <Image src={equipmentIcon} alt="Equipment Manager" width={64} height={64} />
                     </div>
                     <div class="card-text">
                         <h3>Equipment Manager</h3>
@@ -82,7 +83,7 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
                 <a href="/tools/speedups/" class="tool-card-modern">
                     <div class="card-glow"></div>
                     <div class="card-icon-container">
-                        <img src={speedupsIcon.src} alt="Speedups Icon" width="64" height="64" loading="eager" />
+                        <Image src={speedupsIcon} alt="Speedup Calculator" width={64} height={64} />
                     </div>
                     <div class="card-text">
                         <h3>Speedup Calculator</h3>
@@ -94,7 +95,7 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
                 <a href="/tools/davor_toolkit/" class="tool-card-modern special-card">
                     <div class="card-glow"></div>
                     <div class="card-icon-container">
-                        <img src={davorIcon.src} alt="Davor Icon" width="64" height="64" loading="eager" />
+                        <Image src={davorIcon} alt="Davor's Toolkit" width={64} height={64} />
                     </div>
                     <div class="card-text">
                         <h3>Davor's Toolkit</h3>
@@ -106,7 +107,7 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
                 <a href="/tools/calendar/" class="tool-card-modern">
                     <div class="card-glow"></div>
                     <div class="card-icon-container">
-                        <img src={calendarIcon.src} alt="Calendar Icon" width="64" height="64" loading="eager" />
+                        <Image src={calendarIcon} alt="Event Calendar" width={64} height={64} />
                     </div>
                     <div class="card-text">
                         <h3>Event Calendar</h3>
@@ -118,7 +119,7 @@ import kvkIcon from '../../assets/images/navi/kvk_suite.webp';
                 <a href="/tools/kvk_suite/" class="tool-card-modern new-card">
                     <div class="card-glow"></div>
                     <div class="card-icon-container">
-                        <img src={kvkIcon.src} alt="KvK Icon" width="64" height="64" loading="eager" />
+                        <Image src={kvkIcon} alt="KvK Suite" width={64} height={64} />
                     </div>
                     <div class="card-text">
                         <h3>KvK Suite</h3>

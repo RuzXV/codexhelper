@@ -1,6 +1,7 @@
 <script>
     import { fade } from 'svelte/transition';
     import { createEventDispatcher } from 'svelte';
+    import { fetchWithAuth } from '../../../stores/auth.js';
 
     const dispatch = createEventDispatcher();
 
@@ -37,8 +38,8 @@
         loading = true;
         try {
             const [featureRes, calendarRes] = await Promise.all([
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/features`),
-                window.auth.fetchWithAuth(`/api/guilds/${guildId}/calendar`),
+                fetchWithAuth(`/api/guilds/${guildId}/features`),
+                fetchWithAuth(`/api/guilds/${guildId}/calendar`),
             ]);
 
             features = {
@@ -73,7 +74,7 @@
     async function deauthorizeServer() {
         deauthorizing = true;
         try {
-            await window.auth.fetchWithAuth(`/api/guilds/${selectedServer.id}/authorization`, {
+            await fetchWithAuth(`/api/guilds/${selectedServer.id}/authorization`, {
                 method: 'DELETE',
             });
             showDeauthConfirm = false;

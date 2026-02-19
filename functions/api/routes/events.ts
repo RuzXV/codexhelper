@@ -10,11 +10,11 @@ const events = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 events.get('/', async (c) => {
     try {
-        const { results } = await c.env.DB.prepare('SELECT * FROM events ORDER BY start_date ASC').all();
+        const { results } = await c.env.DB.prepare(
+            'SELECT id, series_id, title, type, troop_type, start_date, duration FROM events ORDER BY start_date ASC',
+        ).all();
 
-        c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-        c.header('Pragma', 'no-cache');
-        c.header('Expires', '0');
+        c.header('Cache-Control', 'public, max-age=60');
 
         return c.json((results as EventRecord[]) || []);
     } catch (e) {
