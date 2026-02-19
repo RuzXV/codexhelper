@@ -4,7 +4,7 @@
     // xlsx is dynamically imported in exportToExcel() to avoid 880KB in the initial bundle
     import ArkTeamCard from './ArkTeamCard.svelte';
     import SaveBar from '../../shared/SaveBar.svelte';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
 
     export let guildId;
     export let allianceTag;
@@ -193,7 +193,7 @@
     }
 </script>
 
-<svelte:window on:click={() => (openDropdownId = null)} />
+<svelte:window on:click={() => (openDropdownId = null)} on:keydown={(e) => { if (e.key === 'Escape') openDropdownId = null; }} />
 
 <div class="alliance-panel" transition:fade>
     <div class="panel-header">
@@ -239,6 +239,8 @@
                                 <button
                                     type="button"
                                     class="custom-select-trigger"
+                                    aria-haspopup="listbox"
+                                    aria-expanded={openDropdownId === 'channel'}
                                     on:click={(e) => toggleDropdown('channel', e)}
                                 >
                                     <span
@@ -294,6 +296,8 @@
                                 <button
                                     type="button"
                                     class="custom-select-trigger"
+                                    aria-haspopup="listbox"
+                                    aria-expanded={openDropdownId === 'admin'}
                                     on:click={(e) => toggleDropdown('admin', e)}
                                 >
                                     <span class:placeholder={!currentConfig.admin_role_id}>
@@ -342,6 +346,8 @@
                                 <button
                                     type="button"
                                     class="custom-select-trigger"
+                                    aria-haspopup="listbox"
+                                    aria-expanded={openDropdownId === 'notify'}
                                     on:click={(e) => toggleDropdown('notify', e)}
                                 >
                                     <span class:placeholder={!currentConfig.notification_role_id}>

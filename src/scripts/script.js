@@ -119,135 +119,46 @@ const STATS_ENDPOINT = '/api/stats';
 const TOP_SERVERS_ENDPOINT = '/api/top-servers';
 const REVIEWS_ENDPOINT = '/api/reviews';
 
-function logMessage(message, type = 'info') {
-    const timestamp = new Date().toISOString();
-    const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
-
-    switch (type) {
-        case 'error':
-            console.error(logEntry);
-            break;
-        case 'warn':
-            console.warn(logEntry);
-            break;
-        case 'debug':
-            console.debug(logEntry);
-            break;
-        default:
-            console.log(logEntry);
-    }
-}
-
 async function fetchApiData(endpoint) {
     const url = API_BASE_URL + endpoint;
-    logMessage(`Fetching data from: ${url}`, 'debug');
-
-    const isLocalFile = window.location.protocol === 'file:';
-    if (isLocalFile) {
-        logMessage('Running from local file, CORS issues may occur', 'warn');
-    }
 
     const timeout = new Promise((_, reject) => {
         setTimeout(() => reject(new Error('Request timeout after 10 seconds')), 10000);
     });
 
     try {
-        const fetchOptions = {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'no-cache',
-            credentials: 'omit',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        };
-
-        logMessage(`Fetch options: ${JSON.stringify(fetchOptions)}`, 'debug');
-
-        const response = await Promise.race([fetch(url, fetchOptions), timeout]);
-
-        logMessage(`Response status for ${endpoint}: ${response.status}`, 'debug');
-        logMessage(
-            `Response headers for ${endpoint}: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`,
-            'debug',
-        );
-
-        const corsHeaders = [
-            'access-control-allow-origin',
-            'access-control-allow-credentials',
-            'access-control-allow-headers',
-            'access-control-allow-methods',
-        ];
-
-        corsHeaders.forEach((header) => {
-            const value = response.headers.get(header);
-            if (value) {
-                logMessage(`CORS Header ${header}: ${value}`, 'debug');
-            }
-        });
-
-        const allowedOrigin = response.headers.get('access-control-allow-origin');
-        if (allowedOrigin) {
-            logMessage(`API allows origin: ${allowedOrigin}`, 'debug');
-        }
+        const response = await Promise.race([
+            fetch(url, {
+                method: 'GET',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 'Content-Type': 'application/json' },
+            }),
+            timeout,
+        ]);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const contentType = response.headers.get('content-type');
-        logMessage(`Response content type: ${contentType}`, 'debug');
-
         if (!contentType || !contentType.includes('application/json')) {
             throw new Error('Response is not JSON. Content-Type: ' + contentType);
         }
 
-        const data = await response.json();
-        logMessage(`Successfully fetched data from ${endpoint}`, 'info');
-        logMessage(`Data keys: ${Object.keys(data).join(', ')}`, 'debug');
-        return data;
+        return await response.json();
     } catch (error) {
-        logMessage(`Error fetching data from ${endpoint}: ${error.message}`, 'error');
-
-        if (error instanceof TypeError) {
-            if (error.message.includes('fetch')) {
-                logMessage('Network error or CORS issue detected', 'error');
-                logMessage('Possible causes:', 'error');
-                logMessage('1. API server is unreachable', 'error');
-                logMessage('2. CORS policy is blocking the request', 'error');
-                logMessage('3. Network connectivity issues', 'error');
-                logMessage('4. SSL/TLS certificate issues', 'error');
-
-                if (isLocalFile) {
-                    logMessage('NOTE: You are running this from a file:// URL which may cause CORS issues.', 'warn');
-                    logMessage(
-                        'Solution: Deploy to a web server or ask your API provider to allow file:// origins',
-                        'warn',
-                    );
-                    logMessage('For development, you can use a local server (e.g., Python HTTP server)', 'warn');
-                }
-            } else {
-                logMessage(`Type error: ${error.message}`, 'error');
-            }
-        } else if (error.message.includes('timeout')) {
-            logMessage('Request timed out. The server might be slow or unreachable.', 'error');
-        } else if (error.message.includes('HTTP error')) {
-            logMessage('Server returned an error response', 'error');
-        } else {
-            logMessage(`Unexpected error: ${error.message}`, 'error');
-        }
-
+        console.error(`Failed to fetch ${endpoint}:`, error.message);
         throw error;
     }
 }
 
 function renderTopServers(servers) {
-    logMessage(`Rendering ${servers.length} servers into two carousel rows`, 'debug');
     const serverListRow1 = document.getElementById('serverListRow1');
     const serverListRow2 = document.getElementById('serverListRow2');
 
     if (!serverListRow1 || !serverListRow2) {
-        logMessage('One or both server list elements not found', 'error');
+        console.error('Server list elements not found');
         return;
     }
 
@@ -263,10 +174,7 @@ function renderTopServers(servers) {
     const serversRow1 = servers.slice(0, 10);
     const serversRow2 = servers.slice(10, 20);
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
+    const escapeHtml = window.escapeHtml;
 
     function createServerItem(server) {
         const serverItem = document.createElement('li');
@@ -276,7 +184,7 @@ function renderTopServers(servers) {
         const safeIconUrl = escapeHtml(server.icon_url);
 
         serverItem.innerHTML = `
-            <img src="${safeIconUrl}" alt="${safeName} Icon" class="server-logo" onerror="this.src='/images/global/logo-new.webp'">
+            <img src="${safeIconUrl}" alt="${safeName} Icon" class="server-logo">
             <div class="server-info">
                 <p class="server-name">${safeName}</p>
                 <span class="server-members">
@@ -287,6 +195,9 @@ function renderTopServers(servers) {
                 </span>
             </div>
         `;
+
+        const img = serverItem.querySelector('.server-logo');
+        if (img) img.addEventListener('error', () => { img.src = '/images/global/logo-new.webp'; }, { once: true });
 
         return serverItem;
     }
@@ -329,25 +240,22 @@ function renderReviews(reviews) {
 
     reviewsList.innerHTML = '';
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
+    const escapeHtml = window.escapeHtml;
 
     function renderDiscordFormatting(text) {
-        // Discord custom emojis
-        text = text.replace(/&lt;(a?):(\w+):(\d+)&gt;/g, (_, animated, name, id) => {
+        // Discord custom emojis — only allow numeric IDs and word-char names (already escaped)
+        text = text.replace(/&lt;(a?):(\w{1,32}):(\d{17,20})&gt;/g, (_, animated, name, id) => {
             const ext = animated ? 'gif' : 'png';
             return `<img src="https://cdn.discordapp.com/emojis/${id}.${ext}" alt=":${name}:" class="review-emoji">`;
         });
-        // Bold **text**
-        text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        // Italic *text*
-        text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-        // Underline __text__
-        text = text.replace(/__(.+?)__/g, '<u>$1</u>');
-        // Strikethrough ~~text~~
-        text = text.replace(/~~(.+?)~~/g, '<s>$1</s>');
+        // Bold **text** — non-greedy, no nested HTML tags allowed
+        text = text.replace(/\*\*([^*<>]+?)\*\*/g, '<strong>$1</strong>');
+        // Italic *text* — non-greedy, no nested HTML tags
+        text = text.replace(/(?<!\*)\*([^*<>]+?)\*(?!\*)/g, '<em>$1</em>');
+        // Underline __text__ — non-greedy, no nested HTML tags
+        text = text.replace(/__([^_<>]+?)__/g, '<u>$1</u>');
+        // Strikethrough ~~text~~ — non-greedy, no nested HTML tags
+        text = text.replace(/~~([^~<>]+?)~~/g, '<s>$1</s>');
         return text;
     }
 
@@ -364,13 +272,17 @@ function renderReviews(reviews) {
         item.innerHTML = `
             <div class="review-header">
                 <span class="review-username">${safeName}</span>
-                <img src="${safeAvatar}" alt="${safeName}" class="review-avatar" onerror="this.src='/images/global/logo-new.webp'">
+                <img src="${safeAvatar}" alt="${safeName}" class="review-avatar">
             </div>
             <div class="review-body">
                 <p class="review-text">${safeText}</p>
             </div>
             ${dateStr ? `<span class="review-date"><svg class="review-discord-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>${dateStr}</span>` : ''}
         `;
+
+        const avatarImg = item.querySelector('.review-avatar');
+        if (avatarImg) avatarImg.addEventListener('error', () => { avatarImg.src = '/images/global/logo-new.webp'; }, { once: true });
+
         return item;
     }
 
@@ -388,7 +300,6 @@ function renderReviews(reviews) {
 }
 
 function loadFallbackData() {
-    logMessage('Loading fallback data due to API issues', 'warn');
 
     const fallbackStats = {
         total_servers: 1234,
@@ -453,18 +364,15 @@ function loadFallbackData() {
 }
 
 function showLoadingState(section) {
-    logMessage(`Showing loading state for ${section}`, 'debug');
 
     if (section === 'stats') {
-        logMessage('Stats loading state hidden from user', 'debug');
     }
 }
 
 function handleApiError(error, section) {
-    logMessage(`API Error in ${section}: ${error.message}`, 'error');
+    console.error(`API Error in ${section}:`, error.message);
 
     if (section === 'stats') {
-        logMessage('Stats error hidden from user, using fallback data', 'debug');
         const statElements = document.querySelectorAll('.stat-number');
         statElements.forEach((element) => {
             const statType = element.getAttribute('data-stat');
@@ -504,13 +412,12 @@ async function handleApiRequest(endpoint, cacheKey, renderFunction, errorRenderF
         try {
             cachedData = JSON.parse(cachedItem);
         } catch (e) {
-            logMessage(`Could not parse cached data for ${cacheKey}`, 'error');
+            console.error(`Could not parse cached data for ${cacheKey}`);
             localStorage.removeItem(cacheKey);
         }
     }
 
     try {
-        logMessage(`Attempting to fetch live data for ${cacheKey}...`, 'info');
         const liveData = await fetchApiData(endpoint);
 
         const hasDataChanged = !cachedData || JSON.stringify(liveData) !== JSON.stringify(cachedData.data);
@@ -523,21 +430,17 @@ async function handleApiRequest(endpoint, cacheKey, renderFunction, errorRenderF
                     data: liveData,
                 }),
             );
-            logMessage(`Live data for ${cacheKey} was new, updated cache.`, 'info');
         } else {
-            logMessage(`Live data for ${cacheKey} is unchanged.`, 'info');
         }
 
         renderFunction(liveData);
         return false;
     } catch (error) {
-        logMessage(`Failed to load live data for ${cacheKey}. Attempting to use indefinite cache.`, 'warn');
         if (cachedData) {
-            logMessage(`Found valid cached data for ${cacheKey}. Rendering...`, 'info');
             renderFunction(cachedData.data);
             return true;
         } else {
-            logMessage(`No cached data found for ${cacheKey}.`, 'error');
+            console.error(`No cached data found for ${cacheKey}.`);
             if (errorRenderFunction) {
                 errorRenderFunction();
             }
@@ -547,7 +450,6 @@ async function handleApiRequest(endpoint, cacheKey, renderFunction, errorRenderF
 }
 
 async function loadApiData() {
-    logMessage('Starting API data loading with indefinite cache logic.', 'info');
 
     const statsCacheUsed = await handleApiRequest(STATS_ENDPOINT, 'statsCache', updateStats, () => {
         const statElements = document.querySelectorAll('.stat-number');
@@ -579,8 +481,6 @@ async function loadApiData() {
 }
 
 function updateStats(statsData) {
-    logMessage('Updating stats with data', 'debug');
-    logMessage(JSON.stringify(statsData, null, 2), 'debug');
 
     const statElements = document.querySelectorAll('.stat-number');
 
@@ -612,7 +512,6 @@ function updateStats(statsData) {
                 element.textContent = '$3/mo';
                 break;
             default:
-                logMessage(`Unknown stat type: ${statType}`, 'warn');
         }
     });
 }

@@ -8,10 +8,7 @@
     let currentUser = null;
     let authContainerSelector = null;
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
+    const escapeHtml = window.escapeHtml;
 
     function getLoggedInUser() {
         return currentUser;

@@ -2,7 +2,7 @@
     import { createEventDispatcher, tick } from 'svelte';
     import { fade } from 'svelte/transition';
     import SaveBar from '../../shared/SaveBar.svelte';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
 
     const dispatch = createEventDispatcher();
 
@@ -88,9 +88,15 @@
     function handleWindowClick() {
         openDropdownId = null;
     }
+
+    function handleKeydown(e) {
+        if (e.key === 'Escape' && openDropdownId) {
+            openDropdownId = null;
+        }
+    }
 </script>
 
-<svelte:window on:click={handleWindowClick} />
+<svelte:window on:click={handleWindowClick} on:keydown={handleKeydown} />
 
 <div class="section-card" transition:fade={{ duration: 200 }}>
     <div class="section-header">
@@ -127,6 +133,8 @@
                         <button
                             type="button"
                             class="custom-select-trigger"
+                            aria-haspopup="listbox"
+                            aria-expanded={openDropdownId === group.id}
                             on:click={(e) => toggleDropdown(group.id, e)}
                             disabled={saving}
                         >
@@ -139,7 +147,7 @@
                         {#if openDropdownId === group.id}
                             <!-- svelte-ignore a11y_click_events_have_key_events -->
                             <!-- svelte-ignore a11y_no_static_element_interactions -->
-                            <div class="custom-dropdown-menu" on:click|stopPropagation>
+                            <div class="custom-dropdown-menu" role="listbox" on:click|stopPropagation>
                                 <div class="dropdown-search">
                                     <input
                                         id="search-{group.id}"

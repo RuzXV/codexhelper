@@ -95,10 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let historyIndex = -1;
     let inputTimeout = null;
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
+    const escapeHtml = window.escapeHtml;
 
     function populateFilters() {
         if (!filterOptionsContainer) return;
@@ -206,16 +203,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }, 300);
             }
         }
-    }
-
-    function escapeHtml(text) {
-        if (typeof text !== 'string') return '';
-        return text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
     }
 
     if (gradientToggleBtn) {

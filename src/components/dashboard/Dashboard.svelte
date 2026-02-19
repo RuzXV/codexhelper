@@ -5,13 +5,13 @@
     import ChangelogPanel from './master_panel/ChangelogPanel.svelte';
     import HistoryPanel from './master_panel/HistoryPanel.svelte';
     import { fade } from 'svelte/transition';
-    import { initAuthStore, fetchWithAuth, getLoggedInUser } from '../../stores/auth.js';
+    import { initAuthStore, fetchWithAuth, getLoggedInUser } from '../../stores/auth';
     import {
         selectedServer as selectedServerStore,
         availableServers as availableServersStore,
         selectServer as guildSelectServer,
         restoreLastServer,
-    } from '../../stores/guild.js';
+    } from '../../stores/guild';
 
     const SUPER_ADMIN_ID = '285201373266575361';
 

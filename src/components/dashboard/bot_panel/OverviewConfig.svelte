@@ -1,7 +1,7 @@
 <script>
     import { fade } from 'svelte/transition';
     import { createEventDispatcher } from 'svelte';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
 
     const dispatch = createEventDispatcher();
 
@@ -95,7 +95,7 @@
                 {#if selectedServer.icon}
                     <img
                         src={`https://cdn.discordapp.com/icons/${selectedServer.id}/${selectedServer.icon}.png`}
-                        alt=""
+                        alt="{selectedServer.name} server icon"
                         class="server-icon-lg"
                     />
                 {:else}
@@ -115,7 +115,7 @@
                         {patron.is_bypass ? 'Granted Access By' : 'Authorized By'}
                     </div>
                     <div class="patron-info">
-                        <img src={getAvatarUrl(patron)} alt="" class="patron-avatar" />
+                        <img src={getAvatarUrl(patron)} alt="{patron.username} avatar" class="patron-avatar" />
                         <span class="patron-name">
                             {patron.is_bypass ? 'Ruz' : patron.username}
                         </span>

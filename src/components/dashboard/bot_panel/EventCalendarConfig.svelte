@@ -2,7 +2,7 @@
     import { onMount, tick } from 'svelte';
     import { slide, fade } from 'svelte/transition';
     import SaveBar from '../../shared/SaveBar.svelte';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
 
     export let guildId;
     export let channels = [];

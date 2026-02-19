@@ -53,7 +53,10 @@ auth.get('/callback', async (c) => {
     const userData = (await userResponse.json()) as { id: string };
     const userId = userData.id;
 
-    const sessionToken = crypto.randomUUID().replace(/-/g, '');
+    // 256-bit random session token for stronger session security
+    const tokenBytes = new Uint8Array(32);
+    crypto.getRandomValues(tokenBytes);
+    const sessionToken = Array.from(tokenBytes, (b) => b.toString(16).padStart(2, '0')).join('');
     const expiryDate = Date.now() / 1000 + SESSION_DURATION_SECONDS;
 
     const encryptedAccessToken = await encryptFernetToken(c.env.DB_ENCRYPTION_KEY, accessToken);

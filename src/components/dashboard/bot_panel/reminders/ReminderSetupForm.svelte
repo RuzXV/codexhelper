@@ -48,6 +48,8 @@
                         <button
                             type="button"
                             class="custom-select-trigger small"
+                            aria-haspopup="listbox"
+                            aria-expanded={openDropdownId === `setup-ch-${type}`}
                             on:click={(e) => handleToggleDropdown(`setup-ch-${type}`, e)}
                         >
                             <span>{getChannelName(form.channel_id)}</span>

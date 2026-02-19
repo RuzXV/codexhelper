@@ -15,7 +15,15 @@ import { authMiddleware, masterAdminMiddleware } from '../_middleware';
 import { EVENT_INTERVALS, TROOP_CYCLE, EVENT_COLOR_MAP, parseAdminIds } from '../_constants';
 import { GoogleCalendarService } from '../services/googleCalendar';
 import { discordFetchWithRefresh } from '../services/discord';
-import { SubmitReviewSchema, ApproveReviewSchema, validateBody } from '../_validation';
+import {
+    SubmitReviewSchema,
+    ApproveReviewSchema,
+    AdminHeartbeatSchema,
+    GcalResetSchema,
+    AdminRestoreSchema,
+    UpdateCacheSchema,
+    validateBody,
+} from '../_validation';
 
 /** Allowed keys for /data/:key endpoints — prevents arbitrary KV access */
 const ALLOWED_DATA_KEYS = [
@@ -67,7 +75,11 @@ admin.post('/internal/update-cache', async (c) => {
     const secret = c.req.header('X-Internal-Secret');
     if (secret !== c.env.BOT_SECRET_KEY) return errors.unauthorized(c);
 
-    const { top_servers, bot_stats, active_patrons, approved_reviews } = await c.req.json();
+    const body = await c.req.json();
+    const validation = validateBody(UpdateCacheSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
+    const { top_servers, bot_stats, active_patrons, approved_reviews } = validation.data;
 
     const promises = [];
     if (top_servers) promises.push(c.env.API_CACHE.put('top_servers', JSON.stringify(top_servers)));
@@ -301,7 +313,9 @@ admin.use('/admin/*', authMiddleware, masterAdminMiddleware);
 
 admin.post('/admin/heartbeat', async (c) => {
     const user = c.get('user');
-    const { username, avatar } = await c.req.json().catch(() => ({ username: user.username, avatar: null }));
+    const body = await c.req.json().catch(() => ({}));
+    const validation = validateBody(AdminHeartbeatSchema, body);
+    const { username, avatar } = validation.success ? validation.data : { username: user.username, avatar: null };
     const NOW = Date.now();
     const TIMEOUT_MS = 60 * 1000;
 
@@ -393,7 +407,10 @@ admin.get('/admin/logs', async (c) => {
 });
 
 admin.post('/admin/gcal/reset', async (c) => {
-    const { phase = 'cleanup', offset = 0 } = await c.req.json().catch(() => ({}));
+    const body = await c.req.json().catch(() => ({}));
+    const validation = validateBody(GcalResetSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+    const { phase, offset } = validation.data;
     const BATCH_SIZE = 5;
     const gcal = new GoogleCalendarService(c.env.GOOGLE_SERVICE_ACCOUNT_JSON, c.env.GOOGLE_CALENDAR_ID);
 
@@ -420,7 +437,7 @@ admin.post('/admin/gcal/reset', async (c) => {
 
         if (phase === 'create') {
             const { results } = await c.env.DB.prepare(
-                `SELECT * FROM events WHERE start_date >= '2024-01-01' LIMIT ? OFFSET ?`,
+                `SELECT id, title, type, troop_type, start_date, duration FROM events WHERE start_date >= '2024-01-01' LIMIT ? OFFSET ?`,
             )
                 .bind(BATCH_SIZE, offset)
                 .all();
@@ -486,7 +503,16 @@ admin.post('/admin/restore', async (c) => {
         return errors.forbidden(c, 'Only the Master Admin can perform restores.');
     }
 
-    const { targetKey, backupKey } = await c.req.json();
+    const body = await c.req.json();
+    const validation = validateBody(AdminRestoreSchema, body);
+    if (!validation.success) return errors.validation(c, validation.error);
+
+    const { targetKey, backupKey } = validation.data;
+
+    // Validate targetKey against the allowed data keys whitelist
+    if (!ALLOWED_DATA_KEYS.includes(targetKey)) {
+        return errors.badRequest(c, `Invalid restore target key: ${targetKey}`);
+    }
 
     const backupData = await c.env.BOT_DATA.get(backupKey);
     if (!backupData) return errors.notFound(c, 'Backup');

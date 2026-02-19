@@ -158,6 +158,8 @@
                                     id="select-{reminder.reminder_type}"
                                     class="custom-select-trigger"
                                     class:active={openDropdownId === reminder.reminder_type}
+                                    aria-haspopup="listbox"
+                                    aria-expanded={openDropdownId === reminder.reminder_type}
                                     on:click={(e) => handleToggleDropdown(reminder.reminder_type, e)}
                                 >
                                     <span>{getChannelName(reminder.channel_id)}</span>

@@ -7,7 +7,7 @@
     import RemoveModal from './RemoveModal.svelte';
     import CycleConfigModal from './CycleConfigModal.svelte';
     import { getIconSrc } from './calendarIcons';
-    import { fetchWithAuth, getLoggedInUser } from '../../stores/auth.js';
+    import { fetchWithAuth, getLoggedInUser } from '../../stores/auth';
 
     let viewDate = new Date();
     let events = [];

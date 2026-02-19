@@ -1,3 +1,13 @@
+/**
+ * Escapes HTML special characters to prevent XSS when inserting into the DOM.
+ * @param {string} str - The string to escape.
+ * @returns {string} The escaped string.
+ */
+window.escapeHtml = function (str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+};
+
 window.getStorageKey = function (key) {
     const user = window.auth && window.auth.getLoggedInUser ? window.auth.getLoggedInUser() : null;
     if (user && user.id) {

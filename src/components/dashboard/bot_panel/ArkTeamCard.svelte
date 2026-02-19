@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
     export let guildId;
     export let allianceTag;
     export let teamNumber;

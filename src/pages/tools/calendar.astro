@@ -30,6 +30,7 @@ import CalendarComponent from '../../components/calendar/Calendar.svelte';
         }
     </script>
     <main class="tool-page-wrapper">
+        <noscript><div style="text-align:center;padding:2rem;color:#ccc;">This tool requires JavaScript to run. Please enable JavaScript in your browser settings.</div></noscript>
         <CalendarComponent client:only="svelte" />
     </main>
 </Layout>

@@ -470,12 +470,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!paginationDots) return;
         const setNames = Object.keys(equipmentSets[state.troopType]);
         paginationDots.innerHTML = '';
-        setNames.forEach((_, index) => {
-            const dot = document.createElement('span');
+        setNames.forEach((name, index) => {
+            const dot = document.createElement('button');
             dot.className = 'dot';
+            dot.setAttribute('aria-label', `Go to equipment set ${index + 1}: ${name}`);
             if (index === state.equipmentSetIndex) {
                 dot.classList.add('active');
+                dot.setAttribute('aria-current', 'true');
             }
+            dot.addEventListener('click', () => showEquipmentSet(index));
             paginationDots.appendChild(dot);
         });
     }

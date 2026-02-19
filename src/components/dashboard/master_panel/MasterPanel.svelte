@@ -7,7 +7,7 @@
     import BundleEditor from './BundleEditor.svelte';
     import MetaPairingEditor from './MetaPairingEditor.svelte';
     import emojiData from '../../../data/emoji_mappings.json';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
 
     export let user;
 

@@ -3,7 +3,7 @@
     import { fade } from 'svelte/transition';
     import MGEApplicationsPanel from './MGEApplicationsPanel.svelte';
     import SaveBar from '../../shared/SaveBar.svelte';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
 
     export let guildId;
     export let channels = [];
@@ -86,9 +86,15 @@
     function handleWindowClick() {
         openDropdownId = null;
     }
+
+    function handleKeydown(e) {
+        if (e.key === 'Escape' && openDropdownId) {
+            openDropdownId = null;
+        }
+    }
 </script>
 
-<svelte:window on:click={handleWindowClick} />
+<svelte:window on:click={handleWindowClick} on:keydown={handleKeydown} />
 
 <div class="mge-container">
     <div class="mge-subtabs">
@@ -171,6 +177,8 @@
                                         type="button"
                                         class="custom-select-trigger"
                                         aria-labelledby="label-{field.id}"
+                                        aria-haspopup="listbox"
+                                        aria-expanded={openDropdownId === field.id}
                                         on:click={(e) => toggleDropdown(field.id, e)}
                                         disabled={saving}
                                     >

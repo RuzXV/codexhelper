@@ -133,6 +133,8 @@
                     <button
                         type="button"
                         class="custom-select-trigger small"
+                        aria-haspopup="listbox"
+                        aria-expanded={openDropdownId === `custom-ch-${index}`}
                         on:click={(e) => handleToggleDropdown(`custom-ch-${index}`, e)}
                     >
                         <span>{getChannelName(custom.channel_id)}</span>
@@ -159,6 +161,8 @@
                     <button
                         type="button"
                         class="custom-select-trigger small"
+                        aria-haspopup="listbox"
+                        aria-expanded={openDropdownId === `custom-role-${index}`}
                         on:click={(e) => handleToggleDropdown(`custom-role-${index}`, e)}
                     >
                         <span style={custom.role_id ? 'color: var(--accent-blue)' : 'opacity: 0.7'}>
@@ -211,6 +215,8 @@
                     <button
                         type="button"
                         class="custom-select-trigger small"
+                        aria-haspopup="listbox"
+                        aria-expanded={openDropdownId === `custom-unit-${index}`}
                         on:click={(e) => handleToggleDropdown(`custom-unit-${index}`, e)}
                     >
                         <span>{getUnitLabel(custom.unit)}</span>

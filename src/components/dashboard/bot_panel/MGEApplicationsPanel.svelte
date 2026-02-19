@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import { slide, fade } from 'svelte/transition';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
 
     export let guildId;
 

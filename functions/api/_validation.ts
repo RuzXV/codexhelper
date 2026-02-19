@@ -232,6 +232,41 @@ export const ApproveReviewSchema = z.object({
 });
 
 // ============================================
+// Admin Validation Schemas
+// ============================================
+
+export const AdminHeartbeatSchema = z.object({
+    username: z.string().max(50, 'Username too long').optional(),
+    avatar: z.string().max(200, 'Avatar hash too long').nullable().optional(),
+});
+
+export const GcalResetSchema = z.object({
+    phase: z.enum(['cleanup', 'create']).default('cleanup'),
+    offset: z.number().int().nonnegative('Offset must be non-negative').default(0),
+});
+
+export const AdminRestoreSchema = z.object({
+    targetKey: z.string().min(1, 'Target key is required'),
+    backupKey: z.string().min(1, 'Backup key is required').regex(/^backup_history:/, 'Invalid backup key format'),
+});
+
+export const UpdateCacheSchema = z.object({
+    top_servers: z.array(z.object({
+        name: z.string(),
+        icon_url: z.string(),
+        member_count: z.number(),
+    })).optional(),
+    bot_stats: z.record(z.string(), z.unknown()).optional(),
+    active_patrons: z.array(z.string().regex(/^\d{17,20}$/)).optional(),
+    approved_reviews: z.array(z.object({
+        username: z.string(),
+        avatar_url: z.string().nullable(),
+        review_text: z.string(),
+        submitted_at: z.number(),
+    })).optional(),
+});
+
+// ============================================
 // User Settings Validation Schemas
 // ============================================
 

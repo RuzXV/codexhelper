@@ -7,11 +7,8 @@
     import RemindersConfig from './RemindersConfig.svelte';
     import ArkConfig from './ArkConfig.svelte';
     import MGEConfig from './MGEConfig.svelte';
-    import { fetchWithAuth } from '../../../stores/auth.js';
-    import { selectedServer, availableServers } from '../../../stores/guild.js';
-
-    import { createEventDispatcher } from 'svelte';
-    const dispatch = createEventDispatcher();
+    import { fetchWithAuth } from '../../../stores/auth';
+    import { selectedServer, availableServers } from '../../../stores/guild';
 
     let isServerDropdownOpen = false;
 

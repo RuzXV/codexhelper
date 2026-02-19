@@ -291,6 +291,15 @@ guilds.get('/:guildId/features', async (c) => {
     const { guildId } = c.req.param();
     if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
+    // Check KV cache first (2-min TTL)
+    const featuresCacheKey = `guild:features:${guildId}`;
+    try {
+        const cached = await c.env.API_CACHE.get(featuresCacheKey);
+        if (cached) return c.json(JSON.parse(cached));
+    } catch (_) {
+        /* cache miss */
+    }
+
     const [ark, mge, ruins, altar, bypassRecord, authRecord] = await Promise.all([
         c.env.BOT_DB.prepare('SELECT channel_id FROM ark_of_osiris_setups WHERE guild_id = ?').bind(guildId).first(),
         c.env.BOT_DB.prepare('SELECT signup_channel_id FROM mge_settings WHERE guild_id = ?').bind(guildId).first(),
@@ -349,7 +358,15 @@ guilds.get('/:guildId/features', async (c) => {
         altar: { enabled: !!(altar && altar.is_active), channel_id: toStr(altar?.channel_id) },
     };
 
-    return c.json({ features, patron });
+    const result = { features, patron };
+
+    // Cache for 2 minutes (non-blocking)
+    const putPromise = c.env.API_CACHE.put(featuresCacheKey, JSON.stringify(result), { expirationTtl: 120 });
+    if (c.executionCtx && 'waitUntil' in c.executionCtx) {
+        c.executionCtx.waitUntil(putPromise);
+    }
+
+    return c.json(result);
 });
 
 guilds.get('/:guildId/reminders', async (c) => {
@@ -357,8 +374,8 @@ guilds.get('/:guildId/reminders', async (c) => {
     if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
 
     const [reminders, customReminders] = await Promise.all([
-        c.env.BOT_DB.prepare('SELECT * FROM reminder_setups WHERE guild_id = ?').bind(guildId).all(),
-        c.env.BOT_DB.prepare('SELECT * FROM custom_reminders WHERE guild_id = ?').bind(guildId).all(),
+        c.env.BOT_DB.prepare('SELECT reminder_type, channel_id, is_active, first_instance_ts, last_instance_ts, create_discord_event, reminder_intervals_seconds, role_id FROM reminder_setups WHERE guild_id = ?').bind(guildId).all(),
+        c.env.BOT_DB.prepare('SELECT reminder_id, channel_id, title, message, role_id, repeat_interval_seconds, first_instance_ts, reminder_intervals_seconds, is_active, create_discord_event FROM custom_reminders WHERE guild_id = ?').bind(guildId).all(),
     ]);
 
     const castIds = (rows: Record<string, unknown>[]) =>
@@ -539,11 +556,11 @@ guilds.get('/:guildId/ark/all', async (c) => {
     if (!(await verifyGuildReadAccess(c, guildId))) return c.json({ error: 'Unauthorized' }, 403);
     try {
         const [{ results: setups }, { results: teams }, { results: signups }] = await Promise.all([
-            c.env.BOT_DB.prepare('SELECT * FROM ark_of_osiris_setups WHERE guild_id = ?').bind(guildId).all(),
-            c.env.BOT_DB.prepare('SELECT * FROM ark_of_osiris_teams WHERE guild_id = ? ORDER BY team_number ASC')
+            c.env.BOT_DB.prepare('SELECT alliance_tag, channel_id, admin_role_id, tag_role_id, reminder_interval_seconds, is_active FROM ark_of_osiris_setups WHERE guild_id = ?').bind(guildId).all(),
+            c.env.BOT_DB.prepare('SELECT alliance_tag, team_number, team_name, next_match_timestamp, signup_cap, role_id FROM ark_of_osiris_teams WHERE guild_id = ? ORDER BY team_number ASC')
                 .bind(guildId)
                 .all(),
-            c.env.BOT_DB.prepare('SELECT * FROM ark_of_osiris_signups WHERE guild_id = ? ORDER BY signup_timestamp ASC')
+            c.env.BOT_DB.prepare('SELECT alliance_tag, team_number, user_id, in_game_name, signup_timestamp FROM ark_of_osiris_signups WHERE guild_id = ? ORDER BY signup_timestamp ASC')
                 .bind(guildId)
                 .all(),
         ]);
@@ -809,7 +826,7 @@ guilds.get('/:guildId/mge', async (c) => {
     try {
         // Cast coordinator_role_id to TEXT in SQL to avoid JavaScript integer precision loss on Discord snowflake IDs
         const setup = (await c.env.BOT_DB.prepare(
-            'SELECT *, CAST(coordinator_role_id AS TEXT) as coordinator_role_id FROM mge_settings WHERE guild_id = ?',
+            'SELECT current_mge_name, placement_points, signup_channel_id, posted_signups_channel_id, ping_role_id, CAST(coordinator_role_id AS TEXT) as coordinator_role_id, signup_message_id FROM mge_settings WHERE guild_id = ?',
         )
             .bind(guildId)
             .first()) as Record<string, unknown> | null;
@@ -888,7 +905,7 @@ guilds.get('/:guildId/mge/applications', async (c) => {
 
         const [appsResult, questionsResult, rankingsResult] = await Promise.all([
             c.env.BOT_DB.prepare(
-                'SELECT * FROM mge_applications WHERE guild_id = ? AND mge_name = ? ORDER BY submitted_at DESC',
+                'SELECT application_id, mge_name, ingame_name, application_status, rank_spot, submitted_at, answers FROM mge_applications WHERE guild_id = ? AND mge_name = ? ORDER BY submitted_at DESC',
             )
                 .bind(guildId, mgeName)
                 .all(),
@@ -934,7 +951,7 @@ guilds.post('/:guildId/mge/applications/:appId/accept', async (c) => {
         if (!settings?.current_mge_name) return errors.badRequest(c, 'No active MGE');
 
         const app = (await c.env.BOT_DB.prepare(
-            'SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?',
+            'SELECT application_id, guild_id, mge_name, ingame_name, application_status, rank_spot, submitted_at FROM mge_applications WHERE application_id = ? AND guild_id = ?',
         )
             .bind(appId, guildId)
             .first()) as MgeApplicationRow | null;
@@ -973,7 +990,7 @@ guilds.post('/:guildId/mge/applications/:appId/reject', async (c) => {
 
     try {
         const app = await c.env.BOT_DB.prepare(
-            'SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?',
+            'SELECT application_id, guild_id, mge_name, ingame_name, application_status, rank_spot, submitted_at FROM mge_applications WHERE application_id = ? AND guild_id = ?',
         )
             .bind(appId, guildId)
             .first();
@@ -1003,7 +1020,7 @@ guilds.post('/:guildId/mge/applications/:appId/restore', async (c) => {
 
     try {
         const app = await c.env.BOT_DB.prepare(
-            'SELECT * FROM mge_applications WHERE application_id = ? AND guild_id = ?',
+            'SELECT application_id, guild_id, mge_name, ingame_name, application_status, rank_spot, submitted_at FROM mge_applications WHERE application_id = ? AND guild_id = ?',
         )
             .bind(appId, guildId)
             .first();

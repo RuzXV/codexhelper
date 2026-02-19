@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { fade, slide } from 'svelte/transition';
     import ArkAlliancePanel from './ArkAlliancePanel.svelte';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
 
     export let guildId;
     export let channels = [];

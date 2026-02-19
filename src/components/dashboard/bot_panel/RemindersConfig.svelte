@@ -5,7 +5,7 @@
     import CustomReminderCard from './reminders/CustomReminderCard.svelte';
     import SaveBar from '../../shared/SaveBar.svelte';
     import '../../../styles/reminders-shared.css';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
 
     export let guildId;
     export let channels = [];
@@ -140,6 +140,8 @@
 
     function deleteCustomReminder(index) {
         const item = customReminders[index];
+        const name = item.title || 'this reminder';
+        if (!confirm(`Are you sure you want to delete "${name}"? This cannot be undone.`)) return;
         if (item.reminder_id) {
             deletedCustomIds = [...deletedCustomIds, item.reminder_id];
         }
@@ -255,7 +257,7 @@
     }
 </script>
 
-<svelte:window on:click={() => (openDropdownId = null)} />
+<svelte:window on:click={() => (openDropdownId = null)} on:keydown={(e) => { if (e.key === 'Escape') openDropdownId = null; }} />
 
 <div class="reminders-container" transition:fade>
     {#if loading}

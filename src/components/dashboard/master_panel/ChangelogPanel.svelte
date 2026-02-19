@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { fetchWithAuth } from '../../../stores/auth.js';
+    import { fetchWithAuth } from '../../../stores/auth';
 
     let logs = [];
     let loading = true;
