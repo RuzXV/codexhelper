@@ -585,7 +585,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
     .footer-brand { max-width: none; text-align: left; }
     .footer-brand .logo { justify-content: flex-start; margin-bottom: var(--spacing-3); }
     .footer-brand p { padding-right: 0; font-size: var(--font-size-sm); text-align: left; margin-top: var(--spacing-2); }
-    .footer-links { grid-template-columns: repeat(3, 1fr); gap: var(--spacing-4); text-align: left; max-width: none; justify-content: center; }
+    .footer-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-4); text-align: left; max-width: none; justify-content: center; }
     .footer-column { padding: 0; }
     .footer-column h4 { font-size: var(--font-size-base); margin-bottom: var(--spacing-2); font-weight: 600; color: var(--text-primary); }
     .footer-column a { font-size: var(--font-size-sm); margin-bottom: var(--spacing-1); display: block; color: var(--text-secondary); text-decoration: none; transition: color 0.2s ease; padding: var(--spacing-1) 0; }
@@ -714,6 +714,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
     .server-item { min-width: 180px; padding: 0 10px; }
     .server-name { font-size: 0.75rem; max-width: 120px; }
     .server-members { font-size: 0.7rem; }
+    .review-item { min-width: min(280px, 85vw); max-width: min(280px, 85vw); }
 }
 
 .tool-page-wrapper { background-image: radial-gradient(ellipse 65% 85% at 50% 50%, rgba(59, 130, 246, 0.25) 0%, transparent 70%); background-repeat: no-repeat; min-height: 80vh; }

@@ -219,7 +219,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-a
 .select-selected img { width: 24px; height: 24px; }
 .select-selected::after { content: ""; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); background-position: center; background-repeat: no-repeat; background-size: 1.5em 1.5em; width: 1.5em; height: 1.5em; margin-left: auto; transition: transform 0.3s ease; }
 .select-selected.select-arrow-active::after { transform: rotate(180deg); }
-.select-items { position: absolute; background-color: var(--bg-tertiary); top: calc(100% + 4px); left: 0; right: 0; z-index: 99; border: 1px solid var(--border-hover); border-radius: var(--radius-sm); max-height: 200px; overflow-y: auto; }
+.select-items { position: absolute; background-color: var(--bg-tertiary); top: calc(100% + 4px); left: 0; right: 0; z-index: 99; border: 1px solid var(--border-hover); border-radius: var(--radius-sm); max-height: 200px; overflow-y: auto; overflow-x: hidden; }
 .select-hide { display: none; }
 .select-items div { display: flex; align-items: center; gap: var(--spacing-3); color: var(--text-secondary); padding: var(--spacing-3); cursor: pointer; }
 .select-items div:hover, .same-as-selected { background-color: var(--accent-blue-light); color: var(--text-primary); }
@@ -312,6 +312,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-a
     font-weight: 500;
     color: var(--text-secondary);
     margin-bottom: var(--spacing-2);
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 @media (max-width: 1200px) {
