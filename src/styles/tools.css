@@ -1,13 +1,13 @@
-.tool-grid { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-6); }
+.tool-grid { max-width: min(800px, 95vw); margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: clamp(0.75rem, 3vw, 1.5rem); }
 
-.tool-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--spacing-8); display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--spacing-4); text-decoration: none; color: var(--text-primary); transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+.tool-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: clamp(1rem, 4vw, 2rem); display: flex; flex-direction: column; align-items: center; text-align: center; gap: clamp(0.5rem, 2vw, 1rem); text-decoration: none; color: var(--text-primary); transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
 
 .tool-card:hover { transform: translateY(-5px); border-color: var(--accent-blue); box-shadow: 0 0 25px rgba(59, 130, 246, 0.25); }
 
-.tool-card-icon-wrapper { background-color: var(--accent-blue-light); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--accent-blue); }
+.tool-card-icon-wrapper { background-color: var(--accent-blue-light); border-radius: 50%; width: clamp(60px, 10vw, 80px); height: clamp(60px, 10vw, 80px); display: flex; align-items: center; justify-content: center; border: 1px solid var(--accent-blue); }
 
-.tool-card-icon { font-size: 36px; color: var(--accent-blue-bright); }
+.tool-card-icon { font-size: clamp(24px, 5vw, 36px); color: var(--accent-blue-bright); }
 
-.tool-card-content h3 { margin: 0 0 var(--spacing-2); font-size: var(--font-size-xl); }
+.tool-card-content h3 { margin: 0 0 var(--spacing-2); font-size: clamp(1rem, 2vw + 0.5rem, var(--font-size-xl)); }
 
 .tool-card-content p { color: var(--text-secondary); font-size: var(--font-size-sm); margin: 0; line-height: 1.5; }
