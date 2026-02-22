@@ -109,7 +109,7 @@
         font-weight: 600;
         position: relative;
         transition: color 0.2s ease;
-        font-size: 0.95rem;
+        font-size: clamp(0.8rem, 2.5vw, 0.95rem);
         white-space: nowrap;
     }
     .generator-tab-btn:hover {

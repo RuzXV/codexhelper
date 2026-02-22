@@ -558,7 +558,8 @@
         display: none;
     }
     .tool-title { flex-direction: column; gap: var(--spacing-2); }
-    .selectors-container { grid-template-columns: 1fr; min-height: auto; height: auto; }
+    .selectors-container { grid-template-columns: 1fr; min-height: auto; height: auto; min-width: 0; }
+    .pairing-selector-wrapper, .equipment-carousel-wrapper, .inscription-selector-wrapper { min-width: 0; }
     .pairing-selector { max-height: 280px; height: auto; }
     .pairing-item span { font-size: calc(var(--font-size-sm) * 0.9); }
     .equipment-arrow { top: 90%; font-size: 1.5rem; }
