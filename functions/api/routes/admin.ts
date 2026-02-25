@@ -27,6 +27,7 @@ import {
 
 /** Allowed keys for /data/:key endpoints — prevents arbitrary KV access */
 const ALLOWED_DATA_KEYS = [
+    'aliases',
     'commanders',
     'pairings',
     'equipment',
@@ -39,6 +40,9 @@ const ALLOWED_DATA_KEYS = [
     'stat_weighting',
     'score_pairings',
     'system_changelog',
+    'bundles',
+    'events',
+    'meta_lineups',
 ];
 
 const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
