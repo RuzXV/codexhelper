@@ -1,6 +1,7 @@
 <script>
-    import { onMount } from 'svelte';
+    import { onMount, createEventDispatcher } from 'svelte';
     import { fade } from 'svelte/transition';
+    const dispatch = createEventDispatcher();
     import EventCalendarConfig from './EventCalendarConfig.svelte';
     import OverviewConfig from './OverviewConfig.svelte';
     import ChannelConfig from './ChannelConfig.svelte';
