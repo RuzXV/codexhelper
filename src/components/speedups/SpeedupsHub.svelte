@@ -84,23 +84,23 @@
     .hub-tabs {
         display: flex;
         justify-content: center;
-        gap: 15px;
-        margin-bottom: 25px;
+        gap: clamp(0.5rem, 2vw, 1rem);
+        margin-bottom: clamp(1rem, 4vw, 1.5rem);
     }
 
     .hub-tab-btn {
         background: rgba(20, 21, 24, 0.65);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 12px 30px;
+        padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 30px);
         border-radius: 12px;
         color: var(--text-secondary);
         font-weight: 600;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: clamp(6px, 1.5vw, 10px);
         transition: all 0.2s ease;
-        font-size: 1rem;
+        font-size: clamp(0.875rem, 2vw + 0.25rem, 1rem);
     }
 
     .hub-tab-btn:hover {

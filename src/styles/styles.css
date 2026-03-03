@@ -94,7 +94,7 @@ body.dashboard-page .navbar { margin-bottom: 0; }
 
 .logo-image { height: clamp(28px, 5vw, 40px); width: auto; }
 
-.nav-links { display: flex; gap: var(--spacing-6); align-items: center; }
+.nav-links { display: flex; gap: clamp(0.25rem, 1.5vw, 1.5rem); align-items: center; }
 
 .patreon-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-2); padding: var(--spacing-1) var(--spacing-3); border-radius: var(--radius-md); text-decoration: none; font-weight: 500; font-size: var(--font-size-sm); z-index: 1; background: rgba(54, 164, 247, 0.35); border: 1px solid rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: white; transition: all 0.3s ease; position: relative; overflow: hidden; }
 
@@ -168,7 +168,7 @@ body.dashboard-page .navbar { margin-bottom: 0; }
 
 .stats::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); }
 
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: clamp(0.75rem, 2vw, 2rem); margin-top: clamp(3rem, 6vw, 6rem); }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr)); gap: clamp(0.75rem, 2vw, 2rem); margin-top: clamp(3rem, 6vw, 6rem); }
 
 .stat-item { display: flex; align-items: center; gap: clamp(1rem, 2vw, 1.5rem); text-align: left; padding: clamp(1rem, 3vw, 2rem); border-radius: var(--radius-xl); background: var(--bg-card); border: 1px solid var(--border-color); transition: all 0.3s ease; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
 
@@ -466,7 +466,9 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 
     /* STRUCTURAL: Navbar icon-only mode */
     .navbar { border-radius: var(--radius-md); }
-    .nav-brand span { font-weight: 600; white-space: nowrap; }
+    .nav-brand { min-width: 0; overflow: hidden; }
+    .nav-brand a { min-width: 0; }
+    .nav-brand span { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
     .nav-links { display: flex; flex-direction: row; align-items: center; gap: clamp(2px, 1vw, 8px); flex-shrink: 0; }
     .nav-link, .patreon-btn, .discord-login-btn { padding: var(--spacing-2); min-width: 44px; min-height: 44px; width: 44px; height: 44px; transition: transform 0.2s ease, background-color 0.2s ease; }
     .nav-link:hover, .patreon-btn:hover, .discord-login-btn:hover { transform: scale(1.1); }
@@ -479,17 +481,17 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
     /* STRUCTURAL: Sub-nav grid layout */
     .sub-nav-container {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(min(60px, 100%), 1fr));
         gap: var(--spacing-2);
         padding: var(--spacing-2) var(--spacing-3);
         height: auto;
-        overflow-x: hidden;
+        overflow-x: auto;
     }
     .sub-nav-link {
         font-size: var(--font-size-xs);
         white-space: normal;
         text-align: center;
-        height: 4em;
+        min-height: 3em;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -657,7 +659,7 @@ a, button, .nav-link, .faq-question, .carousel-arrow { min-height: 44px; min-wid
 
 @keyframes slide-down { to { transform: translateY(0); opacity: 1; } }
 
-.sub-nav-container { max-width: 1400px; margin: 0 auto; padding: 0 var(--spacing-6); display: flex; gap: var(--spacing-4); }
+.sub-nav-container { max-width: 1400px; margin: 0 auto; padding: 0 var(--spacing-6); display: flex; gap: clamp(0.5rem, 2vw, 1rem); overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .sub-nav-link { color: var(--text-secondary); text-decoration: none; padding: var(--spacing-3) var(--spacing-2); font-weight: 500; position: relative; transition: color 0.2s ease; white-space: nowrap; }
 .sub-nav-link:hover { color: var(--text-primary); }
 .sub-nav-link.active { color: var(--text-primary); }

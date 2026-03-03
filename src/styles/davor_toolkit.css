@@ -62,7 +62,7 @@
 
 .carousel-container { position: relative; width: 100%; margin: 0 auto; overflow: hidden; }
 .carousel-track { display: flex; }
-.carousel-slide { flex: 0 0 100%; padding: 0 clamp(10px, 3vw, 25px); box-sizing: border-box; display: none; min-width: 0; }
+.carousel-slide { flex: 0 0 100%; padding: 0 clamp(10px, 3vw, 25px); box-sizing: border-box; display: none; min-width: 0; overflow: hidden; }
 .carousel-slide.is-active { display: block; }
 
 .carousel-arrow {
@@ -134,7 +134,7 @@
 
 .selectors-container { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.75rem, 2vw, 1.5rem); margin-top: clamp(0.5rem, 2vw, 1rem); }
 .pairing-selector-wrapper, .equipment-carousel-wrapper, .inscription-selector-wrapper { min-height: 0; display: flex; flex-direction: column; height: 100%; transition: opacity 0.15s ease-in-out;}
-.pairing-selector { display: grid; grid-template-columns: 1fr; gap: var(--spacing-2); overflow-y: auto; padding-right: var(--spacing-2); flex-grow: 1; height: 400px;}
+.pairing-selector { display: grid; grid-template-columns: 1fr; gap: var(--spacing-2); overflow-y: auto; padding-right: var(--spacing-2); flex-grow: 1; height: clamp(250px, 50vh, 400px);}
 .pairing-item { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--spacing-2); display: flex; align-items: center; gap: var(--spacing-3); cursor: pointer; transition: all 0.2s ease; }
 .pairing-item:hover { background: var(--bg-secondary); border-color: var(--border-hover); }
 .pairing-item.active { background: var(--accent-blue-light); border-color: var(--accent-blue); }
@@ -147,7 +147,7 @@
 #equipment-set-carousel { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--spacing-4); text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; }
 #equipment-display { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: opacity 0.15s ease-in-out; }
 #equipment-display.fade-out { opacity: 0; }
-.equipment-loadout-shape { position: relative; width: 280px; height: 280px; margin: 0 auto; }
+.equipment-loadout-shape { position: relative; width: min(280px, 100%); height: min(280px, 80vw); margin: 0 auto; }
 .equipment-slot { position: absolute; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; transform: rotate(45deg); }
 .equipment-slot img { max-width: 50px; max-height: 50px; object-fit: contain; transform: rotate(-45deg); }
 .equipment-slot[data-slot="helmet"] { top: -10px; left: 110px; }
@@ -306,7 +306,7 @@
 
 .saved-scores-grid {
     display: grid;
-    grid-template-columns: 120px 100px 2.3fr 1.2fr 100px 80px;
+    grid-template-columns: minmax(80px, 120px) minmax(70px, 100px) 2.3fr 1.2fr minmax(70px, 100px) minmax(60px, 80px);
     align-items: start;
     gap: clamp(0.5rem, 2vw, 1rem);
 }
@@ -487,8 +487,8 @@
 }
 
 #tierlist-pairing-selector {
-    height: 400px;
-    max-height: 400px;
+    height: clamp(250px, 50vh, 400px);
+    max-height: clamp(250px, 50vh, 400px);
     overflow-y: auto;
 }
 

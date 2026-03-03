@@ -20,7 +20,7 @@
     column-gap: 0 !important;
     margin: 0 !important;
 }
-.carousel-slide { flex: 0 0 600px; padding: 0 clamp(10px, 3vw, 25px); box-sizing: border-box; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease; transform: scale(0.8); opacity: 0.5; pointer-events: none; position: relative; }
+.carousel-slide { flex: 0 0 min(600px, 100%); padding: 0 clamp(10px, 3vw, 25px); box-sizing: border-box; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease; transform: scale(0.8); opacity: 0.5; pointer-events: none; position: relative; min-width: 0; overflow: hidden; }
 
 .carousel-slide::before { content: ''; position: absolute; top: 0; left: clamp(10px, 3vw, 25px); width: calc(100% - clamp(20px, 6vw, 50px)); height: 100%; background-color: rgba(20, 21, 24, 0.65); z-index: 2; opacity: 1; transition: opacity 0.5s ease; pointer-events: none; border-radius: var(--radius-lg); }
 
@@ -326,6 +326,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-a
         filter: none;
         pointer-events: auto;
         box-sizing: border-box;
+        min-width: 0;
+        overflow: hidden;
     }
 
     .calculator-island {

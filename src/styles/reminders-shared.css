@@ -12,7 +12,7 @@
     opacity: 0.8;
 }
 .section-header {
-    padding: 15px 20px;
+    padding: clamp(10px, 2vw, 15px) clamp(12px, 3vw, 20px);
     background: rgba(0, 0, 0, 0.15);
     border-bottom: 1px solid var(--border-color);
     display: flex;
@@ -177,11 +177,11 @@ input:checked + .toggle-switch:before {
 .warning-banner {
     background: rgba(245, 158, 11, 0.1);
     border-left: 3px solid #f59e0b;
-    padding: 10px 15px;
-    margin: 15px 20px 0;
+    padding: clamp(8px, 2vw, 10px) clamp(10px, 2vw, 15px);
+    margin: clamp(10px, 2vw, 15px) clamp(12px, 3vw, 20px) 0;
     border-radius: 4px;
     display: flex;
-    gap: 10px;
+    gap: clamp(6px, 1.5vw, 10px);
     align-items: start;
     font-size: 0.85rem;
     color: #fbbf24;
@@ -189,17 +189,17 @@ input:checked + .toggle-switch:before {
 
 /* Settings body */
 .settings-body {
-    padding: 20px;
+    padding: clamp(12px, 3vw, 20px);
 }
 .setting-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    gap: clamp(1rem, 4vw, 2rem);
 }
 .setting-col {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: clamp(12px, 3vw, 20px);
 }
 .setting-group {
     display: flex;
@@ -322,14 +322,14 @@ input:checked + .toggle-switch:before {
     color: #ef4444;
 }
 .custom-card-body {
-    padding: 15px;
+    padding: clamp(10px, 2vw, 15px);
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: clamp(10px, 2vw, 15px);
 }
 .custom-row {
     display: flex;
-    gap: 15px;
+    gap: clamp(8px, 2vw, 15px);
     align-items: flex-end;
 }
 .c-group {

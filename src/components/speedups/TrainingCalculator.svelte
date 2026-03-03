@@ -101,7 +101,7 @@
     }
     .generator-tab-btn {
         flex: 1;
-        padding: var(--spacing-3) 4px;
+        padding: var(--spacing-3) clamp(2px, 1vw, 8px);
         cursor: pointer;
         background: none;
         border: none;
@@ -109,8 +109,10 @@
         font-weight: 600;
         position: relative;
         transition: color 0.2s ease;
-        font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+        font-size: clamp(0.7rem, 2vw + 0.1rem, 0.95rem);
         white-space: nowrap;
+        min-width: 0;
+        text-align: center;
     }
     .generator-tab-btn:hover {
         color: var(--text-primary);
