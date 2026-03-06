@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { Bindings, BatchOperation } from '../_types';
-import { errors } from '../_errors';
+import { errors, isD1Error } from '../_errors';
 import { botAuthMiddleware } from '../_middleware';
 import { BotQuerySchema, BotBatchSchema, validateBody } from '../_validation';
 
@@ -89,48 +89,73 @@ function isSqlAllowed(sql: string): boolean {
 }
 
 bot.get('/templates/list/:userId', async (c) => {
-    const { userId } = c.req.param();
-    const { results } = await c.env.DB.prepare(
-        'SELECT template_name, date_saved, last_loaded FROM user_templates WHERE user_id = ? ORDER BY date_saved DESC',
-    )
-        .bind(userId)
-        .all();
-    return c.json(results || []);
+    try {
+        const { userId } = c.req.param();
+        const { results } = await c.env.DB.prepare(
+            'SELECT template_name, date_saved, last_loaded FROM user_templates WHERE user_id = ? ORDER BY date_saved DESC',
+        )
+            .bind(userId)
+            .all();
+        return c.json(results || []);
+    } catch (e) {
+        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        return errors.internal(c, e);
+    }
 });
 
 bot.get('/templates/autocomplete/:userId', async (c) => {
-    const { userId } = c.req.param();
-    const current = c.req.query('current') || '';
-    const { results } = await c.env.DB.prepare(
-        'SELECT template_id, template_name, date_saved FROM user_templates WHERE user_id = ? AND template_name LIKE ? ORDER BY date_saved DESC LIMIT 25',
-    )
-        .bind(userId, `%${current}%`)
-        .all();
-    return c.json(results || []);
+    try {
+        const { userId } = c.req.param();
+        const current = c.req.query('current') || '';
+        const { results } = await c.env.DB.prepare(
+            'SELECT template_id, template_name, date_saved FROM user_templates WHERE user_id = ? AND template_name LIKE ? ORDER BY date_saved DESC LIMIT 25',
+        )
+            .bind(userId, `%${current}%`)
+            .all();
+        return c.json(results || []);
+    } catch (e) {
+        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        return errors.internal(c, e);
+    }
 });
 
 bot.get('/templates/load/:templateId/:userId', async (c) => {
-    const { templateId, userId } = c.req.param();
-    const result = await c.env.DB.prepare('SELECT * FROM user_templates WHERE template_id = ? AND user_id = ?')
-        .bind(templateId, userId)
-        .first();
-    return result ? c.json(result) : c.json({ error: 'Template not found' }, 404);
+    try {
+        const { templateId, userId } = c.req.param();
+        const result = await c.env.DB.prepare('SELECT * FROM user_templates WHERE template_id = ? AND user_id = ?')
+            .bind(templateId, userId)
+            .first();
+        return result ? c.json(result) : c.json({ error: 'Template not found' }, 404);
+    } catch (e) {
+        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        return errors.internal(c, e);
+    }
 });
 
 bot.delete('/templates/delete/:templateId/:userId', async (c) => {
-    const { templateId, userId } = c.req.param();
-    const { success } = await c.env.DB.prepare('DELETE FROM user_templates WHERE template_id = ? AND user_id = ?')
-        .bind(templateId, userId)
-        .run();
-    return success ? c.json({ status: 'success' }) : c.json({ error: 'Deletion failed or template not found' }, 404);
+    try {
+        const { templateId, userId } = c.req.param();
+        const { success } = await c.env.DB.prepare('DELETE FROM user_templates WHERE template_id = ? AND user_id = ?')
+            .bind(templateId, userId)
+            .run();
+        return success ? c.json({ status: 'success' }) : c.json({ error: 'Deletion failed or template not found' }, 404);
+    } catch (e) {
+        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        return errors.internal(c, e);
+    }
 });
 
 bot.post('/templates/update-loaded/:templateId', async (c) => {
-    const { templateId } = c.req.param();
-    await c.env.DB.prepare('UPDATE user_templates SET last_loaded = ? WHERE template_id = ?')
-        .bind(Date.now() / 1000, templateId)
-        .run();
-    return c.json({ status: 'success' });
+    try {
+        const { templateId } = c.req.param();
+        await c.env.DB.prepare('UPDATE user_templates SET last_loaded = ? WHERE template_id = ?')
+            .bind(Date.now() / 1000, templateId)
+            .run();
+        return c.json({ status: 'success' });
+    } catch (e) {
+        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        return errors.internal(c, e);
+    }
 });
 
 bot.get('/events/upcoming', async (c) => {
@@ -187,18 +212,24 @@ bot.post('/query', async (c) => {
         }
     } catch (e) {
         console.error(`SQL execution error: ${String(e)} | SQL: ${sql.substring(0, 200)}`);
+        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
         return errors.internal(c, e);
     }
 });
 
 bot.get('/sync/feed', async (c) => {
-    const lastTimestamp = c.req.query('since') || 0;
-    const { results } = await c.env.BOT_DB.prepare(
-        'SELECT * FROM system_events WHERE created_at > ? ORDER BY created_at ASC LIMIT 50',
-    )
-        .bind(lastTimestamp)
-        .all();
-    return c.json(results || []);
+    try {
+        const lastTimestamp = c.req.query('since') || 0;
+        const { results } = await c.env.BOT_DB.prepare(
+            'SELECT * FROM system_events WHERE created_at > ? ORDER BY created_at ASC LIMIT 50',
+        )
+            .bind(lastTimestamp)
+            .all();
+        return c.json(results || []);
+    } catch (e) {
+        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        return errors.internal(c, e);
+    }
 });
 
 bot.post('/batch', async (c) => {
@@ -225,6 +256,7 @@ bot.post('/batch', async (c) => {
         return c.json(results);
     } catch (e) {
         console.error('Batch Execution Error:', e);
+        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
         return errors.internal(c, e);
     }
 });

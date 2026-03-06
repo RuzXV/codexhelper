@@ -69,11 +69,40 @@ export const errors = {
         apiError(c, 503, message || 'Service temporarily unavailable'),
 };
 
+/**
+ * Checks whether an error originated from D1 / SQLite so callers can
+ * return 503 (transient) instead of 500 (unexpected).
+ */
+export function isD1Error(error: unknown): boolean {
+    const msg = String(error).toLowerCase();
+    return (
+        msg.includes('d1') ||
+        msg.includes('database') ||
+        msg.includes('sqlite') ||
+        msg.includes('sql execution error') ||
+        msg.includes('table') ||
+        msg.includes('constraint') ||
+        msg.includes('no such') ||
+        msg.includes('busy') ||
+        msg.includes('locked') ||
+        msg.includes('disk i/o')
+    );
+}
+
+/**
+ * Wraps an async route handler so any uncaught exception is turned into
+ * either a 503 (D1/transient) or 500 (unexpected) JSON response instead
+ * of crashing the worker.
+ */
 export function withErrorHandling<T extends AppContext>(handler: (c: T) => Promise<Response>) {
     return async (c: T): Promise<Response> => {
         try {
             return await handler(c);
         } catch (error) {
+            if (isD1Error(error)) {
+                console.error('D1 error caught by withErrorHandling:', error);
+                return errors.serviceUnavailable(c as AppContext, 'Database temporarily unavailable');
+            }
             return errors.internal(c as AppContext, error);
         }
     };
