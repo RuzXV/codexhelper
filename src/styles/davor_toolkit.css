@@ -134,7 +134,7 @@
 
 .selectors-container { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.75rem, 2vw, 1.5rem); margin-top: clamp(0.5rem, 2vw, 1rem); }
 .pairing-selector-wrapper, .equipment-carousel-wrapper, .inscription-selector-wrapper { min-height: 0; display: flex; flex-direction: column; height: 100%; transition: opacity 0.15s ease-in-out;}
-.pairing-selector { display: grid; grid-template-columns: 1fr; gap: var(--spacing-2); overflow-y: auto; padding-right: var(--spacing-2); flex-grow: 1; height: clamp(250px, 50vh, 400px);}
+.pairing-selector { display: grid; grid-template-columns: 1fr; gap: var(--spacing-2); overflow-y: auto; padding-right: var(--spacing-2); flex-grow: 1; height: clamp(250px, 50vh, 400px); touch-action: pan-y;}
 .pairing-item { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--spacing-2); display: flex; align-items: center; gap: var(--spacing-3); cursor: pointer; transition: all 0.2s ease; }
 .pairing-item:hover { background: var(--bg-secondary); border-color: var(--border-hover); }
 .pairing-item.active { background: var(--accent-blue-light); border-color: var(--accent-blue); }
@@ -219,7 +219,7 @@
 .formation-btn.active { border: 2px solid transparent; background-clip: padding-box, border-box; background-origin: padding-box, border-box; background-image: linear-gradient(var(--bg-tertiary), var(--bg-tertiary)), linear-gradient(to right, #FFD700, #FFA500); }
 .formation-btn img { width: clamp(24px, 4vw, 32px); height: clamp(24px, 4vw, 32px); }
 .formation-btn span { font-size: var(--font-size-xs); font-weight: 500; color: var(--text-primary); }
-.inscription-selector { background: var(--bg-primary); border: 1px solid var(--border-hover); border-radius: var(--radius-sm); padding: var(--spacing-3); flex-grow: 1; overflow-y: auto; max-height: 230px;}
+.inscription-selector { background: var(--bg-primary); border: 1px solid var(--border-hover); border-radius: var(--radius-sm); padding: var(--spacing-3); flex-grow: 1; overflow-y: auto; max-height: 230px; touch-action: pan-y;}
 .inscription-grid { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
 #selected-inscriptions-display .inscription-grid { justify-content: center; }
 .inscription-tag {
@@ -326,6 +326,7 @@
     max-height: 500px;
     overflow-y: auto;
     padding-right: var(--spacing-2);
+    touch-action: pan-y;
 }
 
 .saved-scores-grid .score-formation {
@@ -490,6 +491,7 @@
     height: clamp(250px, 50vh, 400px);
     max-height: clamp(250px, 50vh, 400px);
     overflow-y: auto;
+    touch-action: pan-y;
 }
 
 #inscription-tooltip {

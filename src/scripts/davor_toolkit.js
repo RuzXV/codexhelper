@@ -303,13 +303,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const carouselContainer = document.querySelector('.carousel-container');
     if (carouselContainer) {
         let touchStartX = 0;
-        let touchEndX = 0;
+        let touchStartY = 0;
+        let touchMaxDeltaY = 0;
         const minSwipeDistance = 50;
 
         carouselContainer.addEventListener(
             'touchstart',
             (e) => {
                 touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+                touchMaxDeltaY = 0;
+            },
+            { passive: true },
+        );
+
+        carouselContainer.addEventListener(
+            'touchmove',
+            (e) => {
+                const deltaY = Math.abs(e.changedTouches[0].screenY - touchStartY);
+                if (deltaY > touchMaxDeltaY) touchMaxDeltaY = deltaY;
             },
             { passive: true },
         );
@@ -317,14 +329,16 @@ document.addEventListener('DOMContentLoaded', () => {
         carouselContainer.addEventListener(
             'touchend',
             (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                const swipeDistance = touchEndX - touchStartX;
+                const touchEndX = e.changedTouches[0].screenX;
+                const swipeDistanceX = touchEndX - touchStartX;
+                const absX = Math.abs(swipeDistanceX);
 
-                if (Math.abs(swipeDistance) > minSwipeDistance) {
-                    if (swipeDistance < 0 && currentIndex < slides.length - 1) {
+                // Only trigger swipe if horizontal movement dominates vertical
+                if (absX > minSwipeDistance && absX > touchMaxDeltaY * 1.5) {
+                    if (swipeDistanceX < 0 && currentIndex < slides.length - 1) {
                         // Swipe left - next slide
                         moveToSlide(currentIndex + 1);
-                    } else if (swipeDistance > 0 && currentIndex > 0) {
+                    } else if (swipeDistanceX > 0 && currentIndex > 0) {
                         // Swipe right - previous slide
                         moveToSlide(currentIndex - 1);
                     }
