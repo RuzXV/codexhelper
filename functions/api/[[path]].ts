@@ -63,9 +63,10 @@ app.use('/api/*', async (c: Context<{ Bindings: Bindings }>, next: Next) => {
     const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
     const path = new URL(c.req.url).pathname;
 
-    // Bot endpoints are authenticated via secret key — skip rate limiting entirely.
+    // Bot/internal requests authenticated via secret key — skip rate limiting entirely.
     // The bot is a trusted internal service and needs burst capacity on startup.
-    if (path.startsWith('/api/bot')) {
+    const internalSecret = c.req.header('X-Internal-Secret');
+    if (path.startsWith('/api/bot') || (internalSecret && internalSecret === c.env.BOT_SECRET_KEY)) {
         await next();
         return;
     }
