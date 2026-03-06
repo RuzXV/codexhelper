@@ -32,8 +32,8 @@ export function apiError(c: AppContext, status: number, message?: string, detail
         timestamp: new Date().toISOString(),
     };
 
-    if (details && status < 500) {
-        response.details = details;
+    if (details) {
+        response.details = status >= 500 ? String(details) : details;
     }
 
     return c.json(response, status as ContentfulStatusCode);
@@ -70,22 +70,22 @@ export const errors = {
 };
 
 /**
- * Checks whether an error originated from D1 / SQLite so callers can
- * return 503 (transient) instead of 500 (unexpected).
+ * Checks whether an error originated from a transient D1 / SQLite issue
+ * so callers can return 503 instead of 500.
+ *
+ * Only matches genuinely transient errors. Schema/constraint errors are
+ * NOT transient and should surface as 500 so they can be debugged.
  */
 export function isD1Error(error: unknown): boolean {
     const msg = String(error).toLowerCase();
     return (
         msg.includes('d1') ||
-        msg.includes('database') ||
-        msg.includes('sqlite') ||
+        msg.includes('database is locked') ||
+        msg.includes('database disk image is malformed') ||
         msg.includes('sql execution error') ||
-        msg.includes('table') ||
-        msg.includes('constraint') ||
-        msg.includes('no such') ||
         msg.includes('busy') ||
-        msg.includes('locked') ||
-        msg.includes('disk i/o')
+        msg.includes('disk i/o') ||
+        msg.includes('unable to open database')
     );
 }
 
@@ -100,9 +100,10 @@ export function withErrorHandling<T extends AppContext>(handler: (c: T) => Promi
             return await handler(c);
         } catch (error) {
             if (isD1Error(error)) {
-                console.error('D1 error caught by withErrorHandling:', error);
-                return errors.serviceUnavailable(c as AppContext, 'Database temporarily unavailable');
+                console.error('D1 transient error:', error);
+                return errors.serviceUnavailable(c as AppContext, `Database temporarily unavailable: ${String(error)}`);
             }
+            console.error('Non-D1 error:', error);
             return errors.internal(c as AppContext, error);
         }
     };
