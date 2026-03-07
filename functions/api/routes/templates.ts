@@ -19,7 +19,7 @@ templates.get('/', async (c) => {
             .all();
         return c.json(results || []);
     } catch (e) {
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
@@ -40,7 +40,7 @@ templates.post('/', async (c) => {
             .run();
         return c.json({ status: 'success' }, 201);
     } catch (e) {
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
@@ -54,7 +54,7 @@ templates.delete('/:id', async (c) => {
             .run();
         return success ? c.json({ status: 'success' }) : c.json({ error: 'Not Found' }, 404);
     } catch (e) {
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
@@ -68,7 +68,7 @@ templates.put('/:id/load', async (c) => {
             .run();
         return c.json({ status: 'success' });
     } catch (e) {
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });

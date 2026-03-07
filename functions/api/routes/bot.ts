@@ -98,7 +98,7 @@ bot.get('/templates/list/:userId', async (c) => {
             .all();
         return c.json(results || []);
     } catch (e) {
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
@@ -114,7 +114,7 @@ bot.get('/templates/autocomplete/:userId', async (c) => {
             .all();
         return c.json(results || []);
     } catch (e) {
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
@@ -127,7 +127,7 @@ bot.get('/templates/load/:templateId/:userId', async (c) => {
             .first();
         return result ? c.json(result) : c.json({ error: 'Template not found' }, 404);
     } catch (e) {
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
@@ -140,7 +140,7 @@ bot.delete('/templates/delete/:templateId/:userId', async (c) => {
             .run();
         return success ? c.json({ status: 'success' }) : c.json({ error: 'Deletion failed or template not found' }, 404);
     } catch (e) {
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
@@ -153,7 +153,7 @@ bot.post('/templates/update-loaded/:templateId', async (c) => {
             .run();
         return c.json({ status: 'success' });
     } catch (e) {
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
@@ -212,7 +212,7 @@ bot.post('/query', async (c) => {
         }
     } catch (e) {
         console.error(`SQL execution error: ${String(e)} | SQL: ${sql.substring(0, 200)}`);
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
@@ -227,7 +227,7 @@ bot.get('/sync/feed', async (c) => {
             .all();
         return c.json(results || []);
     } catch (e) {
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
@@ -256,7 +256,7 @@ bot.post('/batch', async (c) => {
         return c.json(results);
     } catch (e) {
         console.error('Batch Execution Error:', e);
-        if (isD1Error(e)) return errors.serviceUnavailable(c, 'Database temporarily unavailable');
+        if (isD1Error(e)) return errors.serviceUnavailable(c, `Database temporarily unavailable: ${String(e)}`);
         return errors.internal(c, e);
     }
 });
