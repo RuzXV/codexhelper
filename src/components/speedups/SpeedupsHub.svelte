@@ -274,6 +274,69 @@
         text-align: center;
     }
 
+    .speedups-hub :global(.helps-slider-group) {
+        margin-bottom: 20px;
+    }
+    .speedups-hub :global(.helps-header) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+    }
+    .speedups-hub :global(.helps-header label) {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+    .speedups-hub :global(.helps-value) {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--accent-blue-bright);
+        min-width: 24px;
+        text-align: right;
+    }
+    .speedups-hub :global(.helps-slider) {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-hover);
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+    }
+    .speedups-hub :global(.helps-slider::-webkit-slider-thumb) {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--accent-blue);
+        border: 2px solid var(--accent-blue-bright);
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .speedups-hub :global(.helps-slider::-webkit-slider-thumb:hover) {
+        transform: scale(1.15);
+        box-shadow: 0 0 8px rgba(79, 140, 247, 0.5);
+    }
+    .speedups-hub :global(.helps-slider::-moz-range-thumb) {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--accent-blue);
+        border: 2px solid var(--accent-blue-bright);
+        cursor: pointer;
+    }
+    .speedups-hub :global(.helps-range-labels) {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 4px;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+    }
+
     .speedups-hub :global(.ratio-selector) {
         display: grid;
         grid-template-columns: repeat(4, 1fr);

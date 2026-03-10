@@ -286,7 +286,9 @@ admin.get('/data/:key', async (c) => {
     const key = c.req.param('key');
     const secret = c.req.header('X-Internal-Secret');
 
-    if (!ALLOWED_DATA_KEYS.includes(key)) {
+    const isBackupHistory = key.startsWith('backup_history:') && ALLOWED_DATA_KEYS.includes(key.split(':')[1]);
+
+    if (!ALLOWED_DATA_KEYS.includes(key) && !isBackupHistory) {
         return errors.badRequest(c, `Invalid data key: ${key}`);
     }
 
@@ -305,7 +307,7 @@ admin.get('/data/:key', async (c) => {
     }
 
     const data = await c.env.BOT_DATA.get(key, 'json');
-    return c.json(data || {});
+    return c.json(data || (isBackupHistory ? [] : {}));
 });
 
 admin.get('/reviews', async (c) => {

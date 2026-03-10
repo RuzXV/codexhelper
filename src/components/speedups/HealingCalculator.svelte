@@ -22,7 +22,7 @@
     };
     let healingSpeed = 90;
     let resourceBuff = 10;
-    const HELP_COUNT = 30;
+    let helpCount = 30;
     let counts = {
         t4: { infantry: '', cavalry: '', archer: '', siege: '' },
         t5: { infantry: '', cavalry: '', archer: '', siege: '' },
@@ -44,7 +44,7 @@
     let resultAnimationTrigger = false;
     let activeTooltip = null;
 
-    $: calculateHealing(counts, healingSpeed, resourceBuff, tradeRatio);
+    $: calculateHealing(counts, healingSpeed, resourceBuff, tradeRatio, helpCount);
 
     function autoFontSize(node, value) {
         const update = () => {
@@ -111,7 +111,7 @@
             const originalSeconds = Math.max(3, Math.ceil(totalBaseSeconds));
             let tempSeconds = originalSeconds;
 
-            for (let i = 0; i < HELP_COUNT; i++) {
+            for (let i = 0; i < helpCount; i++) {
                 if (tempSeconds <= 0) break;
                 const reduction = Math.max(180, tempSeconds * 0.01);
                 tempSeconds = Math.max(0, tempSeconds - reduction);
@@ -271,6 +271,26 @@
             </div>
         </div>
 
+        <div class="form-group helps-slider-group">
+            <div class="helps-header">
+                <label for="help-count">Alliance Helps</label>
+                <span class="helps-value">{helpCount}</span>
+            </div>
+            <input
+                type="range"
+                id="help-count"
+                min="0"
+                max="30"
+                step="1"
+                bind:value={helpCount}
+                class="helps-slider"
+            />
+            <div class="helps-range-labels">
+                <span>0</span>
+                <span>30</span>
+            </div>
+        </div>
+
         <div class="form-group">
             <span class="label-text">Tier 4 Healed</span>
             <div class="troop-grid t4-group">
@@ -398,7 +418,7 @@
         </div>
 
         {#if hasResult}
-            <div class="instruction-text">Speedup cost assumes maximum helps (30) on all troops healed.</div>
+            <div class="instruction-text">Speedup cost assumes {helpCount} help{helpCount !== 1 ? 's' : ''} on all troops healed.</div>
         {/if}
 
         <div
