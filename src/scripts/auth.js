@@ -46,7 +46,7 @@
 
         if (isSubscribed) {
             dropdownContent = `
-                <a href="/dashboard" class="dropdown-item">
+                <a href="https://codexhelper-dash.pages.dev" class="dropdown-item">
                     <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
                 </a>
                 <div class="dropdown-item logout-trigger">
@@ -56,7 +56,7 @@
         } else {
             const dashboardLink = user.is_master_admin
                 ? `
-                <a href="/dashboard" class="dropdown-item">
+                <a href="https://codexhelper-dash.pages.dev" class="dropdown-item">
                     <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
                 </a>
             `

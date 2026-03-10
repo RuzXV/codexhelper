@@ -1,9 +1,14 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import DashboardComponent from '../../components/dashboard/Dashboard.svelte';
+// Redirect handled by Cloudflare _redirects; this is a fallback.
 ---
 
-<Layout title="Dashboard - Codex Helper" bodyClass="dashboard-page has-sub-nav">
-    <meta name="robots" content="noindex, nofollow" slot="head-scripts" />
-    <DashboardComponent client:only="svelte" />
-</Layout>
+<html>
+    <head>
+        <meta http-equiv="refresh" content="0;url=https://codexhelper-dash.pages.dev" />
+        <title>Redirecting to Dashboard...</title>
+    </head>
+    <body>
+        <p>Redirecting to <a href="https://codexhelper-dash.pages.dev">the dashboard</a>...</p>
+        <script>window.location.href = 'https://codexhelper-dash.pages.dev';</script>
+    </body>
+</html>
