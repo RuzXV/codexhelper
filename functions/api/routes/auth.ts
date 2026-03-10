@@ -97,7 +97,7 @@ auth.get('/login', (c) => {
         // Validate against allowlist to prevent open redirects
         try {
             const returnUrl = new URL(returnTo);
-            const allowed = ['codexhelper.com', 'www.codexhelper.com', 'dashboard.codexhelper.com'];
+            const allowed = ['codexhelper.com', 'www.codexhelper.com', 'dashboard.codexhelper.com', 'codexhelper-dash.pages.dev'];
             if (allowed.includes(returnUrl.hostname)) {
                 c.header('Set-Cookie', `login_return_to=${returnTo}; Max-Age=600; HttpOnly; Secure; SameSite=Lax; Path=/; Domain=.codexhelper.com`, { append: true });
             }

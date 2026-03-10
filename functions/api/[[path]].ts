@@ -22,6 +22,7 @@ app.use(
             'https://codexhelper.com',
             'https://www.codexhelper.com',
             'https://dashboard.codexhelper.com',
+            'https://codexhelper-dash.pages.dev',
             'http://127.0.0.1:8788',
             'http://localhost:5173',
         ],
