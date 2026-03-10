@@ -14,7 +14,7 @@ async function invalidateSession(
     await c.env.DB.prepare('DELETE FROM user_sessions WHERE session_token = ?')
         .bind(user.sessionToken)
         .run();
-    c.header('Set-Cookie', 'session_token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax');
+    c.header('Set-Cookie', 'session_token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax; Domain=.codexhelper.com');
 }
 
 /**

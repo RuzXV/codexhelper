@@ -19,7 +19,7 @@ auth.get('/callback', async (c) => {
     }
 
     // Clear the state cookie now that it's been verified
-    c.header('Set-Cookie', 'oauth_state=; Max-Age=0; HttpOnly; Secure; SameSite=Lax; Path=/');
+    c.header('Set-Cookie', 'oauth_state=; Max-Age=0; HttpOnly; Secure; SameSite=Lax; Path=/; Domain=.codexhelper.com');
 
     const url = new URL(c.req.url);
     const origin = url.origin;
@@ -68,10 +68,14 @@ auth.get('/callback', async (c) => {
         .bind(sessionToken, userId, encryptedAccessToken, encryptedRefreshToken, expiryDate)
         .run();
 
-    const cookieOptions = `Max-Age=${SESSION_DURATION_SECONDS}; Path=/; HttpOnly; Secure; SameSite=Lax`;
+    const cookieOptions = `Max-Age=${SESSION_DURATION_SECONDS}; Path=/; HttpOnly; Secure; SameSite=Lax; Domain=.codexhelper.com`;
     c.header('Set-Cookie', `session_token=${sessionToken}; ${cookieOptions}`);
 
-    return c.redirect('/');
+    // Redirect to the return_to URL if set (cross-subdomain login), otherwise /
+    const returnTo = getCookie(c, 'login_return_to') || '/';
+    // Clear the return_to cookie
+    c.header('Set-Cookie', 'login_return_to=; Max-Age=0; HttpOnly; Secure; SameSite=Lax; Path=/; Domain=.codexhelper.com', { append: true });
+    return c.redirect(returnTo);
 });
 
 // Generate OAuth2 state and redirect to Discord
@@ -85,7 +89,23 @@ auth.get('/login', (c) => {
     const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${c.env.WEBSITE_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
 
     // Store state in a short-lived cookie (10 minutes)
-    c.header('Set-Cookie', `oauth_state=${state}; Max-Age=600; HttpOnly; Secure; SameSite=Lax; Path=/`);
+    c.header('Set-Cookie', `oauth_state=${state}; Max-Age=600; HttpOnly; Secure; SameSite=Lax; Path=/; Domain=.codexhelper.com`);
+
+    // Store return_to URL if provided (for cross-subdomain login, e.g. dashboard.codexhelper.com)
+    const returnTo = c.req.query('return_to');
+    if (returnTo) {
+        // Validate against allowlist to prevent open redirects
+        try {
+            const returnUrl = new URL(returnTo);
+            const allowed = ['codexhelper.com', 'www.codexhelper.com', 'dashboard.codexhelper.com'];
+            if (allowed.includes(returnUrl.hostname)) {
+                c.header('Set-Cookie', `login_return_to=${returnTo}; Max-Age=600; HttpOnly; Secure; SameSite=Lax; Path=/; Domain=.codexhelper.com`, { append: true });
+            }
+        } catch (_) {
+            /* invalid URL, ignore */
+        }
+    }
+
     return c.redirect(authUrl);
 });
 
@@ -96,7 +116,7 @@ auth.post('/logout', async (c) => {
         await c.env.DB.prepare('DELETE FROM user_sessions WHERE session_token = ?').bind(sessionToken).run();
     }
 
-    c.header('Set-Cookie', 'session_token=; Max-Age=0; HttpOnly; Secure; SameSite=Lax; Path=/');
+    c.header('Set-Cookie', 'session_token=; Max-Age=0; HttpOnly; Secure; SameSite=Lax; Path=/; Domain=.codexhelper.com');
     return c.json({ status: 'success', message: 'Logged out.' });
 });
 

@@ -18,7 +18,13 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 app.use(
     '/api/*',
     cors({
-        origin: ['https://codexhelper.com', 'https://www.codexhelper.com', 'http://127.0.0.1:8788'],
+        origin: [
+            'https://codexhelper.com',
+            'https://www.codexhelper.com',
+            'https://dashboard.codexhelper.com',
+            'http://127.0.0.1:8788',
+            'http://localhost:5173',
+        ],
         allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         credentials: true,
     }),
