@@ -15,6 +15,7 @@ import {
 } from '../_types';
 import { errors } from '../_errors';
 import { authMiddleware } from '../_middleware';
+import { parseAdminIds } from '../_constants';
 import { verifyGuildPatreonAccess, verifyGuildAdmin } from '../services/discord';
 import {
     CalendarSettingsSchema,
@@ -62,6 +63,9 @@ async function verifyGuildReadAccess(
     c: Context<{ Bindings: Bindings; Variables: Variables }>,
     guildId: string,
 ): Promise<boolean> {
+    const user = c.get('user');
+    const masterAdminIds = parseAdminIds(c.env.MASTER_ADMIN_IDS);
+    if (masterAdminIds.includes(user.id)) return true;
     return verifyGuildAdmin(c, guildId);
 }
 
