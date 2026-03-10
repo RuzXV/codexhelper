@@ -27,12 +27,13 @@ async function refreshDiscordToken(
 ): Promise<boolean> {
     const user = c.get('user');
 
-    // Rate limit: only allow one refresh per user per 10 seconds to prevent abuse
+    // Rate limit: only allow one refresh per user per 10 seconds to prevent concurrent refreshes
     const refreshLock = `refresh_lock:${user.id}`;
     try {
         const locked = await c.env.API_CACHE.get(refreshLock);
         if (locked) {
-            await invalidateSession(c);
+            // Another request is already refreshing — don't invalidate session,
+            // just signal that this request should retry with potentially updated tokens
             return false;
         }
         await c.env.API_CACHE.put(refreshLock, '1', { expirationTtl: 10 });
@@ -82,6 +83,14 @@ async function refreshDiscordToken(
         accessToken: tokenJson.access_token,
         refreshToken: tokenJson.refresh_token,
     });
+
+    // Invalidate stale session cache so subsequent requests read fresh tokens from DB
+    const sessionCacheKey = `session:${user.sessionToken}`;
+    try {
+        await c.env.API_CACHE.delete(sessionCacheKey);
+    } catch (_) {
+        /* best-effort cache clear */
+    }
 
     // Invalidate stale guild cache so next lookup uses fresh token
     const guildCacheKey = `discord:guilds:${user.id}`;

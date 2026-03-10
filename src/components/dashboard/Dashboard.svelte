@@ -28,10 +28,8 @@
 
         initAuthStore();
 
-        if (window.auth && typeof window.auth.init === 'function') {
-            await window.auth.init('#auth-container-dashboard');
-        }
-
+        // Register handler BEFORE init() so we catch the auth:loggedIn event
+        // that fires synchronously during renderLoggedInState inside init()
         const authHandler = (e) => {
             user = e.detail.user;
             determineAccess(user);
@@ -41,7 +39,12 @@
 
         document.addEventListener('auth:loggedIn', authHandler);
 
-        setTimeout(() => {
+        if (window.auth && typeof window.auth.init === 'function') {
+            await window.auth.init('#auth-container-dashboard');
+        }
+
+        // Fallback: if init completed without firing the event (e.g. no cached user, API failed)
+        if (!user) {
             const loggedInUser = getLoggedInUser();
             if (loggedInUser) {
                 user = loggedInUser;
@@ -49,7 +52,7 @@
                 fetchUserServers(user);
             }
             loading = false;
-        }, 500);
+        }
 
         return () => {
             document.removeEventListener('auth:loggedIn', authHandler);

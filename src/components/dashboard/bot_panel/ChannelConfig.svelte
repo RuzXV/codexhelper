@@ -37,12 +37,13 @@
 
             for (const groupId of changedGroups) {
                 const channelId = currentSettings[groupId];
+                const isRemove = channelId === 'none' || !channelId;
                 await fetchWithAuth(`/api/guilds/${guildId}/settings/channels`, {
                     method: 'POST',
                     body: JSON.stringify({
                         command_group: groupId,
-                        channel_id: channelId,
-                        action: channelId === 'none' || !channelId ? 'Remove Channel' : 'Add Channel',
+                        channel_id: isRemove ? null : channelId,
+                        action: isRemove ? 'Remove Channel' : 'Add Channel',
                     }),
                 });
             }
