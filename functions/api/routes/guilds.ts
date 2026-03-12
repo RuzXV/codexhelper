@@ -13,7 +13,7 @@ import {
     MgeSettingsRow,
     MgeApplicationRow,
 } from '../_types';
-import { errors } from '../_errors';
+import { errors, withErrorHandling } from '../_errors';
 import { authMiddleware } from '../_middleware';
 import { parseAdminIds } from '../_constants';
 import { verifyGuildPatreonAccess, verifyGuildAdmin } from '../services/discord';
@@ -207,7 +207,7 @@ guilds.get('/:guildId/settings/channels', async (c) => {
     }
 });
 
-guilds.post('/:guildId/settings/channels', async (c) => {
+guilds.post('/:guildId/settings/channels', withErrorHandling(async (c) => {
     const { guildId } = c.req.param();
     const body = await c.req.json();
     const validation = validateBody(ChannelActionSchema, body);
@@ -249,7 +249,7 @@ guilds.post('/:guildId/settings/channels', async (c) => {
     }
 
     return c.json({ success: true });
-});
+}));
 
 guilds.get('/:guildId/channels', async (c) => {
     const { guildId } = c.req.param();

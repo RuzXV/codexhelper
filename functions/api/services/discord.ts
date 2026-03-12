@@ -1,7 +1,7 @@
 import { Context } from 'hono';
 import { Bindings, Variables, DiscordGuild } from '../_types';
 import { parseAdminIds } from '../_constants';
-import { encryptFernetToken } from '../../crypto';
+import { encryptFernetToken, decryptFernetToken } from '../../crypto';
 
 /**
  * Invalidate a user session — deletes from DB and clears cookie.
@@ -32,8 +32,32 @@ async function refreshDiscordToken(
     try {
         const locked = await c.env.API_CACHE.get(refreshLock);
         if (locked) {
-            // Another request is already refreshing — don't invalidate session,
-            // just signal that this request should retry with potentially updated tokens
+            // Another request is already refreshing — wait briefly then read the fresh tokens from DB
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            try {
+                const freshSession = (await c.env.DB.prepare(
+                    'SELECT discord_access_token, discord_refresh_token FROM user_sessions WHERE session_token = ?',
+                )
+                    .bind(user.sessionToken)
+                    .first()) as { discord_access_token: string; discord_refresh_token: string | null } | null;
+
+                if (freshSession) {
+                    const freshAccess = await decryptFernetToken(c.env.DB_ENCRYPTION_KEY, freshSession.discord_access_token);
+                    let freshRefresh = '';
+                    if (freshSession.discord_refresh_token) {
+                        freshRefresh = await decryptFernetToken(c.env.DB_ENCRYPTION_KEY, freshSession.discord_refresh_token);
+                    }
+                    c.set('user', { ...user, accessToken: freshAccess, refreshToken: freshRefresh });
+
+                    // Invalidate stale session cache
+                    const sessionCacheKey = `session:${user.sessionToken}`;
+                    try { await c.env.API_CACHE.delete(sessionCacheKey); } catch (_) { /* best-effort */ }
+
+                    return true;
+                }
+            } catch (_) {
+                /* Failed to read fresh tokens — fall through */
+            }
             return false;
         }
         await c.env.API_CACHE.put(refreshLock, '1', { expirationTtl: 10 });
