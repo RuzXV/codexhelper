@@ -228,7 +228,7 @@ export async function verifyGuildPatreonAccess(
     if (authRecord) {
         // Verify that the patron who authorized this guild is still active
         const patronCheck = await c.env.BOT_DB.prepare(
-            'SELECT 1 FROM patron_users WHERE discord_user_id = ? AND is_active = 1',
+            'SELECT 1 FROM patron_users WHERE discord_user_id = ? AND is_active_patron = 1',
         )
             .bind(authRecord.authorized_by_discord_user_id)
             .first();
