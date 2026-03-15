@@ -1161,9 +1161,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const item = targetLoadout[slotKey];
 
             if (currentComparisonMode === 'refine') {
-                if (item) toggleRefine(slotElement);
+                if (item) {
+                    toggleRefine(slotElement);
+                } else {
+                    showAlert('Please add an equipment piece to this slot before using Refine mode.', 'No Equipment');
+                }
             } else if (currentComparisonMode === 'awaken') {
-                if (item) openAwakenMenu(slotElement);
+                if (item) {
+                    openAwakenMenu(slotElement);
+                } else {
+                    showAlert('Please add an equipment piece to this slot before using Awaken mode.', 'No Equipment');
+                }
             } else {
                 if (item) {
                     removeItemFromComparisonSlot(slotElement);
