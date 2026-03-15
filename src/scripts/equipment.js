@@ -1397,6 +1397,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 bgcolor: window.getComputedStyle(node).backgroundColor || 'transparent',
                 cacheBust: true,
                 quality: 0.95,
+                copyDefaultStyles: false,
             });
             const blob = await (await fetch(dataUrl)).blob();
             if (!blob) {
@@ -1415,7 +1416,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Image generation timed out')), 10000),
+                setTimeout(() => reject(new Error('Image generation timed out')), 30000),
             );
             const blob = await Promise.race([generateImageBlob(), timeoutPromise]);
 
@@ -1446,7 +1447,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Image generation timed out')), 10000),
+                setTimeout(() => reject(new Error('Image generation timed out')), 30000),
             );
             const blob = await Promise.race([generateImageBlob(), timeoutPromise]);
 
