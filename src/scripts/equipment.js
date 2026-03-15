@@ -1390,6 +1390,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const watermark = document.querySelector('.screenshot-watermark');
         if (watermark) watermark.classList.add('visible');
 
+        // Temporarily remove cross-origin stylesheets to prevent dom-to-image-more
+        // from hanging when it tries to read their cssRules (CORS SecurityError).
+        // Computed styles are already applied to elements, so the screenshot is unaffected.
+        const removedSheets = [];
+        document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+            try {
+                const sheet = link.sheet;
+                if (sheet) sheet.cssRules; // test access
+            } catch {
+                // CORS-blocked stylesheet — temporarily remove it
+                link.parentNode.removeChild(link);
+                removedSheets.push(link);
+            }
+        });
+
         try {
             await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 50)));
             await waitForImagesToLoad(node);
@@ -1413,6 +1428,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             return blob;
         } finally {
+            // Restore removed stylesheets
+            removedSheets.forEach((link) => document.head.appendChild(link));
             if (watermark) watermark.classList.remove('visible');
         }
     }
