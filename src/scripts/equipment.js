@@ -1386,81 +1386,35 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function generateImageBlob() {
-        console.log('[IMG-GEN] Starting generateImageBlob...');
         const node = screenshotCaptureArea;
-        if (!node) {
-            console.error('[IMG-GEN] screenshotCaptureArea is null/undefined!');
-            throw new Error('Screenshot capture area not found');
-        }
-        console.log('[IMG-GEN] Capture node:', node.id, 'size:', node.clientWidth, 'x', node.clientHeight);
+        if (!node) throw new Error('Screenshot capture area not found');
 
-        // Check if domtoimage library is loaded
-        if (typeof domtoimage === 'undefined') {
-            console.error('[IMG-GEN] domtoimage library is NOT loaded!');
-            throw new Error('dom-to-image-more library not loaded. Check if the CDN script loaded.');
+        if (typeof html2canvas === 'undefined') {
+            throw new Error('html2canvas library not loaded.');
         }
-        console.log('[IMG-GEN] domtoimage library available, methods:', Object.keys(domtoimage));
 
         const watermark = document.querySelector('.screenshot-watermark');
         if (watermark) watermark.classList.add('visible');
 
-        // Temporarily remove cross-origin stylesheets to prevent dom-to-image-more
-        // from hanging when it tries to read their cssRules (CORS SecurityError).
-        const removedSheets = [];
-        document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-            try {
-                const sheet = link.sheet;
-                if (sheet) sheet.cssRules; // test access
-                console.log('[IMG-GEN] Stylesheet OK:', link.href || '(inline)');
-            } catch (e) {
-                console.log('[IMG-GEN] Removing CORS-blocked stylesheet:', link.href);
-                link.parentNode.removeChild(link);
-                removedSheets.push(link);
-            }
-        });
-        console.log('[IMG-GEN] Removed', removedSheets.length, 'CORS-blocked stylesheets');
-
         try {
-            console.log('[IMG-GEN] Waiting for RAF + 50ms...');
             await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 50)));
-
-            console.log('[IMG-GEN] Waiting for images to load...');
-            const images = Array.from(node.getElementsByTagName('img'));
-            console.log('[IMG-GEN] Found', images.length, 'images in capture area:',
-                images.map(i => ({ src: i.src?.substring(0, 80), complete: i.complete, w: i.naturalWidth })));
             await waitForImagesToLoad(node);
-            console.log('[IMG-GEN] All images loaded.');
 
-            const scale = 2;
-            console.log('[IMG-GEN] Calling domtoimage.toPng with scale:', scale, 'size:', node.clientWidth * scale, 'x', node.clientHeight * scale);
-            const startTime = performance.now();
-            const dataUrl = await domtoimage.toPng(node, {
-                width: node.clientWidth * scale,
-                height: node.clientHeight * scale,
-                style: {
-                    transform: `scale(${scale})`,
-                    transformOrigin: 'top left',
-                },
-                bgcolor: window.getComputedStyle(node).backgroundColor || 'transparent',
-                cacheBust: true,
-                quality: 0.95,
-                copyDefaultStyles: false,
+            const canvas = await html2canvas(node, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: window.getComputedStyle(node).backgroundColor || '#1a1a2e',
+                logging: false,
             });
-            console.log('[IMG-GEN] domtoimage.toPng completed in', (performance.now() - startTime).toFixed(0), 'ms, dataUrl length:', dataUrl?.length);
 
-            const blob = await (await fetch(dataUrl)).blob();
-            console.log('[IMG-GEN] Blob created, size:', blob?.size, 'type:', blob?.type);
-            if (!blob) {
-                throw new Error('Data URL to Blob conversion failed.');
-            }
-            return blob;
-        } catch (err) {
-            console.error('[IMG-GEN] Error during generation:', err);
-            throw err;
+            return await new Promise((resolve, reject) => {
+                canvas.toBlob(
+                    (blob) => (blob ? resolve(blob) : reject(new Error('Canvas to Blob conversion failed.'))),
+                    'image/png',
+                );
+            });
         } finally {
-            // Restore removed stylesheets
-            removedSheets.forEach((link) => document.head.appendChild(link));
-            console.log('[IMG-GEN] Restored', removedSheets.length, 'stylesheets');
             if (watermark) watermark.classList.remove('visible');
         }
     }
