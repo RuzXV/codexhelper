@@ -1164,13 +1164,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (item) {
                     toggleRefine(slotElement);
                 } else {
-                    showAlert('Please add an equipment piece to this slot before using Refine mode.', 'No Equipment');
+                    showAlert(
+                        'This slot is empty. Please exit Refine mode first by clicking the Refine button, then click this slot to add equipment.',
+                        'Refine Mode Active',
+                    );
                 }
             } else if (currentComparisonMode === 'awaken') {
                 if (item) {
                     openAwakenMenu(slotElement);
                 } else {
-                    showAlert('Please add an equipment piece to this slot before using Awaken mode.', 'No Equipment');
+                    showAlert(
+                        'This slot is empty. Please exit Awaken mode first by clicking the Awaken button, then click this slot to add equipment.',
+                        'Awaken Mode Active',
+                    );
                 }
             } else {
                 if (item) {
